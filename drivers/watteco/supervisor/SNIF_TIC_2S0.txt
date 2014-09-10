@@ -1,0 +1,82 @@
+18:43:11.185 aaaa::1 -> aaaa::ff:ff00:803b (sz=6)
+# [110000500004]
+OK 0x00500004 ./0/request/read-attribut/configuration/simple-descepn/
+
+
+18:51:15.129 aaaa::ff:ff00:803b -> aaaa::1 (sz=25)
+# [110100500004004c000f02000300540052000f000101000f00]
+OK 0x00500004 ./0/response/read-attribut/configuration/simple-descepn/?status=0&appt=4c&clat=00500004&nbep=2&clusterinput=tic-cbe-metering.0,simple-metering.0,binary-input.0,binary-input.1
+
+18:51:16.132 aaaa::1 -> aaaa::ff:ff00:803b (sz=33)
+# [1106005400000041003c012c14ffffffffffffffff000000010000000000000032]
+OK 0x00540000 ./0/request/configure-reporting/tic-cbe-metering/data/?direction=0&clat=00540000&
+
+18:51:18.269 aaaa::ff:ff00:803b -> aaaa::1 (sz=8)
+# [1107005400000000]
+OK 0x00540000 ./0/response/configure-reporting/tic-cbe-metering/data/status=0&direction=0
+
+18:51:18.769 aaaa::ff:ff00:803b -> aaaa::1 (sz=8)
+# [110a000f00551000]
+OK 0x000f0055 ./0/response/report-attribut-event/binary-input/cur-value/?clat=000f0055&value=0&xvalue=00
+
+18:51:19.217 aaaa::1 -> aaaa::ff:ff00:803b (sz=25)
+# [1106005200000041012c0e100c000032000032000a00050005]
+OK 0x00520000 ./0/request/configure-reporting/simple-metering/cur-value/?direction=0&clat=00520000&mint=300&maxt=3600&size=12&xsumwh=000032&xsumvarh=000032&count=10&xcurwh=0005&xcurvarh=0005
+
+18:51:21.309 aaaa::ff:ff00:803b -> aaaa::1 (sz=8)
+# [1107005200000000]
+OK 0x00520000 ./0/response/configure-reporting/simple-metering/cur-value/status=0&direction=0
+
+18:51:21.849 aaaa::ff:ff00:803b -> aaaa::1 (sz=11)
+# [110a000f04022300000000]
+OK 0x000f0402 ./0/response/report-attribut-event/binary-input/counter/?clat=000f0402&value=0&xvalue=00000000
+
+18:51:22.370 aaaa::1 -> aaaa::ff:ff00:803b (sz=13)
+# [1106000f00005510003c003c01]
+OK 0x000f0055 ./0/request/configure-reporting/binary-input/cur-value/?direction=0&clat=000f0055&mint=60&maxt=60&minc=1
+
+18:51:24.379 aaaa::ff:ff00:803b -> aaaa::1 (sz=8)
+# [1107000f00000055]
+OK 0x000f0055 ./0/response/configure-reporting/binary-input/cur-value/status=0&direction=0
+
+
+18:51:24.929 aaaa::ff:ff00:803b -> aaaa::1 (sz=8)
+# [310a000f00551000]
+OK 0x000f0055 ./1/response/report-attribut-event/binary-input/cur-value/?clat=000f0055&value=0&xvalue=00
+
+18:51:25.351 aaaa::1 -> aaaa::ff:ff00:803b (sz=16)
+# [1106000f00040223003c003c00000001]
+OK 0x000f0402 ./0/request/configure-reporting/binary-input/counter/?direction=0&clat=000f0402&mint=60&maxt=60&minc=1
+
+18:51:27.469 aaaa::ff:ff00:803b -> aaaa::1 (sz=8)
+# [1107000f00000402]
+OK 0x000f0402 ./0/response/configure-reporting/binary-input/counter/status=0&direction=0
+
+18:51:28.9 aaaa::ff:ff00:803b -> aaaa::1 (sz=11)
+# [310a000f04022300000000]
+OK 0x000f0402 ./1/response/report-attribut-event/binary-input/counter/?clat=000f0402&value=0&xvalue=00000000
+
+18:51:28.431 aaaa::1 -> aaaa::ff:ff00:803b (sz=13)
+# [3106000f00005510003c003c01]
+OK 0x000f0055 ./1/request/configure-reporting/binary-input/cur-value/?direction=0&clat=000f0055&mint=60&maxt=60&minc=1
+
+18:51:30.539 aaaa::ff:ff00:803b -> aaaa::1 (sz=8)
+# [3107000f00000055]
+OK 0x000f0055 ./1/response/configure-reporting/binary-input/cur-value/status=0&direction=0
+
+18:51:31.541 aaaa::1 -> aaaa::ff:ff00:803b (sz=16)
+# [3106000f00040223003c003c00000001]
+OK 0x000f0402 ./1/request/configure-reporting/binary-input/counter/?direction=0&clat=000f0402&mint=60&maxt=60&minc=1
+
+18:51:33.609 aaaa::ff:ff00:803b -> aaaa::1 (sz=8)
+# [3107000f00000402]
+OK 0x000f0402 ./1/response/configure-reporting/binary-input/counter/status=0&direction=0
+
+18:51:33.610 aaaa::1 -> aaaa::ff:ff00:803b (sz=6)
+# [110000540010]
+OK 0x00540010 ./0/request/read-attribut/tic-cbe-metering/type/
+
+18:51:36.659 aaaa::ff:ff00:803b -> aaaa::1 (sz=9)
+# [110100540010002003]
+OK 0x00540010 ./0/response/read-attribut/tic-cbe-metering/type/?status=0&appt=20&clat=00540010&value=3&xvalue=03
+

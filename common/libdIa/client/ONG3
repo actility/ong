@@ -1,0 +1,1 @@
+./client.x -m create -f temp.xml -v9 $* -R "coap://cyh-00606e33457d.actility.net:8080/m2m/applications/NW_00124b000122bb78" "coap://[::1]:5685/MyFOX/APP_00000000.1/retargeting2/0x0006.0x00.ope"

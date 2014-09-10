@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+x-template="${w_template}"
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="applicationID" val="APP_${d_ieee}.${a_num}"/>
+<!--
+    <str name="applicationProfileID" val="0x104"/>
+    <str name="applicationDeviceID" val="0x0103"/>
+-->
+    <int name="applicationDeviceVersion" val="1"/>
+    <int name="endpoint" val="1"/>
+    <list name="interfaces">
+<!--
+
+     See sensor.c:iSensorSetInterfaceListInObj() and itf_inst_%04x_server.xml
+
+        <obj>
+            <str name="interfaceID" val="TemperatureMeasurement.Srv"/>
+            <str name="clusterID" val="0x0402"/>
+            <enum name="clusterType" val="server"/>
+            
+            <int name="zbMeasuredValue" href="${s_rootapp}/APP_0b435eff56a3bbbb.1/retargeting2/0x0402/0x0000"/>
+            <int name="zbMinMeasuredValue" val="-4000"/>
+            <int name="zbMaxMeasuredValue" val="12000"/>
+            
+            
+            <real name="m2mMeasuredValue" unit="obix:units/celsius" href="${s_rootapp}/APP_0b435eff56a3bbbb.1/containers/0x0402/contentInstances/latest/content"/>
+        </obj>
+        <obj>
+            <str name="interfaceID" val="RelativeHumidityMeasurement.Srv"/>
+            <str name="clusterID" val="0x0405"/>
+            <enum name="clusterType" val="server"/>
+            
+            <int name="zbMeasuredValue" href="${s_rootapp}/APP_0b435eff56a3bbbb.1/retargeting2/0x0405/0x0000"/>
+            <int name="zbMinMeasuredValue" val="500"/>
+            <int name="zbMaxMeasuredValue" val="9500"/>
+            
+            
+            <real name="m2mMeasuredValue" unit="obix:units/percent_relative_humidity" href="${s_rootapp}/APP_0b435eff56a3bbbb.1/containers/0x0405/contentInstances/latest/content"/>
+        </obj>
+-->
+    </list>
+</obj>

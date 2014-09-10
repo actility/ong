@@ -1,0 +1,12 @@
+
+CCFLAGS += -Wall -Werror
+ifeq ($(DEBUG),on)
+  CCFLAGS += -g -O0
+endif
+
+PRJLIB= $(ROOTACT)/wmbus/lib/libwmbus.a
+PRJINC= -I$(ROOTACT)/wmbus/include -I$(ROOTACT)/drvcommon/lib 
+
+ifeq ($(SYSTEM),cov1)
+  LDFLAGS += -lpthread
+endif

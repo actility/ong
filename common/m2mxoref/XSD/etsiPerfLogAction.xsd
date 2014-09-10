@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- <perfLogAction> resource type -->
+	<complexType name="PerfLogAction">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:perfLogStart" minOccurs="0"/>
+					<element ref="tns:perfLogStop" minOccurs="0"/>
+				</sequence>
+				<!-- attribute ref="tns:id" use="required" fixed="perfLogAction"/ -->
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="perfLogStart" type="anyURI"/>
+	<element name="perfLogStop" type="anyURI"/>
+
+</schema>

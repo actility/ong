@@ -1,0 +1,159 @@
+
+ _   _    __   _  __    __ 
+| | / /  |  \ | | \ \  / / 
+| |/ /   |   \| |  \ \/ /  
+| |\ \   | |\   |   }  {   
+| | \ \  | | \  |  / /\ \  
+|_|  \_\ |_|  \_| /_/  \_\ 
+
+
+KNX Physical Topology
+---------------------
+
+One EIDB instance per KNX network.
+
+    Driver M2M <--+--> EIBD <---> KNX/IP <---> Network A
+                  |
+                  +--> EIBD <---> KNX/IP <---> Network B
+                  |
+                  +--> EIBD <---> KNX/USB <--> Network C
+
+
+Create a Network from your ETS4 project
+---------------------------------------
+
+1) Create and initialize the network under ETS4
+2) Export your ETS4 project as a 'knxproj' file
+3) Use the tool 'convert_ETS4_project.sh' into script folder
+    $ cd knx/script/
+    $ ./convert_ETS4_project.sh <path_to>/myproject.knxproj
+4) Get the result at the path output by the script, and saved it as 'myproject.xml'
+5) Upload this file on the ONG Browser, put the file in the topology cnt of the KNX IPU
+6) Create the network with the operation 'knxCreateNetwork' on the IPU
+
+
+Project structure
+-----------------
+
+├── base : Makefile definition (based on rtbase)
+├── config : Sample configuration files (spvconfig, modeling, KNX knowledge databases)
+├── contrib : KNX External tools (EIBD, libeibclient)
+├── diatemplates : XML Template
+├── drvcommon : Actility drivers shared code
+├── include : KNX types definitions
+├── lib : KNX utils (obix <-> KNX translator, eibd connection, modeling loader ...)
+├── sample : Sample files from ETS4
+├── script : ETS4 project convertor tool
+├── supervisor : Callbacks (DIA, Events) on drvcommon, state machine for M2M Tree init, 
+├── tests : Some unit-tests
+└── xoref : Definition for custom XML files
+
+
+Patch for DRVCOMMON
+-------------------
+
+- diadev.c => DiaDevInstCreate : Don't parse *_inst.xml, *_cont.xml, *_elem.xml if the WDiaUCBPreLoadTemplate return a valid Xo object (Inclued in 1.4.0)
+- dianet.c    add device support based on diadev.c, allow to attach a t_cmn_sensor struct to the DIA request and use a netnork context in callback  (Not merged)
+- diaapp.c
+- diadat.c
+
+- diaipu.c => remove static on DiaIpuInstCreate, allow to refresh the IPU from superviseur/sensor.c  (Not merged)
+
+- _whatStr header: the string must be declared as const, not static (Not merged)
+                   The string declared as static is duplicated for each source file.
+                   The symbol is define in lib/version.c using the content of Version file at the root of KNX driver source
+                   
+- Allow driver to overwrite the cmn_ieee size in drvcommon (Inclued in 1.4.0)
+#ifndef CMN_IEEE_SIZE
+#define CMN_IEEE_SIZE 32
+#endif
+	char		cmn_ieee[CMN_IEEE_SIZE];	// $d_ieee
+	
+- Create per request callback with weak symbol (Inclued in 1.4.0)
+  No strncmp any more, gcc do it during linkage
+
+- diaserver.c: callback for POST on IPU (Not merged)
+               add some HTTP code  (Not merged)
+               
+- cmndefine.h : #define	MAX_PENDING_DIA		1 -> 5
+
+- admtcp.c:  add AdmTcpClose  (Not merged)
+- diatools: add DiaUdpClose  (Not merged)
+
+
+Known Issues / TODO
+-------------------
+
+- add m2m:maxNrOfInstances=1 on DPT state based
+- Add retry when EIDB startup/connect failed
+- Version file is not used
+  
+  
+Setup an ONG
+------------
+
+ - Create a VM (Ubuntu Server 12.04 LTS 32 bits)
+ 
+ - Install some dev stuff
+   apt-get install gdb cproto build-essential libxml2-dev git git-gui
+ 
+ - Remove ipv6 support (VM optional)
+   nano /etc/sysctl.conf
+   net.ipv6.conf.all.disable_ipv6=1   
+   net.ipv6.conf.default.disable_ipv6=1   
+   net.ipv6.conf.lo.disable_ipv6=1
+   
+ - Set a root password (VM)
+   sudo passwd
+   
+ - Remove root PS1 (VM), need by the ONG installer
+   nano .bashrc
+   
+ - Run ONG setup (Host)
+   java -jar ong-installer-2.2.0.jar
+   
+ - Ensure ONG is running (VM)
+   netstat -ln | grep 8080
+
+ - Install stdin-logger from boot-repo
+
+Build on ARM
+------------
+
+- libxml2-devel-2.7.8-0-cov2.apu
+- xo-build-4.2.8-0-cov2.apu
+- xo-devel-4.2.8-0-cov2.apu
+
+
+Startup EIBD (Manually)
+-----------------------
+    
+Using a KnxIP Gateway
+    eibd -d -D -S -T -i ipt:192.168.1.169:3671
+
+
+Attach sniffer on EIBD instance
+-------------------------------
+
+    $ groupsocketlisten ip:127.0.0.1:<port>
+    Write from 1.1.11 to 1/2/3: 24 8F 
+    Write from 0.0.0 to 1/2/3: 12 34 
+    Write from 1.1.11 to 1/2/3: 24 A2 
+
+
+Rest Auth
+---------
+
+Enable Basic Auth with following credentials
+":" is the login must be escaped, postman don't do it 
+    login = http%3a//nsc1.actility.com%3a8088/m2m/applications/SUPPORT
+    pwd = <empty>
+
+
+/etc/hosts
+----------
+
+Ensure the following line exists
+::1       <your_box_name> localhost localhost.localdomain localhost6 localhost6.localdomain6 ip6-localhost ip6-loopback
+
+

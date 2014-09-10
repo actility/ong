@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:sclBase xmlns:m2m="http://uri.etsi.org/m2m">
+  <m2m:accessRightID>accessRights/Netadmin_AR</m2m:accessRightID>
+  <m2m:searchStrings>
+    <m2m:searchString>hw/type/gateway</m2m:searchString>
+    <m2m:searchString>hw/vendor/Connected Object</m2m:searchString>
+    <m2m:searchString>hw/name/Cocoon</m2m:searchString>
+    <m2m:searchString>hw/version/1.0.0</m2m:searchString>
+    <m2m:searchString>fwk/vendor/Actility SA</m2m:searchString>
+    <m2m:searchString>fwk/name/SONG</m2m:searchString>
+    <m2m:searchString>fwk/version/2.0.0</m2m:searchString>
+  </m2m:searchStrings>
+</m2m:sclBase>

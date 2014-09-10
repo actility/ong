@@ -1,0 +1,1 @@
+./client.x -m retrieve -v9 $* /m2m/applications/NW_020000ffff0024fd

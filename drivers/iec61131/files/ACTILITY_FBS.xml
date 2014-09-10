@@ -1,0 +1,192 @@
+<pous>
+    <pou name="WAVE_GENERATOR" pouType="functionBlock">
+        <interface>
+            <inputVars>
+                <variable name="Average"> <type> <REAL/> </type> </variable>
+                <variable name="Amplitude"> <type> <REAL/> </type> </variable>
+                <variable name="Period"> <type> <REAL/> </type> </variable>
+                <variable name="SigType"> <type> <INT/> </type> </variable>
+            </inputVars>
+            <outputVars>
+                <variable name="Value"> <type> <REAL/> </type> </variable>
+            </outputVars>
+        </interface>
+        
+        <body>
+            <FBD>
+                <inVariable localId="1"> <expression>Average</expression> </inVariable>
+                <inVariable localId="2"> <expression>Amplitude</expression> </inVariable>
+                <inVariable localId="3"> <expression>Period</expression> </inVariable>
+                <inVariable localId="4"> <expression>SigType</expression> </inVariable>
+                
+                <block localId="7" typeName="WAVE_GENERATOR_function">
+                    <inputVariables>
+                        <variable formalParameter="Average"> <connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn> </variable>
+                        <variable formalParameter="Amplitude"> <connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn> </variable>
+                        <variable formalParameter="Period"> <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn> </variable>
+                        <variable formalParameter="SigType"> <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn> </variable>
+                    </inputVariables>
+                    <inOutVariables/>
+                    <outputVariables>
+                        <variable formalParameter="Value" />
+                    </outputVariables>
+                </block>
+                
+                <outVariable localId="21">
+                    <connectionPointIn> <connection refLocalId="7" formalParameter="Value"> </connection> </connectionPointIn> <expression>Value</expression>
+                </outVariable>
+                
+            </FBD>
+        </body>
+    </pou>
+ 
+    <pou name="SQUAREWAVE_GENERATOR" pouType="functionBlock">
+        <interface>
+            <inputVars>
+                <variable name="Period"> <type> <REAL/> </type> </variable>
+            </inputVars>
+            <outputVars>
+                <variable name="Value"> <type> <BOOL/> </type> </variable>
+            </outputVars>
+            <localVars>
+                <variable name="START_TIME"> <type> <TIME/> </type> </variable>
+            </localVars>
+        </interface>
+        
+        <body>
+            <FBD>
+                <inVariable localId="1"> <expression>Period</expression> </inVariable>
+            	<inVariable localId="2"> <expression>START_TIME</expression> </inVariable>
+                
+                <block localId="7" typeName="SQUAREWAVE_GENERATOR_function">
+                    <inputVariables>
+                        <variable formalParameter="Period"> <connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn> </variable>
+                		<variable formalParameter="START_TIME"> <connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn> </variable>
+                    </inputVariables>
+                    <inOutVariables/>
+                    <outputVariables>
+                        <variable formalParameter="Value" />
+                		<variable formalParameter="START_TIME" />
+                    </outputVariables>
+                </block>
+                
+                <outVariable localId="21">
+                    <connectionPointIn> <connection refLocalId="7" formalParameter="Value"> </connection> </connectionPointIn> <expression>Value</expression>
+                </outVariable>
+            	<outVariable localId="22">
+              		<connectionPointIn> <connection refLocalId="7" formalParameter="START_TIME"> </connection> </connectionPointIn> <expression>START_TIME</expression>
+            	</outVariable>
+                
+            </FBD>
+        </body>
+    </pou>
+    
+    <pou name="PWM_GENERATOR" pouType="functionBlock">
+        <interface>
+            <inputVars>
+                <variable name="Start"> <type> <BOOL/> </type> </variable>
+            </inputVars>
+            <inputVars>
+                <variable name="ResetMode"> <type> <DINT/> </type> </variable>
+            </inputVars>
+            <inputVars>
+                <variable name="Period"> <type> <TIME/> </type> </variable>
+            </inputVars>
+            <inputVars>
+                <variable name="Ratio"> <type> <DINT/> </type> </variable>
+            </inputVars>
+            <inputVars>
+                <variable name="Limit_High"> <type> <DINT/> </type> </variable>
+            </inputVars>
+            <inputVars>
+                <variable name="Limit_Low"> <type> <DINT/> </type> </variable>
+            </inputVars>
+
+            <outputVars>
+                <variable name="PWM_Out"> <type> <BOOL/> </type> </variable>
+            </outputVars>
+
+            <localVars>
+                <variable name="Started"> <type> <BOOL/> </type> </variable>
+            </localVars>
+            <localVars>
+                <variable name="Start_Prev"> <type> <BOOL/> </type> </variable>
+            </localVars>
+            <localVars>
+                <variable name="Start_Time"> <type> <TIME/> </type> </variable>
+            </localVars>
+            <localVars>
+                <variable name="State"> <type> <SINT/> </type> </variable>
+            </localVars>
+            <localVars>
+                <variable name="Cycle_Cnt"> <type> <DINT/> </type> </variable>
+            </localVars>
+        </interface>
+        
+        <body>
+            <FBD>
+                <inVariable localId="1"> <expression>Start</expression> </inVariable>
+            	<inVariable localId="2"> <expression>ResetMode</expression> </inVariable>
+            	<inVariable localId="3"> <expression>Period</expression> </inVariable>
+            	<inVariable localId="4"> <expression>Ratio</expression> </inVariable>
+            	<inVariable localId="5"> <expression>Limit_High</expression> </inVariable>
+            	<inVariable localId="6"> <expression>Limit_Low</expression> </inVariable>
+
+            	<inVariable localId="7"> <expression>Started</expression> </inVariable>
+                <inVariable localId="8"> <expression>Start_Prev</expression> </inVariable>
+            	<inVariable localId="9"> <expression>Start_Time</expression> </inVariable>
+            	<inVariable localId="10"> <expression>State</expression> </inVariable>
+            	<inVariable localId="11"> <expression>Cycle_Cnt</expression> </inVariable>
+
+                <block localId="8" typeName="PWM_GENERATOR_function">
+                    <inputVariables>
+                        <variable formalParameter="Start"> <connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn> </variable>
+                		<variable formalParameter="ResetMode"> <connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn> </variable>
+                		<variable formalParameter="Period"> <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn> </variable>
+                		<variable formalParameter="Ratio"> <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn> </variable>
+                		<variable formalParameter="Limit_High"> <connectionPointIn> <connection refLocalId="5"> </connection> </connectionPointIn> </variable>
+                		<variable formalParameter="Limit_Low"> <connectionPointIn> <connection refLocalId="6"> </connection> </connectionPointIn> </variable>
+
+                		<variable formalParameter="Started"> <connectionPointIn> <connection refLocalId="7"> </connection> </connectionPointIn> </variable>
+                		<variable formalParameter="Start_Prev"> <connectionPointIn> <connection refLocalId="8"> </connection> </connectionPointIn> </variable>
+                		<variable formalParameter="Start_Time"> <connectionPointIn> <connection refLocalId="9"> </connection> </connectionPointIn> </variable>
+                		<variable formalParameter="State"> <connectionPointIn> <connection refLocalId="10"> </connection> </connectionPointIn> </variable>
+                		<variable formalParameter="Cycle_Cnt"> <connectionPointIn> <connection refLocalId="11"> </connection> </connectionPointIn> </variable>
+                    </inputVariables>
+
+                    <inOutVariables/>
+                    
+                    <outputVariables>
+                        <variable formalParameter="PWM_Out" />
+                		<variable formalParameter="Started" />
+                		<variable formalParameter="Start_Prev" />
+                		<variable formalParameter="Start_Time" />
+                		<variable formalParameter="State" />
+                		<variable formalParameter="Cycle_Cnt" />
+                    </outputVariables>
+                </block>
+                
+                <outVariable localId="21">
+                    <connectionPointIn> <connection refLocalId="8" formalParameter="PWM_Out"> </connection> </connectionPointIn> <expression>PWM_Out</expression>
+                </outVariable>
+            	<outVariable localId="22">
+              		<connectionPointIn> <connection refLocalId="8" formalParameter="Started"> </connection> </connectionPointIn> <expression>Started</expression>
+            	</outVariable>
+            	<outVariable localId="23">
+              		<connectionPointIn> <connection refLocalId="8" formalParameter="Start_Prev"> </connection> </connectionPointIn> <expression>Start_Prev</expression>
+            	</outVariable>
+            	<outVariable localId="24">
+              		<connectionPointIn> <connection refLocalId="8" formalParameter="Start_Time"> </connection> </connectionPointIn> <expression>Start_Time</expression>
+            	</outVariable>
+            	<outVariable localId="25">
+              		<connectionPointIn> <connection refLocalId="8" formalParameter="State"> </connection> </connectionPointIn> <expression>State</expression>
+            	</outVariable>
+            	<outVariable localId="26">
+              		<connectionPointIn> <connection refLocalId="8" formalParameter="Cycle_Cnt"> </connection> </connectionPointIn> <expression>Cycle_Cnt</expression>
+            	</outVariable>
+                
+            </FBD>
+        </body>
+    </pou>
+    
+</pous>

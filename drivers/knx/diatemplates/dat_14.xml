@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<real val="${raw_FloatValue}" xmlns="http://obix.org/ns/schema/1.1">
+    <real name="FloatValue" val="${raw_FloatValue}"/>
+    <str name="raw" val="0x${dpt_raw}"/>
+</real>

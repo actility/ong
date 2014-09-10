@@ -1,0 +1,43 @@
+dead lock dans les traces :
+(gdb) info threads
+  2 Thread 6631  0xf7769430 in __kernel_vsyscall ()
+* 1 Thread 6629  0xf7769430 in __kernel_vsyscall ()
+
+(gde) where
+#0  0xf7769430 in __kernel_vsyscall ()
+#1  0xf773d389 in __lll_lock_wait ()
+    at ../nptl/sysdeps/unix/sysv/linux/i386/i686/../i486/lowlevellock.S:142
+#2  0xf77385db in _L_lock_791 () from /lib32/libpthread.so.0
+#3  0xf7738401 in __pthread_mutex_lock (mutex=0x809c2a4)
+        at pthread_mutex_lock.c:61
+#4  0x0807fd4c in EnterCS (t=2, file=0x8083240 "diaudp.c", line=86, 
+	    fmt=0x8083249 "DIA udp event\n") at trace.c:51
+#5  rtl_tracedbg (t=2, file=0x8083240 "diaudp.c", line=86, 
+	        fmt=0x8083249 "DIA udp event\n") at trace.c:243
+#6  0x0804ebb1 in CB_DiaUdpEvent (tb=0x8e03098, fd=6, r1=0x8e40248, r2=0x0, 
+		    revents=1) at diaudp.c:86
+#7  0x080803eb in rtl_pollScan (ptbl=0x8e03098, timeout=100) at poll.c:285
+#8  rtl_poll (ptbl=0x8e03098, timeout=100) at poll.c:325
+#9  0x08055bb5 in MainLoop () at main.c:250
+#10 0x080562ca in main (argc=1, argv=0xff9f7e34) at main.c:396
+
+(gdb) thread 2
+Switching to thread 2 (Thread 6631)]#0  0xf7769430 in __kernel_vsyscall ()
+
+
+#0  0xf7769430 in __kernel_vsyscall ()
+#1  0xf773d389 in __lll_lock_wait ()
+    at ../nptl/sysdeps/unix/sysv/linux/i386/i686/../i486/lowlevellock.S:142
+#2  0xf77385db in _L_lock_791 () from /lib32/libpthread.so.0
+#3  0xf7738401 in __pthread_mutex_lock (mutex=0x809c2a4)
+        at pthread_mutex_lock.c:61
+#4  0x0807fd4c in EnterCS (t=0, file=0x808430b "panaddr.c", line=87, 
+    fmt=0x8084354 "router address (@1) not found in '%s'\n") at trace.c:51
+#5  rtl_tracedbg (t=0, file=0x808430b "panaddr.c", line=87, 
+        fmt=0x8084354 "router address (@1) not found in '%s'\n") at trace.c:243
+#6  0x08056c62 in AwGetPanAddr (pan=0xf74672fc "") at panaddr.c:86
+#7  0x0804b54a in HttpLoop (param=0x0) at http.c:142
+#8  HttpRun (param=0x0) at http.c:205
+#9  0xf7735e72 in start_thread (arg=0xf7467b70) at pthread_create.c:304
+#10 0xf7579f9e in clone () at ../sysdeps/unix/sysv/linux/i386/clone.S:130
+

@@ -1,0 +1,366 @@
+ _   _    __   _  __    __ 
+| | / /  |  \ | | \ \  / / 
+| |/ /   |   \| |  \ \/ /  
+| |\ \   | |\   |   }  {   
+| | \ \  | | \  |  / /\ \  
+|_|  \_\ |_|  \_| /_/  \_\ 
+
+
+Part 1: For users
+=================
+
+Software arguments
+------------------
+
+usage: ./knx.x <options>
+Where options are :
+    -t <level>: set the trace level to <level>
+    -d <0|1>  : disable/enable trace debugging
+    -D        : disable DIA layer
+    -X        : enable trace on DIA requests/responses
+    -i        : reset KNX networks at start-up (if not provided the HAN are resumed from previous run)
+    --version : print the version string of the KNX driver and its dependencies
+ 
+
+Configuration file
+------------------
+
+The configuration file is named 'spvconfig.xml'.
+Only option specific to KNX are describe bellow.
+
+- eibdoption1 / eibdoption2 / eibdoption3: are options for EIBD added when the driver create an EIBD processus.
+  Mandatory: No
+  Default: Empty string
+  Sample:
+    <str name="eibdoption1" val="--trace=10"/>
+    
+    
+Telnet interface
+----------------
+
+Only command specific to KNX are describe bellow.
+
+- create network <name>
+  Allow to create a new network from telnet, the topology of the new network is fetch from the topology container of the IPU.
+  The new network is added in the driver cache and will be restored at each driver restart.
+  All M2M applications need by this network will be created few seconds after the end of the command. 
+  
+- delete network <name>
+  Delete a network.
+  The driver cache is flushed, and all associed M2M application are deleted.
+
+- load networks
+  Scan the driver cache to load new networks.
+
+- init networks
+  Ensure all M2M application are created for each networks loaded by the driver.
+
+
+Topology file
+-------------
+
+The topology describe a network. This file is mandatory to initialize or update a network.
+This file can be generate from a ETS4 project with the script convert_ETS4_project.sh
+
+    KNX (KNX Network - ETS4 Project)
+     |
+     +---> device (KNX Physical device)
+     |      |
+     |      +---> object (KNX Object)
+     |      |       |
+     |      |       +---> groupAddr (KNX Group Addresse)
+     |      |       +---> groupAddr
+     |      |
+     |      +---> object
+     |              |
+     |              +---> groupAddr
+     |
+     +---> device
+            |
+            +---> object
+                    |
+                    +---> groupAddr
+                    +---> groupAddr
+
+
+    $ cd knx/script/
+    $ ./convert_ETS4_project.sh ../sample/knxproj/B014v3.knxproj -g 10.10.10.10
+        Archive:  prj.zip
+          inflating: knx_master.xml          
+          inflating: M-0001.signature        
+          inflating: M-006A.signature        
+          inflating: P-00D7.signature        
+          inflating: M-0001/Catalog.xml      
+          inflating: M-0001/Hardware.xml     
+          inflating: M-0001/M-0001_A-981D-01-54E8.xml  
+          inflating: M-006A/Catalog.xml      
+          inflating: M-006A/Hardware.xml     
+          inflating: M-006A/M-006A_A-0002-22-311F-O0079.xml  
+          inflating: P-00D7/0.xml            
+          inflating: P-00D7/Project.xml      
+        No license file found - running with licensable features disabled
+        *************** SUCCESS *********************************
+        Converted project at : /tmp/tmp.mNY0b7OiJX/output.xml
+        *********************************************************
+    $ cat /tmp/tmp.mNY0b7OiJX/output.xml
+    <?xml version="1.0" encoding="utf-8"?>
+    <knx xmlns="http://uri.actility.com/m2m/adaptor-knx" gateway="10.10.10.10">
+       <device addr="1.1.10"
+               area="Nouvelle zone"
+               line="Nouvelle ligne"
+               manufacturer="M-0001"
+               fw="981D-01-54E8"
+               name="Load switch N 511/02 (8-fold), blink before off"
+               description="8 x 16A">
+          <object id="M-0001_A-981D-01-54E8_O-7"
+                  name="Switch, Channel B"
+                  description="On / Off"
+                  dptId="1.001">
+             <groupAddr name="Nouvelle adresse de groupe" addr="2" send="true"/>
+          </object>
+          <object id="M-0001_A-981D-01-54E8_O-11"
+                  name="Switch, Channel C"
+                  description="On / Off"
+                  dptId="1.001">
+             <groupAddr name="Nouvelle adresse de groupe" addr="3" send="true"/>
+          </object>
+          <object id="M-0001_A-981D-01-54E8_O-15"
+                  name="Switch, Channel D"
+                  description="On / Off"
+                  dptId="1.001">
+             <groupAddr name="Nouvelle adresse de groupe" addr="4" send="true"/>
+          </object>
+          <object id="M-0001_A-981D-01-54E8_O-19"
+                  name="Switch, Channel E"
+                  description="On / Off"
+                  dptId="1.001">
+             <groupAddr name="Nouvelle adresse de groupe" addr="5" send="true"/>
+          </object>
+          <object id="M-0001_A-981D-01-54E8_O-23"
+                  name="Switch, Channel F"
+                  description="On / Off"
+                  dptId="1.001">
+             <groupAddr name="Nouvelle adresse de groupe" addr="6" send="true"/>
+          </object>
+          <object id="M-0001_A-981D-01-54E8_O-27"
+                  name="Switch, Channel G"
+                  description="On / Off"
+                  dptId="1.001">
+             <groupAddr name="Nouvelle adresse de groupe" addr="7" send="true"/>
+          </object>
+          <object id="M-0001_A-981D-01-54E8_O-31"
+                  name="Switch, Channel H"
+                  description="On / Off"
+                  dptId="1.001">
+             <groupAddr name="Nouvelle adresse de groupe" addr="8" send="true"/>
+          </object>
+          <object id="M-0001_A-981D-01-54E8_O-3"
+                  name="Switch, Channel A"
+                  description="On / Off"
+                  dptId="1.001">
+             <groupAddr name="gogogo" addr="1" send="true"/>
+          </object>
+       </device>
+       <device addr="1.1.11"
+               area="Nouvelle zone"
+               line="Nouvelle ligne"
+               manufacturer="M-006A"
+               fw="0002-22-311F-O0079"
+               name="KNX/EIB Universal Präsenzmelder 360 KLR"
+               description="KNX/EIB Universal Präsenzmelder 360 KLR">
+          <object id="M-006A_A-0002-22-311F-O0079_O-9"
+                  name="brightness value"
+                  description="brightness value"
+                  dptId="7.001">
+             <groupAddr name="Valeur de luminosité" addr="2563" send="true"/>
+          </object>
+          <object id="M-006A_A-0002-22-311F-O0079_O-0"
+                  name="output - light"
+                  description="dimming absolute"
+                  dptId="1.001">
+             <groupAddr name="gogogo" addr="1" send="true"/>
+             <groupAddr name="Alias" addr="20" send="false"/>
+          </object>
+       </device>
+    </knx>
+
+
+KNX Low level tools
+-------------------
+
+- Manual start of EIBD
+ 
+    This command line is the same as the driver will invoke eibd.
+    $ eibd -d -D -S -T -i ipt:<ip of your garteway>:3671
+
+
+- Group address sniffer
+    
+    The port to listen may vary. Check EIBD processus arguments or use netstat to find him.
+    
+    This command will spy all group address
+    $ groupsocketlisten ip:<ip of your eibd>:<port>
+    Write from 1.1.11 to 1/2/3: 24 8F 
+    Write from 0.0.0 to 1/2/3: 12 34 
+    Write from 1.1.11 to 1/2/3: 24 A2
+    
+    This command will spy a specific group address
+    $ grouplisten ip:<ip of your eibd> 0/0/1 
+    Write from 0.0.0: 00 
+    Write from 0.0.0: 01
+
+- Write on a group address
+
+    This command send a hexadecimal buffer to a group address.
+    $ groupswrite ip:<ip of your eibd> 0/0/1 00 
+    Send request
+
+
+Folders & Path
+--------------
+
+$ROOTACT is an environnement variable used to prefix all paths used by the driver.
+
+Logs are generated in the folder:
+$ROOTACT/var/log/knx
+
+Networks cache are in folder:
+$ROOTACT/usr/data/knx/networks
+
+Configuration files:
+$ROOTACT/etc/knx/spvconfig.xml
+$ROOTACT/usr/etc/knx/spvconfig.xml
+    
+
+Create a Network from your ETS4 project
+---------------------------------------
+
+1) Create and initialize the network under ETS4
+2) Export your ETS4 project as a 'knxproj' file
+3) Use the tool 'convert_ETS4_project.sh' into script folder
+    $ cd knx/script/
+    $ ./convert_ETS4_project.sh <path_to>/myproject.knxproj
+4) Get the result at the path output by the script, and saved it as 'myproject.xml'
+5) Upload this file on the ONG Browser, put the file in the topology cnt of the KNX IPU
+6) Create the network with the operation 'knxCreateNetwork' on the IPU
+
+
+
+/etc/hosts
+----------
+
+Ensure the following line exists
+::1       <your_box_name> localhost localhost.localdomain localhost6 localhost6.localdomain6 ip6-localhost ip6-loopback
+
+
+
+
+Part 2: For developers
+======================
+
+
+Project structure
+-----------------
+
+The project structure is very similar to all Actility driver based on 'drvcommon'.
+
+├── base            : Makefile definition (based on rtbase)
+├── config          : Sample configuration files (spvconfig, modeling, KNX knowledge databases)
+├── contrib         : KNX External tools (EIBD, libeibclient, stdin-logger)
+├── diatemplates    : XML Template
+├── drvcommon       : Actility drivers shared code
+├── include         : KNX types definitions
+├── lib             : KNX utils (obix <-> KNX translator, eibd connection, modeling loader ...)
+├── sample          : Sample files from ETS4
+├── script          : ETS4 project convertor tool
+├── supervisor      : Callbacks (DIA, Events) on drvcommon, state machine for M2M Tree init, 
+├── tests           : Some unit-tests
+└── xoref           : Definition for custom XML files
+
+
+KNX physical topology
+---------------------
+
+One EIDB instance per KNX network.
+
+    Driver M2M <--+--> EIBD <---> KNX/IP <---> Network A
+                  |
+                  +--> EIBD <---> KNX/IP <---> Network B
+                  |
+                  +--> EIBD <---> KNX/USB <--> Network C
+
+
+Containers
+----------
+
+    Each M2M applications have a container named DESCRIPTOR which is not describe here.
+
+- topology (IPU)
+    This containers store the topology file used by various operations (knxCreateNetwork, knxUpdateNetwork)
+
+- 0x0000.0x0000.0.m2m (Device applications)
+    Each device applications, which store telegram from KNX, have a container with always the same name.
+    Format of this name is based on Zigbee cluster notation which has no sense here. KNX driver fill the format with zeros.
+    These containers store obix documents which is abstracted data from KNX.
+
+
+Operations
+----------
+
+- knxCreateNetwork (IPU)
+    This operation create a new network, the topology of the new network is fetch from the topology container of the IPU.
+    The new network is added in the driver cache and will be restored at each driver restart.
+    All M2M applications need by this network will be created few seconds after the end of the command. 
+  
+    URL:
+    /m2m/applications/IPU_KNX/retargeting1/knxCreateNetwork
+
+    Payload:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <obix:obj xmlns:obix="http://obix.org/ns/schema/1.1">
+        <obix:str name="knxNetworkID" val="myNetwork" />
+    </obix:obj>
+
+- knxUpdateNetwork (Network)
+    The new topology is fetch from IPU container.
+    The driver analyse the new topology to create/delete/update M2M applications.
+    
+    URL:
+    /m2m/applications/NW_xxx/retargeting1/knxCreateNetwork
+
+    Payload:
+    None
+
+- knxDeleteNetwork (Network)
+    Delete a network.
+    The driver cache is flushed, and all associed M2M application are deleted.
+  
+    URL:
+    /m2m/applications/NW_xxx/retargeting1/knxDeleteNetwork
+
+    Payload:
+    None
+
+- knxDptSet (Device application)
+    Write a telegramme on the KNX bus.
+    The targeted group address is determined by the device application on which the  operation is performed.
+
+    URL:
+    /m2m/applications/APP_xxx.2/retargeting2/knxDptSet
+
+    Payload (Obix Abstracted only):
+    <obix:bool xmlns:obix="http://obix.org/ns/schema/1.1" name="knxData" val="true" />
+    
+    Payload (Direct binary):
+    <obix:obj xmlns:obix="http://obix.org/ns/schema/1.1">
+        <str name="raw" val="x01" />
+    </obix:obj>
+    
+    Payload (Obix Abstracted & Force KNX fields):
+    <obix:bool xmlns:obix="http://obix.org/ns/schema/1.1" name="knxData" val="true">
+        <bool name="b" val="true" />
+    </obix:bool>   
+    
+- Retargeting
+    KNX driver don't use any retargeting attributs
+    

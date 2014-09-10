@@ -1,0 +1,204 @@
+if [ -z "$ROOTACT" ]
+then
+	echo "ROOTACT not specified"
+	exit 1
+fi
+
+Compile()
+{
+for i in base include lib _imsgtst _perf _htbl
+do
+	(
+	cd $i
+	if [ -f MAKE ]
+	then
+		echo "#####"
+		echo "#####	$i"
+		echo "#####"
+		sh ./MAKE $*
+	fi
+	)
+done
+}
+
+# frequemment oublié dans les makefile
+CleanPlus()
+{	
+	rm */core.* > /dev/null 2>&1
+	rm */core > /dev/null 2>&1
+	rm */TRACE_* > /dev/null 2>&1
+	rm */*.log > /dev/null 2>&1
+}
+
+EchoTargetList()
+{
+	echo	"1	| linux-x86"
+	echo	"2	| linux-x86_64"
+	echo	"3	| cov1"
+	echo	"4	| macosx-x86"
+	echo	"5	| macosx-x86_64"
+	echo	"6	| centos6-x86"
+	echo    "7	| centos6-x86_64"
+	echo    "8	| cov2"
+	echo    "9	| lpv3"
+	echo    "10	| cov1_debug"
+	echo    "11	| cov2_debug"
+	echo    "12	| lpv3_debug"
+	echo    "13	| angstrom_panrouter"
+	echo    "14	| android_panrouter"
+	echo    "15	| wirmav2"
+	echo    "16	| rpib"
+
+	echo "> "
+}
+
+ChooseTarget()
+{
+	file=$ROOTACT/rtbase/base/TARGET
+
+	rep=0
+	while [ "$rep" == "0" ]
+	do
+		tty > /dev/null 2>&1
+		if [ $? = "0" ]
+		then
+			EchoTargetList
+		fi
+
+		read rep
+
+		case $rep in
+		1|linux-x86)	
+			echo "SYSTEM=linux-x86" > $file
+			;;
+		2|linux-x86_64)	
+			echo "SYSTEM=linux-x86_64" > $file
+			;;
+		3|cov1)	
+			echo "SYSTEM=cov1" > $file
+			;;
+		4|macosx-x86)	
+			echo "SYSTEM=macosx-x86" > $file
+			;;
+		5|macosx-x86_64)	
+			echo "SYSTEM=macosx-x86_64" > $file
+			;;
+		6|centos6-x86)	
+			echo "SYSTEM=centos6-x86" > $file
+			;;
+		7|centos6-x86_64)	
+			echo "SYSTEM=centos6-x86_64" > $file
+			;;
+		8|cov2)	
+			echo "SYSTEM=cov2" > $file
+			;;
+		9|lpv3)	
+			echo "SYSTEM=lpv3" > $file
+			;;
+		10|cov1_debug)	
+			echo "SYSTEM=cov1_debug" > $file
+			;;
+		11|cov2_debug)	
+			echo "SYSTEM=cov2_debug" > $file
+			;;
+		12|lpv3_debug)	
+			echo "SYSTEM=lpv3_debug" > $file
+			;;
+		13|angstrom_panrouter)	
+			echo "SYSTEM=angstrom_panrouter" > $file
+			;;
+		14|android_panrouter)	
+			echo "SYSTEM=android_panrouter" > $file
+			;;
+		15|wirmav2)	
+			echo "SYSTEM=wirmav2" > $file
+			;;
+		16|rpib)	
+			echo "SYSTEM=rpib" > $file
+			;;
+		*)
+			echo "MAKE rtbase : unknown target $rep"
+			tty > /dev/null 2>&1
+			if [ $? != "0" ]
+			then
+				exit 1
+			fi
+			rep=0
+			;;
+		esac
+	done
+}
+
+DoTarget()
+{
+if [ ! -f $ROOTACT/rtbase/targeted ]
+then
+	echo	"$ROOTACT"
+	ChooseTarget
+	sh -x $ROOTACT/rtbase/base/system > $ROOTACT/rtbase/targeted 2>&1
+fi
+
+if [ ! -f $ROOTACT/rtbase/base/TARGET ]
+then
+	echo	"$ROOTACT"
+	ChooseTarget
+fi
+}
+
+
+SELF=rtbase
+source $ROOTACT/rtbase/base/system
+echo	"#####"
+echo	"make $* $SELF for [$SYSTEM]"
+
+
+case  $# in
+	0)
+		DoTarget
+		Compile
+		exit 0
+		;;
+	*)	case $1 in
+			target)
+				DoTarget
+			;;
+			src|source)
+				shift
+				./MAKE clean
+				rm $ROOTACT/rtbase/targeted >/dev/null 2>&1
+				sh ${MKPKGSOURCE} -p $SELF $*
+				exit 0
+			;;
+			runtime)
+				shift
+				DoTarget
+				./MAKE
+				sh ${MKPKGRUNTIME} -p $SELF
+				exit 0
+			;;
+			clean)
+				shift
+				rm $ROOTACT/rtbase/targeted >/dev/null 2>&1
+				CleanPlus
+				Compile clean
+				rm $ROOTACT/rtbase/targeted >/dev/null 2>&1
+				exit 0
+			;;
+			svn*)
+				svncmd=$1
+				shift
+				sh ${MKSVN} -p $SELF -c $svncmd $*
+				exit 0
+			;;
+			*)
+				DoTarget
+				Compile $*
+				exit 0
+			;;
+		esac
+	;;
+esac
+
+echo "Usage: MAKE [target|clean|runtime|src|source]"
+exit 1
+

@@ -1,0 +1,27 @@
+chmod 755 $ROOTACT/etc/init.d/awspv
+chmod 755 $ROOTACT/etc/init.d/tunslip
+mkdir -p $ROOTACT/etc/rc.d
+cd $ROOTACT/etc/rc.d
+ln -fs ../init.d/awspv S06awspv
+ln -fs ../init.d/tunslip S02tunslip
+cd $ROOTACT/watteco
+chmod 755 supervisor/awspv.sh
+chmod 755 supervisor/awspv.x
+chmod 755 tunslip/tunslip6.sh
+chmod 755 tunslip/tunslip6.x
+chmod 755 snif/snifwatt.x
+chmod 755 shells/clean_all_before_start.sh
+mkdir -p $ROOTACT/usr/etc/watteco/
+mkdir -p $ROOTACT/usr/data/watteco/
+[ -f $ROOTACT/usr/etc/watteco/modelconfig.xml ] || \
+	cp $ROOTACT/etc/watteco/modelconfig.xml $ROOTACT/usr/etc/watteco/
+[ -f $ROOTACT/usr/etc/watteco/spvconfig.xml ] || \
+	cp $ROOTACT/etc/watteco/spvconfig.xml $ROOTACT/usr/etc/watteco/
+
+if [ -n "$SHELL" ]
+then
+sed -i -e "s|/bin/sh$|$SHELL|" $ROOTACT/etc/init.d/awspv
+sed -i -e "s|/bin/sh$|$SHELL|" $ROOTACT/etc/init.d/tunslip
+sed -i -e "s|/bin/sh$|$SHELL|" supervisor/awspv.sh
+sed -i -e "s|/bin/sh$|$SHELL|" shells/clean_all_before_start.sh
+fi

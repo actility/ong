@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- m2mSpPolicy resource type -->
+	<complexType name="SPSafPolicySet">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:defaultRcatValue" minOccurs="0" />
+					<element ref="tns:defaultTrpdtValues" minOccurs="0" />
+					<element ref="tns:maxPendReqs" minOccurs="0" />
+					<element ref="tns:maxPendData" minOccurs="0" />
+					<element ref="tns:anSelList" minOccurs="0" />
+				</sequence>
+				<!-- attribute ref="tns:id" use="required" fixed="m2mSpPolicy"/-->
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="defaultRcatValue" type="tns:RcatType"/>
+	<element name="defaultTrpdtValues" type="tns:RcatTrpdtList"/>
+	<element name="maxPendReqs" type="tns:ReqThreshList"/>
+	<element name="maxPendData" type="tns:DataThreshList"/>
+	<element name="anSelList" type="tns:AnSelList"/>
+	
+	<complexType name="RcatTrpdtList">
+		<sequence>
+			<element ref="tns:rcatTrpdtItem" minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+  <element name="rcatTrpdtItem" type="tns:RcatTrpdtItem"/>
+
+	<complexType name="RcatTrpdtItem">
+		<sequence>
+			<element ref="tns:rcatList" />
+			<element ref="tns:trpdtType" />
+		</sequence>
+	</complexType>
+  <element name="trpdtType" type="tns:TrpdtType"/>
+  
+ 	<complexType name="ReqThreshList">
+		<sequence>
+			<element ref="tns:rcatThreshLongItem" minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+  <element name="rcatThreshLongItem" type="tns:RcatThreshLongItem"/>
+
+ 	<complexType name="RcatThreshLongItem">
+		<sequence>
+			<element ref="tns:rcatList" />
+			<element ref="tns:thresh" />
+		</sequence>
+	</complexType>
+  <element name="thresh" type="long"/>
+  
+ 	<complexType name="DataThreshList">
+		<sequence>
+			<element ref="tns:rcatMemItem" minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+	</complexType> 
+  <element name="rcatMemItem" type="tns:RcatMemItem"/>
+
+ 	<complexType name="RcatMemItem">
+		<sequence>
+			<element ref="tns:rcatList" />
+			<element ref="tns:mem" />
+		</sequence>
+	</complexType> 
+  <element name="mem" type="long"/>
+
+	<complexType name="AnSelList">
+		<sequence>
+			<element ref="tns:anSelListItem" minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+	<element name="anSelListItem" type="tns:AnSelListItem"/>
+	
+ 	<complexType name="AnSelListItem">
+		<sequence>
+			<element ref="tns:rcatList" />
+			<element ref="tns:rankedAnList" />
+		</sequence>
+	</complexType> 
+  <element name="rankedAnList" type="tns:RankedAnList"/>	
+
+ 	<complexType name="RankedAnList">
+		<sequence>
+			<element ref="tns:accessNetwork" minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+	</complexType> 
+  <element name="accessNetwork" type="token"/>	
+
+</schema>

@@ -1,0 +1,20 @@
+#!(SHELL)
+
+pids=$(ls /proc/ 2>/dev/null | tr -s ' ' '\n' | sed -n "s|^\([0-9]*\)$|\1|p" | tr -s '\n' ' ')
+
+getAllChildProcess() {
+  for pid in $pids; do
+    ppid=$(cat /proc/$pid/stat 2>/dev/null | cut -d " " -f4)
+    if [ -n "$ppid" -a "$ppid" = "$1" ]; then
+      echo $pid
+      getAllChildProcess $pid
+    fi
+  done
+}
+
+if [ -z "$1" -o "$1" = "0" -o "$1" = "1" ]; then
+    exit 1
+else
+    echo $1
+    getAllChildProcess $1
+fi

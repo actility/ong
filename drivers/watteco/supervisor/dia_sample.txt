@@ -1,0 +1,521 @@
+
+
+'//m2m/applications/IPU_6LoWPAN' created sz=797
+'//m2m/applications/IPU_6LoWPAN/containers/DESCRIPTOR' created sz=305
+'//m2m/applications/IPU_6LoWPAN/containers/DESCRIPTOR/contentInstances/latest' created sz=490
+
+'//m2m/applications/NW_020000ffff0023f4' created sz=885
+'//m2m/applications/NW_020000ffff0023f4/containers/DESCRIPTOR' created sz=305
+'//m2m/applications/NW_020000ffff0023f4/containers/DESCRIPTOR/contentInstances/latest' created sz=380
+
+
+'//m2m/applications/DEV_020000ffff00240f' created sz=959
+'//m2m/applications/DEV_020000ffff00240f/containers/DESCRIPTOR' created sz=305
+'//m2m/applications/DEV_020000ffff00240f/containers/DESCRIPTOR/contentInstances/latest' created sz=435
+
+'//m2m/applications/APP_020000ffff00240f.1' created sz=1395
+'//m2m/applications/APP_020000ffff00240f.1/containers/DESCRIPTOR' created sz=305
+'//m2m/applications/APP_020000ffff00240f.1/containers/DESCRIPTOR/contentInstances/latest' created sz=1857
+
+'//m2m/applications/APP_020000ffff00240f.1/containers/0x0006.0x0000.0.m2m' created sz=328
+'//m2m/applications/APP_020000ffff00240f.1/containers/0x0006.0x0000.0.m2m/contentInstances/latest' created sz=174
+
+'//m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.0.m2m' created sz=328
+'//m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.0.m2m/contentInstances/latest' created sz=178
+
+'//m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.3.m2m' created sz=328
+'//m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.3.m2m/contentInstances/latest' created sz=172
+
+
+
+>>>> dia client side >>>>>>>>>>> 1833812522/'' 'DiaIpuElemRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/IPU_6LoWPAN'
+type='' sz=0
+>>>> dia client side >>>>>>>>>>> 1833812523/'' 'DiaNetElemRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/NW_020000ffff0023f4'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812522/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812524/'' 'DiaIpuElemCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/IPU_6LoWPAN'
+type='application/xml' sz=797
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:application xmlns:m2m="http://uri.etsi.org/m2m" appId="IPU_6LoWPAN"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectType/ETSI.IP</m2m:searchString><m2m:searchString>ETSI.ObjectTechnology/ZigBee.ZigBee_1_0</m2m:searchString><m2m:searchString>ETSI.InterworkingProxyID/IPU_6LoWPAN</m2m:searchString></m2m:searchStrings><m2m:aPoC>coap://[::1]:5684/6lowpan/IPU_6LoWPAN</m2m:aPoC><m2m:aPoCPaths><m2m:aPoCPath><m2m:path>retargeting1</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting2</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR2</m2m:accessRightID></m2m:aPoCPath></m2m:aPoCPaths></m2m:application>
+'
+<<<< dia client side <<<<<<<<<<< 1833812523/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812525/'' 'DiaNetElemCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/NW_020000ffff0023f4'
+type='application/xml' sz=885
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:application xmlns:m2m="http://uri.etsi.org/m2m" appId="NW_020000ffff0023f4"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectType/ETSI.AN_NWK</m2m:searchString><m2m:searchString>ETSI.ObjectTechnology/ZigBee.ZigBee_1_0</m2m:searchString><m2m:searchString>ETSI.InterworkingProxyID/IPU_6LoWPAN</m2m:searchString><m2m:searchString>ETSI.NetworkID/NW_020000ffff0023f4</m2m:searchString></m2m:searchStrings><m2m:aPoC>coap://[::1]:5684/6lowpan/020000ffff0023f4</m2m:aPoC><m2m:aPoCPaths><m2m:aPoCPath><m2m:path>retargeting1</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting2</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR2</m2m:accessRightID></m2m:aPoCPath></m2m:aPoCPaths></m2m:application>
+'
+<<<< dia client side <<<<<<<<<<< 1833812524/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812526/'' 'DiaIpuContRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/IPU_6LoWPAN/containers/DESCRIPTOR'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812525/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812527/'' 'DiaNetContRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/NW_020000ffff0023f4/containers/DESCRIPTOR'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812526/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812528/'' 'DiaIpuContCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/IPU_6LoWPAN/containers/DESCRIPTOR'
+type='application/xml' sz=305
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:container xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="DESCRIPTOR"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectSemantic/OASIS.OBIX_1_1</m2m:searchString></m2m:searchStrings></m2m:container>
+'
+<<<< dia client side <<<<<<<<<<< 1833812527/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812529/'' 'DiaNetContCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/NW_020000ffff0023f4/containers/DESCRIPTOR'
+type='application/xml' sz=305
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:container xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="DESCRIPTOR"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectSemantic/OASIS.OBIX_1_1</m2m:searchString></m2m:searchStrings></m2m:container>
+'
+<<<< dia client side <<<<<<<<<<< 1833812528/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812530/'' 'DiaIpuInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/IPU_6LoWPAN/containers/DESCRIPTOR/contentInstances/latest'
+type='application/xml' sz=490
+'<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1" x-template="ipu_inst.xml"><str name="interworkingProxyID" val="IPU_6LoWPAN"/><list name="supportedTechnologies"><obj><str name="anPhysical" val="IEEE_802_15_4_2003_2_4GHz"/><str name="anStandard" val="ZigBee_1_0"/><str name="anProfile" val="ZigBee_HA"/></obj></list><list name="networks"><ref href="/m2m/applications/NW_020000ffff0023f4/containers/DESCRIPTOR/contentInstances/latest/content/"/></list></obj>
+'
+<<<< dia client side <<<<<<<<<<< 1833812529/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812531/'' 'DiaNetInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/NW_020000ffff0023f4/containers/DESCRIPTOR/contentInstances/latest'
+type='application/xml' sz=268
+'<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1" x-template="net_inst.xml"><str name="networkID" val="NW_020000ffff0023f4"/><str name="extendedPanID" val="0x020000ffff0023f4"/><str name="panID" val="0x1234"/><list name="nodes"/></obj>
+'
+<<<< dia client side <<<<<<<<<<< 1833812530/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+<<<< dia client side <<<<<<<<<<< 1833812531/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812532/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.0.m2m/contentInstances/latest'
+type='application/xml' sz=178
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="18" x-template="dat_inst_0052_0000_0.xml" x-date="20120806 11:54:35" x-unit="watt_hour"/>
+'
+>>>> dia client side >>>>>>>>>>> 1833812533/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.3.m2m/contentInstances/latest'
+type='application/xml' sz=172
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="1" x-template="dat_inst_0052_0000_3.xml" x-date="20120806 11:54:35" x-unit="watt"/>
+'
+<<<< dia client side <<<<<<<<<<< 1833812532/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+<<<< dia client side <<<<<<<<<<< 1833812533/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812534/'' 'DiaDatElemRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1'
+type='' sz=0
+>>>> dia client side >>>>>>>>>>> 1833812535/'' 'DiaDatElemRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812534/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812536/'' 'DiaDatElemCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1'
+type='application/xml' sz=1395
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:application xmlns:m2m="http://uri.etsi.org/m2m" appId="APP_020000ffff00240f.1"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectType/ETSI.AN_APP</m2m:searchString><m2m:searchString>ETSI.ObjectTechnology/ZigBee.ZigBee_1_0</m2m:searchString><m2m:searchString>ETSI.InterworkingProxyID/IPU_6LoWPAN</m2m:searchString><m2m:searchString>ETSI.NetworkID/NW_020000ffff0023f4</m2m:searchString><m2m:searchString>ETSI.NodeID/DEV_020000ffff00240f</m2m:searchString><m2m:searchString>ZigBee.ClusterID/server/0x0006</m2m:searchString><m2m:searchString>ZigBee.InterfaceID/OnOff.Srv</m2m:searchString><m2m:searchString>ZigBee.ClusterID/server/0x0052</m2m:searchString><m2m:searchString>ZigBee.InterfaceID/SimpleMetering.Srv</m2m:searchString></m2m:searchStrings><m2m:aPoC>coap://[::1]:5684/6lowpan/APP_020000ffff00240f.1</m2m:aPoC><m2m:aPoCPaths><m2m:aPoCPath><m2m:path>retargeting1</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting2</m2m:path><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR2</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting3</m2m:path><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR3</m2m:accessRightID></m2m:aPoCPath></m2m:aPoCPaths></m2m:application>
+'
+<<<< dia client side <<<<<<<<<<< 1833812535/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812537/'' 'DiaDatElemCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1'
+type='application/xml' sz=1395
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:application xmlns:m2m="http://uri.etsi.org/m2m" appId="APP_020000ffff00240f.1"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectType/ETSI.AN_APP</m2m:searchString><m2m:searchString>ETSI.ObjectTechnology/ZigBee.ZigBee_1_0</m2m:searchString><m2m:searchString>ETSI.InterworkingProxyID/IPU_6LoWPAN</m2m:searchString><m2m:searchString>ETSI.NetworkID/NW_020000ffff0023f4</m2m:searchString><m2m:searchString>ETSI.NodeID/DEV_020000ffff00240f</m2m:searchString><m2m:searchString>ZigBee.ClusterID/server/0x0006</m2m:searchString><m2m:searchString>ZigBee.InterfaceID/OnOff.Srv</m2m:searchString><m2m:searchString>ZigBee.ClusterID/server/0x0052</m2m:searchString><m2m:searchString>ZigBee.InterfaceID/SimpleMetering.Srv</m2m:searchString></m2m:searchStrings><m2m:aPoC>coap://[::1]:5684/6lowpan/APP_020000ffff00240f.1</m2m:aPoC><m2m:aPoCPaths><m2m:aPoCPath><m2m:path>retargeting1</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting2</m2m:path><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR2</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting3</m2m:path><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR3</m2m:accessRightID></m2m:aPoCPath></m2m:aPoCPaths></m2m:application>
+'
+<<<< dia client side <<<<<<<<<<< 1833812536/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812538/'' 'DiaDatContRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0006.0x0000.0.m2m'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812537/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812539/'' 'DiaDatContRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.0.m2m'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812538/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812540/'' 'DiaDatContCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0006.0x0000.0.m2m'
+type='application/xml' sz=328
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:container xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="0x0006.0x0000.0.m2m"><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectSemantic/OASIS.OBIX_1_1</m2m:searchString></m2m:searchStrings></m2m:container>
+'
+<<<< dia client side <<<<<<<<<<< 1833812539/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812541/'' 'DiaDatContCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.0.m2m'
+type='application/xml' sz=328
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:container xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="0x0052.0x0000.0.m2m"><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectSemantic/OASIS.OBIX_1_1</m2m:searchString></m2m:searchStrings></m2m:container>
+'
+<<<< dia client side <<<<<<<<<<< 1833812540/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+<<<< dia client side <<<<<<<<<<< 1833812541/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812542/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.0.m2m/contentInstances/latest'
+type='application/xml' sz=178
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="18" x-template="dat_inst_0052_0000_0.xml" x-date="20120806 11:54:44" x-unit="watt_hour"/>
+'
+>>>> dia client side >>>>>>>>>>> 1833812543/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.3.m2m/contentInstances/latest'
+type='application/xml' sz=172
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="0" x-template="dat_inst_0052_0000_3.xml" x-date="20120806 11:54:44" x-unit="watt"/>
+'
+<<<< dia client side <<<<<<<<<<< 1833812542/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+<<<< dia client side <<<<<<<<<<< 1833812543/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812544/'' 'DiaAppElemRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812544/'' ''
+scode='STATUS_OK'
+targetid=''
+type='application/xml' sz=1395
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:application xmlns:m2m="http://uri.etsi.org/m2m" appId="APP_020000ffff00240f.1"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectType/ETSI.AN_APP</m2m:searchString><m2m:searchString>ETSI.ObjectTechnology/ZigBee.ZigBee_1_0</m2m:searchString><m2m:searchString>ETSI.InterworkingProxyID/IPU_6LoWPAN</m2m:searchString><m2m:searchString>ETSI.NetworkID/NW_020000ffff0023f4</m2m:searchString><m2m:searchString>ETSI.NodeID/DEV_020000ffff00240f</m2m:searchString><m2m:searchString>ZigBee.ClusterID/server/0x0006</m2m:searchString><m2m:searchString>ZigBee.InterfaceID/OnOff.Srv</m2m:searchString><m2m:searchString>ZigBee.ClusterID/server/0x0052</m2m:searchString><m2m:searchString>ZigBee.InterfaceID/SimpleMetering.Srv</m2m:searchString></m2m:searchStrings><m2m:aPoC>coap://[::1]:5684/6lowpan/APP_020000ffff00240f.1</m2m:aPoC><m2m:aPoCPaths><m2m:aPoCPath><m2m:path>retargeting1</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting2</m2m:path><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR2</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting3</m2m:path><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR3</m2m:accessRightID></m2m:aPoCPath></m2m:aPoCPaths></m2m:application>
+'
+>>>> dia client side >>>>>>>>>>> 1833812545/'' 'DiaAppContRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/DESCRIPTOR'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812545/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812546/'' 'DiaAppContCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/DESCRIPTOR'
+type='application/xml' sz=305
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:container xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="DESCRIPTOR"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectSemantic/OASIS.OBIX_1_1</m2m:searchString></m2m:searchStrings></m2m:container>
+'
+<<<< dia client side <<<<<<<<<<< 1833812546/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812547/'' 'DiaAppInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/DESCRIPTOR/contentInstances/latest'
+type='application/xml' sz=1857
+'<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1" x-template="app_inst.xml"><str name="applicationID" val="APP_020000ffff00240f.1"/><int name="applicationDeviceVersion" val="1"/><int name="endpoint" val="1"/><list name="interfaces"><obj x-template="itf_inst_0006_server.xml"><str name="interfaceID" val="OnOffServerCluster.Srv"/><str name="clusterID" val="0x0006"/><enum name="clusterType" val="server"/><bool name="zclOnOff" href="/m2m/applications/APP_020000ffff00240f.1/retargeting2/0x0006.0x0000.0.attr"/><op name="zclOff" href="/m2m/applications/APP_020000ffff00240f.1/retargeting2/0x0006.0x00.ope"/><op name="zclOn" href="/m2m/applications/APP_020000ffff00240f.1/retargeting2/0x0006.0x01.ope"/><op name="zclToggle" href="/m2m/applications/APP_020000ffff00240f.1/retargeting2/0x0006.0x02.ope"/><bool name="m2mOnOff" href="/m2m/applications/APP_020000ffff00240f.1/containers/0x0006.0x0000.0.m2m/contentInstances/latest/content"/></obj><obj x-template="itf_inst_0052_server.xml"><str name="interfaceID" val="SimpleMeteringServerCluster.Srv"/><str name="clusterID" val="0x0052"/><enum name="clusterType" val="server"/><int name="zclCurrentSummationDelivered" href="/m2m/applications/APP_020000ffff00240f.1/retargeting2/0x0052.0x0000.0.attr"/><int name="zclInstantaneousDemand" href="/m2m/applications/APP_020000ffff00240f.1/retargeting2/0x0052.0x0000.3.attr"/><op name="extReset" href="/m2m/applications/APP_020000ffff00240f.1/retargeting2/0x0052.0x00.ope"/><real name="m2mCurrentSummationDelivered" href="/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.0/contentInstances/latest/content" unit="obix:units/watt_hour"/><real name="m2mInstantaneousDemand" href="/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.3/contentInstances/latest/content" unit="obix:units/watt"/></obj></list></obj>
+'
+<<<< dia client side <<<<<<<<<<< 1833812547/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812548/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.0.m2m/contentInstances/latest'
+type='application/xml' sz=178
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="18" x-template="dat_inst_0052_0000_0.xml" x-date="20120806 11:54:54" x-unit="watt_hour"/>
+'
+>>>> dia client side >>>>>>>>>>> 1833812549/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.3.m2m/contentInstances/latest'
+type='application/xml' sz=172
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="0" x-template="dat_inst_0052_0000_3.xml" x-date="20120806 11:54:54" x-unit="watt"/>
+'
+<<<< dia client side <<<<<<<<<<< 1833812548/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+<<<< dia client side <<<<<<<<<<< 1833812549/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812550/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0006.0x0000.0.m2m/contentInstances/latest'
+type='application/xml' sz=174
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="0" x-template="dat_inst_0006_0000_0.xml" x-date="20120806 11:54:54" x-unit="on|off"/>
+'
+<<<< dia client side <<<<<<<<<<< 1833812550/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812551/'' 'DiaDevElemRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/DEV_020000ffff00240f'
+type='' sz=0
+>>>> dia client side >>>>>>>>>>> 1833812552/'' 'DiaNetElemRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/NW_020000ffff0023f4'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812551/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812553/'' 'DiaDevElemCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/DEV_020000ffff00240f'
+type='application/xml' sz=959
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:application xmlns:m2m="http://uri.etsi.org/m2m" appId="DEV_020000ffff00240f"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectType/ETSI.AN_DEV</m2m:searchString><m2m:searchString>ETSI.ObjectTechnology/ZigBee.ZigBee_1_0</m2m:searchString><m2m:searchString>ETSI.InterworkingProxyID/IPU_6LoWPAN</m2m:searchString><m2m:searchString>ETSI.NetworkID/NW_020000ffff0023f4</m2m:searchString><m2m:searchString>ETSI.NodeID/DEV_020000ffff00240f</m2m:searchString></m2m:searchStrings><m2m:aPoC>coap://[::1]:5684/6lowpan/DEV_020000ffff00240f</m2m:aPoC><m2m:aPoCPaths><m2m:aPoCPath><m2m:path>retargeting1</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting2</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR2</m2m:accessRightID></m2m:aPoCPath></m2m:aPoCPaths></m2m:application>
+'
+<<<< dia client side <<<<<<<<<<< 1833812553/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812554/'' 'DiaDevContRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/DEV_020000ffff00240f/containers/DESCRIPTOR'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812552/'' ''
+scode='STATUS_OK'
+targetid=''
+type='application/xml' sz=1395
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:application xmlns:m2m="http://uri.etsi.org/m2m" appId="NW_020000ffff0023f4"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectType/ETSI.AN_NWK</m2m:searchString><m2m:searchString>ETSI.ObjectTechnology/ZigBee.ZigBee_1_0</m2m:searchString><m2m:searchString>ETSI.InterworkingProxyID/IPU_6LoWPAN</m2m:searchString><m2m:searchString>ETSI.NetworkID/NW_020000ffff0023f4</m2m:searchString></m2m:searchStrings><m2m:aPoC>coap://[::1]:5684/6lowpan/020000ffff0023f4</m2m:aPoC><m2m:aPoCPaths><m2m:aPoCPath><m2m:path>retargeting1</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting2</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR2</m2m:accessRightID></m2m:aPoCPath></m2m:aPoCPaths></m2m:application>
+lowpan/APP_020000ffff00240f.1</m2m:aPoC><m2m:aPoCPaths><m2m:aPoCPath><m2m:path>retargeting1</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting2</m2m:path><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR2</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting3</m2m:path><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR3</m2m:accessRightID></m2m:aPoCPath></m2m:aPoCPaths></m2m:application>
+'
+>>>> dia client side >>>>>>>>>>> 1833812555/'' 'DiaNetContRetrieve'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/NW_020000ffff0023f4/containers/DESCRIPTOR'
+type='' sz=0
+<<<< dia client side <<<<<<<<<<< 1833812554/'' ''
+scode='STATUS_NOT_FOUND'
+targetid=''
+type='text/plain' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812556/'' 'DiaDevContCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/DEV_020000ffff00240f/containers/DESCRIPTOR'
+type='application/xml' sz=305
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:container xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="DESCRIPTOR"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectSemantic/OASIS.OBIX_1_1</m2m:searchString></m2m:searchStrings></m2m:container>
+'
+<<<< dia client side <<<<<<<<<<< 1833812556/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812557/'' 'DiaDevInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/DEV_020000ffff00240f/containers/DESCRIPTOR/contentInstances/latest'
+type='application/xml' sz=435
+'<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1" x-template="dev_inst.xml"><str name="nodeID" val="DEV_020000ffff00240f"/><str name="ieeeAddress" val="0x020000ffff00240f"/><enum name="nodeType" val="endDevice"/><str name="manufacturerCode" val="0x9999"/><list name="applications"><ref href="/m2m/applications/APP_020000ffff00240f.1/containers/DESCRIPTOR/contentInstances/latest/content"/></list></obj>
+'
+<<<< dia client side <<<<<<<<<<< 1833812555/'' ''
+scode='STATUS_OK'
+targetid=''
+type='application/xml' sz=1395
+'<?xml version="1.0" encoding="UTF-8"?>
+<m2m:container xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="DESCRIPTOR"><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID><m2m:searchStrings><m2m:searchString>ETSI.ObjectSemantic/OASIS.OBIX_1_1</m2m:searchString></m2m:searchStrings></m2m:container>
+ology/ZigBee.ZigBee_1_0</m2m:searchString><m2m:searchString>ETSI.InterworkingProxyID/IPU_6LoWPAN</m2m:searchString><m2m:searchString>ETSI.NetworkID/NW_020000ffff0023f4</m2m:searchString></m2m:searchStrings><m2m:aPoC>coap://[::1]:5684/6lowpan/020000ffff0023f4</m2m:aPoC><m2m:aPoCPaths><m2m:aPoCPath><m2m:path>retargeting1</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting2</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR2</m2m:accessRightID></m2m:aPoCPath></m2m:aPoCPaths></m2m:application>
+lowpan/APP_020000ffff00240f.1</m2m:aPoC><m2m:aPoCPaths><m2m:aPoCPath><m2m:path>retargeting1</m2m:path><m2m:accessRightID>/m2m/accessRights/Locadmin_AR</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting2</m2m:path><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR2</m2m:accessRightID></m2m:aPoCPath><m2m:aPoCPath><m2m:path>retargeting3</m2m:path><m2m:accessRightID>/m2m/accessRights/APP_020000ffff00240f.1_AR3</m2m:accessRightID></m2m:aPoCPath></m2m:aPoCPaths></m2m:application>
+'
+>>>> dia client side >>>>>>>>>>> 1833812558/'' 'DiaNetInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/NW_020000ffff0023f4/containers/DESCRIPTOR/contentInstances/latest'
+type='application/xml' sz=380
+'<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1" x-template="net_inst.xml"><str name="networkID" val="NW_020000ffff0023f4"/><str name="extendedPanID" val="0x020000ffff0023f4"/><str name="panID" val="0x1234"/><list name="nodes"><ref href="/m2m/applications/DEV_020000ffff00240f/containers/DESCRIPTOR/contentInstances/latest/content"/></list></obj>
+'
+<<<< dia client side <<<<<<<<<<< 1833812557/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+<<<< dia client side <<<<<<<<<<< 1833812558/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812559/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.0.m2m/contentInstances/latest'
+type='application/xml' sz=178
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="18" x-template="dat_inst_0052_0000_0.xml" x-date="20120806 11:55:03" x-unit="watt_hour"/>
+'
+>>>> dia client side >>>>>>>>>>> 1833812560/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.3.m2m/contentInstances/latest'
+type='application/xml' sz=172
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="0" x-template="dat_inst_0052_0000_3.xml" x-date="20120806 11:55:03" x-unit="watt"/>
+'
+<<<< dia client side <<<<<<<<<<< 1833812559/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+<<<< dia client side <<<<<<<<<<< 1833812560/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia server side >>>>>>>>>>> 0/'(null)' ''
+requesting='./admtcp'
+targetid='/m2m/applications/APP_020000ffff00240f.1/retargeting/0x0006.0x02.ope'
+type='(null)' sz=0
+>>>> dia client side >>>>>>>>>>> 1833812561/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0006.0x0000.0.m2m/contentInstances/latest'
+type='application/xml' sz=174
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="1" x-template="dat_inst_0006_0000_0.xml" x-date="20120806 11:55:11" x-unit="on|off"/>
+'
+<<<< dia client side <<<<<<<<<<< 1833812561/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia client side >>>>>>>>>>> 1833812562/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.0.m2m/contentInstances/latest'
+type='application/xml' sz=178
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="18" x-template="dat_inst_0052_0000_0.xml" x-date="20120806 11:55:13" x-unit="watt_hour"/>
+'
+>>>> dia client side >>>>>>>>>>> 1833812563/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0052.0x0000.3.m2m/contentInstances/latest'
+type='application/xml' sz=173
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="14" x-template="dat_inst_0052_0000_3.xml" x-date="20120806 11:55:13" x-unit="watt"/>
+'
+<<<< dia client side <<<<<<<<<<< 1833812562/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+<<<< dia client side <<<<<<<<<<< 1833812563/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''
+>>>> dia server side >>>>>>>>>>> 0/'(null)' ''
+requesting='./admtcp'
+targetid='/m2m/applications/APP_020000ffff00240f.1/retargeting/0x0006.0x02.ope'
+type='(null)' sz=0
+>>>> dia client side >>>>>>>>>>> 1833812564/'' 'DiaRepInstCreate'
+requesting='coap://m2m.CYH-DAFADAFADAFA.actility/m2m/applications/GIP'
+targetid='/m2m/applications/APP_020000ffff00240f.1/containers/0x0006.0x0000.0.m2m/contentInstances/latest'
+type='application/xml' sz=174
+'<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="0" x-template="dat_inst_0006_0000_0.xml" x-date="20120806 11:55:14" x-unit="on|off"/>
+'
+<<<< dia client side <<<<<<<<<<< 1833812564/'' ''
+scode='STATUS_CREATED'
+targetid=''
+type='application/xml' sz=0
+''

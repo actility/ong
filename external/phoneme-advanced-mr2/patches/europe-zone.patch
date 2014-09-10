@@ -1,0 +1,25 @@
+From d014cc270bec185660d3fc289950040b84dfbfd9 Mon Sep 17 00:00:00 2001
+From: jreich_dev <jreich@CentOS-dev-jreich.actility.net>
+Date: Wed, 22 Aug 2012 16:49:23 +0200
+Subject: [PATCH] europe zone
+
+---
+ .../cdc/build/share/defs_zoneinfo.mk               |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/phoneme_advanced_mr2_b167/cdc/build/share/defs_zoneinfo.mk b/phoneme_advanced_mr2_b167/cdc/build/share/defs_zoneinfo.mk
+index 5b10e2b..b51a8e2 100644
+--- a/phoneme_advanced_mr2_b167/cdc/build/share/defs_zoneinfo.mk
++++ b/phoneme_advanced_mr2_b167/cdc/build/share/defs_zoneinfo.mk
+@@ -69,7 +69,7 @@ TZDATA_VER = `cat $(TZDATA)VERSION`
+ # as samples for J2ME CDC/Foundation Profile reference, 
+ #  America/Los_Angeles, Asia/Calcutta and Asia/Novosibirsk.  
+ #  This is to save space for J2ME builds.
+-TZFILE = j2meref
++TZFILE = j2meref europe
+ JDKTZDATA = $(CVM_SHAREROOT)/tools/javazic/tzdata_jdk/
+ JDKTZFILES = gmt jdk11_backward
+ TZFILES = \
+-- 
+1.7.3.4
+

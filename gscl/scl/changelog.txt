@@ -1,0 +1,597 @@
+-------------------------------------------------------------------------------
+Scl service changelog
+-------------------------------------------------------------------------------
+Version: 2.4.0
+Date: 2014-06-17
+
+New Features:
+-------------
+ - embedded bundles and APUs for target centos6-x86_64.
+
+Bug Fixes:
+----------
+ - Fixed #0001313. ong start with -i option does not erase user's configAdmin
+   configuration
+ - Fixed: gscl-init script did not stop the service when running with java SE.
+ - Fixed: visualvm flag in gscl-init script was inefficient.
+ - Up-graded packages:
+  * felix.shell.telnet-2.0.1
+  * log.command.shell-2.0.1
+  * backend-3.0.1
+  * cm-1.0.3
+  * jxo-3.0.1
+  * jxo.jni-1.2.1
+  * m2m-3.0.3
+  * scl.app.me-2.0.4
+  * shutdown.hook-3.0.1
+  * song-4.0.3
+  * song.binding.coap-2.0.1
+  * storage.driver.sqlite-0.2.2
+  * transport.logger.log-1.0.1
+  * util-4.0.1
+  * storage-0.2.1
+  * song.binding.http-4.0.0
+  * system.version-4.4.1
+  * phoneme-advanced-mr2-167.13-5
+ - Added packages:
+  * curl-7.36.0-2 APU
+  * song.binding.http.ni.api-1.0.0
+  * song.binding.http.jni-1.0.0
+ - Removed packages:
+  * commons.httpclient
+
+-------------------------------------------------------------------------------
+Version: 2.2.6
+Date: 2014-04-18
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * scl.app.me-2.0.3
+
+-------------------------------------------------------------------------------
+Version: 2.2.5
+Date: 2014-04-03
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * scl.app.me-2.0.2
+  * storage.driver.sqlite-0.2.1
+  * storage.driver.sqlite.ni.api-2.0.0
+  * storage.driver.sqlite.jni-2.0.0
+
+-------------------------------------------------------------------------------
+Version: 2.2.4
+Date: 2014-03-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * m2m-3.0.2
+  * song-4.0.2
+
+-------------------------------------------------------------------------------
+Version: 2.2.3
+Date: 2014-03-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed configuration keys for system.version bundle
+
+-------------------------------------------------------------------------------
+Version: 2.2.2
+Date: 2014-03-26
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * m2m-3.0.1
+  * song-4.0.1
+  * scl.app.me-2.0.1
+
+-------------------------------------------------------------------------------
+Version: 2.2.1
+Date: 2014-03-26
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed configuration keys for system.version bundle
+
+-------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2014-03-26
+
+New Features:
+-------------
+ - Added EXI support for centos6-x86 target
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * libxml2-2.7.8-2
+  * jxo.jni-1.2.0
+  * xo-4.4.13
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - Huge refactoring of all packages in java project.
+ - Now API bundles are extracted in standalone bundles
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * backend.api-3.0.0
+  * backend-3.0.0
+  * jxo.api-3.0.0
+  * m2m.api-3.0.0
+  * m2m-3.0.0
+  * scl.app.me-2.0.0
+  * shutdown.hook-3.0.0
+  * song.api-4.0.0
+  * song-4.0.0
+  * song.binding.coap-2.0.0
+  * song.binding.http-3.14.0
+  * storage.api-0.2.0
+  * storage.driver.api-0.2.0
+  * storage-0.2.0
+  * storage.driver.sqlite-0.2.0
+  * system.version-4.0.0
+  * util-4.0.0
+  * backend.command.shell-2.0.0
+  * cm.command.shell-2.0.0
+  * felix.shell.telnet-2.0.0
+  * framework.command.shell.me-2.0.0
+  * inspector.command.shell-1.2.0
+  * log.command.shell-2.0.0
+  * phoneme.command.shell-2.0.0
+  * song.command.shell-3.0.0
+  * song.trace.command.shell-3.0.0
+  * org.apache.felix.shell.acy-2.0.0
+ - Added packages:
+  * cm.api-1.0.0
+  * cm-1.0.0
+  * framework.resources.api-1.0.0
+  * framework.resources.osgi-1.0.0
+  * jxo.ni.api-1.0.0
+  * jxo.jni-1.0.0
+  * log.api-1.0.0
+  * log-1.0.0
+  * shutdown.hook.ni.api-1.0.0
+  * shutdown.hook.jni-1.0.0
+  * song.binding.coap.ni.api-1.0.0
+  * song.binding.coap.jni-1.0.0
+  * song.binding.http.api-1.0.0
+  * storage.driver.sqlite.ni.api-1.0.0
+  * storage.driver.sqlite.jni-1.0.0
+  * transport.logger.api-1.0.0
+  * transport.logger.log-1.0.0
+  * org.apache.felix.shell.acy.api-1.0.0
+  * framework.command.shell.se-1.0.0
+  * song.binding.http.command.shell-1.0.0
+  * sqlite-3.8.3-0
+
+-------------------------------------------------------------------------------
+Version: 1.4.3
+Date: 2014-02-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * system.version-3.2.6
+
+-------------------------------------------------------------------------------
+Version: 1.4.2
+Date: 2014-02-17
+
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * scl.app.me-1.6.4
+
+-------------------------------------------------------------------------------
+Version: 1.4.1
+Date: 2014-02-10
+
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * scl.app.me-1.6.3
+
+-------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2014-02-05
+
+
+New Features:
+-------------
+ - Support for installation on raspberry-pi.
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * storage.driver.sqlite-0.0.11
+  * shutdown.hook-2.4.7
+  * scl.app.me-1.6.2
+  * song.binding.coap-1.4.5
+  * jxo-1.8.1
+  * rtbase-1.2.3
+  * libdIa-1.0.25
+  * phoneme-advanced-mr2-167.13-3
+  * libxml2-2.7.8-1
+  * libdIa-1.0.25-0
+  * xo-4.2.10-0
+  * stdin-logger-1.2.1-0
+  * trans_pty-1.0.1-0
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2014-01-17
+
+
+New Features:
+-------------
+ - Add "All_AR_c.xml" for system-wide "All_AR" accessRight creation at ONG
+   installation. (first used by IEC engine GA)
+ - Add "Locadmin_AR3_c.xml", "Locadmin_AR4_c.xml" and "Locadmin_AR5_c.xml" 
+   respectively for system-wide "Locadmin_AR3", "Locadmin_AR4" and
+   "Locadmin_AR5" accessRights creation at ONG installation. (first used by 
+   KNX GIP driver)
+ - Add new package inspector.command.shell-1.0.0 (groupId:com.actility.m2m)
+   that brings the telnet command "m2m-retrieve"
+ - Add new package apu-install-1.0-0 (groupId:com.actility) that is a tool
+   installed on ONG for apu upgrade.
+ - Changed maxContentLength attribute value to 32768 in
+   com.actility.song.binding.http.config.cfg in order to allow uploading files
+   up to 32 Ko.
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * storage.driver.sqlite-0.0.10
+  * song.binding.http-3.12.8
+  * scl.app.me-1.6.1
+  * song-3.12.0
+  * jxo-1.8.0
+  * rtbase-1.2.0
+  * libdIa-1.0.24
+ - Fixed #0000534. scl-init -j option is inefficient
+
+-------------------------------------------------------------------------------
+Version: 1.0.16
+Date: 2013-09-10
+
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * storage.driver.sqlite-0.0.8
+
+-------------------------------------------------------------------------------
+Version: 1.0.15
+Date: 2013-09-05
+
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed: added missing search string "ETSI.ObjectTechnology/ACTILITY.SYSTEM"
+   in SYSTEM application.
+ - Up-graded packages:
+  * song.binding.http-3.12.5
+  * song.binding.coap-1.4.4
+	* util-3.6.0
+	* felix.shell.telnet 1.2.2
+	* scl.app.me-1.2.0
+	* jxo-1.6.1
+
+-------------------------------------------------------------------------------
+Version: 1.0.14
+Date: 2013-05-30
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * song.binding.http-3.10.0
+  * m2m-1.20.0
+  * storage.driver.sqlite-0.0.7-006
+  * song-3.10.2
+ - Modified packages:
+  * scl.app.me-1.0.0
+
+-------------------------------------------------------------------------------
+Version: 1.0.13
+Date: 2013-01-24
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * scl.app-3.16.1
+  * song-3.10.1
+
+-------------------------------------------------------------------------------
+Version: 1.0.12
+Date: 2013-01-23
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * scl.app-3.16.0
+  * jxo-1.6.0
+  * m2mxoref-1.1.12-0
+  * xo-4.2.5-1
+  * storage.driver.sqlite-0.0.7-004
+
+-------------------------------------------------------------------------------
+Version: 1.0.11
+Date: 2013-01-16
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Down-graded packages:
+  * m2mxoref-1.1.9-0
+
+-------------------------------------------------------------------------------
+Version: 1.0.10
+Date: 2013-01-15
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Added packages:
+  * m2mxoref-1.1.11-1
+ - Up-graded packages:
+  * rtbase-1.0.27-1
+  * libdIa-1.0.15-1
+  * scl.app-3.14.0
+  * m2m-1.16.0
+  * storage.driver.sqlite-0.0.7-003
+
+-------------------------------------------------------------------------------
+Version: 1.0.9
+Date: 2013-01-07
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Removed error message when trying to kill scl and it is already
+   killed
+
+-------------------------------------------------------------------------------
+Version: 1.0.8
+Date: 2013-01-02
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * storage.driver.sqlite-0.0.7-002
+
+-------------------------------------------------------------------------------
+Version: 1.0.7
+Date: 2012-12-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - New init script leveraging new "functions" script
+ - Merged "kf2" into "scl" init script
+ - Up-graded packages:
+  * scl.app-3.12.2
+  * storage.driver.sqlite-0.0.7-001
+
+-------------------------------------------------------------------------------
+Version: 1.0.6
+Date: 2012-12-11
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Added packages:
+  * phoneme.command.shell-1.0.1
+ - Up-graded packages:
+  * storage.driver.sqlite-0.0.6-005
+  * system.version-3.2.5
+  * shutdown.hook-2.4.6
+  * song.binding.coap-1.4.2
+  * jxo-1.4.6
+  * scl.app-3.12.1
+
+-------------------------------------------------------------------------------
+Version: 1.0.5
+Date: 2012-12-05
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Removed framework properties for TR-069 stack because it is no longer part of
+   the scl
+ - Up-graded packages:
+  * java.cdc.pom-2.6.0
+  * scl.app-3.12.0
+  * m2m-1.14.0
+  * m2m.api-1.14.0
+  * backend.command.shell-1.4.0
+  * song-3.10.0
+  * song.binding.coap-1.4.1
+  * song.binding.http-3.8.0
+  * storage-0.0.7-002
+  * storage.driver.sqlite-0.0.6-004
+  * util-3.4.0
+  * jxo-1.4.5
+  * shutdown.hook-2.4.5
+
+-------------------------------------------------------------------------------
+Version: 1.0.4
+Date: 2012-11-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Added a configuration for com.actility.song.binding.coap bundle
+ - Fixed init script which could see the scl as started while it is not
+ - Fixed default domain name from actility.net to actility.com
+ - Up-graded packages:
+  * m2m-1.12.1
+  * m2m.api-1.12.1
+  * system.version-3.2.4
+  * scl.app-3.10.2
+  * song.binding.coap-1.2.0
+  * storage-0.0.7-001
+  * storage.api-0.0.6
+  * storage.driver.api-0.0.6
+  * storage.driver.sqlite-0.0.6-002
+  * libdIa-1.0.15-0
+  * rtbase-1.0.27
+  * xo-4.0.32
+  * jxo-1.4.3
+  * shutdown.hook-2.4.3
+
+-------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2012-11-13
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. getopt arguments in scl init script were wrong for inspector option
+ - Up-graded packages:
+  * m2m-1.12.0
+  * scl.app-3.10.1
+  * song.binding.http-3.6.3
+  * storage-0.0.2-001
+  * backend-2.8.0
+  * jxo-1.4.2
+  * shutdown.hook-2.4.2
+  * song.binding.coap-1.0.4
+  * storage.driver.sqlite-0.0.3-002
+
+-------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2012-10-31
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Added searchString ETSI.ObjectType/ETSI.GA to SYTEM application
+   resource
+ - Fixed. SYSTEM DESCRIPTOR is now re-aligned with ONG Browser
+ - Fixed. Replaced 'source' command by '.' which is more portable
+ - Up-graded packages:
+  * song-3.6.1
+  * system.version-3.2.2
+  * song.binding.http-3.6.2
+  * libdIa-1.0.13
+
+-------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2012-10-26
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Up-graded packages:
+  * m2m-1.10.0
+  * scl.app-1.10.0
+ - Fixed. Removed stdout logs from the OSGi logs as they are now captured by
+   stdin-logger
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2012-10-23
+Initial version

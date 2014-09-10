@@ -1,0 +1,1225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="Actility"
+              productName="iec61131"
+              productVersion="1.0.28"
+              creationDateTime="2013-06-10T10:05:45"/>
+  <contentHeader name="Appliances"
+                 version="1.1.2"
+                 modificationDateTime="2013-08-02T14:18:21"
+                 author="Laurent Nicq">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="10" y="10"/>
+      </fbd>
+      <ld>
+        <scaling x="0" y="0"/>
+      </ld>
+      <sfc>
+        <scaling x="10" y="10"/>
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes/>
+    <pous>
+      <pou name="Automatic_Appliance" pouType="program">
+        <interface>
+          <externalVars>
+            <variable name="Appliance1_State">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Appliance2_State">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Appliance1_Out">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Appliance2_Out">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="Time_AutoOff">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="T#10s"/>
+              </initialValue>
+            </variable>
+            <variable name="Time_AutoRestart">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="T#20s"/>
+              </initialValue>
+            </variable>
+            <variable name="Auto_OFF_Test">
+              <type>
+                <derived name="Auto_OFF_Common"/>
+              </type>
+            </variable>
+            <variable name="Auto_RESTART_Test">
+              <type>
+                <derived name="Auto_RESTART_Common"/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <FBD>
+            <inVariable localId="2" height="30" width="130">
+              <position x="10" y="110"/>
+              <connectionPointOut>
+                <relPosition x="130" y="20"/>
+              </connectionPointOut>
+              <expression>Appliance1_State</expression>
+            </inVariable>
+            <outVariable localId="3" height="30" width="110">
+              <position x="560" y="110"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="10" formalParameter="AutoOFF_Out">
+                  <position x="560" y="130"/>
+                  <position x="490" y="130"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Appliance1_Out</expression>
+            </outVariable>
+            <inVariable localId="4" height="30" width="140">
+              <position x="10" y="160"/>
+              <connectionPointOut>
+                <relPosition x="140" y="20"/>
+              </connectionPointOut>
+              <expression>Time_AutoOff</expression>
+            </inVariable>
+            <block localId="10" width="300" height="120" typeName="Auto_OFF_Common" instanceName="Auto_OFF_Test" executionOrderId="1">
+              <position x="190" y="80"/>
+              <inputVariables>
+                <variable formalParameter="AutoOFF_Input">
+                  <connectionPointIn>
+                    <relPosition x="0" y="50"/>
+                    <connection refLocalId="2">
+                      <position x="190" y="130"/>
+                      <position x="140" y="130"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="AutoOFF_Time">
+                  <connectionPointIn>
+                    <relPosition x="0" y="100"/>
+                    <connection refLocalId="4">
+                      <position x="190" y="180"/>
+                      <position x="150" y="180"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="AutoOFF_Out">
+                  <connectionPointOut>
+                    <relPosition x="300" y="50"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <outVariable localId="11" height="30" width="130">
+              <position x="540" y="50"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="10" formalParameter="AutoOFF_Out">
+                  <position x="540" y="70"/>
+                  <position x="510" y="70"/>
+                  <position x="510" y="130"/>
+                  <position x="490" y="130"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Appliance1_State</expression>
+            </outVariable>
+            <comment localId="12" height="90" width="510">
+              <position x="20" y="210"/>
+              <content>
+<![CDATA[The AutoOff_ input is the current state of the device
+The Output of the device is copied to the State of the device every cycle. This is simulating a typical 2 way capable device]]>
+              </content>
+            </comment>
+            <outVariable localId="1" height="30" width="130">
+              <position x="540" y="410"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="13" formalParameter="AutoRESTART_Out">
+                  <position x="540" y="430"/>
+                  <position x="520" y="430"/>
+                  <position x="520" y="380"/>
+                  <position x="490" y="380"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Appliance2_State</expression>
+            </outVariable>
+            <inVariable localId="5" height="30" width="140">
+              <position x="10" y="360"/>
+              <connectionPointOut>
+                <relPosition x="140" y="20"/>
+              </connectionPointOut>
+              <expression>Appliance2_State</expression>
+            </inVariable>
+            <outVariable localId="6" height="30" width="120">
+              <position x="550" y="360"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="13" formalParameter="AutoRESTART_Out">
+                  <position x="550" y="380"/>
+                  <position x="490" y="380"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Appliance2_Out</expression>
+            </outVariable>
+            <inVariable localId="7" height="30" width="140">
+              <position x="10" y="410"/>
+              <connectionPointOut>
+                <relPosition x="140" y="20"/>
+              </connectionPointOut>
+              <expression>Time_AutoRestart</expression>
+            </inVariable>
+            <block localId="13" width="300" height="110" typeName="Auto_RESTART_Common" instanceName="Auto_RESTART_Test" executionOrderId="1">
+              <position x="190" y="340"/>
+              <inputVariables>
+                <variable formalParameter="AutoRESTART_Input">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="5">
+                      <position x="190" y="380"/>
+                      <position x="150" y="380"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="AutoRESTART_Time">
+                  <connectionPointIn>
+                    <relPosition x="0" y="90"/>
+                    <connection refLocalId="7">
+                      <position x="190" y="430"/>
+                      <position x="150" y="430"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="AutoRESTART_Out">
+                  <connectionPointOut>
+                    <relPosition x="300" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+          </FBD>
+        </body>
+        <documentation>
+<![CDATA[]]>
+        </documentation>
+      </pou>
+      <pou name="Auto_RESTART_Common" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="AutoRESTART_Input">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="AutoRESTART_Time">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="AutoRESTART_Out">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="AutoRESTART_Enable">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE"/>
+              </initialValue>
+            </variable>
+            <variable name="AutoRESTART_Elapsed">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+            <variable name="AutoRestart_timer">
+              <type>
+                <derived name="TP"/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <FBD>
+            <block localId="1" width="110" height="180" typeName="TP" instanceName="AutoRestart_timer" executionOrderId="2">
+              <position x="290" y="70"/>
+              <inputVariables>
+                <variable formalParameter="EN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="50"/>
+                    <connection refLocalId="11">
+                      <position x="290" y="120"/>
+                      <position x="170" y="120"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="100"/>
+                    <connection refLocalId="12" formalParameter="OUT">
+                      <position x="290" y="170"/>
+                      <position x="260" y="170"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PT">
+                  <connectionPointIn>
+                    <relPosition x="0" y="150"/>
+                    <connection refLocalId="4">
+                      <position x="290" y="220"/>
+                      <position x="170" y="220"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="ENO">
+                  <connectionPointOut>
+                    <relPosition x="110" y="50"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="Q">
+                  <connectionPointOut>
+                    <relPosition x="110" y="100"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="ET">
+                  <connectionPointOut>
+                    <relPosition x="110" y="150"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <outVariable localId="3" height="30" width="140">
+              <position x="520" y="150"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="13" formalParameter="OUT">
+                  <position x="520" y="170"/>
+                  <position x="490" y="170"/>
+                </connection>
+              </connectionPointIn>
+              <expression>AutoRESTART_Out</expression>
+            </outVariable>
+            <inVariable localId="4" height="30" width="150">
+              <position x="20" y="200"/>
+              <connectionPointOut>
+                <relPosition x="150" y="20"/>
+              </connectionPointOut>
+              <expression>AutoRESTART_Time</expression>
+            </inVariable>
+            <outVariable localId="5" height="30" width="170">
+              <position x="490" y="200"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1" formalParameter="ET">
+                  <position x="490" y="220"/>
+                  <position x="400" y="220"/>
+                </connection>
+              </connectionPointIn>
+              <expression>AutoRESTART_Elapsed</expression>
+            </outVariable>
+            <inVariable localId="11" height="30" width="150">
+              <position x="20" y="100"/>
+              <connectionPointOut>
+                <relPosition x="150" y="20"/>
+              </connectionPointOut>
+              <expression>AutoRESTART_Enable</expression>
+            </inVariable>
+            <inVariable localId="10" height="30" width="150">
+              <position x="20" y="150"/>
+              <connectionPointOut>
+                <relPosition x="150" y="20"/>
+              </connectionPointOut>
+              <expression>AutoRESTART_Input</expression>
+            </inVariable>
+            <block localId="12" width="60" height="50" typeName="NOT" executionOrderId="1">
+              <position x="200" y="130"/>
+              <inputVariables>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="10">
+                      <position x="200" y="170"/>
+                      <position x="170" y="170"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="60" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <block localId="13" width="60" height="50" typeName="NOT" executionOrderId="3">
+              <position x="430" y="130"/>
+              <inputVariables>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="1" formalParameter="Q">
+                      <position x="430" y="170"/>
+                      <position x="400" y="170"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="60" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+          </FBD>
+        </body>
+      </pou>
+      <pou name="Auto_Light_Common" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Light_Motion_Detected">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Light_State">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Light_Output">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Light_Auto_Enable">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Not used yet by IEC engine]]>
+              </documentation>
+            </variable>
+            <variable name="Light_ON_Elapsed">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+          </localVars>
+          <inputVars>
+            <variable name="Light_ON_Timer1">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+            <variable name="Light_ON_Timer2">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+          </inputVars>
+          <localVars>
+            <variable name="Light_ON_Timer">
+              <type>
+                <derived name="TP"/>
+              </type>
+            </variable>
+          </localVars>
+          <inputVars>
+            <variable name="Light_ON_Timer_Select">
+              <type>
+                <BOOL/>
+              </type>
+              <documentation>
+<![CDATA[False: Short Time True: long Time]]>
+              </documentation>
+            </variable>
+            <variable name="Light_ON_Level">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="50"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Detection Light level from 0% to 100%]]>
+              </documentation>
+            </variable>
+            <variable name="Current_Light_Level">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="100"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Measured Light level from 0% to 100%]]>
+              </documentation>
+            </variable>
+          </inputVars>
+          <localVars>
+            <variable name="Rising_Edge">
+              <type>
+                <derived name="R_TRIG"/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <FBD>
+            <block localId="1" width="110" height="180" typeName="TP" instanceName="Light_ON_Timer" executionOrderId="5">
+              <position x="510" y="70"/>
+              <inputVariables>
+                <variable formalParameter="EN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="50"/>
+                    <connection refLocalId="11">
+                      <position x="510" y="120"/>
+                      <position x="470" y="120"/>
+                      <position x="470" y="40"/>
+                      <position x="190" y="40"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="100"/>
+                    <connection refLocalId="15" formalParameter="OUT">
+                      <position x="510" y="170"/>
+                      <position x="390" y="170"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PT">
+                  <connectionPointIn>
+                    <relPosition x="0" y="150"/>
+                    <connection refLocalId="16" formalParameter="OUT">
+                      <position x="510" y="220"/>
+                      <position x="480" y="220"/>
+                      <position x="480" y="450"/>
+                      <position x="450" y="450"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="ENO">
+                  <connectionPointOut>
+                    <relPosition x="110" y="50"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="Q">
+                  <connectionPointOut>
+                    <relPosition x="110" y="100"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="ET">
+                  <connectionPointOut>
+                    <relPosition x="110" y="150"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <outVariable localId="3" height="30" width="140">
+              <position x="680" y="150"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1" formalParameter="Q">
+                  <position x="680" y="170"/>
+                  <position x="620" y="170"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Light_Output</expression>
+            </outVariable>
+            <inVariable localId="4" height="30" width="150">
+              <position x="20" y="190"/>
+              <connectionPointOut>
+                <relPosition x="150" y="20"/>
+              </connectionPointOut>
+              <expression>Light_State</expression>
+            </inVariable>
+            <outVariable localId="5" height="30" width="170">
+              <position x="650" y="200"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1" formalParameter="ET">
+                  <position x="650" y="220"/>
+                  <position x="640" y="220"/>
+                  <position x="640" y="220"/>
+                  <position x="620" y="220"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Light_ON_Elapsed</expression>
+            </outVariable>
+            <inVariable localId="11" height="30" width="150">
+              <position x="40" y="20"/>
+              <connectionPointOut>
+                <relPosition x="150" y="20"/>
+              </connectionPointOut>
+              <expression>Light_Auto_Enable</expression>
+            </inVariable>
+            <inVariable localId="10" height="30" width="170">
+              <position x="20" y="100"/>
+              <connectionPointOut>
+                <relPosition x="170" y="20"/>
+              </connectionPointOut>
+              <expression>Light_Motion_Detected</expression>
+            </inVariable>
+            <block localId="14" width="60" height="50" typeName="R_TRIG" instanceName="Rising_Edge" executionOrderId="1">
+              <position x="210" y="80"/>
+              <inputVariables>
+                <variable formalParameter="CLK">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="10">
+                      <position x="210" y="120"/>
+                      <position x="190" y="120"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="Q">
+                  <connectionPointOut>
+                    <relPosition x="60" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <block localId="15" width="70" height="140" typeName="AND" executionOrderId="3">
+              <position x="320" y="130"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="14" formalParameter="Q">
+                      <position x="320" y="170"/>
+                      <position x="295" y="170"/>
+                      <position x="295" y="120"/>
+                      <position x="270" y="120"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="80"/>
+                    <connection refLocalId="23" formalParameter="OUT">
+                      <position x="320" y="210"/>
+                      <position x="270" y="210"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN3">
+                  <connectionPointIn>
+                    <relPosition x="0" y="120"/>
+                    <connection refLocalId="20" formalParameter="OUT">
+                      <position x="320" y="250"/>
+                      <position x="293" y="250"/>
+                      <position x="293" y="320"/>
+                      <position x="270" y="320"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="70" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <block localId="16" width="70" height="150" typeName="SEL" executionOrderId="4">
+              <position x="380" y="410"/>
+              <inputVariables>
+                <variable formalParameter="G">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="17">
+                      <position x="380" y="450"/>
+                      <position x="330" y="450"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN0">
+                  <connectionPointIn>
+                    <relPosition x="0" y="80"/>
+                    <connection refLocalId="18">
+                      <position x="380" y="490"/>
+                      <position x="330" y="490"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="130"/>
+                    <connection refLocalId="19">
+                      <position x="380" y="540"/>
+                      <position x="330" y="540"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="70" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="17" height="30" width="170">
+              <position x="160" y="430"/>
+              <connectionPointOut>
+                <relPosition x="170" y="20"/>
+              </connectionPointOut>
+              <expression>Light_ON_Timer_Select</expression>
+            </inVariable>
+            <inVariable localId="18" height="30" width="130">
+              <position x="200" y="470"/>
+              <connectionPointOut>
+                <relPosition x="130" y="20"/>
+              </connectionPointOut>
+              <expression>Light_ON_Timer1</expression>
+            </inVariable>
+            <inVariable localId="19" height="30" width="130">
+              <position x="200" y="520"/>
+              <connectionPointOut>
+                <relPosition x="130" y="20"/>
+              </connectionPointOut>
+              <expression>Light_ON_Timer2</expression>
+            </inVariable>
+            <block localId="20" width="70" height="120" typeName="LE" executionOrderId="2">
+              <position x="200" y="270"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="50"/>
+                    <connection refLocalId="22">
+                      <position x="200" y="320"/>
+                      <position x="170" y="320"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="100"/>
+                    <connection refLocalId="21">
+                      <position x="200" y="370"/>
+                      <position x="170" y="370"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="70" y="50"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="21" height="30" width="120">
+              <position x="50" y="350"/>
+              <connectionPointOut>
+                <relPosition x="120" y="20"/>
+              </connectionPointOut>
+              <expression>Light_ON_Level</expression>
+            </inVariable>
+            <inVariable localId="22" height="30" width="150">
+              <position x="20" y="300"/>
+              <connectionPointOut>
+                <relPosition x="150" y="20"/>
+              </connectionPointOut>
+              <expression>Current_Light_Level</expression>
+            </inVariable>
+            <block localId="23" width="70" height="60" typeName="NOT" executionOrderId="1">
+              <position x="200" y="170"/>
+              <inputVariables>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="4">
+                      <position x="200" y="210"/>
+                      <position x="170" y="210"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="70" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+          </FBD>
+        </body>
+      </pou>
+      <pou name="Auto_OFF_Common" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="AutoOFF_Input">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="AutoOFF_Time">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="AutoOFF_Out">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="AutoOFF_Enable">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE"/>
+              </initialValue>
+            </variable>
+            <variable name="AutoOFF_Elapsed">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+            <variable name="AutoOff_timer">
+              <type>
+                <derived name="TP"/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <FBD>
+            <block localId="1" width="110" height="180" typeName="TP" instanceName="AutoOff_timer" executionOrderId="1">
+              <position x="240" y="70"/>
+              <inputVariables>
+                <variable formalParameter="EN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="50"/>
+                    <connection refLocalId="11">
+                      <position x="240" y="120"/>
+                      <position x="170" y="120"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="100"/>
+                    <connection refLocalId="10">
+                      <position x="240" y="170"/>
+                      <position x="170" y="170"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PT">
+                  <connectionPointIn>
+                    <relPosition x="0" y="150"/>
+                    <connection refLocalId="4">
+                      <position x="240" y="220"/>
+                      <position x="170" y="220"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="ENO">
+                  <connectionPointOut>
+                    <relPosition x="110" y="50"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="Q">
+                  <connectionPointOut>
+                    <relPosition x="110" y="100"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="ET">
+                  <connectionPointOut>
+                    <relPosition x="110" y="150"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <outVariable localId="3" height="30" width="110">
+              <position x="450" y="150"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1" formalParameter="Q">
+                  <position x="450" y="170"/>
+                  <position x="350" y="170"/>
+                </connection>
+              </connectionPointIn>
+              <expression>AutoOFF_Out</expression>
+            </outVariable>
+            <inVariable localId="4" height="30" width="110">
+              <position x="60" y="200"/>
+              <connectionPointOut>
+                <relPosition x="110" y="20"/>
+              </connectionPointOut>
+              <expression>AutoOFF_Time</expression>
+            </inVariable>
+            <outVariable localId="5" height="30" width="130">
+              <position x="430" y="200"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1" formalParameter="ET">
+                  <position x="430" y="220"/>
+                  <position x="350" y="220"/>
+                </connection>
+              </connectionPointIn>
+              <expression>AutoOFF_Elapsed</expression>
+            </outVariable>
+            <inVariable localId="11" height="30" width="130">
+              <position x="40" y="100"/>
+              <connectionPointOut>
+                <relPosition x="130" y="20"/>
+              </connectionPointOut>
+              <expression>AutoOFF_Enable</expression>
+            </inVariable>
+            <inVariable localId="10" height="30" width="130">
+              <position x="40" y="150"/>
+              <connectionPointOut>
+                <relPosition x="130" y="20"/>
+              </connectionPointOut>
+              <expression>AutoOFF_Input</expression>
+            </inVariable>
+          </FBD>
+        </body>
+      </pou>
+      <pou name="Automatic_Light" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="Auto_Light_Test">
+              <type>
+                <derived name="Auto_Light_Common"/>
+              </type>
+            </variable>
+            <variable name="Motion_Simul">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Light_State1">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Light_Out1">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Light_Timer_Select">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE"/>
+              </initialValue>
+            </variable>
+            <variable name="Light_Timer1">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="t#10s"/>
+              </initialValue>
+            </variable>
+            <variable name="Light_Timer2">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="t#20s"/>
+              </initialValue>
+            </variable>
+            <variable name="Light_Level_Threshold">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="50"/>
+              </initialValue>
+            </variable>
+            <variable name="Light_Level_Current">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="49"/>
+              </initialValue>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <FBD>
+            <block localId="1" width="270" height="330" typeName="Auto_Light_Common" instanceName="Auto_Light_Test" executionOrderId="1">
+              <position x="250" y="300"/>
+              <inputVariables>
+                <variable formalParameter="Light_Motion_Detected">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="2">
+                      <position x="250" y="340"/>
+                      <position x="160" y="340"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Light_State">
+                  <connectionPointIn>
+                    <relPosition x="0" y="90"/>
+                    <connection refLocalId="3">
+                      <position x="250" y="390"/>
+                      <position x="150" y="390"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Light_ON_Timer1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="130"/>
+                    <connection refLocalId="4">
+                      <position x="250" y="430"/>
+                      <position x="150" y="430"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Light_ON_Timer2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="170"/>
+                    <connection refLocalId="5">
+                      <position x="250" y="470"/>
+                      <position x="150" y="470"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Light_ON_Timer_Select">
+                  <connectionPointIn>
+                    <relPosition x="0" y="220"/>
+                    <connection refLocalId="6">
+                      <position x="250" y="520"/>
+                      <position x="190" y="520"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Light_ON_Level">
+                  <connectionPointIn>
+                    <relPosition x="0" y="260"/>
+                    <connection refLocalId="9">
+                      <position x="250" y="560"/>
+                      <position x="220" y="560"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Current_Light_Level">
+                  <connectionPointIn>
+                    <relPosition x="0" y="310"/>
+                    <connection refLocalId="10">
+                      <position x="250" y="610"/>
+                      <position x="200" y="610"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="Light_Output">
+                  <connectionPointOut>
+                    <relPosition x="270" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="2" height="30" width="110">
+              <position x="50" y="320"/>
+              <connectionPointOut>
+                <relPosition x="110" y="20"/>
+              </connectionPointOut>
+              <expression>Motion_Simul</expression>
+            </inVariable>
+            <inVariable localId="3" height="30" width="100">
+              <position x="50" y="370"/>
+              <connectionPointOut>
+                <relPosition x="100" y="20"/>
+              </connectionPointOut>
+              <expression>Light_State1</expression>
+            </inVariable>
+            <inVariable localId="4" height="30" width="100">
+              <position x="50" y="410"/>
+              <connectionPointOut>
+                <relPosition x="100" y="20"/>
+              </connectionPointOut>
+              <expression>Light_Timer1</expression>
+            </inVariable>
+            <inVariable localId="5" height="30" width="100">
+              <position x="50" y="450"/>
+              <connectionPointOut>
+                <relPosition x="100" y="20"/>
+              </connectionPointOut>
+              <expression>Light_Timer2</expression>
+            </inVariable>
+            <inVariable localId="6" height="30" width="140">
+              <position x="50" y="500"/>
+              <connectionPointOut>
+                <relPosition x="140" y="20"/>
+              </connectionPointOut>
+              <expression>Light_Timer_Select</expression>
+            </inVariable>
+            <outVariable localId="7" height="30" width="90">
+              <position x="590" y="320"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1" formalParameter="Light_Output">
+                  <position x="590" y="340"/>
+                  <position x="520" y="340"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Light_Out1</expression>
+            </outVariable>
+            <outVariable localId="8" height="30" width="100">
+              <position x="580" y="360"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1" formalParameter="Light_Output">
+                  <position x="580" y="380"/>
+                  <position x="550" y="380"/>
+                  <position x="550" y="340"/>
+                  <position x="520" y="340"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Light_State1</expression>
+            </outVariable>
+            <inVariable localId="9" height="30" width="170">
+              <position x="50" y="540"/>
+              <connectionPointOut>
+                <relPosition x="170" y="20"/>
+              </connectionPointOut>
+              <expression>Light_Level_Threshold</expression>
+            </inVariable>
+            <inVariable localId="10" height="30" width="150">
+              <position x="50" y="590"/>
+              <connectionPointOut>
+                <relPosition x="150" y="20"/>
+              </connectionPointOut>
+              <expression>Light_Level_Current</expression>
+            </inVariable>
+            <comment localId="11" height="250" width="650">
+              <position x="30" y="20"/>
+              <content>
+<![CDATA[Sample to illustrate a Automatic Light control.
+Light goes ON if:
+ - Light level above the configured limit
+ - and motion detected (Rising Edge)
+Light goes OFF after:
+ - went ON
+ - after Time1 or Time2
+ - TimeX selectable with a Boolean variable
+
+Can also be realized using SFC]]>
+              </content>
+            </comment>
+          </FBD>
+        </body>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="config">
+        <resource name="resource_main">
+          <task name="Sampling" interval="T#1s" priority="0">
+            <pouInstance name="Light" typeName="Automatic_Light"/>
+            <pouInstance name="Appliance" typeName="Automatic_Appliance"/>
+          </task>
+          <globalVars>
+            <variable name="Appliance1_Out" address="%QX1.0">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Appliance1_State" address="%IX1.0">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Appliance2_Out" address="%QX2.0">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Appliance2_State" address="%IX2.0">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </globalVars>
+        </resource>
+      </configuration>
+    </configurations>
+  </instances>
+</project>

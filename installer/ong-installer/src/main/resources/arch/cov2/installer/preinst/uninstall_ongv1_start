@@ -1,0 +1,10 @@
+
+if [ -d /usr/local/phoneme ]; then
+    rm -rf /usr/local/phoneme
+fi
+if [ -f /etc/inittab -a -z "`grep \"$ROOTACT/bin/ntpclient\" /etc/inittab`" ]; then
+    sed -i -e "/^.*ntpclient.*$/d" /etc/inittab
+fi
+if [ -f /etc/init.d/rcS -a "x" != "x`grep 'ong start' /etc/init.d/rcS | grep -v ROOTACT`" ]; then
+    sed -i -e "/^.*ong start.*$/d" /etc/init.d/rcS
+fi

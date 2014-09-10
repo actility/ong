@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="IlluminanceMeasurement.Srv" status="cfg-mandatory"/>
+    <str name="zbClusterID" val="0x0400" status="cfg-mandatory"/>
+    <enum name="zbClusterType" val="server" status="cfg-mandatory"/>
+
+    <!-- ZigBee attributes -->
+    <int name="zbMeasuredValue" ${a_configAttr0}="${a_configVal0}" />
+    <int name="zbMinMeasuredValue" ${a_configAttr1}="${a_configVal1}" />
+    <int name="zbMaxMeasuredValue" ${a_configAttr2}="${a_configVal2}" />
+            
+    <!-- ZigBee commands -->
+            
+    <!-- M2M POINTS-->
+    <real name="m2mMeasuredValue" unit="obix:units/lux" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0400.0x0000.0.m2m/contentInstances/latest/content"/>
+</obj>

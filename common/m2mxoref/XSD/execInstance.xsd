@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:tns="http://uri.etsi.org/m2m" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m">
+	<include schemaLocation="common.xsd"/>
+
+	<!-- execInstance type resource -->
+	<element name="execInstance" type="tns:ExecInstance"/>
+
+	<complexType name="ExecInstance">
+		<sequence>
+			<!-- common attributes -->
+			<element ref="tns:expirationTime" minOccurs="0"/>
+			<element ref="tns:accessRightID" minOccurs="0"/>			
+			<element ref="tns:creationTime" minOccurs="0"/>
+			<element ref="tns:lastModifiedTime" minOccurs="0"/>
+			
+			<!-- MO specific attributes -->
+			<element ref="tns:execStatus" minOccurs="0"/>
+ 			<element ref="tns:execResult" minOccurs="0"/>
+			<element ref="tns:execDisable" minOccurs="0"/>
+
+			<!-- sub resources -->			
+			<element ref="tns:subscriptionsReference" minOccurs="0"/>
+		</sequence>
+		<attribute ref="tns:id"/>
+	</complexType>	
+
+	<element name="execStatus" type="tns:ExecStatus"/>
+	<element name="execDisable" type="anyURI"/>
+
+	<simpleType name="ExecStatus">
+		<restriction base="string">
+			<enumeration value="INITIATED"/>
+			<enumeration value="STARTED"/>	
+			<enumeration value="FINISHED"/>			
+			<enumeration value="CANCELLING"/>											
+		</restriction>
+	</simpleType>
+
+
+	<element name="execResult" type="tns:ExecResultList"/>
+	<complexType name="ExecResultList">
+		<sequence>
+                        <element name="execResultItem" type="tns:ExecResultItem" minOccurs="0" maxOccurs="unbounded"/> 			
+		</sequence>		
+	</complexType>
+	
+	<complexType name="ExecResultItem">
+		<sequence>
+			<element name="name" type="string"/>
+			<element name="value" type="anyType"/>
+		</sequence>
+	</complexType>
+	</schema>

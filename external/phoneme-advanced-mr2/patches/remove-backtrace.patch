@@ -1,0 +1,43 @@
+From 6e2214c77d846d7b7b6513b93df8af31bb7c2b4e Mon Sep 17 00:00:00 2001
+From: jreich_dev <jreich@CentOS-dev-jreich.actility.net>
+Date: Fri, 5 Oct 2012 09:57:15 +0200
+Subject: [PATCH 3/3] remove backtrace
+
+---
+ .../cdc/src/share/javavm/runtime/utils.c           |   13 -------------
+ 1 files changed, 0 insertions(+), 13 deletions(-)
+
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/utils.c b/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/utils.c
+index 7daac0b..f22f651 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/utils.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/utils.c
+@@ -25,7 +25,6 @@
+  *
+  */
+ 
+-#include <execinfo.h>
+ #include "javavm/include/porting/doubleword.h"
+ #include "javavm/include/porting/int.h"
+ #include "javavm/include/porting/time.h"
+@@ -66,18 +65,6 @@
+ void
+ CVMbacktracePanic(const char* message)
+ {
+-    void* frames[32];
+-    size_t size;
+-    char** functionNames;
+-    size_t i;
+-
+-    size = backtrace(frames, 32);
+-    functionNames = backtrace_symbols(frames, size);
+-    CVMconsolePrintf("Backtrace is (%d frames):\n", size);
+-    for (i = 0; i < size; i++) {
+-        CVMconsolePrintf("frame %d: %s\n", i, functionNames[i]);
+-    }
+-    free(functionNames);
+     CVMpanic(message);
+ }
+ 
+-- 
+1.7.3.4
+

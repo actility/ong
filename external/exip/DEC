@@ -1,0 +1,12 @@
+
+File=demo
+
+#java -jar ${ROOTACT}/ExiProcessor/ExiProcessor.jar -schema accessRight.xsd -exi_in ${File}.exi -xml_out ${File}.jout
+
+java -jar ${ROOTACT}/ExiProcessor/ExiProcessor.jar -exi_in ${File}.exi -xml_out ${File}.jout
+
+#$ROOTACT/exip/bin/examples/exipd -xml -schema=accessRight.exs,common.exs ${File}.exi
+
+
+./exipd -xml ${File}.exi > ${File}.out
+./exipd -xml -schema=exipe-test-xsd.exi,exipe-test-nested-xsd.exi,exipe-test-types-xsd.exi ${File}S.exi > ${File}S.out

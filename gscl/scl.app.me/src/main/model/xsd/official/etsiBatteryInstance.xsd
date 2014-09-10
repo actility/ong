@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd" />
+	<include schemaLocation="parameters.xsd" />
+
+	<!-- <batteryInstance> resource type -->
+	<complexType name="BatteryInstance">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:battLevel"/>
+					<element ref="tns:battStatus"/>
+				</sequence>
+			</extension >
+		</complexContent>
+	</complexType>
+		
+	<element name="battLevel" type="tns:BatteryLevel">
+		<annotation>
+			<documentation>
+			Contains the current battery level expressed in percentage.
+			</documentation>
+		</annotation>
+	</element>
+
+	<simpleType name="BatteryLevel" >
+		<restriction base="long" >
+			<minInclusive value="0" />
+			<maxInclusive value="100" />
+		</restriction>
+	</simpleType>
+
+	<element name="battStatus" type="tns:BatteryStatus">
+		<annotation>
+			<documentation>
+			Indicates the status of the battery.
+			</documentation>
+		</annotation>
+	</element>
+
+	<simpleType name="BatteryStatus" >
+		<restriction base="string" >
+			<enumeration value="NORMAL" />
+			<enumeration value="CHARGING" />
+			<enumeration value="CHARGE_COMPLETE" />
+			<enumeration value="DAMAGED" />
+			<enumeration value="LOW_BATTERY" />
+			<enumeration value="NOT_INSTALLED" />
+			<enumeration value="UNKNOWN" />
+	</restriction>
+	</simpleType>
+ 
+</schema>

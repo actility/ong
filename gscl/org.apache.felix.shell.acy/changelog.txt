@@ -1,0 +1,52 @@
+-------------------------------------------------------------------------------
+Apache Felix shell changelog
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - Extract Interface of org.apache.felix.shell and 
+   org.ungoverned.osgi.service.shell packages to a new API bundle so called 
+   "org.apache.felix.shell.acy.api".
+ - Change artifact Id for "org.apache.felix.shell.acy.me" (was
+   org.apache.felix.shell.acy)
+ - Remote the commands "sysprop", "stop", "start", "install", "uninstall", 
+   "update", "refresh", "inspect" and "resolve" that are unsupported by the
+   IS2T JVM. 
+   These commands have been isolated in a new bundle so called 
+   "org.apache.felix.shell.acy.se".
+ - Report patches for IS2T VM compatibility.
+
+Bug Fixes:
+----------
+ - Fixed. Sort commands by name when using the 'help' command
+
+-------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2012-06-05
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Sort commands by name when using the 'help' command
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2012-03-20
+
+New Features:
+-------------
+ - Added sessions to group commands
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.4.3
+
+Version 1.4.3 coming from official Apache Felix project

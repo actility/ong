@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resourceModeling
+	xmlns="http://uri.actility.com/m2m/ong">
+    
+    <!-- Basic (ZigBee server cluster) -->
+    <interface filter="zigbee:/server/0x0000">
+        <descriptor>
+            <attr name="zbVersion" config="descriptor"/>
+            <attr name="zbApplicationVersion" config="descriptor"/>   
+            <attr name="zbStackVersion" config="descriptor"/> 
+            <attr name="zbHWVersion" config="descriptor"/>          
+            <attr name="zbManufacturerName" config="descriptor"/>     
+            <attr name="zbModelIdentifier" config="descriptor"/>      
+            <attr name="zbDateCode" config="descriptor"/>   
+            <attr name="zbPowerSource" config="descriptor"/>         
+            <attr name="zbLocationDescription" config="descriptor"/> 
+            <cmd name="zbResettoFactoryDefaults" accessRight="level1"/>
+        </descriptor>
+    </interface>
+    
+    <!-- Identify (ZigBee server cluster) -->
+    <interface filter="zigbee:/client/0x0003">
+        <descriptor>        
+            <attr name="zbIdentifyTime" config="retargeting" accessRight="level3"/>
+            <cmd name="zbIdentify" accessRight="level3"/>
+            <cmd name="zbIdentifyQuery" accessRight="level3"/>
+        </descriptor>
+    </interface>
+    
+    <!-- OnOff (ZigBee client cluster) -->
+    <interface filter="zigbee:/client/0x0006">
+        <descriptor>
+            <cmd name="zdoBind" accessRight="level2"/>
+            <cmd name="zdoUnbind" accessRight="level2"/>
+        </descriptor>
+    </interface>
+    
+    <!-- OnOff (ZigBee server cluster) -->
+    <interface filter="zigbee:/server/0x0006">
+        <descriptor>
+            <attr name="zbOnOff" config="retargeting" accessRight="level3"/>
+            <cmd name="zbOff" accessRight="level2"/>
+            <cmd name="zbOn" accessRight="level2"/>
+            <cmd name="zbToggle" accessRight="level2"/>
+            <point name="m2mOnOff" config="logging"/>       
+        </descriptor>
+        <covConfiguration filter="zigbee:/attribute/0x0000" maxInterval="PT2H"/>
+    </interface>
+    
+    <!-- Relative Humidity Measurement (ZigBee server cluster) -->
+    <interface filter="zigbee:/server/0x0405"> 
+        <descriptor>
+            <attr name="zbMeasuredValue" config="retargeting" accessRight="level3"/>
+            <attr name="zbMinMeasuredValue" config="descriptor"/>
+            <attr name="zbMaxMeasuredValue" config="descriptor"/>
+            <point name="m2mMeasuredValue" config="logging"/>
+        </descriptor>
+        <covConfiguration filter="zigbee:/attribute/0x0000" minInterval="PT5M" maxInterval="PT1H" minCOV="50"/>
+    </interface>
+    
+    <!-- Simple Metering (ZigBee server cluster) -->
+    <interface filter="zigbee:/server/0x0702">
+        <descriptor>
+            <attr name="zbCurrentSummationDelivered" config="retargeting" accessRight="level3"/>
+            <attr name="zbInstantaneousDemand" config="retargeting" accessRight="level3"/>
+            <attr name="zbUnitofMeasure" config="descriptor"/>
+            <attr name="zbMultiplier" config="descriptor"/>
+            <attr name="zbDivisor" config="descriptor"/>
+            <attr name="zbSummationFormatting" config="descriptor"/>
+            <attr name="zbDemandFormatting" config="descriptor"/>
+            <attr name="zbMeteringDeviceType" config="descriptor"/>
+            <cmd name="zdoBind" accessRight="level2"/>
+            <cmd name="zdoUnbind" accessRight="level2"/>
+            <point name="m2mCurrentSummationDelivered" config="logging" maxNrOfInstances="100"/>
+            <point name="m2mInstantaneousDemand" config="logging" maxNrOfInstances="10" storageDriver="ram"/>
+        </descriptor>
+        <covConfiguration  filter="zigbee:/attribute/0x0000" minInterval="PT5M" maxInterval="PT1H" minCOV="50"/>
+        <covConfiguration  filter="zigbee:/attribute/0x0400" minInterval="PT5M" maxInterval="PT1H" minCOV="50"/>
+    </interface>  
+
+    <!-- Simple Metering (ZigBee server cluster) / Develco SPECIFIC -->
+    <interface filter="zigbee:/manufacturer/0x1015/server/0x0702">
+        <descriptor>
+            <attr name="zbCurrentSummationDelivered" config="retargeting" accessRight="level3"/>
+            <attr name="zbInstantaneousDemand" config="retargeting" accessRight="level3"/>
+            <attr name="zbUnitofMeasure" config="descriptor"/>
+            <attr name="zbMultiplier" config="descriptor"/>
+            <attr name="zbDivisor" config="descriptor"/>
+            <attr name="zbSummationFormatting" config="descriptor"/>
+            <attr name="zbDemandFormatting" config="descriptor"/>
+            <attr name="zbMeteringDeviceType" config="descriptor"/>
+            <attr name="extPulseScallingFactor" config="retargeting" accessRight="level2"/>
+            <attr name="extCurrentSummation" config="retargeting" accessRight="level2"/>
+            <cmd name="zdoBind" accessRight="level2"/>
+            <cmd name="zdoUnbind" accessRight="level2"/>
+            <point name="m2mCurrentSummationDelivered" config="logging" maxNrOfInstances="100"/>
+            <point name="m2mInstantaneousDemand" config="logging" maxNrOfInstances="10" storageDriver="ram"/>
+        </descriptor>
+        <covConfiguration  filter="zigbee:/attribute/0x0000" minInterval="PT5M" maxInterval="PT1H" minCOV="50"/>
+        <covConfiguration  filter="zigbee:/attribute/0x0400" minInterval="PT5M" maxInterval="PT1H" minCOV="50"/>
+    </interface>  
+    
+    <!-- Temperature Measurement (ZigBee server cluster) -->
+    <interface filter="zigbee:/server/0x0402">
+        <descriptor>
+            <attr name="zbMaxMeasuredValue" config="retargeting" accessRight="level3"/>
+            <attr name="zbMinMeasuredValue" config="descriptor"/>
+            <attr name="zbMaxMeasuredValue" config="descriptor"/>
+            <point name="m2mMeasuredValue" config="logging"/>
+        </descriptor>
+        <covConfiguration filter="zigbee:/attribute/0x0000" minInterval="PT5M" maxInterval="PT1H" minCOV="50"/>
+    </interface>    
+</resourceModeling>

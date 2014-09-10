@@ -1,0 +1,12 @@
+chmod 755 $ROOTACT/etc/init.d/knx
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/init.d/knx
+mkdir -p $ROOTACT/etc/rc.d
+cd $ROOTACT/etc/rc.d
+ln -fs ../init.d/knx S07knx
+chmod 755 $ROOTACT/bin/knx.x
+mkdir -p $ROOTACT/usr/etc/knx/
+[ -f $ROOTACT/usr/etc/knx/modelconfig.xml ] || \
+cp $ROOTACT/etc/knx/modelconfig.xml $ROOTACT/usr/etc/knx/
+[ -f $ROOTACT/usr/etc/knx/spvconfig.xml ] || \
+cp $ROOTACT/etc/knx/spvconfig.xml $ROOTACT/usr/etc/knx/
+

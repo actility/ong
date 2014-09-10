@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="common.xsd" />
+
+	<element name="containers" type="tns:Containers" />
+
+	<complexType name="Containers">
+		<sequence>
+			<element ref="tns:accessRightID" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0" />
+			<element ref="tns:lastModifiedTime" minOccurs="0" />
+			<!-- subresources -->
+			<element ref="tns:containerCollection" minOccurs="0" />
+			<element ref="tns:containerAnncCollection" minOccurs="0" />
+			<element ref="tns:locationContainerCollection" minOccurs="0" />
+			<element ref="tns:locationContainerAnncCollection" minOccurs="0" />
+			<element ref="tns:subscriptionsReference" minOccurs="0" />
+		</sequence>
+	</complexType>
+
+	<element name="containerCollection" type="tns:NamedReferenceCollection" />
+	<element name="containerAnncCollection" type="tns:NamedReferenceCollection" />
+	<element name="locationContainerCollection" type="tns:NamedReferenceCollection" />
+	<element name="locationContainerAnncCollection" type="tns:NamedReferenceCollection" />
+</schema>

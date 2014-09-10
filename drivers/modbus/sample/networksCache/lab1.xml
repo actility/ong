@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<context xmlns="http://uri.actility.com/m2m/adaptor-modbus">
+    <networks>
+        <network name="lab1" type="ethernet">
+            <devices>
+                <device name="OTB" addr="192.168.1.181:502" ref="Telemecanique:OTB1E0DM9LP:0" />
+            </devices>
+        </network> 
+    </networks>
+</context>

@@ -1,0 +1,1 @@
+valgrind --tool=memcheck --leak-check=yes ./client.x -m retrieve -v9 $* /test

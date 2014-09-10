@@ -1,0 +1,63 @@
+#!(SHELL)
+#
+# WMBus:       Starts the WMBus driver
+
+exec 2> /dev/null
+
+CURRENT_DIR=`dirname $0`
+. $CURRENT_DIR/../ong.cfg
+. $CURRENT_DIR/../functions
+
+OPTIONS=""
+WMBUS_DATA=$ROOTACT/usr/data/wmbus
+SERVICE="wmbus"
+PIDFILE=$WMBUS_DATA/wmbus.pid
+STOPFILE=$WMBUS_DATA/stop
+
+usage() {
+    echo "Usage: WMBus [<options>] {start|stop|status|restart}"
+    echo "  Where options are:"
+    echo "   -h|--help    Print this help message"
+    echo "   -i|--init    Re-initialize ONG"
+}
+
+
+preStart() {
+  mkdir -p $ROOTACT/usr/data/wmbus
+}
+
+serviceCommand() {
+  echo "wmbus.x "$OPTIONS
+}
+
+stopService() {
+  WMBUS_PIDS=$(pidof wmbus.x)
+  [ -n "$WMBUS_PIDS" ] && kill -TERM $WMBUS_PIDS
+}
+
+abortService() {
+  WMBUS_PIDS=$(pidof wmbus.x)
+  [ -n "$WMBUS_PIDS" ] && kill -KILL $WMBUS_PIDS
+}
+
+GETOPTTEMP=`getopt -o a:hi --long help,init -- $@`
+if [ $? != 0 ] ; then usage ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments
+while [ -n "$1" ]
+do
+    case "$1" in
+        "-a") shift; OPTIONS=$OPTIONS" -a "$1;;
+        "-h"|"--help") usage; exit;;
+        "-i"|"--init") OPTIONS=$OPTIONS" -i";;
+        "--") shift; break ;;
+        * ) echo "Internal error ($*)!"; exit 1;;
+    esac
+    shift
+done
+
+handleParams $*
+
+exit $?
+

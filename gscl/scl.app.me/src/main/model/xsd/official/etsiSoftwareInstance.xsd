@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- <swInstance> resource type -->
+	<complexType name="SwInstance">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:softwareName"/>
+					<element ref="tns:softwareVersion"/>
+					<element ref="tns:softwareURL"/>
+					<element ref="tns:swActionStatus"/>
+				</sequence>
+			</extension>
+		</complexContent>
+		<!-- attribute name="id"></attribute -->
+	</complexType>
+
+	<element name="softwareName" type="tns:swName"/>
+
+	<simpleType name="swName">
+		<restriction base="string">
+			<maxLength value="64"/>
+		</restriction>
+	</simpleType>
+
+
+
+	<element name="softwareURL" type="tns:swURL"/>
+
+	<simpleType name="swURL">
+		<restriction base="string">
+			<maxLength value="1024"/>
+		</restriction>
+	</simpleType>
+
+	<element name="swActionStatus" type="tns:ActionStatus"/>
+
+</schema>

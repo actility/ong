@@ -1,0 +1,1519 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="Actility"
+              productName="iec61131"
+              productVersion="1.0.28"
+              creationDateTime="2013-07-16T14:50:58"/>
+  <contentHeader name="EEDOMUS_TPL"
+                 version="1.0.1"
+                 modificationDateTime="2013-09-10T17:36:39"
+                 author="Laurent Nicq">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="10" y="10"/>
+      </fbd>
+      <ld>
+        <scaling x="0" y="0"/>
+      </ld>
+      <sfc>
+        <scaling x="10" y="10"/>
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes/>
+    <pous>
+      <pou name="rules_template" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="EE_Rule_0000_Name">
+              <type>
+                <string/>
+              </type>
+              <initialValue>
+                <simpleValue value="'Rule_0000'"/>
+              </initialValue>
+            </variable>
+            <variable name="EE_Rule_0000_TS_Active">
+              <type>
+                <DT/>
+              </type>
+              <documentation>
+<![CDATA[Time Stamp Last Activation]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_TS_LastExec">
+              <type>
+                <DT/>
+              </type>
+              <documentation>
+<![CDATA[Time Stamp Last Execution]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_State">
+              <type>
+                <DINT/>
+              </type>
+              <documentation>
+<![CDATA[0: waiting for condition 1: executing]]>
+              </documentation>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="EE_Rule_0000_Count_Exec">
+              <type>
+                <DINT/>
+              </type>
+              <documentation>
+<![CDATA[Number of execution]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_Active">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="EE_Rule_0000_GLO_Var_00">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+            <variable name="EE_Rule_0000_GLO_Var_01">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+            <variable name="EE_Rule_0000_GLO_Var_02">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="EE_Rule_0000_LOC_Var_00">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+              <documentation>
+<![CDATA[initial value for Debug only]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_LOC_Var_01">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="1"/>
+              </initialValue>
+              <documentation>
+<![CDATA[initial value for Debug only]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_LOC_Var_02">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="2"/>
+              </initialValue>
+              <documentation>
+<![CDATA[initial value for Debug only]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_CAL_SINGLE_00">
+              <type>
+                <string/>
+              </type>
+              <initialValue>
+                <simpleValue value="'SINGLE_00'"/>
+              </initialValue>
+              <documentation>
+<![CDATA[initial value for Debug only]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_CAL_DAILY_00">
+              <type>
+                <string/>
+              </type>
+              <initialValue>
+                <simpleValue value="'DAILY_00'"/>
+              </initialValue>
+              <documentation>
+<![CDATA[initial value for Debug only]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_CAL_WEEKLY_00">
+              <type>
+                <string/>
+              </type>
+              <initialValue>
+                <simpleValue value="'WEEKLY_00'"/>
+              </initialValue>
+              <documentation>
+<![CDATA[initial value for Debug only]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_CAL_WEEKLY_Days_00">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="2#0111_1111"/>
+              </initialValue>
+              <documentation>
+<![CDATA[initial value for Debug only. Bit0: Sunday Bit1: Monday]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_CAL_Daily_Start_00">
+              <type>
+                <TOD/>
+              </type>
+              <initialValue>
+                <simpleValue value="TOD#11:55:00"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Start Time for Daily Calendar]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_CAL_Daily_Stop_00">
+              <type>
+                <TOD/>
+              </type>
+              <initialValue>
+                <simpleValue value="TOD#19:15:00"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Stop Time for Daily Calendar]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_CAL_Weekly_Start_00">
+              <type>
+                <TOD/>
+              </type>
+              <initialValue>
+                <simpleValue value="TOD#12:20:00"/>
+              </initialValue>
+              <documentation>
+<![CDATA[StartTime for Weekly Calendar]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_CAL_Weekly_Stop_00">
+              <type>
+                <TOD/>
+              </type>
+              <initialValue>
+                <simpleValue value="TOD#18:20:00"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Stop Time for Weekly Calendar]]>
+              </documentation>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="EE_Rule_GLOBAL_Day_Phase_00">
+              <type>
+                <TOD/>
+              </type>
+              <documentation>
+<![CDATA[Day Phase calculated in an other POU]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_GLOBAL_Day_Phase_01">
+              <type>
+                <TOD/>
+              </type>
+              <documentation>
+<![CDATA[Day Phase calculated in an other POU]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_GLOBAL_Day_Type">
+              <type>
+                <DINT/>
+              </type>
+              <documentation>
+<![CDATA[0: working 1: non-working 2: vacation]]>
+              </documentation>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="EE_Rule_0000_Retrigger_TON">
+              <type>
+                <derived name="TON"/>
+              </type>
+            </variable>
+            <variable name="EE_Rule_0000_Get_triggerET">
+              <type>
+                <TIME/>
+              </type>
+              <documentation>
+<![CDATA[For debug and Test only]]>
+              </documentation>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="EE_Rule_0000_Trigger_Wait">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="EE_Rule_0000_Trigger_Activate">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="EE_Rule_0000_Trigger_Ready">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <actions>
+          <action name="EE_Rule_0000_Action_Init_00">
+            <body>
+              <ST>
+<![CDATA[EE_Rule_0000_State:=-1;
+(* Initialization of Variable and Function such as Calendar *)
+newCalendarDailyEvent(  EE_Rule_0000_CAL_DAILY_00,
+                        EE_Rule_0000_CAL_Daily_Start_00,
+                        EE_Rule_0000_CAL_Daily_Stop_00,
+                        1
+                        );
+newCalendarWeeklyEvent( EE_Rule_0000_CAL_WEEKLY_00,
+                        EE_Rule_0000_CAL_Weekly_Start_00,
+                        EE_Rule_0000_CAL_Weekly_Stop_00,
+                        EE_Rule_0000_CAL_WEEKLY_Days_00
+                        );
+(* Multiple Actions can be created *)
+]]>
+              </ST>
+            </body>
+          </action>
+          <action name="EE_Rule_0000_Action_Criteria_00">
+            <body>
+              <ST>
+<![CDATA[(* Any USER action once the criteria and/or timer is matching goes here*)
+(* there can be multiple separated Actions if necessary for code clarity *)]]>
+              </ST>
+            </body>
+          </action>
+        </actions>
+        <transitions>
+          <transition name="EE_Rule_0000_Tra_Timer">
+            <body>
+              <ST>
+<![CDATA[(* This transition is for all Timing and Calendar related conditions *)
+(* If Timer are not used, leave it to TRUE *)
+(* TRUE; *)
+checkCalendarEvent( EE_Rule_0000_CAL_DAILY_00)
+OR
+checkCalendarEvent( EE_Rule_0000_CAL_WEEKLY_00);]]>
+              </ST>
+            </body>
+          </transition>
+          <transition name="EE_Rule_0000_Tra_Criteria">
+            <body>
+              <ST>
+<![CDATA[(* This part of the transition is for Logical conditions in a Rule *)
+(* If Criteria are not used, leave it to TRUE *)
+(* TRUE; *)
+(* This part transition is for all Timing and Calendar related conditions *)
+(* If Timer are not used, leave it to TRUE *)
+(* TRUE; *)
+checkCalendarEvent( EE_Rule_0000_CAL_DAILY_00)
+OR
+checkCalendarEvent( EE_Rule_0000_CAL_WEEKLY_00);
+(* add an AND between the Time condition and Logical condition *)]]>
+              </ST>
+            </body>
+          </transition>
+          <transition name="EE_Rule_0000_Tra_Active">
+            <body>
+              <ST>
+<![CDATA[EE_Rule_0000_Active= TRUE ;  ]]>
+              </ST>
+            </body>
+          </transition>
+          <transition name="EE_Rule_0000_Tra_Inactive">
+            <body>
+              <ST>
+<![CDATA[EE_Rule_0000_Active= FALSE ;  ]]>
+              </ST>
+            </body>
+          </transition>
+        </transitions>
+        <body>
+          <SFC>
+            <step localId="1" height="40" width="180" name="EE_Rule_0000_Step_Init" initialStep="true">
+              <position x="100" y="20"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="90" y="40"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="180" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="2" height="10" width="20">
+              <position x="180" y="70"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="190" y="70"/>
+                  <position x="190" y="60"/>
+                  <position x="190" y="60"/>
+                  <position x="190" y="60"/>
+                </connection>
+                <connection refLocalId="1">
+                  <position x="190" y="70"/>
+                  <position x="190" y="60"/>
+                  <position x="190" y="60"/>
+                  <position x="190" y="60"/>
+                </connection>
+                <connection refLocalId="1">
+                  <position x="190" y="70"/>
+                  <position x="190" y="60"/>
+                  <position x="190" y="60"/>
+                  <position x="190" y="60"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[TRUE]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <step localId="3" height="30" width="180" name="EE_Rule_0000_Step_Loopback">
+              <position x="100" y="90"/>
+              <connectionPointIn>
+                <relPosition x="90" y="0"/>
+                <connection refLocalId="2">
+                  <position x="190" y="90"/>
+                  <position x="190" y="80"/>
+                  <position x="190" y="80"/>
+                  <position x="190" y="80"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="90" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="180" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="4" height="10" width="20">
+              <position x="180" y="130"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="3">
+                  <position x="190" y="130"/>
+                  <position x="190" y="120"/>
+                  <position x="190" y="120"/>
+                  <position x="190" y="120"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="EE_Rule_0000_Tra_Active"/>
+              </condition>
+            </transition>
+            <actionBlock localId="5" width="210" height="30">
+              <position x="380" y="20"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1">
+                  <position x="380" y="40"/>
+                  <position x="280" y="40"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Rule_0000_Action_Init_00"/>
+              </action>
+            </actionBlock>
+            <step localId="6" height="30" width="180" name="EE_Rule_0000_Step_Active">
+              <position x="100" y="150"/>
+              <connectionPointIn>
+                <relPosition x="90" y="0"/>
+                <connection refLocalId="4">
+                  <position x="190" y="150"/>
+                  <position x="190" y="140"/>
+                  <position x="190" y="140"/>
+                  <position x="190" y="140"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="90" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="180" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="9" height="10" width="20">
+              <position x="100" y="270"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="22">
+                  <position x="110" y="270"/>
+                  <position x="110" y="201"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="EE_Rule_0000_Tra_Criteria"/>
+              </condition>
+            </transition>
+            <actionBlock localId="10" width="240" height="40">
+              <position x="380" y="150"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="6">
+                  <position x="380" y="170"/>
+                  <position x="280" y="170"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Rule_0000_State :=0;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Rule_0000_TS_Active := LocalDT();]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <block localId="11" width="50" height="110" typeName="TON" instanceName="EE_Rule_0000_Retrigger_TON" executionOrderId="1">
+              <position x="540" y="580"/>
+              <inputVariables>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="16">
+                      <position x="540" y="620"/>
+                      <position x="500" y="620"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PT">
+                  <connectionPointIn>
+                    <relPosition x="0" y="90"/>
+                    <connection refLocalId="15">
+                      <position x="540" y="670"/>
+                      <position x="500" y="670"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="Q">
+                  <connectionPointOut>
+                    <relPosition x="50" y="40"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="ET">
+                  <connectionPointOut>
+                    <relPosition x="50" y="90"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <step localId="12" height="30" width="180" name="EE_Rule_0000_Step_Criteria">
+              <position x="20" y="300"/>
+              <connectionPointIn>
+                <relPosition x="90" y="0"/>
+                <connection refLocalId="9">
+                  <position x="110" y="300"/>
+                  <position x="110" y="280"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="90" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="180" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="13" height="10" width="20">
+              <position x="100" y="530"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="25">
+                  <position x="110" y="530"/>
+                  <position x="110" y="371"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[EE_Rule_0000_Trigger_Ready=TRUE]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <inVariable localId="15" height="30" width="190">
+              <position x="310" y="650"/>
+              <connectionPointOut>
+                <relPosition x="190" y="20"/>
+              </connectionPointOut>
+              <expression>EE_Rule_0000_Trigger_Wait</expression>
+            </inVariable>
+            <inVariable localId="16" height="30" width="190">
+              <position x="310" y="600"/>
+              <connectionPointOut>
+                <relPosition x="190" y="20"/>
+              </connectionPointOut>
+              <expression>EE_Rule_0000_Trigger_Activate</expression>
+            </inVariable>
+            <outVariable localId="17" height="30" width="200">
+              <position x="630" y="600"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="11" formalParameter="Q">
+                  <position x="630" y="620"/>
+                  <position x="590" y="620"/>
+                </connection>
+              </connectionPointIn>
+              <expression>EE_Rule_0000_Trigger_Ready</expression>
+            </outVariable>
+            <outVariable localId="18" height="30" width="200">
+              <position x="630" y="650"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="11" formalParameter="ET">
+                  <position x="630" y="670"/>
+                  <position x="590" y="670"/>
+                </connection>
+              </connectionPointIn>
+              <expression>EE_Rule_0000_Get_triggerET</expression>
+            </outVariable>
+            <actionBlock localId="19" width="360" height="140">
+              <position x="380" y="300"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="12">
+                  <position x="380" y="320"/>
+                  <position x="200" y="320"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Rule_0000_TS_LastExec := LocalDT();]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Rule_0000_State:=1;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Rule_0000_Count_Exec:=EE_Rule_0000_Count_Exec+1;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Rule_0000_Trigger_Activate:=FALSE;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Rule_0000_Retrigger_TON"/>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Rule_0000_Trigger_Activate:=TRUE;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Rule_0000_Action_Criteria_00"/>
+              </action>
+            </actionBlock>
+            <jumpStep localId="21" height="20" width="20" targetName="EE_Rule_0000_Step_Loopback">
+              <position x="100" y="560"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="13">
+                  <position x="110" y="560"/>
+                  <position x="110" y="540"/>
+                  <position x="110" y="540"/>
+                  <position x="110" y="540"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <selectionDivergence localId="22" height="1" width="160">
+              <position x="110" y="200"/>
+              <connectionPointIn>
+                <relPosition x="80" y="0"/>
+                <connection refLocalId="6">
+                  <position x="190" y="200"/>
+                  <position x="190" y="180"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="0" y="1"/>
+              </connectionPointOut>
+              <connectionPointOut formalParameter="">
+                <relPosition x="160" y="1"/>
+              </connectionPointOut>
+            </selectionDivergence>
+            <jumpStep localId="23" height="20" width="20" targetName="EE_Rule_0000_Step_Init">
+              <position x="260" y="240"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="24">
+                  <position x="270" y="240"/>
+                  <position x="270" y="220"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <transition localId="24" height="10" width="20">
+              <position x="260" y="210"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="22">
+                  <position x="270" y="210"/>
+                  <position x="270" y="200"/>
+                  <position x="270" y="200"/>
+                  <position x="270" y="201"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="EE_Rule_0000_Tra_Inactive"/>
+              </condition>
+            </transition>
+            <selectionDivergence localId="25" height="1" width="150">
+              <position x="110" y="370"/>
+              <connectionPointIn>
+                <relPosition x="75" y="0"/>
+                <connection refLocalId="12">
+                  <position x="185" y="370"/>
+                  <position x="185" y="350"/>
+                  <position x="110" y="350"/>
+                  <position x="110" y="330"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="0" y="1"/>
+              </connectionPointOut>
+              <connectionPointOut formalParameter="">
+                <relPosition x="150" y="1"/>
+              </connectionPointOut>
+            </selectionDivergence>
+            <transition localId="7" height="10" width="20">
+              <position x="250" y="460"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="25">
+                  <position x="260" y="460"/>
+                  <position x="260" y="371"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="EE_Rule_0000_Tra_Inactive"/>
+              </condition>
+            </transition>
+            <jumpStep localId="26" height="20" width="20" targetName="EE_Rule_0000_Step_Init">
+              <position x="250" y="490"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="7">
+                  <position x="260" y="490"/>
+                  <position x="260" y="470"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+          </SFC>
+        </body>
+      </pou>
+      <pou name="macros_template" pouType="program">
+        <interface>
+          <externalVars>
+            <variable name="EE_Macro_0000_Start">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="EE_Macro_0000_Started">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="EE_Macro_0000_Loop">
+              <type>
+                <BOOL/>
+              </type>
+              <documentation>
+<![CDATA[indicates if Macro shall loopback]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Macro_0000_Terminate">
+              <type>
+                <BOOL/>
+              </type>
+              <documentation>
+<![CDATA[indicates if Macro shall terminate]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Macro_0000_Name">
+              <type>
+                <string/>
+              </type>
+              <documentation>
+<![CDATA[administrative, debug]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Macro_0000_LOC_Wait_00">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="T#5s"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Local wait time]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Macro_0000_LOC_Wait_01">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+            <variable name="EE_Macro_0000_LOC_Wait_02">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="EE_Macro_0000_GLO_Wait_00">
+              <type>
+                <TIME/>
+              </type>
+              <documentation>
+<![CDATA[Global wait time]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Macro_0000_GLO_Wait_01">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="EE_Macro_0000_Random_Wait">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+            <variable name="EE_Macro_0000_WakeupTime">
+              <type>
+                <DT/>
+              </type>
+            </variable>
+            <variable name="EE_Macro_0000_WaitTime">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="EE_Macro_0000_GLO_OutBOOL_00">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="EE_Macro_0000_GLO_OutDINT_00">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+          </externalVars>
+        </interface>
+        <actions>
+          <action name="EE_Macro_0000_Action_NextWakeup">
+            <body>
+              <ST>
+<![CDATA[EE_Macro_0000_WakeupTime:= ADD_DT_TIME( LocalDT(), EE_Macro_0000_WaitTime);]]>
+              </ST>
+            </body>
+          </action>
+          <action name="EE_Macro_0000_Action_Random">
+            <body>
+              <ST>
+<![CDATA[(* Calculate a randon Wait Time *)
+(* Example for Random between 2 and 10 sec *)
+EE_Macro_0000_Random_Wait := DINT_TO_TIME( 2 + RAND (8) );]]>
+              </ST>
+            </body>
+          </action>
+          <action name="EE_Macro_0000_Action_00">
+            <body>
+              <ST>
+<![CDATA[(* Action to be performed on Actuators *)
+EE_Macro_0000_GLO_OutBOOL_00:=TRUE;
+EE_Macro_0000_GLO_OutDINT_00:=EE_Macro_0000_GLO_OutDINT_00+1;
+]]>
+              </ST>
+            </body>
+          </action>
+          <action name="EE_Macro_0000_Action_01">
+            <body>
+              <ST>
+<![CDATA[EE_Macro_0000_GLO_OutBOOL_00:=FALSE;
+EE_Macro_0000_GLO_OutDINT_00:=EE_Macro_0000_GLO_OutDINT_00+1;]]>
+              </ST>
+            </body>
+          </action>
+          <action name="EE_Macro_0000_Action_02">
+            <body>
+              <ST>
+<![CDATA[EE_Macro_0000_GLO_OutBOOL_00:=TRUE;
+EE_Macro_0000_GLO_OutDINT_00:=EE_Macro_0000_GLO_OutDINT_00+1;]]>
+              </ST>
+            </body>
+          </action>
+          <action name="EE_Macro_0000_Action_03">
+            <body>
+              <ST>
+<![CDATA[EE_Macro_0000_GLO_OutBOOL_00:=FALSE;
+EE_Macro_0000_GLO_OutDINT_00:=EE_Macro_0000_GLO_OutDINT_00+1;]]>
+              </ST>
+            </body>
+          </action>
+        </actions>
+        <transitions>
+          <transition name="EE_Macro_0000_Tra_Wait_00">
+            <body>
+              <ST>
+<![CDATA[(*If immediate action, set to TRUE*)
+(*TRUE;*)
+(* if time based *)
+LocalDT() >=EE_Macro_0000_WakeupTime;]]>
+              </ST>
+            </body>
+          </transition>
+          <transition name="EE_Macro_0000_Tra_Loop">
+            <body>
+              <ST>
+<![CDATA[(EE_Macro_0000_Loop= TRUE) AND (EE_Macro_0000_Terminate= FALSE) ;]]>
+              </ST>
+            </body>
+          </transition>
+          <transition name="EE_Macro_0000_Tra_Terminate">
+            <body>
+              <ST>
+<![CDATA[(EE_Macro_0000_Loop= FALSE) AND (EE_Macro_0000_Terminate= TRUE) ;]]>
+              </ST>
+            </body>
+          </transition>
+        </transitions>
+        <body>
+          <SFC>
+            <step localId="1" height="30" width="160" name="EE_Macro_0000_Step_Init" initialStep="true">
+              <position x="95" y="70"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="85" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="160" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="2" height="10" width="20">
+              <position x="170" y="120"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="180" y="120"/>
+                  <position x="180" y="100"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[EE_Macro_0000_Start = TRUE;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <actionBlock localId="3" width="240" height="40">
+              <position x="320" y="70"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1">
+                  <position x="320" y="90"/>
+                  <position x="255" y="90"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Macro_0000_Started:=FALSE;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Macro_0000_Name:='Macro_0000']]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <step localId="4" height="30" width="190" name="EE_Macro_0000_Step_Loopback">
+              <position x="80" y="150"/>
+              <connectionPointIn>
+                <relPosition x="100" y="0"/>
+                <connection refLocalId="2">
+                  <position x="180" y="150"/>
+                  <position x="180" y="130"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="100" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="190" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="5" width="350" height="100">
+              <position x="320" y="150"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="4">
+                  <position x="320" y="170"/>
+                  <position x="270" y="170"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Macro_0000_Started:=TRUE;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Macro_0000_Start:=FALSE;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Macro_0000_Action_00"/>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Macro_0000_WaitTime:=EE_Macro_0000_LOC_Wait_00;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Macro_0000_Action_NextWakeup"/>
+              </action>
+            </actionBlock>
+            <transition localId="6" height="10" width="20">
+              <position x="170" y="260"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="4">
+                  <position x="180" y="260"/>
+                  <position x="180" y="180"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="EE_Macro_0000_Tra_Wait_00"/>
+              </condition>
+            </transition>
+            <step localId="7" height="30" width="190" name="EE_Macro_0000_Step_01">
+              <position x="80" y="320"/>
+              <connectionPointIn>
+                <relPosition x="100" y="0"/>
+                <connection refLocalId="6">
+                  <position x="180" y="320"/>
+                  <position x="180" y="270"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="100" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="190" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="8" width="360" height="80">
+              <position x="320" y="320"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="7">
+                  <position x="320" y="340"/>
+                  <position x="270" y="340"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Macro_0000_Action_01"/>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Macro_0000_WaitTime:=EE_Macro_0000_GLO_Wait_00;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Macro_0000_Action_NextWakeup"/>
+              </action>
+            </actionBlock>
+            <transition localId="9" height="10" width="20">
+              <position x="170" y="410"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="7">
+                  <position x="180" y="410"/>
+                  <position x="180" y="350"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="EE_Macro_0000_Tra_Wait_00"/>
+              </condition>
+            </transition>
+            <step localId="10" height="30" width="190" name="EE_Macro_0000_Step_Final">
+              <position x="80" y="600"/>
+              <connectionPointIn>
+                <relPosition x="100" y="0"/>
+                <connection refLocalId="23">
+                  <position x="180" y="600"/>
+                  <position x="180" y="550"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="100" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="190" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="11" width="360" height="80">
+              <position x="320" y="600"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="10">
+                  <position x="320" y="620"/>
+                  <position x="270" y="620"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Macro_0000_Action_03"/>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Macro_0000_Loop:=FALSE;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[EE_Macro_0000_Terminate:=TRUE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <selectionDivergence localId="13" height="1" width="260">
+              <position x="50" y="720"/>
+              <connectionPointIn>
+                <relPosition x="130" y="0"/>
+                <connection refLocalId="10">
+                  <position x="180" y="720"/>
+                  <position x="180" y="630"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="0" y="1"/>
+              </connectionPointOut>
+              <connectionPointOut formalParameter="">
+                <relPosition x="260" y="1"/>
+              </connectionPointOut>
+            </selectionDivergence>
+            <transition localId="14" height="10" width="20">
+              <position x="40" y="750"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="13">
+                  <position x="50" y="750"/>
+                  <position x="50" y="721"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="EE_Macro_0000_Tra_Loop"/>
+              </condition>
+            </transition>
+            <transition localId="15" height="10" width="20">
+              <position x="300" y="750"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="13">
+                  <position x="310" y="750"/>
+                  <position x="310" y="721"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="EE_Macro_0000_Tra_Terminate"/>
+              </condition>
+            </transition>
+            <jumpStep localId="16" height="20" width="20" targetName="EE_Macro_0000_Step_Loopback">
+              <position x="40" y="810"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="14">
+                  <position x="50" y="810"/>
+                  <position x="50" y="760"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <jumpStep localId="17" height="20" width="20" targetName="EE_Macro_0000_Step_Init">
+              <position x="300" y="810"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="15">
+                  <position x="310" y="810"/>
+                  <position x="310" y="760"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <comment localId="18" height="60" width="340">
+              <position x="620" y="70"/>
+              <content>
+<![CDATA[Started is FALSE:
+This is used when Macro shall wait for next start
+]]>
+              </content>
+            </comment>
+            <comment localId="12" height="80" width="260">
+              <position x="700" y="150"/>
+              <content>
+<![CDATA[Disable AUTO Restart
+Perform Action on Actuator
+Calculate next WakeUp time based on
+LOCAL or GLOBAL Wait time
+]]>
+              </content>
+            </comment>
+            <comment localId="19" height="80" width="260">
+              <position x="700" y="320"/>
+              <content>
+<![CDATA[Perform Action on Actuator
+Calculate next WakeUp time based on
+LOCAL or GLOBAL Wait time
+]]>
+              </content>
+            </comment>
+            <comment localId="20" height="80" width="260">
+              <position x="700" y="600"/>
+              <content>
+<![CDATA[Perform Last Action on Actuator
+Decide if Macro shall
+TERMINATE or LOOPBACK
+]]>
+              </content>
+            </comment>
+            <step localId="21" height="30" width="190" name="EE_Marco_0000_Step_02">
+              <position x="80" y="440"/>
+              <connectionPointIn>
+                <relPosition x="100" y="0"/>
+                <connection refLocalId="9">
+                  <position x="180" y="440"/>
+                  <position x="180" y="420"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="100" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="190" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="22" width="360" height="80">
+              <position x="320" y="440"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="21">
+                  <position x="320" y="460"/>
+                  <position x="270" y="460"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Macro_0000_Action_02"/>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Macro_0000_Action_Random"/>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="EE_Macro_0000_Action_NextWakeup"/>
+              </action>
+            </actionBlock>
+            <transition localId="23" height="10" width="20">
+              <position x="170" y="540"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="21">
+                  <position x="180" y="540"/>
+                  <position x="180" y="470"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="EE_Macro_0000_Tra_Wait_00"/>
+              </condition>
+            </transition>
+            <comment localId="24" height="80" width="260">
+              <position x="700" y="440"/>
+              <content>
+<![CDATA[Perform Action on Actuator
+Calculate next WakeUp time based on
+RANDOM wait time
+]]>
+              </content>
+            </comment>
+            <comment localId="25" height="60" width="180">
+              <position x="550" y="750"/>
+              <content>
+<![CDATA[TERMINATE or LOOPBACK
+with interlock
+]]>
+              </content>
+            </comment>
+            <comment localId="26" height="40" width="260">
+              <position x="700" y="260"/>
+              <content>
+<![CDATA[Wait for the calculated time
+]]>
+              </content>
+            </comment>
+          </SFC>
+        </body>
+        <documentation>
+<![CDATA[]]>
+        </documentation>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="config">
+        <resource name="Common_Resource">
+          <task name="Trigger_Fast1" interval="t#100ms" priority="0"/>
+          <task name="Trigger_Fast2" interval="t#200ms" priority="0"/>
+          <task name="Trigger_Slow1" interval="t#1s" priority="0">
+            <pouInstance name="Macro_0000" typeName="macros_template"/>
+            <pouInstance name="Rule_0000" typeName="rules_template"/>
+          </task>
+          <task name="Trigger_Slow2" interval="t#2s" priority="0"/>
+          <task name="" priority="0"/>
+          <globalVars>
+            <variable name="EE_Rule_0000_Active" address="%IX0000">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE"/>
+              </initialValue>
+              <documentation>
+<![CDATA[TRUE for Debug only]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_GLOBAL_Day_Phase_00">
+              <type>
+                <TOD/>
+              </type>
+            </variable>
+            <variable name="EE_Rule_GLOBAL_Day_Phase_01">
+              <type>
+                <TOD/>
+              </type>
+            </variable>
+            <variable name="EE_Rule_GLOBAL_Day_Type">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+            <variable name="EE_Rule_0000_Trigger_Wait">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="t#5s"/>
+              </initialValue>
+            </variable>
+            <variable name="EE_Rule_0000_GLO_Var_00" address="%IX0001">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="10"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Initial Value for Debug only]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_GLO_Var_01">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="11"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Initial Value for Debug only]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Rule_0000_GLO_Var_02">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="12"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Initial Value for Debug only]]>
+              </documentation>
+            </variable>
+          </globalVars>
+          <globalVars retain="true">
+            <variable name="EE_Rule_0000_Count_Exec" address="%QX0000">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+          </globalVars>
+          <globalVars>
+            <variable name="EE_Macro_0000_Start">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Initial Value for Debug only]]>
+              </documentation>
+            </variable>
+            <variable name="EE_Macro_0000_Started">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="EE_Macro_0000_GLO_Wait_00">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="t#10s"/>
+              </initialValue>
+            </variable>
+            <variable name="EE_Macro_0000_GLO_Wait_01">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+            <variable name="EE_Macro_0000_GLO_OutBOOL_00">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="EE_Macro_0000_GLO_OutDINT_00">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+          </globalVars>
+        </resource>
+      </configuration>
+    </configurations>
+  </instances>
+</project>

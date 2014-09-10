@@ -1,0 +1,3 @@
+grep -v "ROOTACT" $PROFILE > $PROFILE.tmp
+echo "export ROOTACT=$ROOTACT" >> $PROFILE.tmp
+mv -f $PROFILE.tmp $PROFILE

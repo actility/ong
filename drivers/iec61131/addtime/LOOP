@@ -1,0 +1,5 @@
+while true
+do
+	./addtime.x -36000; sleep 10
+	./addtime.x 36000; sleep 10
+done

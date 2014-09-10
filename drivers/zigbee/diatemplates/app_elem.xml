@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     ## w_netid
+     ## w_ipuid
+     ## d_ieee
+     ## a_num
+     ## w_drvcontact
+     ## w_driverpath
+-->
+<m2m:application appId="APP_${d_ieee}.${a_num}"
+    xmlns:m2m="http://uri.etsi.org/m2m">
+    
+    <m2m:accessRightID>${s_rootacc}/APP_${d_ieee}.${a_num}_AR</m2m:accessRightID>
+    <m2m:searchStrings>
+        <m2m:searchString>ETSI.ObjectType/ETSI.AN_APP</m2m:searchString>
+        <m2m:searchString>ETSI.ObjectTechnology/ZigBee.ZigBee_1_0</m2m:searchString>
+        <m2m:searchString>ETSI.InterworkingProxyID/${w_ipuid}</m2m:searchString>
+        <m2m:searchString>ETSI.NetworkID/NW_${w_netid}</m2m:searchString>
+        <m2m:searchString>ETSI.NodeID/DEV_${d_ieee}</m2m:searchString>
+<!--
+     Not defined for watteco
+
+        <m2m:searchString>ZigBee.ProfileID/0x0104</m2m:searchString>
+        <m2m:searchString>ZigBee.DeviceID/0x0302</m2m:searchString>
+-->
+<!--
+     See sensor.c:iSensorSetSearchStringInObj()
+        <m2m:searchString>ETSI.InterfaceID/TemperatureMeasurement.Srv</m2m:searchString>
+        <m2m:searchString>ETSI.InterfaceID/RelativeHumidityMeasurement.Srv</m2m:searchString>
+	...
+
+        <m2m:searchString>ZigBee.ClusterID/server/0x0402</m2m:searchString>
+        <m2m:searchString>ZigBee.ClusterID/server/0x0405</m2m:searchString>
+	...
+-->
+    </m2m:searchStrings>
+    <m2m:aPoC>coap://${w_drvcontact}/${w_driverpath}/APP_${d_ieee}.${a_num}</m2m:aPoC>
+    <m2m:aPoCPaths>
+        <m2m:aPoCPath>
+            <m2m:path>retargeting1</m2m:path>
+            <m2m:accessRightID>${s_rootacc}/Locadmin_AR2</m2m:accessRightID>
+        </m2m:aPoCPath>
+        <m2m:aPoCPath>
+            <m2m:path>retargeting2</m2m:path>
+            <m2m:accessRightID>${s_rootacc}/APP_${d_ieee}.${a_num}_AR2</m2m:accessRightID>
+        </m2m:aPoCPath>
+        <m2m:aPoCPath>
+            <m2m:path>retargeting3</m2m:path>
+            <m2m:accessRightID>${s_rootacc}/APP_${d_ieee}.${a_num}_AR3</m2m:accessRightID>
+        </m2m:aPoCPath>
+    </m2m:aPoCPaths>
+</m2m:application>

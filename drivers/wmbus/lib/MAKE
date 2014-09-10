@@ -1,0 +1,16 @@
+
+ARGS=$*
+make $ARGS
+if [ $? -ne 0 ]
+then
+  exit 1
+fi
+
+(
+  cd preprocessor
+  ./MAKE $ARGS
+  if [ $? -ne 0 ]
+  then
+    exit 1
+  fi
+)

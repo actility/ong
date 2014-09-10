@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">	
+	
+	<include schemaLocation="parameters.xsd"/>
+	<include schemaLocation="group.xsd"/>
+
+	<!-- <areaNwkInstance> resource type -->
+	<complexType name="AreaNwkInstance">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:areaNwkType"/>
+					<element ref="tns:mtu"/>
+					<element ref="tns:listOfDevices"/>
+					<element ref="tns:areaNwkTypeInfo"/>
+				</sequence>
+			</extension>
+		</complexContent>
+		<!-- attribute name="id"></attribute -->
+	</complexType>
+
+	<element name="areaNwkType" type="tns:AreaNwkType"/>		
+	<simpleType name="AreaNwkType">
+		<restriction base="string">
+			<enumeration value="6LOWPAN"/>
+			<enumeration value="6LOWPAN-BLUETOOTH"/>				
+			<enumeration value="6LOWPAN-WIFI"/>					
+			<enumeration value="6LOWPAN-PLC"/>
+			<enumeration value="IPV4-WPAN"/>
+			<enumeration value="IPV4-BLUETOOTH"/>				
+			<enumeration value="IPV4-WIFI"/>					
+			<enumeration value="IPV4-PLC"/>
+			<enumeration value="ZIGBEE"/>				
+		</restriction>
+	</simpleType>	
+
+	<element name="mtu" type="long"/>
+	<element name="listOfDevices" type="tns:Group"/>
+	<element name="areaNwkTypeInfo" type="tns:Parameters"/>	
+	
+</schema>

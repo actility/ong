@@ -1,0 +1,38 @@
+>>>
+0x000000: 42 01 4e de 94 74 65 73 74 28 37 33 36 36 34 32 B.N..test(736642
+0x000010: 39 36                                           96              
+Table of active requests :
+Req #0 : coap_tid=20190 dia_tid=73664296 date=0s ago
+<<<
+0x000000: 43 45 26 87 11 29 50 58 37 33 36 36 34 32 39 36 CE&..)PX73664296
+0x000010: 3c 78 6d 6c 3e 33 32 2e 35 3c 2f 78 6d 6c 3e 0a <xml>32.5</xml>.
+0x000020: 2f 2a 20 6d 61 69 6e 2e 63 20 2d 2d 20 0a 20 2a /* main.c -- . *
+0x000030: 0a 20 2a 20 43 6f 70 79 72 69 67 68 74 20 28 43 . * Copyright (C
+0x000040: 29 20 32 30 31 32 20 41 63 74 69 6c 69 74 79 0a ) 2012 Actility.
+0x000050: 20 2a 0a 20 2a 20 54 68 69 73 20 66 69 6c 65 20  *. * This file 
+0x000060: 69 73 20 70 61 72 74 20 6f 66 20 74 68 65 20 64 is part of the d
+0x000070: 49 61 20 6c 69 62 72 61 72 79 20 6c 69 62 64 49 Ia library libdI
+0x000080: 61 2e 20 50 6c 65 61 73 65 20 73 65 65 0a 20 2a a. Please see. *
+0x000090: 20 52 45 41 44 4d 45 20 66 6f 72 20 74 65 72 6d  README for term
+0x0000a0: 73 20 6f 66 20 75 73 65 2e 0a 20 2a 2f 0a 0a 23 s of use.. */..#
+0x0000b0: 69 6e 63 6c 75 64 65 20 3c 73 74 64 69 6f 2e 68 include <stdio.h
+0x0000c0: 3e 0a 23 69 6e 63 6c 75 64 65 20 3c 73 74 72 69 >.#include <stri
+0x0000d0: 6e 67 73 2e 68 3e 0a 23 69 6e 63 6c 75 64 65 20 ngs.h>.#include 
+0x0000e0: 3c 73 74 72 69 6e 67 2e 68 3e 0a 23 69 6e 63 6c <string.h>.#incl
+0x0000f0: 75 64 65 20 3c 66 63 6e 74 6c 2e 68 3e 0a 23 69 ude <fcntl.h>.#i
+>>>
+0x000000: 60 00 26 87                                     `.&.            
+<xml>32.5</xml>
+/* main.c -- 
+ *
+ * Copyright (C) 2012 Actility
+ *
+ * This file is part of the dIa library libdIa. Please see
+ * README for terms of use.
+ */
+
+#include <stdio.h>
+#include <strings.h>
+#include <string.h>
+#include <fcntl.h>
+#iTable of active requests :

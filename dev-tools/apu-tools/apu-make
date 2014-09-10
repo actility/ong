@@ -1,0 +1,477 @@
+#!/bin/bash
+
+#
+# Copyright   Actility, SA. All Rights Reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version
+# 2 only, as published by the Free Software Foundation.
+# 
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License version 2 for more details (a copy is
+# included at /legal/license.txt).
+# 
+# You should have received a copy of the GNU General Public License
+# version 2 along with this work; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+# 
+# Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+# or visit www.actility.com if you need additional
+# information or have any questions.
+# 
+# id $Id$
+# author $Author$
+# version $Revision$
+# lastrevision $Date$
+# modifiedby $LastChangedBy$
+# lastmodified $LastChangedDate$
+#
+
+# This file is intended to be invoked from your project source (e.g. from $ROOTACT/zigbee).
+# 
+# It brings utility functions to retrieve dependencies, built APUs 
+# and other such deployment stuffs.
+# freely inspired from this article:
+# http://www.sonatype.com/people/2011/01/downloading-artifacts-from-nexus-with-bash/
+#
+# Here are the few requirements to make it work:
+# 1/ ROOTACT must be defined
+# 2/ all APU dependencies must be depicted in ./apu/dependencies/*.cfg file
+#    with one .cfg file per dependency. It supports two type of dependencies (gave with
+#    DEPENDENCY_TYPE variable):
+#    - "repository": indicates the dependency is to be retrieved from Nexus server, and
+#      than the *.cfg file MUST define the :
+#      o GROUP_ID (e.g. com.actility)
+#      o ARTIFACT_ID (e.g. rtbase-devel)
+#      o VERSION (e.g. 1.0.15-0)
+#      o REPO (e.g. releases)
+#      o PACKAGING (e.g. apu)
+#      o WITH_ARCH (can be 0: architecture not specififed, 1: target architecture is 
+#                   required or 2: the architecture is forced to the one of the machine 
+#                   used for compilation)
+#      o INCLUDE_ARCH (It indicates the targeted architectures for which the dependency is
+#                      needed. If not present and by default, apu-maker assumes that all
+#                      architectures are in the included archs. If set, is a
+#                      space-separated list of the concerned architectures 
+#                      (e.g.: "INCLUDE_ARCH=centos6-x86 cov2" indicates that the entry is 
+#                      a dependency for centos6-x86 and cov2, but this is not true for the
+#                      other supported arch such as cov1...))
+#    - "source": indicates the dependency is made of source; they are then copied into the
+#      build path, and compilation is attempted.
+#    Both also needs variable "TARGET_DIR", with is the targeted folder name to use in the 
+#    build directory.
+# 3/ one can build several APU from the same project. For instance for xo project:
+#    - the APU so called "xo" provides the installation for the ONG runtime,
+#    - the APU so called "xo-devel" provides the installation for development purpose
+#    (headers and library cross-compiled for the target),
+#    - the APU so called "xo-build" provides the installation for generation purpose
+#    (utils for development and compilation to be ran on the machine used for compilation.
+#    - the APU so called "xo-src" provides the source code.
+#    Each package is defined in ./apu/package_* directory by providing the following files:
+#    - "control" for the APU generation. This file has the look and feel of a manifest file.
+#    - "postinst" file for APU post installation phase. This file contains the Linux 
+#      commands to be run after APU installation (e.g. create symbolic link, give execution
+#      rights to files, create folders, do text replacement, ...)
+#      This file is optional.
+#    - "apu.sh" file that must provide the shell implementation for the following functions:
+#      o buildProject (and $1 is then the targeted plateform (e.g. cov2))
+#      o buildApuImage (and $1 is then the APU package sub-path currently processed)
+#      o projectGroupId
+#      o projectName
+#      o projectVersion
+#      o projectApuRev
+
+APU_CURRENT=$(pwd)
+APU_BUILD_SUB_DIR=.apu_build
+APU_CP_EXCLUDED_DIRS=".svn .git $APU_BUILD_SUB_DIR"
+
+APU_STEP_PREPARE=0
+APU_STEP_COMPILE=1
+APU_STEP_PACKAGE=2
+APU_STEP_INSTALL=3
+APU_STEP_DEPLOY=4
+
+APU_ENV=0
+APU_LOCAL=0
+APU_COMPILATION=1
+
+if ! type -p curl > /dev/null
+then
+  echo "oops... curl is not installed on the system..." >&2 
+  exit 1 
+fi
+
+if ! type -p mvn > /dev/null
+then
+  echo "oops... maven is not installed on the system..." >&2
+  exit 1
+fi
+
+if [ -z "$APU_HOME" ]; then
+  echo "oops... APU_HOME environment variable must be defined..." >&2
+  exit 1
+fi
+
+APU_FUNCTIONS_FILE_NAME=$APU_HOME/apu-functions.sh
+APU_CONF_FILE_NAME=~/.apu/apu-tools.conf
+APU_CONF_FILE_PATH=.
+
+if ! [ -f "$APU_CONF_FILE_NAME" ]; then
+  echo "*** Unable to find $APU_CONF_FILE_NAME file... Aborted." >&2
+  exit 1
+else
+  . $APU_CONF_FILE_NAME
+fi
+
+if ! [ -f "$APU_FUNCTIONS_FILE_NAME" ]; then
+  echo "*** Unable to find $APU_FUNCTIONS_FILE_NAME file... Aborted." >&2
+  exit 1
+else
+  . $APU_FUNCTIONS_FILE_NAME
+fi
+
+
+usage() {
+  echo "Usage: $(basename $0) [<options>] COMMAND"
+  echo ""
+  echo "List of Commands:"
+  echo "prepare [GROUP_ID:]TARGET [PATH]           Fetch dependencies of the project for the given TARGET but does not compile it (this can be done in the optional PATH)"
+  echo "compile [GROUP_ID:]TARGET [PATH]           Compiles the project for the given TARGET (this can be done in the optional PATH)"
+  echo "package [GROUP_ID:]TARGET [PATH]           Compiles and packages the project for the given TARGET (this can be done in the optional PATH)"
+  echo "install [GROUP_ID:]TARGET [PATH]           Compiles, packages and installs the project for the given TARGET (this can be done in the optional PATH)"
+  echo "deploy [GROUP_ID:]TARGET [PATH]            Compiles, packages, installs and deploys the project for the given TARGET (this can be done in the optional PATH)"
+  echo "clean [GROUP_ID:]TARGET [PATH]             Cleans the project for the given TARGET (this can be done in the optional PATH)"
+  echo "env [GROUP_ID:]TARGET                      Print env variables for the compilation of the given TARGET"
+  echo "install-target [GROUP_ID:]TARGET[:VERSION] Installs TARGET given its optional groupId, name and optional version. If no version is provided, LATEST is assumed"
+  echo "ls-targets [GROUP_ID]                      List all installed TARGETs for the given groupId or all default ones if none"
+  echo ""
+  echo "Options are:"
+  echo "   -e|--env              Use env variables instead of targets installed in APU repository"
+  echo "   -l|--local            Run compilation locally (no dep. check, no copy, work-in-place)"
+  echo "   -s|--skip-compilation Skip the compilation phase (only relevant with -l option)"
+  echo "   -h|--help             Print this help message"
+}
+
+
+###############################################################################
+
+GETOPTTEMP=$(getopt -o elsh --long env,local,skip-compilation,help -- $@)
+if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments
+while [ -n "$1" ]
+do
+  case "$1" in
+    "-e"|"--env") APU_ENV=1;;
+    "-l"|"--local") APU_LOCAL=1;;
+    "-s"|"--skip-compilation") APU_COMPILATION=0;;
+    "-h"|"--help") usage >&2; exit 0;;
+    "--") shift; break ;;
+    * ) exitWithMsg "Internal error ($*)!" 1;;
+  esac
+  shift
+done
+
+[ "$APU_LOCAL" == "0" ] && [ "$APU_COMPILATION" == "0" ] && APU_COMPILATION=1 && \
+echo "*** WARNING: --local is disabled; --skip-compilation ignored"
+
+# Read command
+case "$1" in
+  "compile") APU_COMMAND="compile"; shift;;
+  "package") APU_COMMAND="package"; shift;;
+  "install") APU_COMMAND="install"; shift;;
+  "deploy") APU_COMMAND="deploy"; shift;;
+  "clean") APU_COMMAND="clean"; shift;;
+  "prepare") APU_COMMAND="prepare"; shift;;
+  "env") APU_COMMAND="env"; shift;;
+  "install-target") APU_COMMAND="install-target"; shift;;
+  "ls-targets") APU_COMMAND="ls-targets"; shift;;
+  *) usage; exit 1;;
+esac
+
+###############################################################################
+# Commands
+checkApuVersion()
+{
+  if functionExists projectApuMinVersion; then
+    checkApuMinVersion $(projectApuMinVersion)
+  fi
+  if functionExists projectApuMaxVersion; then
+    checkApuMaxVersion $(projectApuMaxVersion)
+  fi
+}
+
+buildCmd()
+{
+  _APU_STEP=$1
+
+  if [ -z "$2" ]; then
+    echo "*** compilation target is a mandatory parameter" >&2
+    usage >&2
+    exit 1
+  fi
+  if [ "$APU_ENV" = "0" ]; then
+    if [ "$2" != "noarch" ]; then
+      resolveTarget $2 .env
+      _APU_TOOLCHAIN_RESULT=$?
+      if [ "$_APU_TOOLCHAIN_RESULT" != "0" ]; then
+        rm .env
+        exit $_APU_TOOLCHAIN_RESULT
+      fi
+      . .env
+      rm .env
+
+      echo "Use target   : $TARGET_GROUP_ID:$TARGET_ARTIFACT_ID:$TARGET_VERSION"
+      echo "Use toolchain: $TOOLCHAIN_GROUP_ID:$TOOLCHAIN_ARTIFACT_ID:$TOOLCHAIN_VERSION"
+    else
+      TARGET=noarch
+    fi
+  fi
+
+  # Get ROOTACT
+  if [ -z "$ROOTACT" ]; then
+    export ROOTACT=$(cd .. && pwd)
+    echo "ROOTACT not defined; assuming ROOTACT=$ROOTACT"
+  else
+    # normalize ROOTACT value
+    ROOTACT=$(cd $ROOTACT && pwd)
+    if [[ $APU_CURRENT != $ROOTACT* ]]
+    then
+      echo "*** ROOTACT and current dir doesn't match (ROOTACT=$ROOTACT) (CURRENT=$APU_CURRENT)" >&2
+      exit 1
+    fi
+  fi
+
+  _APU_BUILD_DIR=$ROOTACT/$APU_PROJECT_DIR/$APU_BUILD_SUB_DIR/$TARGET
+  [ "$APU_LOCAL" == "1" ] && _APU_BUILD_DIR=$ROOTACT
+  [ -n "$3" ] && _APU_BUILD_DIR=$3
+
+  for _APU_PATH in $(ls -1d $ROOTACT/$APU_PROJECT_DIR/apu/package_*)
+  do
+    _APU_SUB_PATH=$(basename $_APU_PATH)
+    
+    echo "################################################"
+    echo "Building APU $APU_PROJECT_DIR with $_APU_SUB_PATH"
+    echo "################################################"
+
+    if ! [ -f $ROOTACT/$APU_PROJECT_DIR/apu/$_APU_SUB_PATH/apu.sh ]; then
+      exitWithMsg "apu.sh file not found in $_APU_PATH" 1
+    fi
+
+    if [ "$APU_LOCAL" == "1" ]; then
+      _APU_SUB_BUILD_DIR=$ROOTACT
+    else
+      _APU_SUB_BUILD_DIR=$_APU_BUILD_DIR/$_APU_SUB_PATH
+      mkdir -p $_APU_SUB_BUILD_DIR/$APU_PROJECT_DIR
+
+      if [ "$_APU_STEP" -ge "$APU_STEP_PREPARE" ]; then
+        # check for dependencies
+        buildDependencies "$_APU_SUB_BUILD_DIR" "$TARGET" "$APU_CURRENT"
+
+        _APU_RSYNC_EXCLUDED=""
+        for _APU_CP_EXCLUDED_DIR in $APU_CP_EXCLUDED_DIRS
+        do
+          _APU_RSYNC_EXCLUDED="$_APU_RSYNC_EXCLUDED --exclude $_APU_CP_EXCLUDED_DIR"
+        done
+        rsync -av --progress $APU_CURRENT $_APU_SUB_BUILD_DIR $_APU_RSYNC_EXCLUDED || \
+        exitWithMsg "Failed to copy all source files. Aborted." 1
+      fi
+    fi
+
+    if [ "$APU_COMPILATION" == "1" -a "$_APU_STEP" -ge "$APU_STEP_COMPILE" ]; then
+      (
+        export ROOTACT=$_APU_SUB_BUILD_DIR
+        cd $ROOTACT/
+        [ -f $ROOTACT/$APU_PROJECT_DIR/apu/apu.sh ] && . $ROOTACT/$APU_PROJECT_DIR/apu/apu.sh
+        [ -f $ROOTACT/$APU_PROJECT_DIR/apu/$_APU_SUB_PATH/apu.sh ] || \
+        exitWithMsg "$ROOTACT/$APU_PROJECT_DIR/apu/$_APU_SUB_PATH/apu.sh: file not found." 1
+        . $ROOTACT/$APU_PROJECT_DIR/apu/$_APU_SUB_PATH/apu.sh
+        checkApuVersion
+        if functionExists buildProject; then
+          buildProject $TARGET
+        fi
+      ) || exitWithMsg "Failed to compile project; APU generation aborted." 1
+    fi
+
+    if [ "$_APU_STEP" -ge "$APU_STEP_PACKAGE" ]; then
+      # build the APU tree
+      (
+        export ROOTACT=$_APU_SUB_BUILD_DIR
+        cd $ROOTACT/
+        [ -f $ROOTACT/$APU_PROJECT_DIR/apu/apu.sh ] && . $ROOTACT/$APU_PROJECT_DIR/apu/apu.sh
+        . $ROOTACT/$APU_PROJECT_DIR/apu/$_APU_SUB_PATH/apu.sh
+        checkApuVersion
+        buildApuImage $_APU_SUB_PATH
+      ) || exitWithMsg "Failed to build APU image; please check your apu.sh" 1
+
+      # build the APU
+      (
+        export ROOTACT=$_APU_SUB_BUILD_DIR
+        _APU_LOCAL_REPO=$ROOTACT/apu-repository
+        [ ! -d $_APU_LOCAL_REPO ] && mkdir -p $_APU_LOCAL_REPO
+        cd $ROOTACT/
+        [ -f $ROOTACT/$APU_PROJECT_DIR/apu/apu.sh ] && . $ROOTACT/$APU_PROJECT_DIR/apu/apu.sh
+        . $ROOTACT/$APU_PROJECT_DIR/apu/$_APU_SUB_PATH/apu.sh
+        checkApuVersion
+        PRJ_NAME=$(projectName)
+        if functionExists projectNameSuffix; then
+          PRJ_NAME=$PRJ_NAME-$(projectNameSuffix)
+        fi
+        PRJ_VERS=$(projectVersion)
+        PRJ_APU_REV=$(projectApuRev)
+        PRJ_DESC=$(projectDescription)
+        if functionExists projectArchDepend && eval projectArchDepend; then
+          buildApu $PRJ_NAME $PRJ_VERS $PRJ_APU_REV $TARGET "$PRJ_DESC" "$_APU_LOCAL_REPO"
+        else
+          buildApuNoArch $PRJ_NAME $PRJ_VERS $PRJ_APU_REV "$PRJ_DESC" "$_APU_LOCAL_REPO"
+        fi
+      ) || exitWithMsg "Failed to build APU" 1
+    fi
+
+    if [ "$_APU_STEP" -ge "$APU_STEP_INSTALL" ]; then
+      (
+        export ROOTACT=$_APU_SUB_BUILD_DIR
+        cd $ROOTACT/
+        [ -f $ROOTACT/$APU_PROJECT_DIR/apu/apu.sh ] && . $ROOTACT/$APU_PROJECT_DIR/apu/apu.sh
+        . $ROOTACT/$APU_PROJECT_DIR/apu/$_APU_SUB_PATH/apu.sh
+        checkApuVersion
+        PRJ_NAME=$(projectName)
+        if functionExists projectNameSuffix; then
+          PRJ_NAME=$PRJ_NAME-$(projectNameSuffix)
+        fi
+        PRJ_GROUP_ID=$(projectGroupId)
+        PRJ_VERS=$(projectVersion)
+        PRJ_APU_REV=$(projectApuRev)
+        if functionExists projectArchDepend && eval projectArchDepend; then
+          mvnInstall $PRJ_GROUP_ID $PRJ_NAME $PRJ_VERS $PRJ_APU_REV $TARGET
+        else
+          mvnInstallNoArch $PRJ_GROUP_ID $PRJ_NAME $PRJ_VERS $PRJ_APU_REV
+        fi
+      ) || exitWithMsg "Failed to install APU" 1
+    fi
+
+    if [ "$_APU_STEP" -ge "$APU_STEP_DEPLOY" ]; then
+      (
+        export ROOTACT=$_APU_SUB_BUILD_DIR
+        cd $ROOTACT/
+        [ -f $ROOTACT/$APU_PROJECT_DIR/apu/apu.sh ] && . $ROOTACT/$APU_PROJECT_DIR/apu/apu.sh
+        . $ROOTACT/$APU_PROJECT_DIR/apu/$_APU_SUB_PATH/apu.sh
+        checkApuVersion
+        PRJ_NAME=$(projectName)
+        if functionExists projectNameSuffix; then
+          PRJ_NAME=$PRJ_NAME-$(projectNameSuffix)
+        fi
+        PRJ_GROUP_ID=$(projectGroupId)
+        PRJ_VERS=$(projectVersion)
+        PRJ_APU_REV=$(projectApuRev)
+        if functionExists projectArchDepend && eval projectArchDepend; then
+          mvnDeploy $PRJ_GROUP_ID $PRJ_NAME $PRJ_VERS $PRJ_APU_REV $TARGET
+        else
+          mvnDeployNoArch $PRJ_GROUP_ID $PRJ_NAME $PRJ_VERS $PRJ_APU_REV
+        fi
+      ) || exitWithMsg "Failed to deploy APU" 1
+    fi
+  done
+}
+
+cleanCmd()
+{
+  if [ -z "$1" ]; then
+    echo "*** compilation target is a mandatory parameter" >&2
+    usage >&2
+    exit 1
+  fi
+
+  if [ "$1" != "noarch" -a "$APU_ENV" = "0" ]; then
+    resolveTarget $1 .env
+    _APU_TOOLCHAIN_RESULT=$?
+    if [ "$_APU_TOOLCHAIN_RESULT" != "0" ]
+    then
+      rm .env
+      exit $_APU_TOOLCHAIN_RESULT
+    fi
+    . .env
+    rm .env
+  fi
+
+  # Get ROOTACT
+  if [ -z "$ROOTACT" ]; then
+    export ROOTACT=$(cd .. && pwd)
+    echo "ROOTACT not defined; assuming ROOTACT=$ROOTACT"
+  else
+    # normalize ROOTACT value
+    ROOTACT=$(cd $ROOTACT && pwd)
+    if [[ $APU_CURRENT != $ROOTACT* ]]
+    then
+      echo "*** ROOTACT and current dir doesn't match (ROOTACT=$ROOTACT) (CURRENT=$APU_CURRENT)" >&2
+      exit 1
+    fi
+  fi
+
+  _APU_BUILD_DIR=$ROOTACT/$APU_PROJECT_DIR/$APU_BUILD_SUB_DIR/$TARGET
+  [ "$APU_LOCAL" == "1" ] && _APU_BUILD_DIR=$ROOTACT
+  [ -n "$2" ] && _APU_BUILD_DIR=$2
+
+  rm -rf $_APU_BUILD_DIR
+}
+
+installTargetCmd()
+{
+  installTarget $1
+}
+
+lsTargetsCmd()
+{
+  lsTargets $1
+}
+
+###############################################################################
+# first, check some mandatory requirements on the system
+
+APU_PROJECT_DIR=$(basename $APU_CURRENT)
+
+# Execute command
+case "$APU_COMMAND" in
+  "compile")
+    _APU_BUILD_DIR=
+    [ -n "$2" ] && _APU_BUILD_DIR=$2;
+    buildCmd $APU_STEP_COMPILE $1 $_APU_BUILD_DIR;;
+  "package")
+    _APU_BUILD_DIR=
+    [ -n "$2" ] && _APU_BUILD_DIR=$2;
+    buildCmd $APU_STEP_PACKAGE $1 $_APU_BUILD_DIR;;
+  "install")
+    _APU_BUILD_DIR=
+    [ -n "$2" ] && _APU_BUILD_DIR=$2;
+    buildCmd $APU_STEP_INSTALL $1 $_APU_BUILD_DIR;;
+  "deploy")
+    _APU_BUILD_DIR=
+    [ -n "$2" ] && _APU_BUILD_DIR=$2;
+    buildCmd $APU_STEP_DEPLOY $1 $_APU_BUILD_DIR;;
+  "clean")
+    _APU_BUILD_DIR=
+    [ -n "$2" ] && _APU_BUILD_DIR=$2;
+    cleanCmd $1 $_APU_BUILD_DIR;;
+  "prepare")
+    _APU_BUILD_DIR=
+    [ -n "$2" ] && _APU_BUILD_DIR=$2;
+    buildCmd $APU_STEP_PREPARE $1 $_APU_BUILD_DIR;;
+  "env")
+    if [ "$1" != "noarch" ]; then
+      resolveTarget $1 .env
+      cat .env
+      rm .env
+    fi;;
+  "install-target")
+    installTargetCmd $1;;
+  "ls-targets")
+    lsTargetsCmd $1;;
+  *) exitWithMsg "Internal error ($*)!" 2;;
+esac
+
+

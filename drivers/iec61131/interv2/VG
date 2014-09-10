@@ -1,0 +1,1 @@
+valgrind --tool=memcheck --leak-check=yes ./parser.x -f tests/int.st -c1000

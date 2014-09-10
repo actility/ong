@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:container xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="cnt0">
+  <m2m:expirationTime>2012-02-01T21:00:00+01:00</m2m:expirationTime>
+  <m2m:searchStrings>
+    <m2m:searchString>keyword0 for cnt0</m2m:searchString>
+    <m2m:searchString>keyword1 for cnt0</m2m:searchString>
+  </m2m:searchStrings>
+  <m2m:announceTo>
+    <m2m:activated>1</m2m:activated>
+    <m2m:sclList>
+      <reference>//uri0 for cnt0</reference>
+      <reference>//uri1 for cnt0</reference>
+    </m2m:sclList>
+    <m2m:global>1</m2m:global>
+  </m2m:announceTo>
+</m2m:container>

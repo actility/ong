@@ -1,0 +1,19 @@
+
+#include "misc.ref"
+
+watt:sensor	from ong:t_xml_obj
+{
+	watt:simulated		XoString	{ }
+	watt:configured		XoString	{ }
+	watt:configurationLock	XoString	{ }
+	watt:nicename		XoString	{ }
+	watt:multiplyvalue	XoString	{ }
+	watt:addvalue		XoString	{ }
+	watt:tictype		XoString	{ }
+	watt:nbep		XoString	{ }
+	watt:clusterIn		XoString	{ list }
+	watt:clusterOut		XoString	{ list }
+
+	// futur use include an obix object
+	watt:obj		XoVoidObj	{ default=o:obj }
+}

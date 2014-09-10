@@ -1,0 +1,13 @@
+
+f()
+{
+	./ope_ENGINE createInstance A1
+	sleep 1
+	./ope_ENGINE deleteInstance A1
+	sleep 1
+}
+
+while true
+do
+	f
+done

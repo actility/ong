@@ -1,0 +1,1 @@
+sed -i -e "s|<int name=\"tracesize\" val=\"[0-9]*\"/>|<int name=\"tracesize\" val=\"$LOG_ZIGBEE_SIZE\"/>|" $ROOTACT/usr/etc/zigbee/spvconfig.xml

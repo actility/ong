@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <bool name="c" val="${raw_c}" />
+    <bool name="d" val="${raw_d}" />
+    <bool name="p" val="${raw_p}" />
+    <bool name="e" val="${raw_e}" />
+    <int name="d1" val="${raw_d1}" />
+    <int name="d2" val="${raw_d2}" />
+    <int name="d3" val="${raw_d3}" />
+    <int name="d4" val="${raw_d4}" />
+    <int name="d5" val="${raw_d5}" />
+    <int name="d6" val="${raw_d6}" />
+    <int name="index" val="${raw_index}" />
+    <str name="raw" val="0x${dpt_raw}"/>
+</obj>

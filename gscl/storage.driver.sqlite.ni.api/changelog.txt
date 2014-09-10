@@ -1,0 +1,20 @@
+-------------------------------------------------------------------------------
+SQLite driver native Service API changelog
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2014-04-03
+
+New Features:
+-------------
+ - Removed methods to access page_count and freelist_count. DB usage is now
+   managed in the Native bundle
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2014-03-21
+
+Initial version

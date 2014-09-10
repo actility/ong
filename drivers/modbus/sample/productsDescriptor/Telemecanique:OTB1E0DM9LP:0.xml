@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description xmlns="http://uri.actility.com/m2m/adaptor-modbus">
+    <ref>Telemecanique:OTB1E0DM9LP:0</ref>
+    <vendor>Telemecanique</vendor>
+    <product>OTB1E0DM9LP</product>
+    <version>0</version>
+
+	<interfaces>
+	    <!-- 12 Binary inputs -->
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0001.0.m2m" type="bool" display="Binary Input #0" reg="/holding/0/mask/1/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0002.0.m2m" type="bool" display="Binary Input #1" reg="/holding/0/mask/2/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0003.0.m2m" type="bool" display="Binary Input #2" reg="/holding/0/mask/4/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0004.0.m2m" type="bool" display="Binary Input #3" reg="/holding/0/mask/8/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0005.0.m2m" type="bool" display="Binary Input #4" reg="/holding/0/mask/16/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0006.0.m2m" type="bool" display="Binary Input #5" reg="/holding/0/mask/32/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0007.0.m2m" type="bool" display="Binary Input #6" reg="/holding/0/mask/64/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0008.0.m2m" type="bool" display="Binary Input #7" reg="/holding/0/mask/128/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0009.0.m2m" type="bool" display="Binary Input #8" reg="/holding/0/mask/256/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0010.0.m2m" type="bool" display="Binary Input #9" reg="/holding/0/mask/512/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0011.0.m2m" type="bool" display="Binary Input #10" reg="/holding/0/mask/1024/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0012.0.m2m" type="bool" display="Binary Input #11" reg="/holding/0/mask/2048/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+				
+		<!-- 8 Binary outputs -->
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0002.0x0001.0.m2m" type="bool" display="Binary Output #0" reg="/holding/100/mask/1/" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0002.0x0002.0.m2m" type="bool" display="Binary Output #1" reg="/holding/100/mask/2/" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0002.0x0003.0.m2m" type="bool" display="Binary Output #2" reg="/holding/100/mask/4/" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0002.0x0004.0.m2m" type="bool" display="Binary Output #3" reg="/holding/100/mask/8/" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0002.0x0005.0.m2m" type="bool" display="Binary Output #4" reg="/holding/100/mask/16/" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0002.0x0006.0.m2m" type="bool" display="Binary Output #5" reg="/holding/100/mask/32/" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0002.0x0007.0.m2m" type="bool" display="Binary Output #6" reg="/holding/100/mask/64/" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0002.0x0008.0.m2m" type="bool" display="Binary Output #7" reg="/holding/100/mask/128/" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+	</interfaces>
+</description>

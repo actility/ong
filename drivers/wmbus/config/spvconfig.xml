@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     Do not modify this file which is included in delivery.
+     Copy it in $AW_DATA_DIR and edit the copy.
+-->
+<obj xmlns="http://obix.org/ns/schema/1.1">
+
+<!--
+     parameters
+-->
+<list name="parameters">
+  <int name="tracesize" val="1048000"/>
+	<int name="tracelevel" val="0"/>
+	<int name="tracedebug" val="1"/>
+	<int name="tracedia" val="0"/>
+</list>
+
+<!--
+     variables
+-->
+<list name="variables">
+
+	<str name="w_driverid" val="GIP"/>
+	<str name="w_manufacturer" val="1234"/>
+	<str name="w_panid" val="0000"/>
+
+  <str name="w_nsclbaseuri" val="http://nsc1.actility.com:8088/m2m"/>
+	<str name="w_domainname" val="actility.com"/>
+  <str name="w_tpkdev" val=""/>
+
+	<str name="w_driverpath" val="wmbus"/>
+	<str name="w_ipuid" val="IPU_wMBus"/>
+	<str name="w_mode" val="T2-other"/>
+
+	<str name="s_telnetkey" val="123"/>
+	<str name="s_telnetport" val="2002"/>
+
+	<str name="w_coapaddr_l" val="::1"/>
+	<str name="w_coapport_l" val="5686"/>
+	<str name="w_coapaddr_r" val="::1"/>
+	<str name="w_coapport_r" val="5683"/>
+</list>
+
+<!--
+     m2m mapping cluster.attribut.member.type => m2m attribut/point/cmd name
+     	0x%04x.0x%04x.%d.m2m
+     	0x%04x.0x%04x.%d.attr
+     	0x%04x.0x%02x.ope
+-->
+<list name="mapping">
+    <!-- itf_inst_x0003_server.xml -->
+    <str name="0x0003.0x0000.0.m2m"	val="m2mCurrentSummationDelivered"/>
+    <str name="0x002b.0x0000.0.m2m"	val="m2mInstantaneousDemand"/>
+    <str name="0xfd49.0x0000.0.m2m"	val="extVoltageInstantaneousDemand"/>
+    <str name="0xfd5c.0x0000.0.m2m"	val="extCurrentInstantaneousDemand"/>
+</list>
+
+</obj>
+

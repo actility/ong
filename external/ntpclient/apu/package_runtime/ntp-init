@@ -1,0 +1,68 @@
+#!(SHELL)
+#
+# ntp:       Starts the NTP
+
+CURRENT_DIR=$(dirname $0)
+. $CURRENT_DIR/../ong.cfg
+. $CURRENT_DIR/../functions
+[ -r $CURRENT_DIR/../ntp/ntp.cfg ] && . $CURRENT_DIR/../ntp/ntp.cfg
+
+NTP_DATA=$ROOTACT/usr/data/ntp
+
+SERVICE="NTP"
+PIDFILE=$NTP_DATA/ntp.pid
+STOPFILE=$NTP_DATA/stop
+
+[ -z "$NTP_SERVER" ] && NTP_SERVER=nsc1.actility.com
+[ -z "$NTP_PORT" ] && NTP_PORT=123
+
+
+usage() {
+  echo "Usage: ntp [<options>] {start|stop|status|restart}"
+  echo "  Where options are:"
+  echo "   -h|--help    Print this help message"
+  echo "   -i|--init    Re-initialize NTP"
+}
+
+preStart() {
+  ntpclient -s -h $NTP_SERVER -p $NTP_PORT > /dev/null 2>&1
+
+  if [ ! -d $NTP_DATA ]; then
+    mkdir -p $NTP_DATA
+  fi
+}
+
+serviceCommand() {
+  echo -e "ntpclient -h $NTP_SERVER -p $NTP_PORT"
+}
+
+stopService() {
+  NTPCLIENT_PIDS=$(pidof ntpclient)
+  [ -n "$NTPCLIENT_PIDS" ] && kill -TERM $NTPCLIENT_PIDS
+}
+
+abortService() {
+  NTPCLIENT_PIDS=$(pidof ntpclient)
+  [ -n "$NTPCLIENT_PIDS" ] && kill -KILL $NTPCLIENT_PIDS
+}
+
+GETOPTTEMP=$(getopt -o hi --long help,init -- $@)
+if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments
+while [ -n "$1" ]
+do
+  case "$1" in
+    "-h"|"--help") usage; exit;;
+    "-i"|"--init") ;;
+    "--") shift; break ;;
+    * ) echo "Internal error ($*)!"; exit 1;;
+  esac
+  shift
+done
+
+handleParams $*
+
+exit $?
+

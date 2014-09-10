@@ -1,0 +1,16 @@
+-------------------------------------------------------------------------------
+M2M subscription over HTTP - C implementation - changelog
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2014-07-24
+
+Initial version
+
+Dependencies:
+-------------
+ - rtbase-1.2.3-0
+ - m2mxoref-1.1.12-1
+ - xo-4.2.10-0
+ - libSongOverHttp-1.0.1-0
+ - makefile-common-1.0.0-0
+

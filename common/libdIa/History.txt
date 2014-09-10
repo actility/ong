@@ -1,0 +1,78 @@
+
+############################################################################
+1.0.25   2014/02/04
+############################################################################
+- apu dependencies need a new version
+
+############################################################################
+1.0.24   2013/11/26
+############################################################################
+- unitTests
+- added 2048 document test
+- added random size documents test
+
+############################################################################
+1.0.23   2013/11/04
+############################################################################
+- work on draft-18 compliance (draft-9 still compatible) :
+  draft-9 : LIBCOAP_VERSION=2
+  draft-18 : LIBCOAP_VERSION=4
+- For the draft-9 version, change the in Makefile :
+COAP=$(ROOTACT)/libcoap
+- For the draft-18 version, change the in Makefile :
+COAP=$(ROOTACT)/libcoap_29Oct2013
+
+- libcoap_29Oct2013 is patched by Actility with : #ifdef ACTILITY_CHANGES
+- a git commit *must* be applied locally for all changes
+- Until the RFC is published, libcoap_29Oct2013 *must* be patched
+  each month with the git repository :
+  cd libcoap_29Oct2013
+  git fetch
+  git merge origin/master
+
+- KNOWN ISSUE : BLOCK_SIZE is not handled by this version
+- KNOWN ISSUE : microdIa is not upgraded (only draft-9 compatible)
+
+############################################################################
+1.0.22   2013/10/14
+############################################################################
+- compliance with song.binding.coap-1.4.4-centos6-x86.jar
+- APU : add -f to ln -s
+
+############################################################################
+1.0.21   2013/08/30
+############################################################################
+- bug in split_uri, viewable with valgrind
+
+############################################################################
+1.0.20   2013/07/17
+############################################################################
+- SVN version. Removed .git folder.
+
+############################################################################
+1.0.19   2013/07/17
+############################################################################
+- Bad trace 'Entering diaDeleteRequest' : tid was badly printed
+- new function void diaProxy(dia_context_t *dia, char *proxyAddr) :
+  called before another diaXXXRequest(), it sets the proxy where to send
+  the request. diaProxy should be called before each other function.
+- new function boolean diaIsProxied(dia_context_t *dia) : used to determine
+  if PROXY_URI option is received.
+
+- client.x modified to handle the new proxy parameter :
+  This request has a targetId = http://www.free.fr and proxied to 127.0.0.1:5683
+  ./client.x -m create -f temp.xml -v9 -P 127.0.0.1:5683 http://www.free.fr
+
+- split_uri corrected to handle all scheme but coap (http for example)
+
+############################################################################
+1.0.18   2013/5/22
+############################################################################
+- Bug function getFile (bouchon, client and microDia/client+server)
+
+############################################################################
+1.0.17   2013/4/04
+############################################################################
+
+- Android port (getaddrinfo issue)
+

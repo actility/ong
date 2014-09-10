@@ -1,0 +1,200 @@
+###############################################################################
+1.1.12  2013/01/17
+################################################################################
+
++ changed xmime:base64Binary->value$ attribute from XoString to XoBuffer
+
++ Updated apu description:
+
+  changed xo apu dependencies from 'devel' to 'build' (it is a dependency that
+    is used to build the project not to link against)
+  include new m2m.xdi to apu
+
+###############################################################################
+1.1.11	2012/12/27
+###############################################################################
+
++ add "shdico" directive to :
+
+	common.ref:	m2m:searchString
+	container.ref:	m2m:accessRightID
+	misc.ref:	name$
+	misc.ref:	xmlns
+	misc.ref:	xmlns:*
+
+	xobix.ref:	xmlns
+	xobix.ref:	name
+	xobix.ref:	href
+	xobix.ref:	int.unit
+	xobix.ref:	real.unit
+
++ OBIX "xmlns" is now a normal "EMBATTR" attribut of "o:t_xml_obix_obj".
+By this way we can set SHDICO directive to this attribut.
+
++ create the first version of the M2M shared dictionary : "xoref/m2m.xdi"
+
+	#	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	#	!!!! always add new entries at the end of the file !!!!
+	#	!!!! never delete entries                          !!!!
+	#	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
++ add apu directory
+
+
+###############################################################################
+1.1.9	2012/11/21
+###############################################################################
+
++ add copyrights to *.ref
+
+###############################################################################
+1.1.8	2012/10/29
+###############################################################################
+
+
++ add xoref/namespace.xns to runtime package list
+
+###############################################################################
+1.1.7	2012/10/26
+###############################################################################
+
++ add _latest$ (XoString) hidden attribute to m2m:ContentInstances to speed
+  up access to latest ContentInstance
+
+
+###############################################################################
+1.1.6	2012/10/05
+###############################################################################
+
++ namespace.xns bad obix namespace
+
+	o	http://obix.org/ns/schema/1.0
+	=>
+	o	http://obix.org/ns/schema/1.1
+
+
+
+###############################################################################
+1.1.5	2012/09/03
+###############################################################################
+
++ add first definition of resource modeling in modeling.ref
+
++ add 'acy http://uri.actility.com/m2m' to "namespace.xns"
+
++ add actility.ref for 'acy:StorageConfiguration' and 'acy:Param'
+
++ add 'acy:StorageConfiguration' to m2m:Container
+
++ add discovery.ref for ...
+
+
+###############################################################################
+1.1.4	2012/07/05
+###############################################################################
+
++ "xmime" prefixe replaces "xmlmime" prefixe. "xmlmime" is no more used in .ref files, but is still present in namespace files.
+
++ add _owner$ (XoString) in m2m:Subscription for ONGV2 needs.
+
+###############################################################################
+1.1.3	2012/06/18
+###############################################################################
+
++ common.ref:
+	- add xsi:type to m2m:FilterCriteriaType
+
++ notificationChannel.ref:
+	- add xsi:type to m2m:ChannelData
+	- m2m:channelData is a XoVoidObj
+
++ subscription.ref:
+	- m2m:filterCriteria is a XoVoidObj
+
+###############################################################################
+1.1.2	2012/05/25
+###############################################################################
+
++ add wraphidden directive to m2m:namedReference of m2m:NamedReferenceCollection
+
+
+###############################################################################
+1.1.1	2012/05/04
+###############################################################################
+
++ Obix :
+	- add Obix defintion xobix.ref
+	- add xobix.xor to m2m.xor
+	- add "o http://obix.org/ns/schema/1.0" to namespace.xns
+
+
+###############################################################################
+1.1.0	2012/05/03
+###############################################################################
+
++ "wraphidden" directive for
+	- accessRight.ref
+	- contentInstances.ref
+	- membersContent.ref
+
++ all .ref are protected against multiple inclusions with #ifdef XXXX_REF
+
+###############################################################################
+1.0.4	2012/04/30
+###############################################################################
+
++ application.ref :  add "wraphidden" directive
+
+	m2m:APoCPaths from ong:t_xml_obj
+	{
+	    m2m:aPoCPath    m2m:APoCPath    { list wraphidden } // (list size: [0, infinity[) 
+	}
+	alias m2m:APoCPaths with m2m:aPoCPaths
+
++ contentInstance.ref : restore xmlmime namespace for base64Binary and hexBinary
+
++ contentInstance.ref : href really does not have a prefixe
+
+###############################################################################
+1.0.3	2012/04/25
+###############################################################################
+
++ all .ref no more contain define {} and DESC = ""
+	=> xo >= 4.0.24
+
++ misc.ref and common.ref are protected with #ifndef MISC_REF and COMMON_REF
+
++ href from m2m:ContentInstance must be prefixed by m2m => m2m:href
+
++ m2m:base64Binary and m2m:hexBinary must derive from ong:t_xml_obj
+
++ misc.ref extern	ong:t_xml_obj
+
++ provisionnaly "xmlmime:base64Binary" is renamed "m2m:base64Binary" because
+apixmlread.c:DoElementName() is not complete.
+
+###############################################################################
+1.0.2	2012/04/24
+###############################################################################
+
++ "xmlmime http://www.w3.org/2005/05/xmlmime" in namespace.xns
+
++ "link" all xoref/*.xor in an unique xoref/m2m.xor with xold.x
+
+###############################################################################
+1.0.1	2012/04/23
+###############################################################################
+
++ provisionnaly "xmlmime:base64Binary" is renamed "m2m:base64Binary" because
+apixmlread.c:DoElementName() is not complete.
+
++ add directive "stext" and attribut "name$" to xmlmime:base64Binary
+
++ add "xmlns:xsi" to "ong:t_xml_obj" object
+
++ add "xsi http://www.w3.org/2001/XMLSchema-instance" to namespace.xns
+
+
+###############################################################################
+1.0.0	2012/04/23
+###############################################################################

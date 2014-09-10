@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="Actility"
+              productName="iec61131"
+              productVersion="1.0.26"
+              creationDateTime="2013-01-02T13:55:36"/>
+  <contentHeader name="WAVE_TEST"
+                 version="1.1.0"
+                 modificationDateTime="2013-06-25T12:16:12">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="10" y="10"/>
+      </fbd>
+      <ld>
+        <scaling x="0" y="0"/>
+      </ld>
+      <sfc>
+        <scaling x="10" y="10"/>
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes/>
+    <pous>
+      <pou name="Simul_Temperature" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="Information">
+              <type>
+                <string/>
+              </type>
+              <initialValue>
+                <simpleValue value="''"/>
+              </initialValue>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="Temperature">
+              <type>
+                <REAL/>
+              </type>
+              <documentation>
+<![CDATA[Link to GLOBAL Variable]]>
+              </documentation>
+            </variable>
+            <variable name="Global_Config">
+              <type>
+                <BOOL/>
+              </type>
+              <documentation>
+<![CDATA[Link to GLOBAL Variable]]>
+              </documentation>
+            </variable>
+            <variable name="Global_Resource">
+              <type>
+                <BOOL/>
+              </type>
+              <documentation>
+<![CDATA[Link to GLOBAL Variable]]>
+              </documentation>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="AV">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="20"/>
+              </initialValue>
+              <documentation>
+<![CDATA[20 degC]]>
+              </documentation>
+            </variable>
+            <variable name="AMP">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="4"/>
+              </initialValue>
+              <documentation>
+<![CDATA[from 18 to 22 degC]]>
+              </documentation>
+            </variable>
+            <variable name="P">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="30"/>
+              </initialValue>
+              <documentation>
+<![CDATA[30 sec]]>
+              </documentation>
+            </variable>
+            <variable name="SIG">
+              <type>
+                <INT/>
+              </type>
+              <initialValue>
+                <simpleValue value="1"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Sinus wave]]>
+              </documentation>
+            </variable>
+            <variable name="STP">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="20"/>
+              </initialValue>
+            </variable>
+            <variable name="Epsilon">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0.3"/>
+              </initialValue>
+            </variable>
+            <variable name="V">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Wave_Gen">
+              <type>
+                <derived name="WAVE_GENERATOR"/>
+              </type>
+            </variable>
+            <variable name="Hyst">
+              <type>
+                <derived name="HYSTERESIS"/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <SFC>
+            <step localId="1" height="40" width="70" name="STEP1" initialStep="true">
+              <position x="70" y="20"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="40" y="40"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="70" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="3" height="10" width="20">
+              <position x="30" y="310"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="42">
+                  <position x="40" y="310"/>
+                  <position x="40" y="291"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[V = 2.0]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <transition localId="4" height="10" width="20">
+              <position x="350" y="310"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="42">
+                  <position x="360" y="310"/>
+                  <position x="360" y="291"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[V = 1.0]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <jumpStep localId="8" height="20" width="20" targetName="STEP2">
+              <position x="30" y="430"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="52">
+                  <position x="40" y="430"/>
+                  <position x="40" y="420"/>
+                  <position x="40" y="420"/>
+                  <position x="40" y="400"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <step localId="17" height="30" width="60" name="STEP3">
+              <position x="10" y="340"/>
+              <connectionPointIn>
+                <relPosition x="30" y="0"/>
+                <connection refLocalId="3">
+                  <position x="40" y="340"/>
+                  <position x="40" y="320"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="30" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="60" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <step localId="19" height="30" width="60" name="STEP4">
+              <position x="325" y="340"/>
+              <connectionPointIn>
+                <relPosition x="35" y="0"/>
+                <connection refLocalId="4">
+                  <position x="360" y="324"/>
+                  <position x="360" y="370"/>
+                  <position x="360" y="370"/>
+                  <position x="360" y="320"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="35" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="60" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="22" width="230" height="70">
+              <position x="180" y="110"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="29">
+                  <position x="180" y="130"/>
+                  <position x="140" y="130"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Information:='STEP2 Active';]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="Wave_Gen"/>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="Hyst"/>
+              </action>
+            </actionBlock>
+            <step localId="29" height="30" width="70" name="STEP2">
+              <position x="70" y="110"/>
+              <connectionPointIn>
+                <relPosition x="40" y="0"/>
+                <connection refLocalId="49">
+                  <position x="110" y="110"/>
+                  <position x="110" y="90"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="40" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="70" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <jumpStep localId="32" height="20" width="20" targetName="STEP1">
+              <position x="350" y="430"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="43">
+                  <position x="360" y="430"/>
+                  <position x="360" y="400"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <block localId="34" width="150" height="190" typeName="WAVE_GENERATOR" instanceName="Wave_Gen" executionOrderId="1">
+              <position x="490" y="40"/>
+              <inputVariables>
+                <variable formalParameter="Average">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="35">
+                      <position x="490" y="80"/>
+                      <position x="470" y="80"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Amplitude">
+                  <connectionPointIn>
+                    <relPosition x="0" y="80"/>
+                    <connection refLocalId="36">
+                      <position x="490" y="120"/>
+                      <position x="470" y="120"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Period">
+                  <connectionPointIn>
+                    <relPosition x="0" y="130"/>
+                    <connection refLocalId="37">
+                      <position x="490" y="170"/>
+                      <position x="470" y="170"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="SigType">
+                  <connectionPointIn>
+                    <relPosition x="0" y="170"/>
+                    <connection refLocalId="38">
+                      <position x="490" y="210"/>
+                      <position x="470" y="210"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="Value">
+                  <connectionPointOut>
+                    <relPosition x="150" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="35" height="30" width="30">
+              <position x="440" y="60"/>
+              <connectionPointOut>
+                <relPosition x="30" y="20"/>
+              </connectionPointOut>
+              <expression>AV</expression>
+            </inVariable>
+            <inVariable localId="36" height="30" width="50">
+              <position x="420" y="100"/>
+              <connectionPointOut>
+                <relPosition x="50" y="20"/>
+              </connectionPointOut>
+              <expression>AMP</expression>
+            </inVariable>
+            <inVariable localId="37" height="30" width="20">
+              <position x="450" y="150"/>
+              <connectionPointOut>
+                <relPosition x="20" y="20"/>
+              </connectionPointOut>
+              <expression>P</expression>
+            </inVariable>
+            <inVariable localId="38" height="30" width="40">
+              <position x="430" y="190"/>
+              <connectionPointOut>
+                <relPosition x="40" y="20"/>
+              </connectionPointOut>
+              <expression>SIG</expression>
+            </inVariable>
+            <outVariable localId="41" height="30" width="100">
+              <position x="780" y="30"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="34" formalParameter="Value">
+                  <position x="780" y="50"/>
+                  <position x="660" y="50"/>
+                  <position x="660" y="80"/>
+                  <position x="640" y="80"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Temperature</expression>
+            </outVariable>
+            <selectionDivergence localId="42" height="1" width="320">
+              <position x="40" y="290"/>
+              <connectionPointIn>
+                <relPosition x="160" y="0"/>
+                <connection refLocalId="29">
+                  <position x="200" y="290"/>
+                  <position x="200" y="220"/>
+                  <position x="110" y="220"/>
+                  <position x="110" y="140"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="0" y="1"/>
+              </connectionPointOut>
+              <connectionPointOut formalParameter="">
+                <relPosition x="320" y="1"/>
+              </connectionPointOut>
+            </selectionDivergence>
+            <transition localId="43" height="10" width="20">
+              <position x="350" y="390"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="19">
+                  <position x="360" y="390"/>
+                  <position x="360" y="370"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[V=0.0]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <block localId="44" width="100" height="130" typeName="HYSTERESIS" instanceName="Hyst" executionOrderId="2">
+              <position x="670" y="200"/>
+              <inputVariables>
+                <variable formalParameter="XIN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="34" formalParameter="Value">
+                      <position x="670" y="240"/>
+                      <position x="660" y="240"/>
+                      <position x="660" y="80"/>
+                      <position x="640" y="80"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="XIN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="70"/>
+                    <connection refLocalId="45">
+                      <position x="670" y="270"/>
+                      <position x="640" y="270"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="EPS">
+                  <connectionPointIn>
+                    <relPosition x="0" y="110"/>
+                    <connection refLocalId="46">
+                      <position x="670" y="310"/>
+                      <position x="640" y="310"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="Q">
+                  <connectionPointOut>
+                    <relPosition x="100" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="45" height="30" width="40">
+              <position x="600" y="250"/>
+              <connectionPointOut>
+                <relPosition x="40" y="20"/>
+              </connectionPointOut>
+              <expression>STP</expression>
+            </inVariable>
+            <inVariable localId="46" height="30" width="60">
+              <position x="580" y="290"/>
+              <connectionPointOut>
+                <relPosition x="60" y="20"/>
+              </connectionPointOut>
+              <expression>Epsilon</expression>
+            </inVariable>
+            <outVariable localId="47" height="30" width="160">
+              <position x="800" y="180"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="44" formalParameter="Q">
+                  <position x="800" y="200"/>
+                  <position x="790" y="200"/>
+                  <position x="790" y="240"/>
+                  <position x="770" y="240"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Global_Config</expression>
+            </outVariable>
+            <transition localId="49" height="10" width="20">
+              <position x="100" y="80"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="110" y="80"/>
+                  <position x="110" y="68"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[TRUE]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <outVariable localId="50" height="30" width="160">
+              <position x="800" y="270"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="44" formalParameter="Q">
+                  <position x="800" y="290"/>
+                  <position x="790" y="290"/>
+                  <position x="790" y="240"/>
+                  <position x="770" y="240"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Global_Resource</expression>
+            </outVariable>
+            <actionBlock localId="51" width="220" height="30">
+              <position x="160" y="20"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1">
+                  <position x="160" y="40"/>
+                  <position x="150" y="40"/>
+                  <position x="150" y="40"/>
+                  <position x="140" y="40"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Information:='STEP1 Active';]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <actionBlock localId="2" width="220" height="30">
+              <position x="90" y="340"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="17">
+                  <position x="90" y="360"/>
+                  <position x="70" y="360"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Information:='STEP3 Active';]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <actionBlock localId="5" width="220" height="30">
+              <position x="420" y="340"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="19">
+                  <position x="420" y="360"/>
+                  <position x="385" y="360"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Information:='STEP4 Active';]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <transition localId="52" height="10" width="20">
+              <position x="30" y="390"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="17">
+                  <position x="40" y="390"/>
+                  <position x="40" y="380"/>
+                  <position x="40" y="380"/>
+                  <position x="40" y="370"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[TRUE]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+          </SFC>
+        </body>
+        <documentation>
+<![CDATA[]]>
+        </documentation>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="STD_CONF">
+        <resource name="STD_RESOURCE">
+          <task name="STD_TASK" interval="T#1s0ms" priority="0">
+            <pouInstance name="main" typeName="Simul_Temperature"/>
+          </task>
+          <globalVars retain="true">
+            <variable name="Global_Resource">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </globalVars>
+        </resource>
+        <globalVars>
+          <variable name="Global_Config">
+            <type>
+              <BOOL/>
+            </type>
+          </variable>
+          <variable name="Temperature">
+            <type>
+              <REAL/>
+            </type>
+            <initialValue>
+              <simpleValue value="0.0"/>
+            </initialValue>
+            <documentation>
+<![CDATA[Simulated temperature]]>
+            </documentation>
+          </variable>
+        </globalVars>
+      </configuration>
+    </configurations>
+  </instances>
+</project>

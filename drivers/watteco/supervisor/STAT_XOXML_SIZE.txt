@@ -1,0 +1,33 @@
+
+//// IPU x 1
+'Application'	xmlsz=692 dicosz=193 binxosz=539 cprxosz=420.4 ucpxosz=539
+'Container'	xmlsz=351 dicosz=141 binxosz=239 cprxosz=166.9 ucpxosz=239
+'o:obj'		xmlsz=490 dicosz=102 binxosz=594 cprxosz=395.2 ucpxosz=594
+
+//// NETWORK x 1 for 23 devices
+'Application'	xmlsz=779 dicosz=193 binxosz=595 cprxosz=478.4 ucpxosz=595
+'Container'	xmlsz=351 dicosz=141 binxosz=239 cprxosz=166.9 ucpxosz=239
+'o:obj'		xmlsz=2606 dicosz=108 binxosz=3232 cprxosz=2796.0 ucpxosz=3232
+
+
+
+//// ACCESS RIGHTS x 23
+'AccessRight'	xmlsz=1674 dicosz=298 binxosz=1586 cprxosz=1102.2 ucpxosz=1586
+'AccessRight'	xmlsz=1838 dicosz=298 binxosz=1774 cprxosz=1213.8 ucpxosz=1774
+'AccessRight'	xmlsz=1702 dicosz=298 binxosz=1598 cprxosz=1111.8 ucpxosz=1598
+
+
+//// DEVICE/NODE x 23
+'Application'	xmlsz=851 dicosz=193 binxosz=643 cprxosz=520.4 ucpxosz=643
+'Container'	xmlsz=351 dicosz=141 binxosz=239 cprxosz=166.9 ucpxosz=239
+'o:obj'		xmlsz=435 dicosz=115 binxosz=533 cprxosz=357.6 ucpxosz=533
+
+
+//// APPLICATION.1 / DATAFIELD x 23
+'Application'	xmlsz=1307 dicosz=193 binxosz=991 cprxosz=813.9 ucpxosz=991
+'Container'	xmlsz=365 dicosz=141 binxosz=251 cprxosz=182.4 ucpxosz=251
+'o:obj'		xmlsz=628 dicosz=121 binxosz=879 cprxosz=590.9 ucpxosz=879
+'Container'	xmlsz=314 dicosz=120 binxosz=228 cprxosz=167.5 ucpxosz=228
+
+ //// REPORT DATA EVENTS x 23 x N (history size)
+'o:real'	xmlsz=97 dicosz=33 binxosz=47 cprxosz=25.9 ucpxosz=47

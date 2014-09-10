@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obix:obj xmlns:obix="http://obix.org/ns/schema/1.1">
+
+  <str name="thingletID" val="IEC_${APPLICATION}" />
+
+  <str name="iecApplicationID" val="${iecApplicationID}"/>
+  <uri name="iecRequestingEntity" val="${iecRequestingEntity}"/>
+  <int name="iecMaxConf" val="${iecMaxConf}"/>
+  <int name="iecMaxConfSize" val="${iecMaxConfSize}"/>
+  <int name="iecMaxVarMappings" val="${iecMaxVarMappings}"/>
+  <int name="iecMaxVarMappingsSize" val="${iecMaxVarMappingsSize}"/>
+  <int name="iecMaxINvariables" val="${iecMaxINvariables}"/>
+  <int name="iecMaxOUTvariables" val="${iecMaxOUTvariables}"/>
+  <int name="iecMaxTasks" val="${iecMaxTasks}"/>
+  <reltime name="iecMinCyclicInterval" val="${iecMinCyclicInterval}"/>
+  <reltime name="iecOutTokenBucketRate" val="${iecOutTokenBucketRate}"/>
+  <int name="iecOutTokenBucketSize" val="${iecOutTokenBucketSize}"/>
+
+  <bool name="iecRunningStatus" href="/m2m/applications/${APPLICATION}/retargeting3/runningStatus"/>
+  <uri name="iecLoadedConf" href="/m2m/applications/${APPLICATION}/retargeting3/loadedConf"/>
+  <uri name="iecLoadedMapping" href="/m2m/applications/${APPLICATION}/retargeting3/loadedMapping"/>
+
+  <op name="iecDelete" href="/m2m/applications/${APPLICATION}/retargeting1/delete" />
+  <op name="iecResume" href="/m2m/applications/${APPLICATION}/retargeting2/resume" />
+  <op name="iecSuspend" href="/m2m/applications/${APPLICATION}/retargeting2/suspend" />
+  <op name="iecReset" href="/m2m/applications/${APPLICATION}/retargeting2/reset" />
+  <op name="iecLoad" href="/m2m/applications/${APPLICATION}/retargeting2/load" />
+  <op name="iecCommit" href="/m2m/applications/${APPLICATION}/retargeting2/commit" />
+  <op name="iecRollback" href="/m2m/applications/${APPLICATION}/retargeting2/rollback" />
+
+  <list name="interfaces">
+     <obj>
+       <str name="interfaceID" val="IecEngineConfiguration.Srv"/>
+       <uri name="iecConfiguration" href="/m2m/applications/${APPLICATION}/containers/configurations"/>
+       <uri name="iecMapping" href="/m2m/applications/${APPLICATION}/containers/mappings"/>
+       <uri name="iecCommittedConf" href="/m2m/applications/${APPLICATION}/containers/committedConf"/>
+       <uri name="iecCommittedMapping" href="/m2m/applications/${APPLICATION}/containers/committedMapping"/>
+     </obj>
+     <obj>
+       <str name="interfaceID" val="AppLogs.Srv"/>
+       <uri name="appLogs" href="/m2m/applications/${APPLICATION}/containers/appLogs"/>
+     </obj>
+  </list>
+</obix:obj>

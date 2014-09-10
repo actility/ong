@@ -1,0 +1,9 @@
+USER="http%3a//nsc1.actility.com%3a8088/m2m/applications/SYSTEM:"
+
+RES="http://192.168.1.116:8080/m2m/discovery?searchPrefix=/m2m/applications&searchString=ETSI.ObjectType/ETSI.GA&searchString=IEC.ObjectType/IEC_61131_INSTANCE&scope=exact"
+echo $RES
+
+TYPE="Content-Type: application/xml"
+
+curl -v -X GET -u "$USER" $RES/latest/content
+

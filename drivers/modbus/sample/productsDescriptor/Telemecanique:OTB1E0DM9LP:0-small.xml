@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description xmlns="http://uri.actility.com/m2m/adaptor-modbus">
+    <ref>Telemecanique:OTB1E0DM9LP:0</ref>
+    <vendor>Telemecanique</vendor>
+    <product>OTB1E0DM9LP</product>
+    <version>0</version>
+
+	<interfaces>
+	    <!-- 1 Binary inputs -->
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0001.0x0001.0.m2m" type="bool" display="Binary Input #0" reg="/holding/0/mask/1/" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+				
+		<!-- 2 Binary outputs -->
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0002.0x0001.0.m2m" type="bool" display="Binary Output #0" reg="/holding/100/mask/1/" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+		<interface>
+			<id>OnOff.Srv</id>
+			<attributs>
+				<attr name="m2mOnOff" cnt="0x0002.0x0002.0.m2m" type="bool" display="Binary Output #1" reg="/holding/100/mask/2/" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+	</interfaces>
+</description>

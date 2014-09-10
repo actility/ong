@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:container m2m:id="products" xmlns:m2m="http://uri.etsi.org/m2m">
+    <m2m:accessRightID>${s_rootacc}/Locadmin_AR5</m2m:accessRightID>
+    <m2m:searchStrings>
+        <m2m:searchString>ETSI.ObjectSemantic/OASIS.OBIX_1_1</m2m:searchString>
+    </m2m:searchStrings>
+    <m2m:maxNrOfInstances>100</m2m:maxNrOfInstances>
+    <m2m:maxInstanceAge>2592000</m2m:maxInstanceAge>
+</m2m:container>

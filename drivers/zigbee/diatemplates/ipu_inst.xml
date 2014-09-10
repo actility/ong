@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+#
+#	w_ipuid
+#	w_netid
+#
+-->
+<obj 
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interworkingProxyID" val="${w_ipuid}"/>
+    <list name="supportedTechnologies">
+        <obj>
+            <str name="anPhysical" val="IEEE_802_15_4_2003_2_4GHz"/>
+            <str name="anStandard" val="ZigBee_1_0"/>
+            <str name="anProfile" val="ZigBee_HA"/>
+        </obj>
+    </list>
+    <list name="networks">
+        <ref href="${s_rootapp}/NW_${w_netid}/containers/DESCRIPTOR/contentInstances/latest/content/"/>
+    </list>
+</obj>

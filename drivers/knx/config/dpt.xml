@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DatapointTypes xmlns="http://uri.actility.com/m2m/adaptor-knx">
+  <DatapointType id="1" name="1.xxx" sizeinbit="1">
+    <DatapointSubtype id="1" name="DPT_Switch"/>            <!-- No unit needed here -->
+    <DatapointSubtype id="2" name="DPT_Bool"/>              <!-- No unit needed here -->
+    <DatapointSubtype id="3" name="DPT_Enable"/>            <!-- No unit needed here -->
+    <DatapointSubtype id="4" name="DPT_Ramp"/>              <!-- No unit needed here -->
+    <DatapointSubtype id="5" name="DPT_Alarm"/>             <!-- No unit needed here -->
+    <DatapointSubtype id="6" name="DPT_BinaryValue"/>       <!-- No unit needed here -->
+    <DatapointSubtype id="7" name="DPT_Step"/>              <!-- No unit needed here -->
+    <DatapointSubtype id="8" name="DPT_UpDown"/>            <!-- No unit needed here -->
+    <DatapointSubtype id="9" name="DPT_OpenClose"/>         <!-- No unit needed here -->
+    <DatapointSubtype id="10" name="DPT_Start"/>            <!-- No unit needed here -->
+    <DatapointSubtype id="11" name="DPT_State"/>            <!-- No unit needed here -->
+    <DatapointSubtype id="12" name="DPT_Invert"/>           <!-- No unit needed here -->
+    <DatapointSubtype id="15" name="DPT_Reset"/>            <!-- No unit needed here -->
+    <DatapointSubtype id="16" name="DPT_Ack"/>              <!-- No unit needed here -->
+    <DatapointSubtype id="17" name="DPT_Trigger"/>          <!-- No unit needed here -->
+    <DatapointSubtype id="18" name="DPT_Occupancy"/>        <!-- No unit needed here -->
+    <DatapointSubtype id="19" name="DPT_Window_Door"/>      <!-- No unit needed here -->
+    <DatapointSubtype id="21" name="DPT_LogicalFunction"/>  <!-- No unit needed here -->
+    <DatapointSubtype id="22" name="DPT_Scene_AB"/>         <!-- No unit needed here -->
+    <DatapointSubtype id="100" name="DPT_Heat_Cool"/>       <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="2" name="2.xxx" sizeinbit="2">
+    <DatapointSubtype id="1" name="DPT_Switch_Control"/>        <!-- No unit needed here -->
+    <DatapointSubtype id="2" name="DPT_Bool_Control"/>          <!-- No unit needed here -->
+    <DatapointSubtype id="3" name="DPT_Enable_Control"/>        <!-- No unit needed here -->
+    <DatapointSubtype id="4" name="DPT_Ramp_Control"/>          <!-- No unit needed here -->
+    <DatapointSubtype id="5" name="DPT_Alarm_Control"/>         <!-- No unit needed here -->
+    <DatapointSubtype id="6" name="DPT_BinaryValue_Control"/>   <!-- No unit needed here -->
+    <DatapointSubtype id="7" name="DPT_Step_Control"/>          <!-- No unit needed here -->
+    <DatapointSubtype id="10" name="DPT_Start_Control"/>        <!-- No unit needed here -->
+    <DatapointSubtype id="11" name="DPT_State_Control"/>        <!-- No unit needed here -->
+    <DatapointSubtype id="12" name="DPT_Invert_Control"/>       <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="3" name="3.xxx" sizeinbit="4">
+    <DatapointSubtype id="7" name="DPT_Control_Dimming" unit="obix:units/percent"/>
+    <DatapointSubtype id="8" name="DPT_Control_Blinds" unit="obix:units/percent"/>
+  </DatapointType>
+  <DatapointType id="4" name="4.xxx" sizeinbit="8">
+    <DatapointSubtype id="1" name="DPT_Char_ASCII"/>        <!-- No unit needed here -->
+    <DatapointSubtype id="2" name="DPT_Char_8859_1"/>       <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="5" name="5.xxx" sizeinbit="8">
+    <DatapointSubtype id="1" name="DPT_Scaling" unit="obix:units/percent"/>
+    <DatapointSubtype id="3" name="DPT_Angle" unit="obix:units/degrees_angular"/>
+    <DatapointSubtype id="4" name="DPT_Percent_U8" unit="obix:units/percent"/>
+    <DatapointSubtype id="5" name="DPT_DecimalFactor"/>     <!-- No unit needed here -->
+    <DatapointSubtype id="6" name="DPT_Tariff"/>            <!-- No unit needed here -->
+    <DatapointSubtype id="10" name="DPT_Value_1_Ucount"/>   <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="6" name="6.xxx" sizeinbit="8">
+    <DatapointSubtype id="1" name="DPT_Percent_V8" unit="obix:units/percent"/>
+    <DatapointSubtype id="10" name="DPT_Value_1_Count"/>    <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="7" name="7.xxx" sizeinbit="16">
+    <DatapointSubtype id="1" name="DPT_Value_2_Ucount"/>    <!-- No unit needed here -->
+    <DatapointSubtype id="2" name="DPT_TimePeriodMsec" unit="obix:units/second"/>
+    <DatapointSubtype id="3" name="DPT_TimePeriod10Msec" unit="obix:units/second"/>
+    <DatapointSubtype id="4" name="DPT_TimePeriod100Msec" unit="obix:units/second"/>
+    <DatapointSubtype id="5" name="DPT_TimePeriodSec" unit="obix:units/second"/>
+    <DatapointSubtype id="6" name="DPT_TimePeriodMin" unit="obix:units/second"/>
+    <DatapointSubtype id="7" name="DPT_TimePeriodHrs" unit="obix:units/second"/>
+    <DatapointSubtype id="12" name="DPT_UElCurrentmA" unit="obix:units/milliampere"/>
+  </DatapointType>
+  <DatapointType id="8" name="8.xxx" sizeinbit="16">
+    <DatapointSubtype id="1" name="DPT_Value_2_Count" unit="obix:units/null"/>
+    <DatapointSubtype id="2" name="DPT_DeltaTimeMsec" unit="obix:units/second"/>
+    <DatapointSubtype id="3" name="DPT_DeltaTime10Msec" unit="obix:units/second"/>
+    <DatapointSubtype id="4" name="DPT_DeltaTime100Msec" unit="obix:units/second"/>
+    <DatapointSubtype id="5" name="DPT_DeltaTimeSec" unit="obix:units/second"/>
+    <DatapointSubtype id="6" name="DPT_DeltaTimeMin" unit="obix:units/second"/>
+    <DatapointSubtype id="7" name="DPT_DeltaTimeHrs" unit="obix:units/second"/>
+    <DatapointSubtype id="10" name="DPT_Percent_V16" unit="obix:units/percent"/>
+    <DatapointSubtype id="11" name="DPT_Rotation_Angle" unit="obix:units/degrees_angular"/>
+  </DatapointType>
+  <DatapointType id="9" name="9.xxx" sizeinbit="16">
+    <DatapointSubtype id="1" name="DPT_Value_Temp" unit="obix:units/celsius_degrees"/>
+    <DatapointSubtype id="2" name="DPT_Value_Tempd" unit="obix:units/kelvin_degrees"/>
+    <DatapointSubtype id="3" name="DPT_Value_Tempa" unit="obix:units/degrees_kelvin_per_hour"/>
+    <DatapointSubtype id="4" name="DPT_Value_Lux" unit="obix:units/lux"/>
+    <DatapointSubtype id="5" name="DPT_Value_Wsp" unit="obix:units/meters_per_second"/>
+    <DatapointSubtype id="6" name="DPT_Value_Pres" unit="obix:units/pascal"/>
+    <DatapointSubtype id="7" name="DPT_Value_Humidity" unit="obix:units/percent_relative_humidity"/>
+    <DatapointSubtype id="8" name="DPT_Value_AirQuality" unit="obix:units/parts_per_million"/>
+    <DatapointSubtype id="10" name="DPT_Value_Time1" unit="obix:units/second"/>
+    <DatapointSubtype id="11" name="DPT_Value_Time2" unit="obix:units/millisecond"/>
+    <DatapointSubtype id="20" name="DPT_Value_Volt" unit="obix:units/millivolt/"/>
+    <DatapointSubtype id="21" name="DPT_Value_Curr" unit="obix:units/milliampere"/>
+    <DatapointSubtype id="22" name="DPT_PowerDensity" unit="obix:units/watts_per_square_meter"/>
+    <DatapointSubtype id="23" name="DPT_KelvinPerPercent" unit="obix:units/x-kelvin_per_percent"/>
+    <DatapointSubtype id="24" name="DPT_Power" unit="obix:units/kilowatt"/>
+    <DatapointSubtype id="25" name="DPT_Value_Volume_Flow" unit="obix:units/liters_per_hour"/>
+    <DatapointSubtype id="26" name="DPT_Rain_Amount"/>      <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+    <DatapointSubtype id="27" name="DPT_Value_Temp_F"/>     <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+    <DatapointSubtype id="28" name="DPT_Value_Wsp_kmh"/>    <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+  </DatapointType>
+  <DatapointType id="10" name="10.xxx" sizeinbit="24">
+    <DatapointSubtype id="1" name="DPT_TimeOfDay"/>         <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="11" name="11.xxx" sizeinbit="24">
+    <DatapointSubtype id="1" name="DPT_Date"/>              <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="12" name="12.xxx" sizeinbit="32">
+    <DatapointSubtype id="1" name="DPT_Value_4_Ucount"/>    <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="13" name="13.xxx" sizeinbit="32">
+    <DatapointSubtype id="1" name="DPT_Value_4_Count"/>         <!-- No unit needed here -->
+    <DatapointSubtype id="2" name="DPT_FlowRate_m3/h"/>         <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+    <DatapointSubtype id="10" name="DPT_ActiveEnergy"/>         <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+    <DatapointSubtype id="11" name="DPT_ApparantEnergy"/>       <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+    <DatapointSubtype id="12" name="DPT_ReactiveEnergy"/>       <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+    <DatapointSubtype id="13" name="DPT_ActiveEnergy_kWh"/>     <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+    <DatapointSubtype id="14" name="DPT_ApparantEnergy_kVAh"/>  <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+    <DatapointSubtype id="15" name="DPT_ReactiveEnergy_kVARh"/> <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+    <DatapointSubtype id="100" name="DPT_LongDeltaTimeSec" unit="obix:units/second"/>
+  </DatapointType>
+  <DatapointType id="14" name="14.xxx" sizeinbit="32">
+    <DatapointSubtype id="0" name="DPT_Value_Acceleration" unit="obix:units/meters_per_second_squared"/>
+    <DatapointSubtype id="1" name="DPT_Value_Acceleration_Angular" unit="obix:units/radians_per_second_squared"/>
+    <DatapointSubtype id="2" name="DPT_Value_Activation_Energy" unit="obix:units/x-joule_per_mol"/>
+    <DatapointSubtype id="3" name="DPT_Value_Activity" unit="obix:units/x-per_second"/>
+    <DatapointSubtype id="4" name="DPT_Value_Mol" unit="obix:units/x-mol"/>
+    <DatapointSubtype id="5" name="DPT_Value_Amplitude"/>       <!-- No unit needed here -->
+    <DatapointSubtype id="6" name="DPT_Value_AngleRad" unit="obix:units/radian"/>
+    <DatapointSubtype id="7" name="DPT_Value_AngleDeg" unit="obix:units/degrees_angular"/>
+    <DatapointSubtype id="8" name="DPT_Value_Angular_Momentum" unit="obix:units/joule_second"/>
+    <DatapointSubtype id="9" name="DPT_Value_Angular_Velocity" unit="obix:units/x-radians_per_second"/>
+    <DatapointSubtype id="10" name="DPT_Value_Area" unit="obix:units/square_meter"/>
+    <DatapointSubtype id="11" name="DPT_Value_Capacitance" unit="obix:units/farad/"/>
+    <DatapointSubtype id="12" name="DPT_Value_Charge_DensitySurface" unit="obix:units/x-coulomb_square_meter"/>
+    <DatapointSubtype id="13" name="DPT_Value_Charge_DensityVolume" unit="obix:units/x-coulomb_cubic_meter"/>
+    <DatapointSubtype id="14" name="DPT_Value_Compressibility" unit="obix:units/square_meters_per_newton"/>
+    <DatapointSubtype id="15" name="DPT_Value_Conductance" unit="obix:units/x-per_ohm/"/>
+    <DatapointSubtype id="16" name="DPT_Value_Electrical_Conductivity" unit="obix:units/siemens_per_meter"/>
+    <DatapointSubtype id="17" name="DPT_Value_Density" unit="obix:units/kilograms_per_cubic_meter"/>
+    <DatapointSubtype id="18" name="DPT_Value_Electric_Charge" unit="obix:units/coulomb"/>
+    <DatapointSubtype id="19" name="DPT_Value_Electric_Current" unit="obix:units/amperes"/>
+    <DatapointSubtype id="20" name="DPT_Value_Electric_CurrentDensity" unit="obix:units/amperes_per_square_meter"/>
+    <DatapointSubtype id="21" name="DPT_Value_Electric_DipoleMoment" unit="obix:units/x-coulomb_meter"/>
+    <DatapointSubtype id="22" name="DPT_Value_Electric_Displacement" unit="obix:units/x-coulomb_per_square_meter"/>
+    <DatapointSubtype id="23" name="DPT_Value_Electric_FieldStrength" unit="obix:units/volts_per_meter"/>
+    <DatapointSubtype id="24" name="DPT_Value_Electric_Flux" unit="obix:units/x-c"/>
+    <DatapointSubtype id="25" name="DPT_Value_Electric_FluxDensity" unit="obix:units/x-coulomb_per_square_meter"/>
+    <DatapointSubtype id="26" name="DPT_Value_Electric_Polarization" unit="obix:units/x-coulomb_per_square_meter"/>
+    <DatapointSubtype id="27" name="DPT_Value_Electric_Potential" unit="obix:units/volt"/>
+    <DatapointSubtype id="28" name="DPT_Value_Electric_PotentialDifference" unit="obix:units/volt"/>
+    <DatapointSubtype id="29" name="DPT_Value_ElectromagneticMoment" unit="obix:units/x-joule_per_tesla"/>
+    <DatapointSubtype id="30" name="DPT_Value_Electromotive_Force" unit="obix:units/volt"/>
+    <DatapointSubtype id="31" name="DPT_Value_Energy" unit="obix:units/joule"/>
+    <DatapointSubtype id="32" name="DPT_Value_Force" unit="obix:units/newton"/>
+    <DatapointSubtype id="33" name="DPT_Value_Frequency" unit="obix:units/hertz"/>
+    <DatapointSubtype id="34" name="DPT_Value_Angular_Frequency" unit="obix:units/x-radians_per_second"/>
+    <DatapointSubtype id="35" name="DPT_Value_Heat_Capacity" unit="obix:units/x-joule_per_kelvin"/>
+    <DatapointSubtype id="36" name="DPT_Value_Heat_FlowRate" unit="obix:units/watt"/>
+    <DatapointSubtype id="37" name="DPT_Value_Heat_Quantity" unit="obix:units/joule"/>
+    <DatapointSubtype id="38" name="DPT_Value_Impedance" unit="obix:units/ohm"/>
+    <DatapointSubtype id="39" name="DPT_Value_Length" unit="obix:units/meter"/>
+    <DatapointSubtype id="40" name="DPT_Value_Light_Quantity" unit="obix:units/joule"/>
+    <DatapointSubtype id="41" name="DPT_Value_Luminance" unit="obix:units/candelas_per_square_meter"/>
+    <DatapointSubtype id="42" name="DPT_Value_Luminous_Flux" unit="obix:units/lumen"/>
+    <DatapointSubtype id="43" name="DPT_Value_Luminous_Intensity" unit="obix:units/illuminance"/>
+    <DatapointSubtype id="44" name="DPT_Value_Magnetic_FieldStrength" unit="obix:units/amperes_per_meter"/>
+    <DatapointSubtype id="45" name="DPT_Value_Magnetic_Flux" unit="obix:units/weber"/>
+    <DatapointSubtype id="46" name="DPT_Value_Magnetic_FluxDensity" unit="obix:units/tesla"/>
+    <DatapointSubtype id="47" name="DPT_Value_Magnetic_Moment" unit="obix:units/ampere_square_meter"/>
+    <DatapointSubtype id="48" name="DPT_Value_Magnetic_Polarization" unit="obix:units/tesla"/>
+    <DatapointSubtype id="49" name="DPT_Value_Magnetization" unit="obix:units/amperes_per_meter"/>
+    <DatapointSubtype id="50" name="DPT_Value_MagnetomotiveForce" unit="obix:units/ampere"/>
+    <DatapointSubtype id="51" name="DPT_Value_Mass" unit="obix:units/kilogram"/>
+    <DatapointSubtype id="52" name="DPT_Value_MassFlux" unit="obix:units/kilograms_per_second"/>
+    <DatapointSubtype id="53" name="DPT_Value_Momentum" unit="obix:units/x-newton_per_second"/>
+    <DatapointSubtype id="54" name="DPT_Value_Phase_AngleRad" unit="obix:units/radian"/>
+    <DatapointSubtype id="55" name="DPT_Value_Phase_AngleDeg" unit="obix:units/degrees_angular"/>
+    <DatapointSubtype id="56" name="DPT_Value_Power" unit="obix:units/watt"/>
+    <DatapointSubtype id="57" name="DPT_Value_Power_Factor" unit="obix:units/power_factor"/>
+    <DatapointSubtype id="58" name="DPT_Value_Pressure" unit="obix:units/pascal"/>
+    <DatapointSubtype id="59" name="DPT_Value_Reactance" unit="obix:units/ohm"/>
+    <DatapointSubtype id="60" name="DPT_Value_Resistance" unit="obix:units/ohm"/>
+    <DatapointSubtype id="61" name="DPT_Value_Resistivity" unit="obix:units/ohm_meter"/>
+    <DatapointSubtype id="62" name="DPT_Value_SelfInductance" unit="obix:units/henry"/>
+    <DatapointSubtype id="63" name="DPT_Value_SolidAngle" unit="obix:units/steradian"/>
+    <DatapointSubtype id="64" name="DPT_Value_Sound_Intensity" unit="obix:units/watts_per_square_meter"/>
+    <DatapointSubtype id="65" name="DPT_Value_Speed" unit="obix:units/meters_per_second"/>
+    <DatapointSubtype id="66" name="DPT_Value_Stress" unit="obix:units/pascal"/>
+    <DatapointSubtype id="67" name="DPT_Value_Surface_Tension" unit="obix:units/newtons_per_meter"/>
+    <DatapointSubtype id="68" name="DPT_Value_Common_Temperature" unit="obix:units/celsius_degrees"/>
+    <DatapointSubtype id="69" name="DPT_Value_Absolute_Temperature" unit="obix:units/kelvin_degrees"/>
+    <DatapointSubtype id="70" name="DPT_Value_TemperatureDifference" unit="obix:units/temperature_differential"/>
+    <DatapointSubtype id="71" name="DPT_Value_Thermal_Capacity" unit="obix:units/x-joule_per_kelvin"/>
+    <DatapointSubtype id="72" name="DPT_Value_Thermal_Conductivity" unit="obix:units/watts_per_meter_degree_kelvin"/>
+    <DatapointSubtype id="73" name="DPT_Value_ThermoelectricPower" unit="obix:units/volts_per_degree_kelvin"/>
+    <DatapointSubtype id="74" name="DPT_Value_Time" unit="obix:units/second"/>
+    <DatapointSubtype id="75" name="DPT_Value_Torque" unit="obix:units/newton_meter"/>
+    <DatapointSubtype id="76" name="DPT_Value_Volume" unit="obix:units/cubic_meter"/>
+    <DatapointSubtype id="77" name="DPT_Value_Volume_Flux" unit="obix:units/cubic_meters_per_second"/>
+    <DatapointSubtype id="78" name="DPT_Value_Weight" unit="obix:units/newton"/>
+    <DatapointSubtype id="79" name="DPT_Value_Work" unit="obix:units/joule"/>
+  </DatapointType>
+  <DatapointType id="15" name="15.xxx" sizeinbit="32">
+    <DatapointSubtype id="0" name="DPT_Access_Data"/>       <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="16" name="16.xxx" sizeinbit="112">
+    <DatapointSubtype id="0" name="DPT_String_ASCII"/>      <!-- No unit needed here -->
+    <DatapointSubtype id="1" name="DPT_String_8859_1"/>     <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="17" name="17.xxx" sizeinbit="8">
+    <DatapointSubtype id="1" name="DPT_SceneNumber"/>       <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="18" name="18.xxx" sizeinbit="8">
+    <DatapointSubtype id="1" name="DPT_SceneControl"/>      <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="19" name="19.xxx" sizeinbit="64">
+    <DatapointSubtype id="1" name="DPT_DateTime"/>          <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="20" name="20.xxx" sizeinbit="8">
+    <DatapointSubtype id="1" name="DPT_SCLOMode"/>                      <!-- No unit needed here -->
+    <DatapointSubtype id="2" name="DPT_BuildingMode"/>                  <!-- No unit needed here -->
+    <DatapointSubtype id="3" name="DPT_OccMode"/>                       <!-- No unit needed here -->
+    <DatapointSubtype id="4" name="DPT_Priority"/>                      <!-- No unit needed here -->
+    <DatapointSubtype id="7" name="DPT_AlarmClassType"/>                <!-- No unit needed here -->
+    <DatapointSubtype id="11" name="DPT_ErrorClass_System"/>            <!-- No unit needed here -->
+    <DatapointSubtype id="12" name="DPT_ErrorClass_HVAC"/>              <!-- No unit needed here -->
+    <DatapointSubtype id="14" name="DPT_Beaufort_Wind_Force_Scale"/>    <!-- No unit needed here -->
+    <DatapointSubtype id="102" name="DPT_HVACMode"/>                    <!-- No unit needed here -->
+    <DatapointSubtype id="103" name="DPT_DHWMode"/>                     <!-- No unit needed here -->
+    <DatapointSubtype id="104" name="DPT_LoadPriority"/>                <!-- No unit needed here -->
+    <DatapointSubtype id="105" name="DPT_HVACContrMode"/>               <!-- No unit needed here -->
+    <DatapointSubtype id="106" name="DPT_HVACEmergMode"/>               <!-- No unit needed here -->
+    <DatapointSubtype id="107" name="DPT_ChangeoverMode"/>              <!-- No unit needed here -->
+    <DatapointSubtype id="108" name="DPT_ValveMode"/>                   <!-- No unit needed here -->
+    <DatapointSubtype id="109" name="DPT_DamperMode"/>                  <!-- No unit needed here -->
+    <DatapointSubtype id="110" name="DPT_HeaterMode"/>                  <!-- No unit needed here -->
+    <DatapointSubtype id="111" name="DPT_FanMode"/>                     <!-- No unit needed here -->
+    <DatapointSubtype id="112" name="DPT_MasterSlaveMode"/>             <!-- No unit needed here -->
+    <DatapointSubtype id="113" name="DPT_StatusRoomSetp"/>              <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="22" name="22.xxx" sizeinbit="16">
+    <DatapointSubtype id="101" name="DPT_StatusRHCC"/>                  <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="27" name="27.xxx" sizeinbit="32">
+    <DatapointSubtype id="1" name="DPT_CombinedInfoOnOff"/>             <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="217" name="217.xxx" sizeinbit="16">
+    <DatapointSubtype id="1" name="DPT_Version"/>                       <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="219" name="219.xxx" sizeinbit="48">
+    <DatapointSubtype id="1" name="DPT_AlarmInfo"/>                     <!-- No unit needed here -->
+  </DatapointType>
+  <DatapointType id="222" name="222.xxx" sizeinbit="48">
+    <DatapointSubtype id="100" name="DPT_TempRoomSetpSetF16[3]" unit="obix:units/celsius_degrees"/>
+    <DatapointSubtype id="101" name="DPT_TempRoomSetpSetShiftF16[3]" unit="obix:units/kelvin_degrees"/>
+  </DatapointType>
+  <DatapointType id="229" name="229.xxx" sizeinbit="48">
+    <DatapointSubtype id="1" name="DPT_MeteringValue"/>                 <!-- No unit needed here - MBUS -->
+  </DatapointType>
+  <DatapointType id="230" name="230.xxx" sizeinbit="64">
+    <DatapointSubtype id="1000" name="DPT_MBus_Address"/>               <!-- No unit needed here - MBUS -->
+  </DatapointType>
+  <DatapointType id="232" name="232.xxx" sizeinbit="24">
+    <DatapointSubtype id="600" name="DPT_Colour_RGB"/>                  <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+  </DatapointType>
+  <DatapointType id="234" name="234.xxx" sizeinbit="16">
+    <DatapointSubtype id="1" name="DPT_LanguageCodeAlpha2_ASCII"/>      <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+  </DatapointType>
+  <DatapointType id="237" name="237.xxx" sizeinbit="16">
+    <DatapointSubtype id="600" name="DPT_DALI_Control_Gear_Diagnostic"/><!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+  </DatapointType>
+  <DatapointType id="238" name="238.xxx" sizeinbit="8">
+    <DatapointSubtype id="600" name="DPT_DALI_Diagnostics"/>            <!-- Not listed in KNX spec 3/7/2 v1.4 AS -->
+  </DatapointType>
+</DatapointTypes>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <str name="networkID" val="NW_${w_netid}"/>
+    <str name="wmRfChannel" val="${w_rfch}"/>
+    <str name="wmRfPower" val="${w_rfpwr}"/>
+    <str name="wmOperatingMode" val="${w_mode}"/>
+    <str name="wmManufacturerID" val="${w_dongle_mid}"/>
+    <str name="wmIdentificationNumber" val="${w_netid}"/>
+    <int name="wmVersion" val="1" />
+    <str name="wmType" val="Other"/>
+    
+    <list name="nodes">
+<!--
+     See sensor.c:SensorSetDeviceListInObj()
+
+        <ref href="${s_rootapp}/DEV_0b435eff56a3bbbb/containers/DESCRIPTOR/contentInstances/latest/content"/>
+-->
+    </list>
+</obj>

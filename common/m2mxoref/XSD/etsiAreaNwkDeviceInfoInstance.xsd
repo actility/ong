@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	
+	<include schemaLocation="parameters.xsd"/>
+	<include schemaLocation="groups.xsd"/>
+	
+	<!-- <areaNwkDeviceInfoInstance> resource type -->
+	<complexType name="AreaNwkDeviceInfoInstance">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:areaNwkID"/>
+					<element ref="tns:sleepInterval"/>
+					<element ref="tns:sleepDuration"/>
+					<element ref="tns:status"/>
+					
+					<!-- sub resources -->
+					<element ref="tns:areaNwkTypeInfoOfDevice" minOccurs="0"/>
+					<element ref="tns:groupsReference" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>		
+	</complexType>
+
+	<element name="areaNwkID" type="long"/>
+	<element name="status" type="tns:AreaNwkStatus"/>		
+	<simpleType name="AreaNwkStatus">
+		<restriction base="string">
+			<enumeration value="ASLEEP"/>
+			<enumeration value="AWAKE"/>										
+		</restriction>
+	</simpleType>
+	<element name="sleepInterval" type="long"/>
+	<element name="sleepDuration" type="long"/>
+	<element name="areaNwkTypeInfoOfDevice" type="tns:Parameters"/>	
+</schema>

@@ -1,0 +1,4 @@
+
+if [ -f /etc/services -a -z "`grep '^domain' /etc/services`" ]; then
+ echo -e "\ndomain      53/tcp\ndomain      53/udp\n" >> /etc/services
+fi

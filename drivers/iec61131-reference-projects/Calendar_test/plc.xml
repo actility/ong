@@ -1,0 +1,888 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="Actility"
+              productName="iec61131"
+              productVersion="1.0.24"
+              creationDateTime="2013-03-20T17:09:43"/>
+  <contentHeader name="CALENDARS"
+                 version="1.0.1"
+                 modificationDateTime="2013-07-25T17:16:31"
+                 author="Laurent Nicq">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="10" y="10"/>
+      </fbd>
+      <ld>
+        <scaling x="0" y="0"/>
+      </ld>
+      <sfc>
+        <scaling x="10" y="10"/>
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes/>
+    <pous>
+      <pou name="Calendar_Single" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="Light_Outside">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="TimeSTART_Single">
+              <type>
+                <TOD/>
+              </type>
+            </variable>
+            <variable name="TimeEND_Single">
+              <type>
+                <TOD/>
+              </type>
+            </variable>
+            <variable name="Date_Single">
+              <type>
+                <DATE/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="Calendar_Name">
+              <type>
+                <string/>
+              </type>
+              <initialValue>
+                <simpleValue value="'Evening'"/>
+              </initialValue>
+            </variable>
+          </localVars>
+        </interface>
+        <actions>
+          <action name="createEvents">
+            <body>
+              <ST>
+<![CDATA[TimeEND_Single := ADD_TOD_TIME( TimeSTART_Single, T#1m0s);
+newCalendarEvent (Calendar_Name, Date_Single, TimeSTART_Single, TimeEND_Single);]]>
+              </ST>
+            </body>
+          </action>
+        </actions>
+        <transitions>
+          <transition name="Wait_For_ACTIVE_Event">
+            <body>
+              <ST>
+<![CDATA[checkCalendarEvent (Calendar_Name);]]>
+              </ST>
+            </body>
+          </transition>
+          <transition name="Wait_For_INACTIVE_Event">
+            <body>
+              <ST>
+<![CDATA[NOT(checkCalendarEvent (Calendar_Name) ) ;]]>
+              </ST>
+            </body>
+          </transition>
+        </transitions>
+        <body>
+          <SFC>
+            <step localId="1" height="60" width="100" name="Init_Single" initialStep="true">
+              <position x="130" y="10"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="50" y="60"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="100" y="30"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="2" width="110" height="40">
+              <position x="410" y="20"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1">
+                  <position x="410" y="40"/>
+                  <position x="230" y="40"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="createEvents"/>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name=""/>
+              </action>
+            </actionBlock>
+            <step localId="3" height="30" width="100" name="Step_ON_Single">
+              <position x="130" y="230"/>
+              <connectionPointIn>
+                <relPosition x="50" y="0"/>
+                <connection refLocalId="12">
+                  <position x="180" y="230"/>
+                  <position x="180" y="220"/>
+                  <position x="180" y="220"/>
+                  <position x="180" y="210"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="50" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="100" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="5" width="190" height="30">
+              <position x="410" y="230"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="3">
+                  <position x="410" y="250"/>
+                  <position x="210" y="250"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Light_Outside := TRUE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <transition localId="6" height="10" width="20">
+              <position x="170" y="290"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="3">
+                  <position x="180" y="290"/>
+                  <position x="180" y="260"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="Wait_For_INACTIVE_Event"/>
+              </condition>
+            </transition>
+            <step localId="7" height="30" width="110" name="Step_OFF_Single">
+              <position x="125" y="350"/>
+              <connectionPointIn>
+                <relPosition x="55" y="0"/>
+                <connection refLocalId="6">
+                  <position x="180" y="350"/>
+                  <position x="180" y="300"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="55" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="110" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="8" width="190" height="30">
+              <position x="410" y="350"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="7">
+                  <position x="410" y="370"/>
+                  <position x="235" y="370"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Light_Outside :=FALSE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <step localId="10" height="30" width="110" name="Dummy1">
+              <position x="120" y="130"/>
+              <connectionPointIn>
+                <relPosition x="60" y="0"/>
+                <connection refLocalId="11">
+                  <position x="180" y="130"/>
+                  <position x="180" y="100"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="60" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="110" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="11" height="10" width="20">
+              <position x="170" y="90"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="180" y="90"/>
+                  <position x="180" y="70"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[TRUE;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <transition localId="12" height="10" width="20">
+              <position x="170" y="200"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="10">
+                  <position x="180" y="200"/>
+                  <position x="180" y="160"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="Wait_For_ACTIVE_Event"/>
+              </condition>
+            </transition>
+            <jumpStep localId="16" height="20" width="20" targetName="Dummy1">
+              <position x="170" y="420"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="7">
+                  <position x="180" y="420"/>
+                  <position x="180" y="380"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <comment localId="17" height="60" width="190">
+              <position x="490" y="270"/>
+              <content>
+<![CDATA[Shall be  [P] actions.
+[N] is for testing purposes]]>
+              </content>
+            </comment>
+          </SFC>
+        </body>
+      </pou>
+      <pou name="Calendar_Weekly" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="Light_Television">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="TimeSTART_Single">
+              <type>
+                <TOD/>
+              </type>
+            </variable>
+            <variable name="TimeSTART_Weekly">
+              <type>
+                <TOD/>
+              </type>
+            </variable>
+            <variable name="TimeEND_Weekly">
+              <type>
+                <TOD/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="Calendar_Name">
+              <type>
+                <string/>
+              </type>
+              <initialValue>
+                <simpleValue value="'Movie'"/>
+              </initialValue>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="Days_Of_week">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+          </externalVars>
+        </interface>
+        <actions>
+          <action name="createEvents">
+            <body>
+              <ST>
+<![CDATA[TimeSTART_Weekly := ADD_TOD_TIME( TimeSTART_Single, T#4m0s);
+TimeEND_Weekly := ADD_TOD_TIME( TimeSTART_Single, T#5m0s);
+newCalendarWeeklyEvent (Calendar_Name, TimeSTART_Weekly, TimeEND_Weekly, Days_Of_week );]]>
+              </ST>
+            </body>
+          </action>
+        </actions>
+        <transitions>
+          <transition name="Wait_For_ACTIVE_Event">
+            <body>
+              <ST>
+<![CDATA[checkCalendarEvent (Calendar_Name);]]>
+              </ST>
+            </body>
+          </transition>
+          <transition name="Wait_For_INACTIVE_Event">
+            <body>
+              <ST>
+<![CDATA[NOT(checkCalendarEvent (Calendar_Name) ) ;]]>
+              </ST>
+            </body>
+          </transition>
+        </transitions>
+        <body>
+          <SFC>
+            <step localId="1" height="60" width="100" name="Init_Weekly" initialStep="true">
+              <position x="130" y="10"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="50" y="60"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="100" y="30"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="2" width="110" height="30">
+              <position x="410" y="20"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1">
+                  <position x="410" y="40"/>
+                  <position x="230" y="40"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="createEvents"/>
+              </action>
+            </actionBlock>
+            <step localId="3" height="30" width="110" name="Step_ON_Weekly">
+              <position x="125" y="230"/>
+              <connectionPointIn>
+                <relPosition x="55" y="0"/>
+                <connection refLocalId="12">
+                  <position x="180" y="230"/>
+                  <position x="180" y="220"/>
+                  <position x="180" y="220"/>
+                  <position x="180" y="210"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="55" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="110" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="5" width="190" height="30">
+              <position x="410" y="230"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="3">
+                  <position x="410" y="250"/>
+                  <position x="210" y="250"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Light_Television := TRUE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <transition localId="6" height="10" width="20">
+              <position x="170" y="290"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="3">
+                  <position x="180" y="290"/>
+                  <position x="180" y="260"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="Wait_For_INACTIVE_Event"/>
+              </condition>
+            </transition>
+            <step localId="7" height="30" width="110" name="Step_OFF_Weekly">
+              <position x="125" y="350"/>
+              <connectionPointIn>
+                <relPosition x="55" y="0"/>
+                <connection refLocalId="6">
+                  <position x="180" y="350"/>
+                  <position x="180" y="300"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="55" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="110" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="8" width="190" height="30">
+              <position x="410" y="350"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="7">
+                  <position x="410" y="370"/>
+                  <position x="235" y="370"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Light_Television :=FALSE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <step localId="10" height="30" width="110" name="Dummy1">
+              <position x="120" y="130"/>
+              <connectionPointIn>
+                <relPosition x="60" y="0"/>
+                <connection refLocalId="11">
+                  <position x="180" y="130"/>
+                  <position x="180" y="100"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="60" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="110" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="11" height="10" width="20">
+              <position x="170" y="90"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="180" y="90"/>
+                  <position x="180" y="70"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[TRUE;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <transition localId="12" height="10" width="20">
+              <position x="170" y="200"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="10">
+                  <position x="180" y="200"/>
+                  <position x="180" y="160"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="Wait_For_ACTIVE_Event"/>
+              </condition>
+            </transition>
+            <jumpStep localId="16" height="20" width="20" targetName="Dummy1">
+              <position x="170" y="420"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="7">
+                  <position x="180" y="420"/>
+                  <position x="180" y="380"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <comment localId="17" height="60" width="190">
+              <position x="500" y="270"/>
+              <content>
+<![CDATA[Shall be  [P] actions.
+[N] is for testing purposes]]>
+              </content>
+            </comment>
+          </SFC>
+        </body>
+      </pou>
+      <pou name="Calendar_Daily" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="Light_Kitchen">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="TimeSTART_Daily">
+              <type>
+                <TOD/>
+              </type>
+            </variable>
+            <variable name="TimeSTART_Single">
+              <type>
+                <TOD/>
+              </type>
+            </variable>
+            <variable name="TimeEND_Daily">
+              <type>
+                <TOD/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="Calendar_Name">
+              <type>
+                <string/>
+              </type>
+              <initialValue>
+                <simpleValue value="'Dining'"/>
+              </initialValue>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="Days_Interval">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+          </externalVars>
+        </interface>
+        <actions>
+          <action name="createEvents">
+            <body>
+              <ST>
+<![CDATA[TimeSTART_Daily := ADD_TOD_TIME( TimeSTART_Single, T#2m0s);
+TimeEND_Daily := ADD_TOD_TIME( TimeSTART_Single, T#3m0s);
+newCalendarDailyEvent (Calendar_Name, TimeSTART_Daily, TimeEND_Daily, Days_Interval );]]>
+              </ST>
+            </body>
+          </action>
+        </actions>
+        <transitions>
+          <transition name="Wait_For_ACTIVE_Event">
+            <body>
+              <ST>
+<![CDATA[checkCalendarEvent (Calendar_Name);]]>
+              </ST>
+            </body>
+          </transition>
+          <transition name="Wait_For_INACTIVE_Event">
+            <body>
+              <ST>
+<![CDATA[NOT(checkCalendarEvent (Calendar_Name) ) ;]]>
+              </ST>
+            </body>
+          </transition>
+        </transitions>
+        <body>
+          <SFC>
+            <step localId="1" height="60" width="100" name="Init_Daily" initialStep="true">
+              <position x="130" y="10"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="50" y="60"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="100" y="30"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="2" width="110" height="30">
+              <position x="410" y="20"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1">
+                  <position x="410" y="40"/>
+                  <position x="230" y="40"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="createEvents"/>
+              </action>
+            </actionBlock>
+            <step localId="3" height="30" width="100" name="Step_ON_Daily">
+              <position x="130" y="230"/>
+              <connectionPointIn>
+                <relPosition x="50" y="0"/>
+                <connection refLocalId="12">
+                  <position x="180" y="230"/>
+                  <position x="180" y="220"/>
+                  <position x="180" y="220"/>
+                  <position x="180" y="210"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="50" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="100" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="5" width="190" height="30">
+              <position x="410" y="230"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="3">
+                  <position x="410" y="250"/>
+                  <position x="210" y="250"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Light_Kitchen := TRUE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <transition localId="6" height="10" width="20">
+              <position x="170" y="290"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="3">
+                  <position x="180" y="290"/>
+                  <position x="180" y="260"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="Wait_For_INACTIVE_Event"/>
+              </condition>
+            </transition>
+            <step localId="7" height="30" width="100" name="Step_OFF_Daily">
+              <position x="130" y="360"/>
+              <connectionPointIn>
+                <relPosition x="50" y="0"/>
+                <connection refLocalId="6">
+                  <position x="180" y="360"/>
+                  <position x="180" y="300"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="50" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="100" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="8" width="190" height="30">
+              <position x="410" y="360"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="7">
+                  <position x="410" y="380"/>
+                  <position x="230" y="380"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Light_Kitchen :=FALSE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <step localId="10" height="30" width="110" name="Dummy1">
+              <position x="120" y="130"/>
+              <connectionPointIn>
+                <relPosition x="60" y="0"/>
+                <connection refLocalId="11">
+                  <position x="180" y="130"/>
+                  <position x="180" y="100"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="60" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="110" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="11" height="10" width="20">
+              <position x="170" y="90"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="180" y="90"/>
+                  <position x="180" y="70"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[TRUE;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <transition localId="12" height="10" width="20">
+              <position x="170" y="200"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="10">
+                  <position x="180" y="200"/>
+                  <position x="180" y="160"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="Wait_For_ACTIVE_Event"/>
+              </condition>
+            </transition>
+            <jumpStep localId="16" height="20" width="20" targetName="Dummy1">
+              <position x="170" y="430"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="7">
+                  <position x="180" y="430"/>
+                  <position x="180" y="390"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <comment localId="17" height="60" width="190">
+              <position x="450" y="280"/>
+              <content>
+<![CDATA[Shall be  [P] actions.
+[N] is for testing purposes]]>
+              </content>
+            </comment>
+          </SFC>
+        </body>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="Astro_test">
+        <resource name="main_config">
+          <task name="task_main" interval="T#1s0ms" priority="0">
+            <pouInstance name="calendar1" typeName="Calendar_Single"/>
+            <pouInstance name="calendar2" typeName="Calendar_Daily"/>
+            <pouInstance name="calendar3" typeName="Calendar_Weekly"/>
+          </task>
+          <globalVars>
+            <variable name="Date_Single">
+              <type>
+                <DATE/>
+              </type>
+              <initialValue>
+                <simpleValue value="DATE#2013-07-25"/>
+              </initialValue>
+              <documentation>
+<![CDATA[adjust date for testing]]>
+              </documentation>
+            </variable>
+            <variable name="TimeSTART_Single">
+              <type>
+                <TOD/>
+              </type>
+              <initialValue>
+                <simpleValue value="TOD#16:56:00"/>
+              </initialValue>
+              <documentation>
+<![CDATA[adjust time for testing]]>
+              </documentation>
+            </variable>
+            <variable name="TimeEND_Single">
+              <type>
+                <TOD/>
+              </type>
+              <documentation>
+<![CDATA[calculated for testing]]>
+              </documentation>
+            </variable>
+            <variable name="TimeSTART_Daily">
+              <type>
+                <TOD/>
+              </type>
+              <documentation>
+<![CDATA[calculated for testing]]>
+              </documentation>
+            </variable>
+            <variable name="TimeEND_Daily">
+              <type>
+                <TOD/>
+              </type>
+              <documentation>
+<![CDATA[calculated for testing]]>
+              </documentation>
+            </variable>
+            <variable name="Days_Interval">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="1"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Every day (Daily Event)]]>
+              </documentation>
+            </variable>
+            <variable name="TimeSTART_Weekly">
+              <type>
+                <TOD/>
+              </type>
+              <documentation>
+<![CDATA[calculated for testing]]>
+              </documentation>
+            </variable>
+            <variable name="TimeEND_Weekly">
+              <type>
+                <TOD/>
+              </type>
+              <documentation>
+<![CDATA[calculated for testing]]>
+              </documentation>
+            </variable>
+            <variable name="Days_Of_week">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="2#0111_1111"/>
+              </initialValue>
+              <documentation>
+<![CDATA[All days (Weekly Event)]]>
+              </documentation>
+            </variable>
+          </globalVars>
+        </resource>
+      </configuration>
+    </configurations>
+  </instances>
+</project>

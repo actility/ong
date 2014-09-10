@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <!-- M2M -->
+    <str name="applicationID" val="APP_${d_ieee}.${a_num}"/>
+    
+    <!-- Modbus Interfaces are build from product descriptor -->
+    <list name="interfaces"/>
+</obj>

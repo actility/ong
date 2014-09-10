@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="Basic.Srv" status="cfg-mandatory"/>
+    <str name="zbClusterID" val="0x0000" status="cfg-mandatory"/>
+    <enum name="zbClusterType" val="server" status="cfg-mandatory"/>
+
+    <!-- ZigBee attributes -->
+    <int name="zbZclVersion" ${a_configAttr0}="${a_configVal0}" />
+    <int name="zbApplicationVersion" ${a_configAttr1}="${a_configVal1}" />
+    <int name="zbStackVersion" ${a_configAttr2}="${a_configVal2}" />
+    <int name="zbHwVersion" ${a_configAttr3}="${a_configVal3}" />
+    <str name="zbManufacturerName" ${a_configAttr4}="${a_configVal4}" />
+    <str name="zbModelIdentifier" ${a_configAttr5}="${a_configVal5}" />
+    <str name="zbDateCode" ${a_configAttr6}="${a_configVal6}" />
+    <enum name="zbPowerSource" ${a_configAttr7}="${a_configVal7}" />
+    <str name="zbLocationDescription" ${a_configAttr8}="${a_configVal8}" />
+    <enum name="zbPhysicalEnvironment" ${a_configAttr9}="${a_configVal9}" />
+    <bool name="zbDeviceEnabled" ${a_configAttr10}="${a_configVal10}" />
+    <str name="zbAlarmMask" ${a_configAttr11}="${a_configVal11}" />
+
+    <!-- ZigBee commands -->
+    <op name="zbResetToFactoryDefaults" href="${s_rootapp}/APP_${d_ieee}.${a_num}/${r_pathOpe0}/0x0000.0x00.ope"/>
+            
+    <!-- M2M POINTS-->
+</obj>
+

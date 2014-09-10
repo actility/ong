@@ -1,0 +1,13 @@
+
+LIBBASE=$(ROOTACT)/rtbase/lib/librtbase.a
+LIBDIA=$(ROOTACT)/libdIa/libdIa.a
+LIBCOAP=$(ROOTACT)/libcoap/libcoap.a
+
+PRJLIB=\
+	$(ROOTACT)/watteco/lib/libwatteco.a	\
+	$(ROOTACT)/rtbase/lib/librtbase.a
+
+PRJINC=$(ROOTACT)/watteco/include
+
+#CCFLAGS +=-g
+#LDFLAGS +=-g -lpthread

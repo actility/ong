@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:application appId="${w_ipuid}" xmlns:m2m="http://uri.etsi.org/m2m">
+    <m2m:accessRightID>${s_rootacc}/Locadmin_AR1</m2m:accessRightID>
+    <m2m:searchStrings>
+        <m2m:searchString>ETSI.ObjectType/ETSI.IP</m2m:searchString>
+        <m2m:searchString>ETSI.ObjectTechnology/ISO.14543_3</m2m:searchString>
+        <m2m:searchString>ETSI.InterworkingProxyID/${w_ipuid}</m2m:searchString>
+    </m2m:searchStrings>
+    <m2m:aPoC>coap://${w_drvcontact}/${w_driverpath}/${w_ipuid}</m2m:aPoC>
+    <m2m:aPoCPaths>
+        <m2m:aPoCPath>
+            <m2m:path>retargeting1</m2m:path>
+            <m2m:accessRightID>${s_rootacc}/Locadmin_AR2</m2m:accessRightID>
+        </m2m:aPoCPath>
+    </m2m:aPoCPaths>
+</m2m:application>
+

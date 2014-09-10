@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://activity.com/thingpark/m2m" xmlns:tns="http://activity.com/thingpark/m2m" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	
+	<element name="resourceModeling" type="tns:ResourceModeling"/>
+	
+	<complexType name="ResourceModeling">
+		<sequence>
+			<element name="interface" type="tns:Interface" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	
+	<!-- INTERFACE -->
+	<complexType name="Interface">
+		<sequence>
+			<element name="descriptor" type="tns:Descriptor" minOccurs="1" maxOccurs="1"/>
+			<element name="covConfiguration" type="tns:CovConfiguration" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="filter" type="string" use="required"/>
+	</complexType>
+
+	<!-- DESCRIPTOR -->
+	<complexType name="Descriptor">
+		<sequence>
+			<element name="attr" type="tns:Attribute" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="feed" type="tns:Feed" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="cmd" type="tns:Command" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="point" type="tns:Point" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	
+	<!-- ATTRIBUTE -->
+	<complexType name="Attribute">
+		<sequence>
+			<element name="ext" type="tns:ExtParameter" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="name" type="string" use="required"/>
+		<attribute name="config" type="tns:AttributeConfiguration" use="required"/>
+		<attribute name="accessRight" type="tns:AccessRight"/>
+		<attribute name="maxNrOfInstances" type="integer"/>
+		<attribute name="maxByteSize" type="integer"/>
+		<attribute name="maxInstanceAge" type="integer"/>
+		<attribute name="storageDriver" type="string"/>
+	</complexType>
+
+	<simpleType name="AttributeConfiguration">
+		<restriction base="string">
+			<enumeration value="descriptor"></enumeration>
+			<enumeration value="logging"></enumeration>
+			<enumeration value="retargeting"></enumeration>
+		</restriction>
+	</simpleType>
+	
+	<!-- FEED -->
+	<complexType name="Feed">
+		<sequence>
+			<element name="ext" type="tns:ExtParameter" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="name" type="string" use="required"/>
+		<attribute name="maxNrOfInstances" type="integer"/>
+		<attribute name="maxByteSize" type="integer"/>
+		<attribute name="maxInstanceAge" type="integer"/>
+		<attribute name="storageDriver" type="string"/>
+	</complexType>
+	
+	<!-- COMMAND -->
+	<complexType name="Command">
+		<sequence>
+			<element name="ext" type="tns:ExtParameter" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="name" type="string" use="required"/>
+		<attribute name="accessRight" type="tns:AccessRight"/>
+	</complexType>
+
+	<!-- POINT -->
+	<complexType name="Point">
+		<sequence>
+			<element name="ext" type="tns:ExtParameter" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="name" type="string" use="required"/>
+		<attribute name="config" type="tns:PointConfiguration" use="required"/>
+		<attribute name="accessRight" type="tns:AccessRight"/>
+		<attribute name="maxNrOfInstances" type="integer"/>
+		<attribute name="maxByteSize" type="integer"/>
+		<attribute name="maxInstanceAge" type="duration"/>
+		<attribute name="storageDriver" type="string"/>
+	</complexType>
+	
+	<simpleType name="PointConfiguration">
+		<restriction base="string">
+			<enumeration value="logging"></enumeration>
+			<enumeration value="retargeting"></enumeration>
+		</restriction>
+	</simpleType>
+
+	<!-- COV CONFIGURATION -->
+	<complexType name="CovConfiguration">
+		<sequence>
+			<element name="ext" type="tns:ExtParameter" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="filter" type="string" use="required"/>
+		<attribute name="minInterval" type="duration"/>
+		<attribute name="maxInterval" type="duration"/>
+		<attribute name="minCOV" type="string"/>
+	</complexType>
+
+	<!-- EXTENDED PARAMETER -->
+	<complexType name="ExtParameter">
+		<sequence>
+		</sequence>
+		<attribute name="name" type="string" use="required"/>
+		<attribute name="val" type="string" use="required"/>
+	</complexType>
+
+	<!-- ACCESS RIGHT PARAMETER -->
+	<simpleType name="AccessRight">
+		<restriction base="string">
+			<enumeration value="level1"></enumeration>
+			<enumeration value="level2"></enumeration>
+			<enumeration value="level3"></enumeration>
+		</restriction>
+	</simpleType>
+</schema>
+		

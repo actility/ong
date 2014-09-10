@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+x-template="${w_template}"
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="nodeID" val="DEV_${d_ieee}"/>
+    <str name="ieeeAddress" val="0x${d_ieee}"/>
+<!--
+    <str name="networkAddress" val="0x1234"/>  
+-->
+    <enum name="nodeType" val="endDevice"/>
+    <str name="manufacturerCode" val="0x${w_manufacturer}"/>
+
+    <str name="powerMode" val="${d_powmode}"/>
+    <str name="powerSource" val="${d_powsrc}"/>  
+    <str name="powerLevel" val="${d_powlvl}"/>
+    <int name="powerValue" val="${d_powval}"/>
+
+    <list name="applications">
+<!--
+     See sensor.c:iSensorSetApplicationListInObj()
+
+        <ref href="${s_rootapp}/APP_0b435eff56a3bbbb.1/containers/DESCRIPTOR/contentInstances/latest/content/"/>
+-->
+    </list>
+<!--
+    <op name="zdoMgmtBind" href="${s_rootapp}/DEV_0b435eff56a3bbbb/retargeting2/zmgmtbind"/>
+    <op name="zdoMgmtLeave" href="${s_rootapp}/DEV_0b435eff56a3bbbb/retargeting2/zmgmtleave"/>
+-->
+    <op name="reboot" href="${s_rootapp}/DEV_${d_ieee}/retargeting1/0x0050.0x00.ope"/>
+    <op name="delete" href="${s_rootapp}/DEV_${d_ieee}/retargeting1/0xFFFF.0x00.ope"/>
+    <op name="rebuild" href="${s_rootapp}/DEV_${d_ieee}/retargeting1/0xFFFF.0x01.ope"/>
+</obj>

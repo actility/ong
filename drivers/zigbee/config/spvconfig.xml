@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     Do not modify this file which is included in delivery.
+     Copy it in $ROOTACT/usr/data/zigbee/ and edit the copy.
+-->
+
+<obj xmlns="http://obix.org/ns/schema/1.1">
+
+<!--
+     parameters
+-->
+<list name="parameters">
+  <int name="tracesize" val="1048000"/>
+  <int name="tracelevel" val="0"/>
+  <int name="tracedebug" val="0"/>
+  <int name="tracedia" val="0"/>
+</list>
+
+<!--
+     variables
+-->
+<list name="variables">
+  <str name="s_telnetkey" val="123"/>
+  <int name="s_telnetport" val="2001"/>
+
+  <str name="w_driverid" val="GIP"/>
+  <str name="w_driverpath" val="zigbee"/>
+  <str name="w_ipuid" val="IPU_ZigBee"/>
+  <int name="w_rfChan" val="11"/>
+
+  <str name="w_nsclbaseuri" val="http://nsc1.actility.com:8088/m2m"/>
+  <str name="w_domainname" val="actility.com"/>
+  <str name="w_tpkdev" val=""/>
+
+  <str name="w_coapaddr_l" val="::1"/>
+  <int name="w_coapport_l" val="5685"/>
+
+  <str name="w_coapaddr_r" val="::1"/>
+  <int name="w_coapport_r" val="5683"/>
+</list>
+
+<!--
+     m2m mapping cluster.attribute.type => m2m attribute/point/cmd name
+     	0x%04x.0x%04x.0.m2m
+     	0x%04x.0x%04x.0.attr
+     	0x%04x.0x%02x.ope
+-->
+<list name="mapping">
+  <str name="0x0000.0x00.ope" val="zbResetToFactoryDefaults"/>
+  <str name="0x0003.0x00.ope" val="zbIdentify"/>
+  <str name="0x0003.0x01.ope" val="zbIdentifyQuery"/>
+  <str name="0x0006.0x00.ope" val="zbOff"/>
+  <str name="0x0006.0x01.ope" val="zbOn"/>
+  <str name="0x0006.0x02.ope" val="zbToggle"/>
+  <str name="0x0000.0x0010.0.attr" val="zbLocationDescription"/>
+  <str name="0x0003.0x0000.0.attr" val="zbIdentifyTime"/>
+  <str name="0x0006.0x0000.0.attr" val="zbOnOff"/>
+  <str name="0x0400.0x0000.0.attr" val="zbMeasuredValue"/>
+  <str name="0x0402.0x0000.0.attr" val="zbMeasuredValue"/>
+  <str name="0x0405.0x0000.0.attr" val="zbMeasuredValue"/>
+  <str name="0x0702.0x0000.0.attr" val="zbCurrentSummationDelivered"/>
+  <str name="0x0702.0x0400.0.attr" val="zbInstantaneousDemand"/>
+  <str name="0x0006.0x0000.0.m2m" val="m2mOnOff"/>
+  <str name="0x0400.0x0000.0.m2m" val="m2mMeasuredValue"/>
+  <str name="0x0402.0x0000.0.m2m" val="m2mMeasuredValue"/>
+  <str name="0x0405.0x0000.0.m2m" val="m2mMeasuredValue"/>
+  <str name="0x0702.0x0000.0.m2m" val="m2mCurrentSummationDelivered"/>
+  <str name="0x0702.0x0400.0.m2m" val="m2mInstantaneousDemand"/>
+</list>
+
+<list name="interfacesMapping">
+  <list name="cluster.0x0000.server" >
+    <list name="attributes">
+      <str name="attr.0" val="0x0000" />
+      <str name="attr.1" val="0x0001" />
+      <str name="attr.2" val="0x0002" />
+      <str name="attr.3" val="0x0003" />
+      <str name="attr.4" val="0x0004" />
+      <str name="attr.5" val="0x0005" />
+      <str name="attr.6" val="0x0006" />
+      <str name="attr.7" val="0x0007" />
+      <str name="attr.8" val="0x0010" />
+      <str name="attr.9" val="0x0011" />
+      <str name="attr.10" val="0x0012" />
+      <str name="attr.11" val="0x0013" />
+    </list>
+    <list name="operations">
+      <str name="ope.0" val="zbResetToFactoryDefaults" />
+    </list>
+  </list>
+  <list name="cluster.0x0003.server" >
+    <list name="attributes">
+      <str name="attr.0" val="0x0000" />
+    </list>
+    <list name="operations">
+      <str name="ope.0" val="zbIdentify" />
+      <str name="ope.1" val="zbIdentifyQuery" />
+    </list>
+  </list>
+  <list name="cluster.0x0006.client" >
+    <list name="attributes"/>
+    <list name="operations">
+      <str name="ope.0" val="zbBind" />
+      <str name="ope.1" val="zbUnbind" />
+    </list>
+  </list>
+  <list name="cluster.0x0006.server" >
+    <list name="attributes">
+      <str name="attr.0" val="0x0000" />
+    </list>
+    <list name="operations">
+      <str name="ope.0" val="zbOff" />
+      <str name="ope.1" val="zbOn" />
+      <str name="ope.2" val="zbToggle" />
+    </list>
+  </list>
+  <list name="cluster.0x0400.server" >
+    <list name="attributes">
+      <str name="attr.0" val="0x0000" />
+      <str name="attr.1" val="0x0001" />
+      <str name="attr.2" val="0x0002" />
+    </list>
+    <list name="operations"/>
+  </list>
+  <list name="cluster.0x0402.server" >
+    <list name="attributes">
+      <str name="attr.0" val="0x0000" />
+      <str name="attr.1" val="0x0001" />
+      <str name="attr.2" val="0x0002" />
+    </list>
+    <list name="operations"/>
+  </list>
+  <list name="cluster.0x0405.server" >
+    <list name="attributes">
+      <str name="attr.0" val="0x0000" />
+      <str name="attr.1" val="0x0001" />
+      <str name="attr.2" val="0x0002" />
+    </list>
+    <list name="operations"/>
+  </list>
+  <list name="cluster.0x0702.server" >
+    <list name="attributes">
+      <str name="attr.0" val="0x0000" />
+      <str name="attr.1" val="0x0400" />
+      <str name="attr.2" val="0x0300" />
+      <str name="attr.3" val="0x0301" />
+      <str name="attr.4" val="0x0302" />
+      <str name="attr.5" val="0x0303" />
+      <str name="attr.6" val="0x0304" />
+      <str name="attr.7" val="0x0306" />
+    </list>
+    <list name="operations">
+      <str name="ope.0" val="zbBind" />
+      <str name="ope.1" val="zbUnbind" />
+    </list>
+  </list>
+</list>
+
+</obj>
+

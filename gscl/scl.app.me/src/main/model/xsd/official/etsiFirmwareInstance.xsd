@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:tns="http://uri.etsi.org/m2m" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- <fwInstance> resource type -->
+	<complexType name="FwInstance">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:firmwareName"/>
+					<element ref="tns:firmwareVersion"/>
+					<element ref="tns:firmwareURL"/>
+					<element ref="tns:fwActionStatus" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+		<!-- attribute name="id"></attribute -->
+	</complexType>
+
+	<element name="firmwareName" type="tns:fwName"/>
+
+	<simpleType name="fwName">
+		<restriction base="string">
+			<maxLength value="256"/>
+		</restriction>
+	</simpleType>
+
+	<element name="firmwareURL" type="tns:fwURL"/>
+
+	<simpleType name="fwURL">
+		<restriction base="string">
+			<maxLength value="256"/>
+		</restriction>
+	</simpleType>
+
+	<element name="fwActionStatus" type="tns:ActionStatus"/>
+
+
+</schema>

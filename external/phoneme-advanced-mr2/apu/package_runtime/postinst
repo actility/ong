@@ -1,0 +1,4 @@
+chmod 755 $ROOTACT/bin/phoneme/bin/cvm
+cd $ROOTACT/bin
+ln -s phoneme/bin/cvm cvm
+

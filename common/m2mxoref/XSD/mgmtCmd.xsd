@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:tns="http://uri.etsi.org/m2m" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m">
+	<include schemaLocation="commonDM.xsd"/>
+
+	<!-- mgmtCmd type resource -->
+	<element name="mgmtCmd" type="tns:MgmtCmd"/>
+
+	<complexType name="MgmtCmd">
+		<sequence>
+			<!-- common attributes -->
+			<element ref="tns:expirationTime" minOccurs="0"/>
+			<element ref="tns:accessRightID" minOccurs="0"/>
+			<element ref="tns:searchStrings" minOccurs="0"/>
+			<element ref="tns:creationTime" minOccurs="0"/>
+			<element ref="tns:lastModifiedTime" minOccurs="0"/>	
+		
+			<!-- MO specific attributes -->
+			<element ref="tns:description" minOccurs="0"/>
+			<element ref="tns:cmdType" minOccurs="0"/>
+ 			<element ref="tns:execEnable" minOccurs="0"/>
+			<element ref="tns:execReqArgs" minOccurs="0"/>
+
+			<!-- sub resources -->
+			<element ref="tns:execInstancesReference" minOccurs="0"/>
+			<element ref="tns:subscriptionsReference" minOccurs="0"/>
+		</sequence>
+
+		<attribute ref="tns:id"/>
+	</complexType>
+
+	
+	<element name="cmdType" type="tns:CmdType"/>
+	<simpleType name="CmdType">		
+		<restriction base="string">
+			<enumeration value="RESET"/>
+			<enumeration value="REBOOT"/>				
+			<enumeration value="UPLOAD"/>		
+			<enumeration value="DOWNLOAD"/>
+			<enumeration value="SCHEDULEDOWNLOAD"/>				
+			<enumeration value="SCHEDULEINFORM"/>
+			<enumeration value="CHANGEDUSTATE"/>				
+		</restriction>
+	</simpleType>
+	
+	<element name="execEnable" type="anyURI"/>
+	
+	<element name="execReqArgs" type="tns:ExecReqArgsList"/>
+	<complexType name="ExecReqArgsList">
+		<sequence>
+                        <element name="execReqArg" type="tns:ExecReqArg" minOccurs="0" maxOccurs="unbounded"/> 
+			<!-- any minOccurs="0" maxOccurs="unbounded"/ -->
+		</sequence>		
+	</complexType>
+	<complexType name="ExecReqArg">
+		<sequence>
+			<element name="name" type="string"/>
+			<element name="value" type="anyType"/>
+		</sequence>
+	</complexType>
+	
+	<element name="execInstancesReference" type="anyURI"/>	
+</schema>

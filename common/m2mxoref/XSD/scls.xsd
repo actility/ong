@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="common.xsd" />
+
+	<element name="scls" type="tns:Scls" />
+
+	<complexType name="Scls">
+		<sequence>
+			<element ref="tns:accessRightID" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0" />
+			<element ref="tns:lastModifiedTime" minOccurs="0" />
+			<!-- subresources -->
+			<element ref="tns:sclCollection" minOccurs="0" />
+			<element ref="tns:subscriptionsReference" minOccurs="0" />
+			<element ref="tns:mgmtObjsReference" minOccurs="0" />
+
+		</sequence>
+	</complexType>
+
+	<element name="sclCollection" type="tns:NamedReferenceCollection" />
+
+</schema>

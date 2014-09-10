@@ -1,0 +1,55 @@
+-------------------------------------------------------------------------------
+SONG command shell changelog
+-------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - Added new statistics from SONG API 3.6.0
+ - Changed the groupId for com.actility.m2m (was com.actility).
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2012-10-23
+
+New Features:
+-------------
+ - Update to song.binding.api 3.4.0 to add statistics
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2012-10-05
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Removed provided scopes in pom.xml to allow transitive dependencies
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2012-06-05
+
+New Features:
+-------------
+ - Use new song.api 3.0
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2012-03-20
+Initial version

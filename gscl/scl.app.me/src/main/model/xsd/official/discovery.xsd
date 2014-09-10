@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+
+<include schemaLocation="common.xsd" />
+<element name="discovery" type ="tns:Discovery" />
+<complexType name="Discovery">
+	<sequence>
+ 		<element ref="tns:matchSize" minOccurs="0"/>
+ 		<element ref="tns:truncated" minOccurs="0"/>
+ 		<element ref="tns:discoveryURI" minOccurs="0"/>
+	</sequence>
+</complexType>
+<element name="matchSize" type="long"/>
+<element name="truncated" type="boolean" />
+<element name="discoveryURI" type="tns:AnyURIList" />
+</schema>

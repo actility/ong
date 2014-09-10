@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m"
+	xmlns:tns="http://uri.etsi.org/m2m">
+
+	<element name="securityM2MNodeId">
+		<simpleType>
+			<restriction base="hexBinary">
+				<length value="16" />
+			</restriction>
+		</simpleType>
+	</element>
+
+	<element name="securityKmrIndex" type="unsignedInt" />
+
+	<element name="securityLifetime" type="dateTime" />
+
+	<element name="securityMasFqdn" type="anyURI" />
+
+	<element name="securityM2MKey">
+		<simpleType>
+			<restriction base="hexBinary">
+				<length value="32" />
+			</restriction>
+		</simpleType>
+	</element>
+
+	<element name="securitySclId" type="anyURI" />
+
+	<element name="securityKmcIndex" type="unsignedInt" />
+
+	<element name="securitymIdFlags">
+		<simpleType>
+			<restriction base="hexBinary">
+				<length value="2" />
+			</restriction>
+		</simpleType>
+	</element>
+
+	<element name="securityXmlAlgorithmsFlags">
+		<simpleType>
+			<restriction base="hexBinary">
+				<length value="9" />
+			</restriction>
+		</simpleType>
+	</element>
+
+	<element name="securityConnectionId" type="unsignedLong" />
+</schema>

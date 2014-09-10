@@ -1,0 +1,25 @@
+     ___  ___   _____   _____   _____   _   _   _____  
+    /   |/   | /  _  \ |  _  \ |  _  \ | | | | /  ___/ 
+   / /|   /| | | | | | | | | | | |_| | | | | | | |___  
+  / / |__/ | | | | | | | | | | |  _  { | | | | \___  \ 
+ / /       | | | |_| | | |_| | | |_| | | |_| |  ___| | 
+/_/        |_| \_____/ |_____/ |_____/ \_____/ /_____/ 
+
+
+Known issue
+-----------
+
+- When a device application is updated, old containers are not deleted
+  Containers id are generated from 1 to n when iterate on the product descriptor,
+  so it's very hard to detect which containers may not be delete. We can not use the
+  mobus access descriptor to identify because multiple M2M Point can referer to the same
+  modbus register.
+  We maybe need to introduce UUID in the list of interfaces describe in the products XML,
+  to match containers during update.
+
+  Actually delete of containers is disable to avoid lost of data.
+
+- Network on serial line are not restored yet.
+
+
+

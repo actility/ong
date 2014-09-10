@@ -1,0 +1,75 @@
+
+[ "$ROOTBEREMIZ" = "" ] && ROOTBEREMIZ=$ROOTACT/beremiz/beremiz
+
+DIR_PLCOPEN=$ROOTBEREMIZ/plcopen
+F1=iec_std.csv
+F2=structures.py
+
+DIR_CONTROLS=$ROOTBEREMIZ/controls
+F3=VariablePanel.py
+
+DIR_ROOT=$ROOTBEREMIZ
+F4=IDEFrame.py
+
+echo ================================================================
+echo Copy Actility FBS and FCT to $DIR_PLCOPEN
+echo
+echo IEC Standard Functions   : $F1
+echo ACTILITY Function Blocks : $F2
+echo
+echo ================================================================
+
+
+[ -d $DIR_PLCOPEN ] || exit 0
+
+[ -f $DIR_PLCOPEN/$F1.orig ] || {
+	mv $DIR_PLCOPEN/$F1 $DIR_PLCOPEN/$F1.orig
+}
+cp ./$F1 $DIR_PLCOPEN
+
+[ -f $DIR_PLCOPEN/$F2.orig ] || {
+	mv $DIR_PLCOPEN/$F2 $DIR_PLCOPEN/$F2.orig
+}
+cp ./$F2 $DIR_PLCOPEN
+
+echo ================================================================
+echo Copy Actility VariablePanel 	to $DIR_CONTROLS
+echo  and Actility IDEFrame 		to $DIR_ROOT
+
+echo
+echo Actility VariablePanel   	: $F3
+echo Actility IDEFrame   		: $F4
+echo
+echo ================================================================
+
+
+[ -d $DIR_CONTROLS ] || exit 0
+
+[ -f $DIR_CONTROLS/$F3.orig ] || {
+	mv $DIR_CONTROLS/$F3 $DIR_CONTROLS/$F3.orig
+}
+cp ./$F3 $DIR_CONTROLS
+
+[ -f $DIR_ROOT/$F4.orig ] || {
+	mv $DIR_ROOT/$F4 $DIR_ROOT/$F4.orig
+}
+cp ./$F4 $DIR_ROOT
+
+DIR_IMAGES=$ROOTBEREMIZ/images
+F3_SRC=beremiz_actility_splash.png
+F3_TARGET=splash.png
+
+echo ================================================================
+echo Copy Splash image to $DIR_IMAGES
+echo
+echo Source image: $F3_SRC
+echo Target image: $F3_TARGET
+echo
+echo ================================================================
+
+[ -f $DIR_IMAGES/$F3_TARGET.orig ] || {
+	mv $DIR_IMAGES/$F3_TARGET $DIR_IMAGES/$F3_TARGET.orig
+}
+cp ./$F3_SRC $DIR_IMAGES/$F3_TARGET
+
+exit 0

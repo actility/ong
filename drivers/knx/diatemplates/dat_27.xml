@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <bool name="s0" val="${raw_s0}"/>
+    <bool name="s1" val="${raw_s1}"/>
+    <bool name="s2" val="${raw_s2}"/>
+    <bool name="s3" val="${raw_s3}"/>
+    <bool name="s4" val="${raw_s4}"/>
+    <bool name="s5" val="${raw_s5}"/>
+    <bool name="s6" val="${raw_s6}"/>
+    <bool name="s7" val="${raw_s7}"/>
+    <bool name="s8" val="${raw_s8}"/>
+    <bool name="s9" val="${raw_s9}"/>
+    <bool name="s10" val="${raw_s10}"/>
+    <bool name="s11" val="${raw_s11}"/>
+    <bool name="s12" val="${raw_s12}"/>
+    <bool name="s13" val="${raw_s13}"/>
+    <bool name="s14" val="${raw_s14}"/>
+    <bool name="s15" val="${raw_s15}"/>
+    <bool name="m0" val="${raw_m0}"/>
+    <bool name="m1" val="${raw_m1}"/>
+    <bool name="m2" val="${raw_m2}"/>
+    <bool name="m3" val="${raw_m3}"/>
+    <bool name="m4" val="${raw_m4}"/>
+    <bool name="m5" val="${raw_m5}"/>
+    <bool name="m6" val="${raw_m6}"/>
+    <bool name="m7" val="${raw_m7}"/>
+    <bool name="m8" val="${raw_m8}"/>
+    <bool name="m9" val="${raw_m9}"/>
+    <bool name="m10" val="${raw_m10}"/>
+    <bool name="m11" val="${raw_m11}"/>
+    <bool name="m12" val="${raw_m12}"/>
+    <bool name="m13" val="${raw_m13}"/>
+    <bool name="m14" val="${raw_m14}"/>
+    <bool name="m15" val="${raw_m15}"/>
+    <str name="raw" val="0x${dpt_raw}"/>
+</obj>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- <trapInstance> resource type -->
+	<complexType name="TrapInstance ">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:trapId" minOccurs="0" />
+					<element ref="tns:eventOccured" minOccurs="0" />
+					<element ref="tns:trapActionStatus" minOccurs="0" />
+				</sequence>
+			</extension>
+		</complexContent>
+		<!-- attribute name="id"></attribute -->
+	</complexType>
+
+
+	<element name="trapId" type="string" />
+
+	<element name="eventOccured" type="tns:OccuredEvents" >
+		<annotation>
+			<documentation>
+			This element indicates the last occurences of the event.
+			</documentation>
+		</annotation>
+	</element>
+
+	<complexType name="OccuredEvents" >
+		<sequence>
+			<element name="currentIndex" type="tns:trapEventIndex">
+				<annotation>
+					<documentation>Indicates the rank of the last occured event in the table of timeStamps.</documentation>
+				</annotation>
+			</element>
+			<element name="trapEventTimeStamp" type="dateTime" maxOccurs="100">
+				<annotation>
+					<documentation>It is a circular buffer of timeStamps of the last occured events. The number of logged events is limited to 100.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+
+	<simpleType name="trapEventIndex">
+		<restriction base="integer">
+			<minInclusive value="0"/>
+			<maxInclusive value="100"/>
+		</restriction>
+	</simpleType>
+
+	<element name="trapActionStatus" type="tns:ActionStatus"/>
+
+</schema>

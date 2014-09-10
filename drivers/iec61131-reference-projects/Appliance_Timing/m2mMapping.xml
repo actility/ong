@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2mMapping>
+  <map comment="Plug ON"        output="%QX2.0" value="TRUE" targetID="/m2m/applications/APP_00137a00000080d6.10/retargeting2/0x0006.0x01.ope" />
+  <map comment="Plug OFF"       output="%QX2.0" value="FALSE" targetID="/m2m/applications/APP_00137a00000080d6.10/retargeting2/0x0006.0x00.ope" />
+  <map comment="Plug Status"    input="%IX2.0" targetID="/m2m/applications/APP_00137a00000080d6.10/containers/0x0006.0x0000.0.m2m/contentInstances" />
+  <map comment="Plug Kw"        input="%ID1.0" targetID="/m2m/applications/APP_00137a00000080d6.10/containers/0x0702.0x0400.0.m2m/contentInstances" />
+  <map comment="Plug Kwh"       input="%ID1.1" targetID="/m2m/applications/APP_00137a00000080d6.10/containers/0x0702.0x0000.0.m2m/contentInstances" />
+</m2mMapping>

@@ -1,0 +1,261 @@
+#!/bin/sh
+####!/bin/sh -x
+
+
+INIT=0
+
+RESTART=0
+MY_DRIVER=watteco
+MY_PROCESS=awspv.x
+MY_STATUS_FILE=/tmp/awspv.status.test
+
+#MY_EXE=$ROOTACT/$MY_DRIVER/supervisor/awspv.x
+MY_EXE=$ROOTACT/$MY_DRIVER/supervisor/awspv.sh
+MY_EXE_DIR=$ROOTACT/$MY_DRIVER/supervisor
+MY_CLEAN_DATA=$ROOTACT/$MY_DRIVER/shells/clean_all_before_start.sh
+
+LD_LIBRARY_PATH=$ROOTACT/lib:$ROOTACT/shlib
+export LD_LIBRARY_PATH
+#AW_DATA_DIR=$ROOTACT/usr/data/$MY_DRIVER
+#export AW_DATA_DIR
+
+DoExec()
+{
+	cd $MY_EXE_DIR
+	exec nohup $MY_EXE
+}
+
+
+IsProcessRunning()
+{
+	if [ "x$1" = "x" ]
+	then
+		return 1
+	fi
+#	echo	"Process $1 test running ?"
+	if kill -0 $1 2>/dev/null
+	then
+		ret=$?
+	else
+		ret=1
+	fi
+#	echo	"Process $1 test running => $ret"
+	return $ret
+}
+
+HardKill()
+{
+#	echo	"Process $MY_PROCESS $1 killed with -KILL"
+	kill -KILL $1
+	return $?
+}
+
+UserKill()
+{
+#	echo	"Process $MY_PROCESS $1 killed with -USR1"
+	kill -USR1 $1
+	return $?
+}
+
+SoftKill()
+{
+#	echo	"Process $MY_PROCESS $1 try to kill with -TERM"
+	kill -TERM $1
+	return $?
+}
+
+NiceKill()
+{
+	lpid=`pidof $1`
+	if [ "x$lpid" = "x" ]
+	then
+#		not started
+		echo	"Process $MY_PROCESS not started"
+		return 0
+	fi
+	for pid in $lpid
+	do
+#		echo "Process $MY_PROCESS $pid found"
+		SoftKill $pid
+		try=0
+		while IsProcessRunning $pid && [ $try -lt 10 ]
+		do
+			echo	"Process $MY_PROCESS $pid waiting termination"
+			try=$(expr $try + 1)
+			sleep 1
+		done
+		IsProcessRunning $pid && HardKill $pid
+	done
+
+#	echo	"Process $MY_PROCESS now killed"
+
+	return 0
+}
+
+ActionStart()
+{
+	if [ $INIT != "0" ]
+	then
+		if	[ -f $MY_CLEAN_DATA ]
+		then
+		echo	"Process $MY_PROCESS clean data berfore (re)starting"
+			sh $MY_CLEAN_DATA
+		fi
+	fi
+	echo	"Process $MY_PROCESS starting ..."
+	if [ $RESTART = "0" ]
+	then
+		lpid=`pidof $MY_PROCESS`
+		if [ "x$lpid" != "x" ]
+		then
+#			already started
+			echo	"Process $MY_PROCESS already started"
+			return 0
+		fi
+	fi
+
+	if [ ! -x $MY_EXE ]
+	then
+		echo	"Process $MY_PROCESS fail to start"
+		exit 1
+	fi
+
+	DoExec
+
+}
+
+ActionStop()
+{
+	lpid=`pidof $MY_PROCESS`
+	if [ "x$lpid" = "x" ]
+	then
+#		already stopped
+		echo	"Process $MY_PROCESS already stopped"
+		return 0
+	fi
+	echo	"Process $MY_PROCESS stopping ..."
+	NiceKill $MY_PROCESS
+	echo	"Process $MY_PROCESS stopped"
+
+	return 0
+}
+
+ActionRestart()
+{
+	echo	"Process $MY_PROCESS restarting ..."
+	ActionStop
+	RESTART=1
+	ActionStart
+
+	return 0
+}
+
+ActionStatus()
+{
+#	echo	"Process $MY_PROCESS status"
+	lpid=`pidof $MY_PROCESS`
+	if [ "x$lpid" = "x" ]
+	then
+#		already stopped
+		echo	"$MY_PROCESS stop/NOTEXISTING,process $lpid"
+		exit 1
+	fi
+	echo	"$MY_PROCESS start/RUNNING,process $lpid"
+	exit 0
+}
+
+ActionStatusExt()
+{
+#	echo	"Process $MY_PROCESS statusext"
+	lpid=`pidof $MY_PROCESS`
+	if [ "x$lpid" = "x" ]
+	then
+#		already stopped
+		echo	"$MY_PROCESS stop/NOTEXISTING,process $lpid"
+		exit 1
+	fi
+
+#	additional controls
+	echo "STATUS=EXISTING" > $MY_STATUS_FILE
+	UserKill $lpid
+	sleep 3
+	. $MY_STATUS_FILE
+	echo	"$MY_PROCESS start/${STATUS},process $lpid"
+
+
+	exit 0
+}
+
+Usage()
+{
+    echo "Usage: awspv [<options>] {start|stop|status|statusext|restart}"
+    echo "  Where options are:"
+    echo "   -h|--help    Print this help message"
+    echo "   -i|--init    Re-initialize watteco data"
+}
+
+if [ -f /etc/profile ]
+then
+	. /etc/profile
+fi
+
+if [ -z "$ROOTACT" ]
+then
+	echo "ROOTACT not set"
+	exit 1
+fi
+
+if [ -f ${ROOTACT}/shells/functions.sh ]
+then
+	. ${ROOTACT}/shells/functions.sh
+fi
+
+
+#GETOPTTEMP=`getopt -o dfhiI:k --long dbclean,force,help,init,inspector -- $@`
+GETOPTTEMP=`getopt -o hi --long help,init -- $@`
+if [ $? != 0 ] ; then Usage >&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+while [ -n "$1" ]
+do
+    case "$1" in
+        "-h"|"--help") Usage ; exit 0;;
+        "-i"|"--init") INIT=1; OPTIONS=$OPTIONS" -i";;
+        "--") shift; break ;;
+        * ) echo "Internal error ($*)!"; exit 1;;
+    esac
+    shift
+done
+
+case "$1" in
+start)
+	shift
+	ActionStart
+	exit 1
+;;
+stop) 
+	shift
+	ActionStop
+	exit 0 
+;;
+restart)
+	shift
+	ActionRestart
+	exit 1
+;;
+status)
+	shift
+	ActionStatus
+	exit 1
+;;
+statusext)
+	shift
+	ActionStatusExt
+	exit 1
+;;
+*) 
+	Usage
+	exit 1
+	;;
+esac
+
+exit 1

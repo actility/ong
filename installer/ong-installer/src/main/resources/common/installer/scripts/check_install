@@ -1,0 +1,12 @@
+
+eval $( grep ROOTACT $PROFILE )
+
+ping -c 1 $(hostname) 2> /dev/null > /dev/null && echo -n "PING "
+if [ "x" != "x$ROOTACT" ]; then
+    [ -d "$ROOTACT" ] && echo -n "ONG "
+    [ -d "$ROOTACT/usr" ] && echo -n "USR "
+    [ "$ROOTACT" != "$NEW_ROOTACT" -a -d "$NEW_ROOTACT" ] && echo -n "FOLDER"
+else
+    [ -d "$NEW_ROOTACT" ] && echo -n "FOLDER"
+fi
+echo

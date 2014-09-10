@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <!-- M2M -->
+    <str name="nodeID" val="DEV_${d_ieee}"/>
+    <list name="applications"/>
+    
+    <!-- KNX -->
+    <str name="knxDeviceAddress" val="${knx_dev_addr}"/>
+    <str name="knxManufacturerID" val="${knx_dev_manufacturer}"/>
+    <str name="knxManufacturerName" val="${knx_dev_manufacturer_name}"/>
+    <str name="knxFirmwareID" val="${knx_dev_fw}"/> 
+    <str name="knxAreaName" val="${knx_dev_area}"/>
+    <str name="knxLineName" val="${knx_dev_line}"/>
+    <str name="knxDeviceName" val="${knx_dev_name}"/>
+    <str name="knxDeviceDescription" val="${knx_dev_description}"/>
+</obj>

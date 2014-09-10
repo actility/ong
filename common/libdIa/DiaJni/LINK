@@ -1,0 +1,8 @@
+
+pushd .
+cd /home/ongv2/install/factory/actility
+rm song.binding.coap-1.0.0-SNAPSHOT.jar
+ln -s /home/actility/workspace/song.binding.coap/target/song.binding.coap-1.0.0-SNAPSHOT.jar song.binding.coap-1.0.0-SNAPSHOT.jar
+ls -l
+popd
+

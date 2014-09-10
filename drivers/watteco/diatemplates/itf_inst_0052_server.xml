@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+x-template="${w_template}"
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="SimpleMetering.Srv" status="cfg-mandatory"/>
+    <str name="clusterID" val="0x0052" status="cfg-mandatory"/>
+    <enum name="clusterType" val="server" status="cfg-mandatory"/>
+
+    <op name="zbCovConfig"
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x0052.0xFF.ope"/>
+
+    <!-- ZigBee attributes -->
+            
+    <!-- ZigBee commands -->
+    <!-- Watteco commands -->
+     <op name="extReset"
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x0052.0x00.ope"/>
+            
+    <!-- M2M POINTS-->
+    <real name="m2mCurrentSummationDelivered" unit="obix:units/watt_hour" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0052.0x0000.0.m2m/contentInstances/latest/content"/>
+    <real name="m2mInstantaneousDemand" unit="obix:units/watt" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0052.0x0000.3.m2m/contentInstances/latest/content"/>
+
+    <!-- M2M POINTS watteco reactive power-->
+    <real name="extCurrentSummationDeliveredR" unit="obix:units/volt_ampere_reactive_hour" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0052.0x0000.1.m2m/contentInstances/latest/content"/>
+    <real name="extInstantaneousDemandR" unit="obix:units/volt_ampere_reactive" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0052.0x0000.4.m2m/contentInstances/latest/content"/>
+</obj>

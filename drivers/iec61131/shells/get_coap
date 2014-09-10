@@ -1,0 +1,9 @@
+
+Addr=192.168.1.75
+Port=5688
+App=$1
+ReqEntity="coap://plciecong.actility.com:5683/m2m/applications/GIP"
+TargetID="coap://192.168.1.116:5683/m2m/applications/$App/containers/configuration/contentInstances/latest/content"
+
+$ROOTACT/libdIa/client/client.x -m retrieve -A $Addr -p $Port -v9 -R $ReqEntity $TargetID
+

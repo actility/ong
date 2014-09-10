@@ -1,0 +1,6 @@
+
+[ -n "`netstat -na | grep LISTEN | grep ':$HTTP_PORT '`" ] && echo -n "HTTP "
+[ -n "`netstat -na | grep LISTEN | grep ':$TELNET_PORT '`" ] && echo -n "TELNET "
+[ -n "`netstat -na | grep LISTEN | grep ':$SHUTDOWN_PORT '`" ] && echo -n "SHUTDOWN "
+
+echo

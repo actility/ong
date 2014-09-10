@@ -1,0 +1,45 @@
+
+############################################################################
+1.1.2	26-Nov-2013
+############################################################################
+- WAVE_test validation failed : added executionOrderId in every block
+- checked all projects and add executionOrderId if necessary
+
+############################################################################
+1.1.1	17-Sept-2013
+############################################################################
+-   moved to V1.0.28 of the IEC-61131 Engine
+-   Added Office_Light project (under work)
+-   Added Thermostat_PID
+
+- Projects included                     Version
+
+    Appliance_Alarms                    1.1.0
+    Appliance_Timing                    1.1.0
+    Astro                               1.1.2
+    Calendar_test                       1.0.1
+    EEdomus                             1.0.1
+    Office_Light                        1.0.0
+    Thermostat_PID			1.0.0
+    Thermostat_Simple                   1.0.2
+    TON_test                            1.0.0
+    WAVE_test                           1.1.0
+
+############################################################################
+1.1.0	26-July-2013
+        Working version for ALL reference projects
+############################################################################
+
+-   requires V1.0.24 of the IEC-61131 Engine
+
+- Projects included                     Version
+
+    Appliance_Alarms                    1.1.0
+    Appliance_Timing                    1.1.0
+    Astro                               1.1.2
+    Calendar_test                       1.0.1
+    EEdomus                             1.0.1
+    Thermostat_Simple                   1.0.2
+    TON_test                            1.0.0
+    WAVE_test                           1.1.0
+    

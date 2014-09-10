@@ -1,0 +1,60 @@
+#include "misc.ref"
+
+/*
+ *  ETS4 project file converted by XSL
+ */
+knx:groupAddr from ong:t_xml_obj {
+    knx:name                    XoString                    { embattr }
+    knx:addr                    XoString                    { embattr }
+    knx:send                    XoString                    { embattr }
+}
+
+knx:object from ong:t_xml_obj {
+    knx:id                      XoString                    { embattr }
+    knx:name                    XoString                    { embattr }
+    knx:description             XoString                    { embattr }
+    knx:dptId                   XoString                    { embattr }
+    
+    knx:groupAddr               knx:groupAddr               { list wraphidden }
+}
+
+knx:device from ong:t_xml_obj {
+    knx:addr                    XoString                    { embattr }
+    knx:area                    XoString                    { embattr }
+    knx:line                    XoString                    { embattr }
+    knx:manufacturer            XoString                    { embattr }
+    knx:fw                      XoString                    { embattr }
+    knx:name                    XoString                    { embattr }
+    knx:description             XoString                    { embattr }
+    
+    knx:object                  knx:object                  { list wraphidden }
+}
+
+knx:knx from ong:t_xml_obj {
+    knx:device                  knx:device                  { list wraphidden }
+    knx:gateway                 XoString                    { embattr }
+}
+
+/*
+ *  dpt.xml
+ *  List of all DPT Name and description by ID
+ */
+knx:DatapointSubtype from ong:t_xml_obj {
+    knx:id                      XoString                    { embattr }
+    knx:name                    XoString                    { embattr }
+    knx:unit                    XoString                    { embattr }
+    knx:default                 XoString                    { embattr }
+}
+
+knx:DatapointType from ong:t_xml_obj {
+    knx:id                      XoString                    { embattr }
+    knx:name                    XoString                    { embattr }
+    knx:unit                    XoString                    { embattr }
+    knx:sizeinbit               XoString                    { embattr }
+    knx:DatapointSubtype        knx:DatapointSubtype        { list wraphidden }
+}
+
+knx:DatapointTypes from ong:t_xml_obj {
+    knx:DatapointType           knx:DatapointType           { list wraphidden }
+}
+

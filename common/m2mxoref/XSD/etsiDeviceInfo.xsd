@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- etsiDeviceInfo resource type -->
+	<complexType name="EtsiDeviceInfo">
+		<complexContent>
+			<extension base="tns:MgmtObj">
+				<sequence>
+					<element ref="tns:deviceLabel" minOccurs="0"/>
+					<element ref="tns:manufacturer" minOccurs="0"/>
+					<element ref="tns:model" minOccurs="0"/>
+					<element ref="tns:deviceType" minOccurs="0"/>
+					<element ref="tns:firmwareVersion" minOccurs="0" />
+					<element ref="tns:softwareVersion" minOccurs="0"/>
+					<element ref="tns:hardwareVersion" minOccurs="0"/>
+				</sequence>
+				<!-- attribute ref="tns:id" use="required" fixed="etsiDeviceInfo"/ -->
+			</extension>
+		</complexContent>
+	</complexType>
+
+
+	<element name="deviceLabel" type="string"/>
+
+	<element name="manufacturer" type="string">
+		<annotation>
+			<documentation>
+			Manufacturer identifier.
+			</documentation>
+		</annotation>
+	</element>
+
+	<element name="model" type="string">
+		<annotation>
+			<documentation>
+			Manufacturer specified string.
+			</documentation>
+		</annotation>
+	</element>
+
+	<element name="deviceType" type="string">
+		<annotation>
+			<documentation>
+			For example, PDA, meter, sensor, ... .
+			</documentation>
+		</annotation>
+	</element>
+
+
+	<element name="hardwareVersion" type="string"/>
+
+
+</schema>

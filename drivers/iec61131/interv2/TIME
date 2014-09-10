@@ -1,0 +1,1 @@
+time ./parser.x -f tests/if.st -c1000000

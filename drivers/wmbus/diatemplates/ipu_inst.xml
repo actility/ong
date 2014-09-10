@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interworkingProxyID" val="${w_ipuid}"/>
+    <list name="supportedTechnologies">
+        <obj>
+            <str name="anStandard" val="EN_13757_2004"/>
+        </obj>
+    </list>
+    <list name="networks">
+        <ref href="${s_rootapp}/NW_${w_netid}/containers/DESCRIPTOR/contentInstances/latest/content/"/>
+    </list>
+</obj>

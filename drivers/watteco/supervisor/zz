@@ -1,0 +1,30 @@
+[002] cluster=0x0053 attr=0x0000 self=86a4118
+[002] szdata=35 error=0 used=0
+[002] mint=60 maxt=300 cov='$ff$ff$ff$ff$ff$ff$ff$ff$00$00$00$00$00$00$00$02$00$00$00$00$00$01'
+[002] data='1106005300000041003c012c16ffffffffffffffff0000000000000002000000000001'
+[002] itfname='x-CounterTicICE'
+------------------------------
+[003] cluster=0x0053 attr=0x0001 self=86a4148
+[003] szdata=35 error=0 used=0
+[003] mint=60 maxt=300 cov='$ff$ff$ff$ff$ff$ff$ff$ff$00$00$00$00$00$00$00$08$00$00$00$00$00$01'
+[003] data='1106005300000141003c012c16ffffffffffffffff0000000000000008000000000001'
+[003] itfname='x-CounterTicICE'
+------------------------------
+[004] cluster=0x0053 attr=0x0002 self=865c150
+[004] szdata=47 error=0 used=0
+[004] mint=60 maxt=300 cov='$ff$ff$ff$ff$ff$ff$ff$ff$00$00$00$02$00$04$00$08$00$00$00$00$00$01$00$00$00$00$00$01$00$00$00$00$00$01'
+[004] data='1106005300000241003c012c22ffffffffffffffff0000000200040008000000000001000000000001000000000001'
+[004] itfname='x-CounterTicICE'
+------------------------------
+[005] cluster=0x0054 attr=0x0000 self=86a4a28
+[005] szdata=33 error=0 used=1
+[005] mint=60 maxt=300 cov='$ff$ff$ff$ff$ff$ff$ff$ff$00$00$00$01$00$00$00$00$00$00$00$32'
+[005] data='1106005400000041003c012c14ffffffffffffffff000000010000000000000032'
+[005] itfname='x-CounterTicCBE'
+------------------------------
+[006] cluster=0x0055 attr=0x0000 self=86a4818
+[006] szdata=29 error=0 used=0
+[006] mint=60 maxt=300 cov='$ff$ff$ff$ff$ff$ff$ff$ff$00$00$00$00$00$00$00$00'
+[006] data='1106005500000041003c012c10ffffffffffffffff0000000000000000'
+[006] itfname='x-CounterTicCJE'
+

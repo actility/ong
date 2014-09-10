@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <!-- M2M -->
+    <str name="networkID" val="NW_${w_netid}"/>
+    <list name="nodes"/>
+    
+    <!-- KNX -->
+    <str name="knxNetworkName" val="${w_netid}"/>
+    <op name="knxUpdateNetwork" href="${s_rootapp}/NW_${d_ieee}/retargeting1/knxUpdateNetwork"/>
+    <op name="knxDeleteNetwork" href="${s_rootapp}/NW_${d_ieee}/retargeting1/knxDeleteNetwork"/>
+</obj>

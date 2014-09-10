@@ -1,0 +1,268 @@
+-------------------------------------------------------------------------------
+System version changelog
+-------------------------------------------------------------------------------
+Version: 4.4.1  
+Date: 2014-06-18
+
+New Features:
+-------------
+ - N/A 
+Bug Fixes:
+----------
+ - Fixing dynamic loading of configuration 
+
+-------------------------------------------------------------------------------
+Version: 4.4.0  
+Date: 2014-06-04
+
+New Features:
+-------------
+ - New model
+ - Adding monitoring indicators
+ - Adding monitoring alarms
+ - Adding some retargeting operations 
+ - Bundle configuration can be changed by retargeting operation
+ 
+Bug Fixes:
+----------
+ - Changing retargeting operations from GET to POST
+
+-------------------------------------------------------------------------------
+Version: 4.2.2  
+Date: 2014-03-28
+
+New Features:
+-------------
+ - N/A
+ 
+Bug Fixes:
+----------
+ - Renaming of retargeting operation
+ - Fixing some bugs
+ - Changing model and timer implementation
+
+-------------------------------------------------------------------------------
+Version: 4.2.1
+Date: 2014-03-28
+
+New Features:
+-------------
+ - N/A
+ 
+Bug Fixes:
+----------
+ - Fix memory leak on XoObject
+ - Changing load average period : 10 min to 15 min
+
+-------------------------------------------------------------------------------
+Version: 4.2.0
+Date: 2014-03-28
+
+New Features:
+-------------
+ - Xml generation is doing by Jxo
+ - Application M2M resources are created again by system.version
+ - The "versions" command works again  
+ - New commands have been added
+    - uptime : Gives system uptime, number of process, and load average for given periods
+    - memories : Gives the use of ram and swap
+    - disks : Gives the use of system partitions 
+ - It's a merge of version 3.4.0
+ 
+Bug Fixes:
+----------
+ - N/A
+ 
+-------------------------------------------------------------------------------
+Version: 4.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - Changed the groupId for com.actility.m2m (was com.actility).
+
+Bug Fixes:
+----------
+ - The "openSshTunnel" command fails under rpib because the connection 
+   for reverse ssh fails to get established. 
+ - Fixed. Add latency and increate the maximum number of retries.
+
+-------------------------------------------------------------------------------
+Version: 3.2.5
+Date: 2012-12-11
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Removed runtime dependency on trans_pty
+
+-------------------------------------------------------------------------------
+Version: 3.2.4
+Date: 2012-11-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. javax.servlet now declares a version in bundle MANIFEST
+
+-------------------------------------------------------------------------------
+Version: 3.2.3
+Date: 2012-11-13
+
+
+New Features:
+-------------
+ - N/A
+
+
+Bug Fixes:
+----------
+ - Updated centos5-x86 dependency to centos6-x86
+
+-------------------------------------------------------------------------------
+Version: 3.2.2
+Date: 2012-10-31
+
+
+New Features:
+-------------
+ - N/A
+
+
+Bug Fixes:
+----------
+ - Fixed typo mmaxDuration becomes maxDuration
+
+-------------------------------------------------------------------------------
+Version: 3.2.1
+Date: 2012-10-26
+
+
+New Features:
+-------------
+ - N/A
+
+
+Bug Fixes:
+----------
+ - Increased timeout for establishing the reverse SSH tunnel
+
+-------------------------------------------------------------------------------
+Version: 3.2.0
+Date: 2012-10-23
+
+
+New Features:
+-------------
+ - Re-alignment following the new ETSI M2M implementation
+ - Use new SONG API 3.2.0
+ - Removed oBIX
+
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.0.3
+Date: 2012-06-07
+
+
+New Features:
+-------------
+ - N/A
+
+
+Bug Fixes:
+----------
+ - SSH tunnel instance was not forced to release when the request failed. 
+   Fixed.
+ 
+ 
+-------------------------------------------------------------------------------
+Version: 3.0.2
+Date: 2012-05-29
+
+New Features:
+-------------
+ - N/A
+
+
+Bug Fixes:
+----------
+ - Changed default value for com.actility.system.supportServerPort from 22 to 
+   81.
+ - Now "version" operation also returns the ONG firmware base version, 
+   retrieved from firmware manifest file. 
+
+-------------------------------------------------------------------------------
+Version: 3.0.1
+Date: 2012-05-24
+
+New Features:
+-------------
+ - N/A
+
+
+Bug Fixes:
+----------
+ - Changed the SONG status code returned when trying to open the SSH tunnel 
+   but the resource is already in use. Was 409, is now 403 (SCL changed 409
+   to 500 when proxying the response).
+
+
+-------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2012-05-22
+
+New Features:
+-------------
+ - Added invoke methods to open and close a SSH tunnel between the ONG (which 
+   is NATed) and a server in the Internet. All connection parameters are 
+   configurable thanks to framework properties com.actility.system.* 
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2011-04-18
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Unregister system version application from the list of lobby entry
+   listener when stopping
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2011-03-13
+
+New Features:
+-------------
+ - Change the symbolic name of the bundle to comply to OSGi standard name.
+   New bundle symbolic name is com.actility.system.version
+ - Use new java.cdc.pom 2.0.0
+ - Change oBIX contract of generated resource; now each element of the result 
+   list provides the bundle symbolic name, the bundle version and the bundle 
+   current status. 
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2011-11-21 
+Initial version
+

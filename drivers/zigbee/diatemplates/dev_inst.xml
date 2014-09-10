@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="nodeID" val="DEV_${d_ieee}"/>
+    <str name="zbIeeeAddress" val="0x${d_ieee}"/>
+    <str name="zbNetworkAddress" val="${d_shortAddr}"/>  
+    <enum name="zbNodeType" val="${d_type}"/>
+    <str name="zbManufacturerCode" val="${w_manufacturer}"/>
+    <enum name="zbPowerMode" val="${d_powMode}"/>
+    <enum name="zbPowerSource" val="${d_powSrc}"/>  
+    <enum name="zbPowerLevel" val="${d_powLvl}"/>
+
+    <list name="applications">
+<!--
+     See sensor.c:iSensorSetApplicationListInObj()
+
+        <ref href="${s_rootapp}/APP_0b435eff56a3bbbb.1/containers/DESCRIPTOR/contentInstances/latest/content/"/>
+-->
+    </list>
+    <op name="leave" href="${s_rootapp}/DEV_${d_ieee}/retargeting1/m2mLeave"/>
+    <op name="zbMgmtBind" href="${s_rootapp}/DEV_${d_ieee}/retargeting1/zbMgmtBind"/>
+    <op name="zbMgmtRtg" href="${s_rootapp}/DEV_${d_ieee}/retargeting1/zbMgmtRtg"/>
+    <op name="zbMgmtLeave" href="${s_rootapp}/DEV_${d_ieee}/retargeting1/zbMgmtLeave"/>
+</obj>

@@ -1,0 +1,484 @@
+-------------------------------------------------------------------------------
+Song http binding changelog
+-------------------------------------------------------------------------------
+Version: 4.0.0
+Date: 2014-06-17
+
+New Features:
+-------------
+ - Added new long polling mechanism
+ - New HTTP Client implementation through HttpClientNativeLayer service
+ - Added EXI support
+ - Report patches for IS2T VM compatibility
+ - Changed the groupId for com.actility.m2m (was com.actility)
+
+Bug Fixes:
+----------
+ - Important refactoring
+ - Added a debug log to detect long polling expiration verification each
+   seconds
+ - Fixed. Sending of Contact request through the Long Polling connection was
+   not protected with an expiration timer. This leads to a leak of HTTP sockets
+ - Fixed. NPE when receiving a Contact response through a long polling
+   connection which corresponds to an expired Contact request. This has been
+   introduced by previous on Contact request expiration
+ - Fixed dead lock in long polling expiration processing
+ - Fixed. Added a random time to reconnect to NSCL in case of an error on a
+   long polling connection
+
+-------------------------------------------------------------------------------
+Version: 3.12.7
+Date: 2013-09-24
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed #0000455. Enforce re-creation of HTTP server socket in case it is
+   closed by an external event. This re-creation is retried indefinitely until
+   the bundle is stopped.
+
+-------------------------------------------------------------------------------
+Version: 3.12.6
+Date: 2013-09-24
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed removed unused variable in long polling client
+ - Fixed #0000455. Now HTTP server socket only exits if it is stopped
+   applicatively. Before, it was on the first SocketException.
+
+-------------------------------------------------------------------------------
+Version: 3.12.5
+Date: 2013-09-04
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed resetting of the long polling server index was not thread safe
+
+-------------------------------------------------------------------------------
+Version: 3.12.4
+Date: 2013-09-04
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed long polling server leak when a concurrent long polling
+   request is received
+ - Fixed long polling client was not waiting before to re-send a long polling
+   request in case the server respond with an error status code different from
+   404
+
+-------------------------------------------------------------------------------
+Version: 3.12.3
+Date: 2013-09-03
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed HTTP transaction leak when connection is closed while treating the
+   request
+ - Fixed Server long polling request leak when maximum number of long polling
+   servers is reached
+ - Fixed. HttpException from HttpClient was treated as an unrecoverable problem
+   in the long polling client connection. Now it is treated as a normal problem
+   and it does not stop the connection anymore.
+
+-------------------------------------------------------------------------------
+Version: 3.12.2
+Date: 2013-07-16
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed #0000378. NPE when receiving an HTTP response without Server header
+
+-------------------------------------------------------------------------------
+Version: 3.12.1
+Date: 2013-07-12
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Long polling request must wait that the previous long polling
+   response is read
+
+-------------------------------------------------------------------------------
+Version: 3.12.0
+Date: 2013-07-12
+
+New Features:
+-------------
+ - Long polling client has now a dedicated HTTP client so that it uses only
+ one socket for the remote peer communications
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.10.4
+Date: 2013-07-10
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. max HTTP client sockets was not configurable. Added
+ 'clientMaxSocketsPerHost' and 'clientMaxSockets' configurable parameters
+
+-------------------------------------------------------------------------------
+Version: 3.10.3
+Date: 2013-06-13
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. ArrayOutOfBoundException when reading HTTP connection data in a
+   Keep-Alive connection
+
+-------------------------------------------------------------------------------
+Version: 3.10.2
+Date: 2013-05-30
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. ArrayOutOfBoundException when fixing the long poll server circular
+   buffer
+
+-------------------------------------------------------------------------------
+Version: 3.10.1
+Date: 2013-05-15
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. ArrayOutOfBoundException when reaching the end of long poll server
+   circular buffer
+
+-------------------------------------------------------------------------------
+Version: 3.10.0
+Date: 2013-04-08
+
+New Features:
+-------------
+ - Added the possibility to override targetID and declare a proxy request with
+   'targetID' query parameter
+
+Bug Fixes:
+----------
+ - Fixed. Long poll server circular buffer were causing an infinite loop during
+   its fix operation (removing of holes)
+ - Fixed. Outgoing HTTP request timeout was logging a message about long poll
+   client connection. Now it only prints the exception message because it could
+   be raised for any outgoing request (not only long poll client)
+ - Fixed. #0000092: A socket read timeout is not transferred to the SONG layer.
+   Now a '504 Gateway Timeout' is sent
+ - Fixed. #0000096: Proxy hides the real IP:Port of the client
+
+-------------------------------------------------------------------------------
+Version: 3.8.1
+Date: 2013-02-19
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed ClassCastException on LongPollServer class
+ - Fixed infinite loop when Connection header contains ','
+
+-------------------------------------------------------------------------------
+Version: 3.8.0
+Date: 2012-11-27
+
+New Features:
+-------------
+ - Added traces to track performances issues
+
+Bug Fixes:
+----------
+ - Fixed. Respond "403 Forbidden" instead of "400 Bad Request" when no
+   requesting entity is provided in a received request
+
+-------------------------------------------------------------------------------
+Version: 3.6.3
+Date: 2012-11-13
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed Connection header is now parsed as a multi-value header separated by
+   commas
+ - Fixed HTTP server were not correctly stopped when stopping bundle
+ - Fixed removed printStackTrace calls
+
+-------------------------------------------------------------------------------
+Version: 3.6.2
+Date: 2012-10-31
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed NPE when Authorization header is not a valid base64 string
+
+-------------------------------------------------------------------------------
+Version: 3.6.1
+Date: 2012-10-23
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed some logs without is{Level}Enabled
+
+-------------------------------------------------------------------------------
+Version: 3.6.0
+Date: 2012-10-05
+
+New Features:
+-------------
+ - Updated to m2m.api 1.8.0
+ - Updated to jxo.api 1.4.0
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.4.1
+Date: 2012-09-04
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Long poll response handler was not catching RuntimeException. This
+   could kill the thread.
+ - Fixed. An HTTP long poll response could be truncated due to an incomplete
+   read of the inputStream
+ - Fixed. Now binding is supporting HTTP responses withtout a Content-Type
+   header
+
+-------------------------------------------------------------------------------
+Version: 3.4.0
+Date: 2012-08-30
+
+New Features:
+-------------
+ - Added XO to generate M2M error messages when needed
+ - Updated, requesting entity could not be null anymore
+
+Bug Fixes:
+----------
+ - Fixed. Removed bad error logs
+ - Fixed. An HTTP client response could be truncated due to an incomplete read
+   of the inputStream
+ - Fixed. Return an error to an HTTP request when the long poll request
+   embedding the HTTP response is too large
+
+-------------------------------------------------------------------------------
+Version: 3.2.2
+Date: 2012-08-17
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Long poll requests starts a timer instead of blocking the thread.
+   This allows to consume less threads
+
+-------------------------------------------------------------------------------
+Version: 3.2.1
+Date: 2012-07-17
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Long poll responses built from SONG requests were using proxy URI
+   instead of poc URI
+ - Fixed. Matching of HTTP headers names is now case-insensitive
+ - Fixed. Requesting-Entity is now embedded in a X-Acy-Requesting-Entity header
+   instead of Authorization header in long poll responses. This is because
+   Authorization header is a request header
+
+-------------------------------------------------------------------------------
+Version: 3.2.0
+Date: 2012-07-12
+
+New Features:
+-------------
+ - HTTP server is now configurable through framework properties and partly from
+   config admin
+
+Bug Fixes:
+----------
+ - Fixed. Inifinite loop when the remote side closes the HTTP connection
+
+-------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2012-06-05
+
+New Features:
+-------------
+ - Re-alignment with new song.api 3.0.0
+ - Respond 504 Gateway Timeout instead of 408 Request Timeout in case of
+   expiration
+
+Bug Fixes:
+----------
+ - Fixed some framework property names which was in the ancient format (e.g.
+   com.actility.servlet.song...)
+
+-------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2012-03-20
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Added a timer on client side of an HTTP long poll connection to detect
+   expired connections. Default value for this timer is 4 minutes
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2012-03-13
+
+New Features:
+-------------
+ - Updated project artifactId to fit bundle-coding-rules + updated dependencies
+   accordingly
+ - Updated framework properties name to fit bundle-coding-rules
+ - Use new java.cdc.pom 2.0.0
+
+Bug Fixes:
+----------
+ - Removed Commons HTTP Client from the bundle as it is now in an external
+   bundle
+ - Fixed mark javax.net and javax.net.ssl packages as optional in Manifest
+ - Improved management of SONG requests waiting for an HTTP long poll request
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2011-11-03
+
+New Features:
+-------------
+ - Now a long poll request is sent immediately after the reception of a long
+   poll response in order not to waste time
+ - It is now possible to define a proxy for HTTP connections
+ - Use new java-cdc-pom 1.4.0
+
+Bug Fixes:
+----------
+ - Fixed IllegalStateException when stopping client long poll Thread
+ - Fixed added timers in httpclient to protect against infinite wait
+ - Fixed HTTP client long poll connections are now released in every cases.
+   This prevents from connection leaks
+
+-------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2011-09-29
+
+New Features:
+-------------
+ - Remove building of HttpServlet and SongServlet in SongHttpBinding to
+   allow using any implementation according to the context
+
+Bug Fixes:
+----------
+ - Fixed now when a long poll queue is full a 503 Service Unavailable with a
+   Retry-After of 5 seconds is sent to the client instead of a 500 Internal
+   Error
+ - Fixed now if a long poll client connection receives a 404 Not Found then it
+   waits 30 seconds before to retry to send a request
+ - Removed isWarnEnabled as it not part of the log4j API
+ - Fixed when creating a SONG request from an HTTP request the path is now
+   the complete request URI from HTTP instead of the concatenation of the
+   servlet path and the path info
+ - Fixed receivedRequestExpirationTimer configuration parameter was not taken
+   into account
+
+-------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2011-08-04
+
+New Features:
+-------------
+ - Use SONG service API 1.2.0
+
+Bug Fixes:
+----------
+ - Fixed check if client long poll exists before to stop it
+ - Fixed client long poll connection is now aborted when closing the connection
+   this allows to release the thread
+
+-------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2011-07-15
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - An interrupted long poll connection thread is now logged with an INFO level
+   instead of an ERROR
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Initial version

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<errorInfo xmlns="http://uri.etsi.org/m2m">
+ <statusCode>${w_errStatus}</statusCode>
+ <additionalInfo>${w_errAddInfo}</additionalInfo>
+</errorInfo>
+

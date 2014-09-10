@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.actility.m2m</groupId>
+    <artifactId>java.cdc.pom</artifactId>
+    <version>3.0.0</version>
+  </parent>
+  <artifactId>storage</artifactId>
+  <version>0.2.1</version>
+  <packaging>bundle</packaging>
+
+  <name>[Bnd] Storage Service</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.actility.m2m</groupId>
+      <artifactId>storage.api</artifactId>
+      <version>0.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.actility.m2m</groupId>
+      <artifactId>storage.driver.api</artifactId>
+      <version>0.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.actility.m2m</groupId>
+      <artifactId>util</artifactId>
+      <version>[4.0.0,5)</version>
+    </dependency>
+    <dependency>
+      <groupId>com.actility.m2m</groupId>
+      <artifactId>framework.resources.api</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-Activator>
+              com.actility.m2m.storage.osgi.Activator
+            </Bundle-Activator>
+            <Export-Package />
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

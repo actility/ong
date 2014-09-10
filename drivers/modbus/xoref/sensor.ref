@@ -1,0 +1,79 @@
+#include "misc.ref"
+
+/*
+ *  Driver status
+ *  List of network and device to restore on next startup
+ */
+modbus:device from ong:t_xml_obj {
+    modbus:name                 XoString                { embattr }
+    modbus:addr                 XoString                { embattr }
+    modbus:ref                  XoString                { embattr }
+}
+
+modbus:network from ong:t_xml_obj {
+    modbus:name                 XoString                { embattr }
+    modbus:type                 XoString                { embattr }
+    
+    /* Config for Modbus serial */
+    modbus:uart                 XoString                { embattr }
+    modbus:baudrate             XoString                { embattr }
+    modbus:parity               XoString                { embattr }
+    modbus:dataSize             XoString                { embattr }
+    modbus:stopSize             XoString                { embattr }
+    
+    /* List of devices i nthe network */
+    modbus:devices              modbus:device           { list }
+}
+
+modbus:context from ong:t_xml_obj {
+    modbus:networks             modbus:network          { list }
+}
+
+/*
+ *  Product interface descriptor
+ *  This file describe some product metadata and the list of interface to install in the M2M device application
+ */
+modbus:attr from ong:t_xml_obj {
+    modbus:name                 XoString                { embattr }
+    modbus:cnt                  XoString                { embattr }
+    modbus:type                 XoString                { embattr }
+    modbus:unit                 XoString                { embattr }
+    modbus:display              XoString                { embattr }
+    modbus:reg                  XoString                { embattr }
+    modbus:readable             XoString                { embattr }
+    modbus:writable             XoString                { embattr }
+}
+
+stext modbus:id from ong:t_xml_obj {
+    value$                      XoString                { }
+}
+
+modbus:interface from ong:t_xml_obj {
+    modbus:id                   modbus:id               { }
+    modbus:attributs            modbus:attr             { list }
+}
+
+stext modbus:version from ong:t_xml_obj {
+    value$                      XoString                { }
+}
+
+stext modbus:product from ong:t_xml_obj {
+    value$                      XoString                { }
+}
+
+stext modbus:vendor from ong:t_xml_obj {
+    value$                      XoString                { }
+}
+
+stext modbus:ref from ong:t_xml_obj {
+    value$                      XoString                { }
+}
+
+modbus:description from ong:t_xml_obj {
+    modbus:ref                  modbus:ref              {  }
+    modbus:vendor               modbus:vendor           {  }
+    modbus:product              modbus:product          {  }
+    modbus:version              modbus:version          {  }
+    modbus:interfaces           modbus:interface        { list }
+}
+

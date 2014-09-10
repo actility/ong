@@ -1,0 +1,2 @@
+export DYLD_LIBRARY_PATH=/Users/denis/Actility/shlib
+java -d32 -Djava.library.path=/Users/denis/Actility/libdIa/jni diajni

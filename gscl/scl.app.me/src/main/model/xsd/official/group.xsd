@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m"
+	xmlns:xmlmime="http://www.w3.org/2005/05/xmlmime">
+
+	<include schemaLocation="common.xsd" />
+
+	<import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="http://www.w3.org/2005/05/xmlmime.xsd" />
+
+	<element name="group" type="tns:Group" />
+
+	<complexType name="Group">
+		<sequence>
+			<element ref="tns:expirationTime" minOccurs="0" />
+			<element ref="tns:accessRightID" minOccurs="0" />
+			<element ref="tns:searchStrings" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0" />
+			<element ref="tns:lastModifiedTime" minOccurs="0" />
+			<element ref="tns:announceTo" minOccurs="0" />
+			<element ref="tns:memberType" minOccurs="0" />
+			<element ref="tns:currentNrOfMembers" minOccurs="0" />
+			<element ref="tns:maxNrOfMembers" minOccurs="0" />
+			<element ref="tns:members" minOccurs="0" />
+			<!-- subresources -->
+			<element ref="tns:membersContentReference" minOccurs="0" />
+			<element ref="tns:subscriptionsReference" minOccurs="0" />
+		</sequence>
+		<attribute ref="tns:id"/>
+	</complexType>
+
+	<element name="memberType" type="tns:MemberType" />
+	<element name="currentNrOfMembers" type="long" />
+	<element name="maxNrOfMembers" type="long" />
+	<element name="members" type="tns:AnyURIList" />
+
+	<element name="membersContentReference" type="anyURI"/>
+
+	<simpleType name="MemberType">
+		<restriction base="string">
+			<enumeration value="APPLICATION" />
+			<enumeration value="CONTAINER" />
+			<enumeration value="ACCESS_RIGHT" />
+			<enumeration value="SERVER_CAPABILITY_LAYER" />
+			<enumeration value="SCL" />
+		</restriction>
+	</simpleType>
+
+
+</schema>

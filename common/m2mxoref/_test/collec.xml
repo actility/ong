@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:applicationCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m2m="http://uri.etsi.org/m2m">
+  <m2m:namedReference id="toto">toto/</m2m:namedReference>
+  <m2m:namedReference id="titi">titi/</m2m:namedReference>
+</m2m:applicationCollection>

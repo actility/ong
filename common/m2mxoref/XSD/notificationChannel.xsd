@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="common.xsd" />
+
+	<element name="notificationChannel" type="tns:NotificationChannel" />
+
+	<complexType name="NotificationChannel">
+		<sequence>
+			<element ref="tns:channelType" minOccurs="0" />
+			<element ref="tns:contactURI" minOccurs="0" />
+			<element ref="tns:channelData" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0" />
+			<element ref="tns:lastModifiedTime" minOccurs="0" />
+			<!-- subresources -->
+		</sequence>
+		<attribute ref="tns:id"/>
+	</complexType>
+
+
+	<element name="channelType" type="tns:ChannelType" />
+
+	<simpleType name="ChannelType">
+		<restriction base="string">
+			<enumeration value="LONG_POLLING" />
+		</restriction>
+	</simpleType>
+
+	<element name="channelData" type="tns:ChannelData" />
+
+	<complexType name="ChannelData" abstract="true" >
+		<sequence/>
+	</complexType>
+
+	<complexType name="LongPollingChannelData">
+		<complexContent>
+			<extension base="tns:ChannelData">
+				<sequence>
+					<element ref="tns:longPollingURI" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="longPollingURI" type="anyURI" />
+
+</schema>

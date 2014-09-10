@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resourceModeling xmlns="http://uri.actility.com/m2m/ong">
+	
+	<!-- Labjack test -->
+	<interface filter="modbus:/int/Basic.Srv">
+		<descriptor>
+		    <attr name="productId" config="descriptor"/>
+		    <attr name="serialNumber" config="descriptor"/>
+		    <attr name="hardwareVersion" config="descriptor"/>
+		</descriptor>
+	</interface> 
+	<interface filter="modbus:/int/AnalogInput.Srv">
+	    <descriptor>
+            <point name="currentMesure" config="logging"/>
+        </descriptor>
+        <covConfigurations>
+            <covConfiguration filter="mobus:/attribute/currentMesure" minInterval="PT5S" maxInterval="PT2H"/>
+        </covConfigurations>
+    </interface>
+
+
+
+    <!-- OTB -->
+	<interface filter="modbus:/int/OnOff.Srv">
+	    <descriptor>
+	        <!-- descriptor / retargeting -->
+            <!-- <attr name="m2mOnOff" config="retargeting" accessRight="level3"/>   -->
+            
+            <!-- logging -->
+            <point name="m2mOnOff" config="logging"/>
+        </descriptor>
+        <covConfigurations>
+            <covConfiguration filter="modbus:/attribute/m2mOnOff" minInterval="PT5S" maxInterval="PT2H"/>
+        </covConfigurations>
+    </interface>
+
+</resourceModeling>

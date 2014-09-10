@@ -1,0 +1,7 @@
+if [ -f $ROOTACT/etc/init.d/awspv ]
+then
+	echo	"Stop driver watteco / tunslip services"
+	$ROOTACT/etc/init.d/tunslip stop
+	$ROOTACT/etc/init.d/awspv stop
+	sleep 5
+fi

@@ -1,0 +1,8 @@
+
+CC=msp430-gcc
+CFLAGS=-Os -mmcu=msp430f1481 -DMSP430 -DCOAP_RETRANSMIT -DCOAP_MAX_PDU_SIZE=1000 -DMAX_REQUESTS=20
+
+all : microdIa.o
+
+clean :
+	-rm *.o led

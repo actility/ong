@@ -1,0 +1,121 @@
+-------------------------------------------------------------------------------
+Java CDC Parent POM changelog
+-------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2013-10-11
+
+New Features:
+-------------
+ - Changed the groupId for com.actility.m2m (was com.actility), and merged
+ with java.pom 2.0.0.
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.10.0
+Date: 2013-01-14
+
+New Features:
+-------------
+ - Merged with java.pom 1.4.0
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.8.0
+Date: 2013-01-14
+
+New Features:
+-------------
+ - Merged with java.pom
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.6.0
+Date: 2012-11-27
+
+New Features:
+-------------
+ - Improved JNI management. Now, it is based on system property build.type
+   instead of a profile. For example previous compilation on centos6-x86 was:
+    * mvn clean install -Pcentos6-x86
+   Now it is:
+    * mvn clean install -Dbuild.type=centos6-x86
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.4.0
+Date: 2012-11-13
+
+New Features:
+-------------
+ - Updated Profile from centos5-x86 to centos6-x86
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2012-10-05
+
+New Features:
+-------------
+ - Added Profiles for JNI projects
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2011-12-20
+
+New Features:
+-------------
+ - Added GPL license + actility organization
+ - Added nexus mirror
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2011-11-03
+
+New Features:
+-------------
+ - Added Bundle-Vendor in bundle Manifest of the bundle plugin default
+   configuration
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2011-08-04
+
+New Features:
+-------------
+ - Added XmlUnit dependency
+ - Added multiple plugin dependencies
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Initial version

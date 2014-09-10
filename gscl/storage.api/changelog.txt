@@ -1,0 +1,18 @@
+-------------------------------------------------------------------------------
+Storage API - changelog
+-------------------------------------------------------------------------------
+Version: 0.2.0
+Date: 2014-03-21
+
+
+New Features:
+-------------
+ - Updated to the new util-4.0.0
+ - report patches for IS2T VM compatibility.
+ - Changed the groupId for com.actility.m2m (was com.actility).
+	 
+Bug Fixes:
+----------
+ - N/A
+
+

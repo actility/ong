@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<str val="${dpt_value}" xmlns="http://obix.org/ns/schema/1.1">
+    <int name="magicNumber" val="${raw_magicNumber}"/>
+    <int name="versionNumber" val="${raw_versionNumber}"/>
+    <int name="revisionNumber" val="${raw_revisionNumber}"/>
+    <str name="raw" val="0x${dpt_raw}"/>
+</str>
+
+
+

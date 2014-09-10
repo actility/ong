@@ -1,0 +1,212 @@
+-------------------------------------------------------------------------------
+M2M Service changelog
+-------------------------------------------------------------------------------
+Version: 3.0.3
+Date: 2014-05-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Changed BundleLogger to use a static method instead of a static variable
+
+-------------------------------------------------------------------------------
+Version: 3.0.2
+Date: 2014-03-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed infinite loop when accept header contains several media-types with
+   parameter q
+
+-------------------------------------------------------------------------------
+Version: 3.0.1
+Date: 2014-03-26
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed request was rejected when Accept header equals */*
+ - Fixed internal error when setting an attribute starting with prefix m2m
+   using the public API (which is forbidden). The M2M bundle must use an
+   internal API to that
+
+-------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - Added EXI support
+ - report patches for IS2T VM compatibility.
+ - Changed the groupId for com.actility.m2m (was com.actility).
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.22.0
+Date: 2013-10-07
+
+New Features:
+-------------
+ - Updated to m2m.api-1.22.0
+
+Bug Fixes:
+----------
+ - Fixed. Map any unknown 4xx response to STATUS_BAD_REQUEST instead of
+   STATUS_INTERNAL_SERVER_ERROR
+
+-------------------------------------------------------------------------------
+Version: 1.20.0
+Date: 2013-04-08
+
+New Features:
+-------------
+ - Updated to m2m.api-1.20.0
+
+Bug Fixes:
+----------
+ - Fixed. Raised a ServletException if an unsuccess response cannot be sent
+   because the request is already responded. This allows the SONG stack to send
+   an error response. The problem is related to the bug #0000061
+
+-------------------------------------------------------------------------------
+Version: 1.18.0
+Date: 2013-02-27
+
+New Features:
+-------------
+ - Updated to m2m.api-1.18.0
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.16.0
+Date: 2013-01-15
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Updated to m2m.api-1.16.0
+
+-------------------------------------------------------------------------------
+Version: 1.14.0
+Date: 2012-11-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.12.1
+Date: 2012-11-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. javax.servlet now declares a version in bundle MANIFEST
+ - Updated dependency from m2m.api-1.12.0 to m2m.api-1.12.1
+
+-------------------------------------------------------------------------------
+Version: 1.12.0
+Date: 2012-11-13
+
+New Features:
+-------------
+ - Update to m2m.api 1.12.0
+
+Bug Fixes:
+----------
+ - Fixed. NPE when calling getResourceURI and no Location header is present
+ - Fixed. text/xml is now a valid content type and has the same meaning as
+   application/xml
+
+-------------------------------------------------------------------------------
+Version: 1.10.0
+Date: 2012-10-26
+
+New Features:
+-------------
+ - Updated to m2m.api 1.10.0
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.8.0
+Date: 2012-10-05
+
+New Features:
+-------------
+ - Updated to m2m.api 1.8.0
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.6.0
+Date: 2012-08-30
+
+New Features:
+-------------
+ - Updated to m2m.api 1.6.0
+
+Bug Fixes:
+----------
+ - N/A
+ 
+-------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2012-08-17
+
+New Features:
+-------------
+ - Updated to m2m.api 1.4.0
+
+Bug Fixes:
+----------
+ - N/A
+ 
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2012-07-12
+
+New Features:
+-------------
+ - Added Proxy request indication management for ETSi re-targeting
+ - Updated m2m.api dependency to 1.2.0
+ - Updated song.api dependency to 3.2.0
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2012-06-05
+Initial version

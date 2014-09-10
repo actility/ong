@@ -1,0 +1,95 @@
+if [ -z "$ROOTACT" ]
+then
+	Error "ROOTACT not specified"
+	exit 1
+fi
+source $ROOTACT/rtbase/base/system
+
+SELF=xo
+echo "#####"
+echo	"$SELF for $SYSTEM"
+
+Compile()
+{
+for i in lib libexi com
+do
+	(
+	cd $i
+	if [ -f MAKE ]
+	then
+		echo "#####"
+		echo "#####	$i"
+		echo "#####"
+		sh ./MAKE $*
+	fi
+	)
+done
+}
+
+# frequemment oublié dans les makefile
+CleanPlus()
+{	
+	rm */core.* > /dev/null 2>&1
+	rm */core > /dev/null 2>&1
+	rm */TRACE_* > /dev/null 2>&1
+	rm */*.log > /dev/null 2>&1
+}
+
+
+case  $# in
+	0)
+		Compile
+		if [ ! -d ${ROOTACT}/exip ]
+		then
+			echo "Xo has not been compiled with EXI"
+		else
+			EXIVERSION="???"
+			if	[ -f ${ROOTACT}/exip/Version ]
+			then
+				EXIVERSION=`cat ${ROOTACT}/exip/Version`
+			fi
+			if	[ -f libexi/libxoexi.so ]
+			then
+			echo "Xo has been compiled with EXI ${EXIVERSION}"
+			else
+			echo "Xo can not be compiled with EXI ${EXIVERSION}"
+			fi
+		fi
+		exit 0
+		;;
+	*)	case $1 in
+			src|source)
+				shift
+				./MAKE clean
+				sh ${MKPKGSOURCE} -p $SELF $*
+				exit 0
+			;;
+			runtime)
+				shift
+				./MAKE
+				sh ${MKPKGRUNTIME} -p $SELF
+				exit 0
+			;;
+			clean)
+				shift
+				CleanPlus
+				Compile clean
+				exit 0
+				;;
+			svn*)
+				svncmd=$1
+				shift
+				sh ${MKSVN} -p $SELF -c $svncmd $*
+				exit 0
+			;;
+			*)
+				Compile $*
+				exit 0
+				;;
+		esac
+	;;
+esac
+
+echo "Usage: MAKE [clean|runtime|src|source]"
+exit 1
+

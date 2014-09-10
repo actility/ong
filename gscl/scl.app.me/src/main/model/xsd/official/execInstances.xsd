@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:tns="http://uri.etsi.org/m2m" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="common.xsd"/>
+	<include schemaLocation="execInstance.xsd"/>
+
+	<!-- execInstances type resource -->
+	<element name="execInstances" type="tns:ExecInstances"/>
+	<complexType name="ExecInstances">
+		<sequence>
+			<!-- common attributes -->						
+			<element ref="tns:creationTime" minOccurs="0"/>
+			<element ref="tns:lastModifiedTime" minOccurs="0"/>			
+			
+			<!-- sub resources -->
+			<element ref="tns:execInstanceCollection" minOccurs="0"/>			
+			<element ref="tns:subscriptionsReference" minOccurs="0"/>
+		</sequence>
+		<attribute ref="tns:id"/>
+	</complexType>
+
+	<element name="execInstanceCollection" type="tns:NamedReferenceCollection" />
+	 
+</schema>

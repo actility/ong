@@ -1,0 +1,92 @@
+#!(SHELL)
+
+CURRENT_DIR=$(dirname $0)
+. $CURRENT_DIR/ong.cfg
+
+OPTIONS=""
+RETVAL=0
+
+usage() {
+    echo "Usage: ong [<options>] {start|stop|status|restart}"
+    echo "  Where options are:"
+    echo "   -h|--help    Print this help message"
+    echo "   -i|--init    Re-initialize ONG"
+}
+
+start() {
+    list=$(ls $ROOTACT/etc/rc.d)
+    TMPRETVAL=0
+    for script in $list
+    do
+        $ROOTACT/etc/rc.d/$script $OPTIONS start
+        TMPRETVAL=$?
+        [ "x$TMPRETVAL" != "x0" ] && RETVAL=$TMPRETVAL
+    done
+    return $RETVAL
+}
+
+stop() {
+    list=$(ls -r $ROOTACT/etc/rc.d)
+    TMPRETVAL=0
+    for script in $list
+    do
+        $ROOTACT/etc/rc.d/$script stop
+        TMPRETVAL=$?
+        [ "x$TMPRETVAL" != "x0" ] && RETVAL=$TMPRETVAL
+    done
+    return $RETVAL
+}
+
+status() {
+    list=$(ls $ROOTACT/etc/rc.d)
+    TMPRETVAL=0
+    for script in $list
+    do
+        $ROOTACT/etc/rc.d/$script status
+        TMPRETVAL=$?
+        [ "x$TMPRETVAL" != "x0" ] && RETVAL=$TMPRETVAL
+    done
+    return $RETVAL
+}
+
+GETOPTTEMP=$(getopt -o hi --long help,init -- $@)
+if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments
+while [ -n "$1" ]
+do
+    case "$1" in
+        "-h"|"--help") usage; exit;;
+        "-i"|"--init") OPTIONS=$OPTIONS" -i";;
+        "--") shift; break ;;
+        * ) echo "Internal error ($*)!"; exit 1;;
+    esac
+    shift
+done
+
+case "$1" in
+    start)
+        start
+        ;;
+
+    stop)
+        stop
+        ;;
+
+    status)
+        status
+        ;;
+
+    restart)
+        stop
+        start
+        ;;
+
+    *)
+        usage
+        exit 1
+
+esac
+
+exit $RETVAL

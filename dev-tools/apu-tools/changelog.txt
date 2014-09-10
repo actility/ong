@@ -1,0 +1,218 @@
+-------------------------------------------------------------------------------
+APU tools changelog
+-------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2014-08-22
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- 'projectArchDepend' was not evaluated and source APU had a wrong name (with
+  the arch name). Fixed.
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2014-xx-xx
+
+New Features:
+-------------
+- Ne way to compile projects
+
+Bug Fixes:
+----------
+- N/A
+
+-------------------------------------------------------------------------------
+Version: 1.12.0
+Date: 2014-01-23
+
+New Features:
+-------------
+- Added "rpib" target
+
+Bug Fixes:
+----------
+- N/A
+
+-------------------------------------------------------------------------------
+Version: 1.10.1
+Date: 2013-12-12
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Fix on script apu-install-stdalone.sh : using "-y" option leads to an
+  infinite loop.
+
+-------------------------------------------------------------------------------
+Version: 1.10.0
+Date: 2013-12-12
+
+New Features:
+-------------
+- Added script apu-install-stdalone.sh, which has no dependencies. It is
+  designed to be installed on the ONG box. apu-install-stdalone.sh is
+  distributed in APU apu-install-<version>-<revision>.apu, and install it as
+  $ROOTACT/bin/apu-install.
+
+Bug Fixes:
+----------
+- N/A
+
+
+-------------------------------------------------------------------------------
+Version: 1.8.0
+Date: 2013-12-06
+
+New Features:
+-------------
+- Added -l|--local option to apu-maker.sh to allow generating an APU file
+  locally (i.e. no copy, no dependencies retrieving). APU files are moved to
+	$ROOTACT/apu-repository fokder.
+- Added -s|--skip-generation option to apu-maker.sh to allow skipping the
+  projet generation phase ('buildProject' from apu.sh files are then not 
+	invoked at all)
+
+Bug Fixes:
+----------
+- N/A
+
+
+-------------------------------------------------------------------------------
+Version: 1.6.1
+Date: 2013-10-25
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Fixed tgz installation which was not working
+
+
+-------------------------------------------------------------------------------
+Version: 1.6.0
+Date: 2013-09-26
+
+New Features:
+-------------
+- Add new script so called apu-install.sh. This script is design to install
+  the APU, either locally or either from a maven repository (same mecanism as
+  the one implemented in apu-maker.sh).
+
+
+Bug Fixes:
+----------
+- N/A
+
+
+-------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2013-09-24
+
+New Features:
+-------------
+- Add support for new variable in dependency files: INCLUDE_ARCH
+  It indicates the targeted architectures for which the dependency is
+  needed. If not present and by default, apu-maker assumes that all
+  architectures are in the included archs. If set, is a space-separated list
+  of the concerned architectures (e.g.: "INCLUDE_ARCH=centos6-x86 cov2"
+  indicates that the entry is a dependency for centos6-x86 and cov2, but this
+  is not true for the other supported arch such as cov1...).
+
+
+Bug Fixes:
+----------
+- N/A
+
+
+-------------------------------------------------------------------------------
+Version: 1.2.1
+Date: 2013-08-30
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Fixed. Substitution of '.' into '/' in groupId was only working for the
+  first occurrence. Now it replaces all occurrences.
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2013-06-28
+
+New Features:
+-------------
+- Now apu-maker leverages the maven local repository instead of always relying
+  on nexus
+
+
+Bug Fixes:
+----------
+- N/A
+
+
+-------------------------------------------------------------------------------
+Version: 1.0.4
+Date: 2013-04-17
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Dependencies are always treated as if they was apu. Now apu-maker the
+  packaging. It also handles tgz files now
+
+
+-------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2013-04-10
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Now apu-maker.sh prints an error if control.tar.gz and data.tar.gz or not
+  found in an APU file.
+
+
+-------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2013-01-09
+
+
+New Features:
+-------------
+- Add "WITH_ARCH=2" support: when set to 2, it indicates that the target
+  architecture of the APU to retrieve is to be forced to the architure of the
+	machine used for compilation (typically "centos6-x86"). The first usage is
+	for "xo-build" APU.
+
+
+Bug Fixes:
+----------
+- The "TARGET_DIR" variable from dependencies file (apu/dependencies/*.cfg)
+  was required for retrieving a "repository" dependency (a test -d was 
+	performed), but was not used.
+  Remove test on TARGET_DIR in case of "repository" dependency.
+
+
+-------------------------------------------------------------------------------
+

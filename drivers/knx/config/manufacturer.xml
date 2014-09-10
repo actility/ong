@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list name="manufacturers" xmlns="http://obix.org/ns/schema/1.1">
+  <int val="1" name="Siemens"/>
+  <int val="2" name="ABB"/>
+  <int val="4" name="Albrecht Jung"/>
+  <int val="5" name="Bticino"/>
+  <int val="6" name="Berker"/>
+  <int val="7" name="Busch-Jaeger Elektro"/>
+  <int val="8" name="GIRA Giersiepen"/>
+  <int val="9" name="Hager Electro"/>
+  <int val="10" name="INSTA ELEKTRO"/>
+  <int val="11" name="LEGRAND Appareillage électrique"/>
+  <int val="12" name="Merten"/>
+  <int val="14" name="ABB SpA – SACE Division"/>
+  <int val="22" name="Siedle &amp; Söhne"/>
+  <int val="24" name="Eberle"/>
+  <int val="25" name="GEWISS"/>
+  <int val="27" name="Albert Ackermann"/>
+  <int val="28" name="Schupa GmbH"/>
+  <int val="29" name="ABB SCHWEIZ"/>
+  <int val="30" name="Feller"/>
+  <int val="32" name="DEHN &amp; SÖHNE"/>
+  <int val="33" name="CRABTREE"/>
+  <int val="36" name="Paul Hochköpper"/>
+  <int val="37" name="Altenburger Electronic"/>
+  <int val="41" name="Grässlin"/>
+  <int val="42" name="Simon"/>
+  <int val="44" name="VIMAR"/>
+  <int val="45" name="Moeller Gebäudeautomation KG"/>
+  <int val="46" name="Eltako"/>
+  <int val="49" name="Bosch-Siemens Haushaltsgeräte"/>
+  <int val="52" name="RITTO GmbH&amp;Co.KG"/>
+  <int val="53" name="Power Controls"/>
+  <int val="55" name="ZUMTOBEL"/>
+  <int val="57" name="Phoenix Contact"/>
+  <int val="61" name="WAGO Kontakttechnik"/>
+  <int val="66" name="Wieland Electric"/>
+  <int val="67" name="Hermann Kleinhuis"/>
+  <int val="69" name="Stiebel Eltron/Hydrotherm"/>
+  <int val="71" name="Tehalit"/>
+  <int val="72" name="Theben AG"/>
+  <int val="73" name="Wilhelm Rutenbeck"/>
+  <int val="75" name="Winkhaus"/>
+  <int val="76" name="Robert Bosch"/>
+  <int val="78" name="Somfy"/>
+  <int val="80" name="Woertz"/>
+  <int val="81" name="Viessmann Werke"/>
+  <int val="82" name="Theodor HEIMEIER Metallwerk"/>
+  <int val="83" name="Joh. Vaillant"/>
+  <int val="85" name="AMP Deutschland"/>
+  <int val="89" name="Buderus Heiztechnik GmbH"/>
+  <int val="90" name="SEF - ECOTEC"/>
+  <int val="92" name="DORMA GmbH + Co. KG"/>
+  <int val="93" name="WindowMaster A/S"/>
+  <int val="94" name="Walther Werke"/>
+  <int val="95" name="ORAS"/>
+  <int val="97" name="Dätwyler"/>
+  <int val="98" name="Electrak"/>
+  <int val="99" name="Techem"/>
+  <int val="100" name="Schneider Electric Industries SAS"/>
+  <int val="101" name="WHD Wilhelm Huber + Söhne"/>
+  <int val="102" name="Bischoff Elektronik"/>
+  <int val="104" name="JEPAZ"/>
+  <int val="105" name="RTS Automation"/>
+  <int val="106" name="EIBMARKT GmbH"/>
+  <int val="107" name="WAREMA electronic GmbH"/>
+  <int val="108" name="Eelectron"/>
+  <int val="109" name="Belden Wire &amp; Cable B.V."/>
+  <int val="110" name="Becker-Antriebe GmbH"/>
+  <int val="111" name="J.Stehle+Söhne GmbH"/>
+  <int val="112" name="AGFEO"/>
+  <int val="113" name="Zennio"/>
+  <int val="114" name="TAPKO Technologies"/>
+  <int val="115" name="HDL"/>
+  <int val="116" name="Uponor"/>
+  <int val="117" name="se Lightmanagement AG"/>
+  <int val="118" name="Arcus-eds"/>
+  <int val="119" name="Intesis"/>
+  <int val="120" name="Herholdt Controls srl"/>
+  <int val="121" name="Zublin AG"/>
+  <int val="122" name="Durable Technologies"/>
+  <int val="123" name="Innoteam"/>
+  <int val="124" name="ise GmbH"/>
+  <int val="125" name="TEAM FOR TRONICS"/>
+  <int val="126" name="CIAT"/>
+  <int val="127" name="Remeha BV"/>
+  <int val="128" name="ESYLUX"/>
+  <int val="129" name="BASALTE"/>
+  <int val="130" name="Vestamatic"/>
+  <int val="131" name="MDT technologies"/>
+  <int val="132" name="Warendorfer Küchen GmbH"/>
+  <int val="133" name="Video-Star"/>
+  <int val="134" name="Sitek"/>
+  <int val="135" name="CONTROLtronic"/>
+  <int val="136" name="Function Innovation and Technology AS"/>
+  <int val="137" name="AMX"/>
+  <int val="138" name="ELDAT"/>
+  <int val="139" name="VIKO"/>
+  <int val="140" name="Pulse Technologies"/>
+  <int val="141" name="Crestron"/>
+  <int val="142" name="STEINEL professional"/>
+  <int val="143" name="BILTON LED Lighting"/>
+  <int val="144" name="denro AG"/>
+  <int val="145" name="GePro"/>
+  <int val="146" name="preussen automation"/>
+  <int val="147" name="Zoppas Industries"/>
+  <int val="148" name="MACTECH"/>
+  <int val="149" name="TECHNO-TREND"/>
+  <int val="150" name="FS Cables"/>
+  <int val="151" name="Delta Dore"/>
+  <int val="152" name="Eissound"/>
+  <int val="153" name="Cisco"/>
+  <int val="154" name="Dinuy"/>
+  <int val="155" name="iKNiX"/>
+  <int val="156" name="Rademacher Geräte-Elektronik GmbH &amp; Co. KG"/>
+  <int val="157" name="EGi Electroacustica General Iberica"/>
+  <int val="158" name="Ingenium"/>
+  <int val="159" name="ElabNET"/>
+  <int val="160" name="Blucasa s.r.l."/>
+  <int val="161" name="Hunter Douglas"/>
+  <int val="162" name="APRICUM"/>
+  <int val="163" name="TIANSU Automation"/>
+  <int val="164" name="Bubendorff"/>
+  <int val="165" name="MBS GmbH"/>
+  <int val="166" name="Enertex Bayern GmbH"/>
+  <int val="167" name="BMS"/>
+  <int val="168" name="Sinapsi"/>
+  <int val="169" name="Embedded Systems SIA"/>
+  <int val="170" name="KNX1"/>
+  <int val="171" name="Tokka"/>
+  <int val="172" name="NanoSense"/>
+  <int val="173" name="PEAR Automation GmbH"/>
+  <int val="174" name="DGA"/>
+  <int val="175" name="Lutron"/>
+  <int val="176" name="AIRZONE – ALTRA"/>
+  <int val="177" name="Lithoss Design Switches"/>
+  <int val="178" name="3ATEL"/>
+  <int val="179" name="Philips Controls"/>
+  <int val="180" name="VELUX A/S"/>
+  <int val="181" name="LOYTEC"/>
+  <int val="182" name="SBS S.p.A."/>
+  <int val="183" name="SIRLAN Technologies"/>
+  <int val="184" name="Bleu Comm' Azur"/>
+  <int val="185" name="IT GmbH"/>
+  <int val="186" name="RENSON"/>
+  <int val="187" name="HEP Group"/>
+  <int val="188" name="Balmart"/>
+  <int val="189" name="GFS GmbH"/>
+  <int val="190" name="Schenker Storen AG"/>
+  <int val="191" name="3E s.r.l."/>
+  <int val="192" name="Newron System"/>
+  <int val="193" name="maintronic"/>
+  <int val="194" name="Vantage"/>
+  <int val="195" name="Foresis"/>
+  <int val="196" name="Research &amp; Production Association SEM"/>
+  <int val="197" name="Weinzierl Engineering GmbH"/>
+  <int val="198" name="Möhlenhoff Wärmetechnik GmbH"/>
+  <int val="199" name="PKC-GROUP Oyj"/>
+  <int val="200" name="B.E.G."/>
+  <int val="201" name="Elsner Elektronik GmbH"/>
+  <int val="202" name="Siemens Building Technologies (HK/China) Ltd."/>
+  <int val="204" name="Eutrac"/>
+  <int val="205" name="Gustav Hensel GmbH &amp; Co. KG"/>
+  <int val="206" name="GARO AB"/>
+  <int val="207" name="Waldmann Lichttechnik"/>
+  <int val="208" name="SCHÜCO"/>
+  <int val="209" name="EMU"/>
+  <int val="210" name="JNet Systems AG"/>
+  <int val="214" name="O.Y.L. Electronics"/>
+  <int val="215" name="Galax System"/>
+  <int val="216" name="Disch"/>
+  <int val="217" name="Aucoteam"/>
+  <int val="218" name="Luxmate Controls"/>
+  <int val="219" name="Danfoss"/>
+  <int val="220" name="AST GmbH"/>
+  <int val="222" name="WILA Leuchten"/>
+  <int val="223" name="b+b Automations- und Steuerungstechnik"/>
+  <int val="225" name="Lingg &amp; Janke"/>
+  <int val="227" name="Sauter"/>
+  <int val="228" name="SIMU"/>
+  <int val="232" name="Theben HTS AG"/>
+  <int val="233" name="Amann GmbH"/>
+  <int val="234" name="BERG Energiekontrollsysteme GmbH"/>
+  <int val="235" name="Hüppe Form Sonnenschutzsysteme GmbH"/>
+  <int val="237" name="Oventrop KG"/>
+  <int val="238" name="Griesser AG"/>
+  <int val="239" name="IPAS GmbH"/>
+  <int val="240" name="elero GmbH"/>
+  <int val="241" name="Ardan Production and Industrial Controls Ltd."/>
+  <int val="242" name="Metec Meßtechnik GmbH"/>
+  <int val="244" name="ELKA-Elektronik GmbH"/>
+  <int val="245" name="ELEKTROANLAGEN D. NAGEL"/>
+  <int val="246" name="Tridonic Bauelemente GmbH"/>
+  <int val="248" name="Stengler Gesellschaft"/>
+  <int val="249" name="Schneider Electric (MG)"/>
+  <int val="250" name="KNX Association"/>
+  <int val="252" name="Hugo Müller GmbH &amp; Co KG"/>
+  <int val="253" name="Siemens HVAC"/>
+  <int val="254" name="APT"/>
+  <int val="256" name="HighDom"/>
+  <int val="257" name="Top Services"/>
+  <int val="258" name="ambiHome"/>
+  <int val="259" name="DATEC electronic AG"/>
+  <int val="260" name="ABUS Security-Center"/>
+  <int val="261" name="Lite-Puter"/>
+  <int val="262" name="Tantron Electronic"/>
+  <int val="263" name="Yönnet"/>
+  <int val="264" name="DKX Tech"/>
+  <int val="265" name="Viatron"/>
+  <int val="266" name="Nautibus"/>
+  <int val="268" name="Longchuang"/>
+  <int val="269" name="Air-On AG"/>
+  <int val="270" name="ib-company GmbH"/>
+  <int val="271" name="SATION"/>
+</list>

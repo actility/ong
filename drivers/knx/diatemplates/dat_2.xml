@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<enum val="${dpt_value}" xmlns="http://obix.org/ns/schema/1.1">
+  <bool name="v" val="${raw_v}"/>
+  <bool name="c" val="${raw_c}"/>
+  <str name="raw" val="0x${dpt_raw}"/>
+</enum>

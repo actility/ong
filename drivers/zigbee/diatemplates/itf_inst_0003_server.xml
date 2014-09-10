@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="Identify.Srv" status="cfg-mandatory"/>
+    <str name="zbClusterID" val="0x0003" status="cfg-mandatory"/>
+    <enum name="zbClusterType" val="server" status="cfg-mandatory"/>
+
+    <!-- ZigBee attributes -->
+    <int name="zbIdentifyTime" ${a_configAttr0}="${a_configVal0}" />
+            
+    <!-- ZigBee commands -->
+
+    <op name="zbIdentify" href="${s_rootapp}/APP_${d_ieee}.${a_num}/${r_pathOpe0}/0x0003.0x00.ope"/>
+
+    <op name="zbIdentifyQuery" href="${s_rootapp}/APP_${d_ieee}.${a_num}/${r_pathOpe1}/0x0003.0x01.ope"/>
+
+    <!-- M2M POINTS-->
+</obj>
+

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <str name="knxDpt" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0000.0x0000.0.m2m/contentInstances/latest/content" displayName="${dpt_name}" is="knx:${dpt_name}">
+        <str name="raw"/>
+    </str>
+    <op name="knxDptSet" href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/knxDptSet" in="knx:${dpt_name}" out="obix:nil"/>
+</obj>

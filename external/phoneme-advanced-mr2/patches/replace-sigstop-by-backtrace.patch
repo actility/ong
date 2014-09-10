@@ -1,0 +1,167 @@
+From 51401c57029924434e0332f5ce5dc66b3d76ca39 Mon Sep 17 00:00:00 2001
+From: jreich_dev <jreich@CentOS-dev-jreich.actility.net>
+Date: Fri, 5 Oct 2012 09:55:58 +0200
+Subject: [PATCH 2/3] replace sigstop by backtrace
+
+---
+ .../linux-arm/javavm/runtime/segvhandler_arch.c    |    8 +++-----
+ .../linux-mips/javavm/runtime/segvhandler_arch.c   |    8 +++-----
+ .../javavm/runtime/segvhandler_arch.c              |    5 ++---
+ .../linux-sparc/javavm/runtime/segvhandler_arch.c  |    5 ++---
+ .../cdc/src/linux/javavm/runtime/sync_md.c         |    4 ++--
+ .../cdc/src/share/javavm/include/utils.h           |    2 ++
+ .../cdc/src/share/javavm/runtime/utils.c           |   19 +++++++++++++++++++
+ 7 files changed, 33 insertions(+), 18 deletions(-)
+
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux-arm/javavm/runtime/segvhandler_arch.c b/phoneme_advanced_mr2_b167/cdc/src/linux-arm/javavm/runtime/segvhandler_arch.c
+index bfbffb9..de6b5f4 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux-arm/javavm/runtime/segvhandler_arch.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux-arm/javavm/runtime/segvhandler_arch.c
+@@ -311,9 +311,8 @@ static void handleSegv(int sig, int a2, int a3, int a4,
+     {
+ 	fprintf(stderr, "Process #%d received signal %d\n", pid, sig);
+ 	/* A real one. Suspend thread */
+-	fprintf(stderr, "Process #%d being suspended\n", pid);
+-	
+-	kill(pid, SIGSTOP);
++
++    CVMbacktracePanic("Unexpected signal");	
+     }
+ #else
+     /* Call chained handler */
+@@ -324,8 +323,7 @@ static void handleSegv(int sig, int a2, int a3, int a4,
+         } else {
+             if (sa.sa_handler == SIG_IGN || sa.sa_handler == SIG_DFL) {
+                 fprintf(stderr, "Process #%d received signal %d\n", pid, sig);
+-                fprintf(stderr, "Process #%d being suspended\n", pid);
+-                kill(pid, SIGSTOP);
++                CVMbacktracePanic("Unexpected signal");
+             } else {
+                 (*(sa.sa_handler))(sig);
+             }
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux-mips/javavm/runtime/segvhandler_arch.c b/phoneme_advanced_mr2_b167/cdc/src/linux-mips/javavm/runtime/segvhandler_arch.c
+index 12e86f3..be14dab 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux-mips/javavm/runtime/segvhandler_arch.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux-mips/javavm/runtime/segvhandler_arch.c
+@@ -193,9 +193,8 @@ static void handleSegv(int sig, siginfo_t* info, struct ucontext* ucp)
+     {
+ 	fprintf(stderr, "Process #%d received signal %d\n", pid, sig);
+ 	/* A real one. Suspend thread */
+-	fprintf(stderr, "Process #%d being suspended\n", pid);
+-	
+-	kill(pid, SIGSTOP);
++
++    CVMbacktracePanic("Unexpected signal");	
+ 	/* on linux-mips, the pc is off by 4. Fix it.
+ 	 * NOTE: for some reason it is not off by 4 if the crash is in
+ 	 * the code cache, which is why didn't adjust it above also.
+@@ -212,8 +211,7 @@ static void handleSegv(int sig, siginfo_t* info, struct ucontext* ucp)
+         } else {
+             if (sa.sa_handler == SIG_IGN || sa.sa_handler == SIG_DFL) {
+                 fprintf(stderr, "Process #%d received signal %d\n", pid, sig);
+-                fprintf(stderr, "Process #%d being suspended\n", pid);
+-                kill(pid, SIGSTOP);
++                CVMbacktracePanic("Unexpected signal");
+             } else {
+                 (*(sa.sa_handler))(sig);
+             }
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux-powerpc/javavm/runtime/segvhandler_arch.c b/phoneme_advanced_mr2_b167/cdc/src/linux-powerpc/javavm/runtime/segvhandler_arch.c
+index 03e8b06..b9123cd 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux-powerpc/javavm/runtime/segvhandler_arch.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux-powerpc/javavm/runtime/segvhandler_arch.c
+@@ -190,9 +190,8 @@ static void handleSegv(int sig, siginfo_t* info, struct ucontext* ucp)
+     {
+ 	fprintf(stderr, "Process #%d received signal %d\n", pid, sig);
+ 	/* A real one. Suspend thread */
+-	fprintf(stderr, "Process #%d being suspended\n", pid);
+-	
+-	kill(pid, SIGSTOP);
++
++    CVMbacktracePanic("Unexpected signal");	
+     }
+ #else
+     /* Call chained handler */
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux-sparc/javavm/runtime/segvhandler_arch.c b/phoneme_advanced_mr2_b167/cdc/src/linux-sparc/javavm/runtime/segvhandler_arch.c
+index 676bc19..75c9355 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux-sparc/javavm/runtime/segvhandler_arch.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux-sparc/javavm/runtime/segvhandler_arch.c
+@@ -254,9 +254,8 @@ static void handleSegv(int sig, siginfo_t* info, struct sigcontext* sigc)
+     {
+ 	fprintf(stderr, "Process #%d received signal %d\n", pid, sig);
+ 	/* A real one. Suspend thread */
+-	fprintf(stderr, "Process #%d being suspended\n", pid);
+-	
+-	kill(pid, SIGSTOP);
++
++    CVMbacktracePanic("Unexpected signal");	
+     }
+ #else
+     /* Call chained handler */
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/sync_md.c b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/sync_md.c
+index 7d88e71..7c7a2b7 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/sync_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/sync_md.c
+@@ -530,8 +530,8 @@ void crash(int sig)
+ {
+     int pid = getpid();
+     
+-    fprintf(stderr, "Process #%d received signal %d, suspending\n", pid, sig);
+-    kill(pid, SIGSTOP);
++    fprintf(stderr, "Process #%d received signal %d\n", pid, sig);
++    CVMbacktracePanic("Unexpected signal");
+ }
+ 
+ #if defined(CVM_JVMPI) || defined(CVM_JVMTI)
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/share/javavm/include/utils.h b/phoneme_advanced_mr2_b167/cdc/src/share/javavm/include/utils.h
+index ab90ed8..e04195a 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/share/javavm/include/utils.h
++++ b/phoneme_advanced_mr2_b167/cdc/src/share/javavm/include/utils.h
+@@ -42,6 +42,8 @@
+ #include "javavm/export/jni.h"
+ #include "generated/cni/sun_misc_CVM.h"
+ 
++void CVMbacktracePanic(const char* message);
++
+ /*
+  * Console I/O. Same as printf, but supports special formats like
+  * %C, %P, and %F. See CVMformatStringVaList for details.
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/utils.c b/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/utils.c
+index fe85223..7daac0b 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/utils.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/utils.c
+@@ -25,6 +25,7 @@
+  *
+  */
+ 
++#include <execinfo.h>
+ #include "javavm/include/porting/doubleword.h"
+ #include "javavm/include/porting/int.h"
+ #include "javavm/include/porting/time.h"
+@@ -62,6 +63,24 @@
+ 
+ #include "jni_util.h"
+ 
++void
++CVMbacktracePanic(const char* message)
++{
++    void* frames[32];
++    size_t size;
++    char** functionNames;
++    size_t i;
++
++    size = backtrace(frames, 32);
++    functionNames = backtrace_symbols(frames, size);
++    CVMconsolePrintf("Backtrace is (%d frames):\n", size);
++    for (i = 0; i < size; i++) {
++        CVMconsolePrintf("frame %d: %s\n", i, functionNames[i]);
++    }
++    free(functionNames);
++    CVMpanic(message);
++}
++
+ /*
+  * Console I/O. Same as printf, but supports special formats like
+  * %C, %P, and %F. See CVMformatStringVaList for details.
+-- 
+1.7.3.4
+

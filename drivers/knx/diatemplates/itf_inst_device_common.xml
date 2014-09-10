@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <!-- M2M attributes -->
+    <str name="interfaceID" val="${dpt_name}.Srv"/>
+    
+    <!-- KNX attributes -->
+    <str name="knxObjectID" val="${knxObjectID}"/>
+    <str name="knxObjectName" val="${knxObjectName}"/>
+    <str name="knxObjectDescription" val="${knxObjectDescription}"/>
+    <str name="knxDptID" val="${dpt_id}"/>
+    <str name="knxDptName" val="${dpt_name}"/>
+	<list name="knxGroups">
+	    <!-- M2M Points are described on dedicated XML template : itf_inst_ga_xxx.xml -->
+	</list>
+</obj>

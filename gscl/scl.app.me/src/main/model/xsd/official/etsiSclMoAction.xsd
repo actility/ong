@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- sclMoAction resource type -->
+	<complexType name="SclMoAction">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:reRegistration" minOccurs="0" />
+					<element ref="tns:deRegistration" minOccurs="0" />
+				</sequence>
+				<!-- attribute ref="tns:id" use="required" fixed="sclMoAction"/-->
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="reRegistration" type="anyURI"/>
+	<element name="deRegistration" type="anyURI"/>
+
+</schema>

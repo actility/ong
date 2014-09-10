@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<real val="${dpt_value}" xmlns="http://obix.org/ns/schema/1.1">
+  <bool name="b" val="${raw_b}"/>
+  <int name="StepCode" val="${raw_StepCode}"/>
+  <str name="raw" val="0x${dpt_raw}"/>
+</real>

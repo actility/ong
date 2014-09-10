@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+x-template="${w_template}"
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="OnOff.Srv" status="cfg-mandatory"/>
+    <str name="clusterID" val="0x0006" status="cfg-mandatory"/>
+    <enum name="clusterType" val="server" status="cfg-mandatory"/>
+
+    <op name="zbCovConfig"
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x0006.0xFF.ope"/>
+
+    <!-- ZigBee attributes
+    <bool name="zbOnOff" href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x0006.0x0000.0.attr"/>
+    -->
+            
+    <!-- ZigBee commands -->
+
+    <op name="zbOff"
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x0006.0x00.ope"/>
+
+    <op name="zbOn"
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x0006.0x01.ope"/>
+
+    <op name="zbToggle"
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x0006.0x02.ope"/>
+
+    <!-- M2M POINTS-->
+    <bool name="m2mOnOff" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0006.0x0000.0.m2m/contentInstances/latest/content"/>
+
+</obj>

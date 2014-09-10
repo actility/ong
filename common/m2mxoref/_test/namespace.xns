@@ -1,0 +1,11 @@
+#
+#
+#
+
+m2m	http://uri.etsi.org/m2m
+o	http://obix.org/ns/schema/1.1
+ong	http://uri.actility.com/m2m/ong
+acy     http://uri.actility.com/m2m
+xmime	http://www.w3.org/2005/05/xmlmime
+xsi	http://www.w3.org/2001/XMLSchema-instance
+xsd	http://www.w3.org/2001/XMLSchema

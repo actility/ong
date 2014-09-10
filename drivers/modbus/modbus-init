@@ -1,0 +1,62 @@
+#!(SHELL)
+#
+# MODBUS:       Starts the Modbus driver
+
+exec 2> /dev/null
+
+CURRENT_DIR=`dirname $0`
+. $CURRENT_DIR/../ong.cfg
+. $CURRENT_DIR/../functions
+
+OPTIONS=""
+MODBUS_DATA=$ROOTACT/usr/data/modbus
+SERVICE="modbus"
+PIDFILE=$MODBUS_DATA/modbus.pid
+STOPFILE=$MODBUS_DATA/stop
+
+usage() {
+    echo "Usage: Modbus [<options>] {start|stop|status|restart}"
+    echo "  Where options are:"
+    echo "   -h|--help    Print this help message"
+    echo "   -i|--init    Re-initialize ONG"
+}
+
+preStart() {
+  mkdir -p $MODBUS_DATA
+}
+
+serviceCommand() {
+  echo "modbus.x "$OPTIONS
+}
+
+stopService() {
+  MODBUS_PIDS=$(pidof modbus.x)
+  [ -n "$MODBUS_PIDS" ] && kill -TERM $MODBUS_PIDS
+}
+
+abortService() {
+  MODBUS_PIDS=$(pidof modbus.x)
+  [ -n "$MODBUS_PIDS" ] && kill -KILL $MODBUS_PIDS
+}
+
+GETOPTTEMP=`getopt -o a:hi --long help,init -- $@`
+if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments
+while [ -n "$1" ]
+do
+    case "$1" in
+        "-a") shift; OPTIONS=$OPTIONS" -a "$1;;
+        "-h"|"--help") usage; exit;;
+        "-i"|"--init") OPTIONS=$OPTIONS" -i";;
+        "--") shift; break ;;
+        * ) echo "Internal error ($*)!"; exit 1;;
+    esac
+    shift
+done
+
+handleParams $*
+
+exit $?
+

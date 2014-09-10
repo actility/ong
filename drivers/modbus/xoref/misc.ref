@@ -1,0 +1,19 @@
+#ifndef MISC_REF
+#define MISC_REF
+
+/*
+ *      this object is never created, just used for derivation
+ *      extern  ong:t_xml_obj with xo >= 4.0.21
+ */
+extern ong:t_xml_obj
+{
+    name$                   XoString                {  }
+    xmlns                   XoString                { embattr  }
+    xmlns:xsd               XoString                { embattr  }
+    xmlns:xsi               XoString                { embattr  }
+    xmlns:xmlmime               XoString                { embattr  }
+    xmlns:m2m               XoString                { embattr  }
+    xmlns:ong               XoString                { embattr  }
+}
+
+#endif // MISC_REF

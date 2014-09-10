@@ -1,0 +1,1205 @@
+
+###############################################################################
+4.4.13	2014/01/26
+###############################################################################
+
++ proposed extension to various files used with XO/XML/EXI :
+	.xsd	: ...
+	.xml	: ...
+	.ref	: xo objects definitions (~= .xsd)
+	.xns	: common xo prefixes for XML namespaces (ascii)
+	.xo	: xo instances in binary format
+	.xor	: xo instances of meta-classes (XoObjRef,XoAttrRef) from .ref
+	.asc	: xo instances in ascii format
+	.xdi	: shared dictionary of common strings (ascii)
+	.xo0	: xo instances in binary format + shared dico + compression 0
+	.xoz	: xo instances in binary format + shared dico + compression lz77
+	.exi	: xo instances in EXI schema less format
+	.exs	: xsd gramars in EXI format
+	.ixi	: xo instances in EXI schema informed
+	.jxo	: xo instances in JSON format (experimental)
+
+ This is simply a convention because applications have to known the nature of
+ the files they want to load/save and use different API functions for that :
+ - xo ascii 	XoLoadAscii*()	XoSaveAscii*()
+ - xo binary	XoLoad*()	XoSave*()
+ - xml		XoReadXml*()	XoWritXml*()
+ - exi		XoReadExi*()	XoWritExi*()
+ For xo binary applications do not have to worry about options used (at time 
+ saving) when loading files.
+
++ first delivery of "EXI" with lib exip 0.5.r294
+
+- if $ROOTACT/exip does not exist at compilation time, the EXI feature will not
+ be available and XO will still be compiled in XML mode only
+
+- link with libxoexi.a and libexip.a or with libxoexi.so (and libexip.so)
+
+   !!!! in this version libexip.a is embedded in libxoexi.so
+   !!!! maybe this will change
+
+- libxo.a and libxo.so can still be used if EXI is not required
+
+- it is still mandatory to link with libxml2 even if xml is not used
+
++ delivery of "EXI schema less"
+
+- new functions (same behaviour as XoReadXmlxxx() and XoWritXmlxxx()) :
+
+-- read functions :
+	void *XoReadExiEx(char *filename,char *roottype,int flags,int *err);
+	void *XoReadExiMem(char *buf,int sz,char *roottype,int flags,int *err);
+
+ 
+-- write functions :
+	int32 XoWritExiEx(char *filename,void *obj,int32 flags,char *schemaID, 
+					int useRootObj);
+
+	void *XoWritExiMem(void *obj,int32 flags,char **bufout,char *schemaID, 
+					int useRootObj);
+	void XoWritExiFreeMem(void *buf);
+	void XoWritExiFreeCtxt(void *pbuf);
+
+	with schemaID == "" for "EXI schema less"
+
+
+- command "xoxml.x" has one parameter to deal with EXI :
+ -e file.exi : save loaded object using EXI schema less
+
+
+ ex : "xoxml.x -e subs.exi subs.xml" converts xml file in EXI file
+
+- new command "xordexi.x" converts EXI file to XML (-xml) file or XO ascii file
+
+ ex : "xordexi.x" [-xml] -d subs.exi
+
++ labs delivery of "EXI schema informed"
+
+- only for tests in labs !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+- m2mxoref >= 1.2.1
+
+- command "xoxml.x" has new parameters to deal with EXI :
+ -e file.exi : save loaded object using EXI schema less
+ -E file.exi : save loaded object using EXI schema informed 
+ -x sch1.exs,sch2.exs... : uses EXI schemas
+ -b schemaID : defines schemaID
+
+ if no schema are given,all EXI schemas are loaded from $ROOTACT/m2mxoref/exixsd
+
+- load schema function :
+	void XoLoadEXISchemas(char* fileName);	// only this schema
+	void XoLoadEXISchemaDir(char *dirName);	// all schemas in directory
+
+- functions to read and write EXI documents are the same than in schema less.
+
+- ExiProcessor tools kit must be installed to compile the gramars. These tools 
+require a java SDK (1.7).
+(http://sourceforge.net/projects/exiprocessor/files/ExiProcessor_2012-03-22.zip)
+The generated files need to be corrected with schemaConvert.x in m2mxoref to fix
+a problem in ExiProcessor.
+
+###############################################################################
+4.4.12	2014/01/18
+###############################################################################
+
+### xo 4.2.9 is xo 4.4.12 aligned without exi processing
+
++ namespaces redefinition : apixmlns.c:_XoAddNameSpace() and XoAddNameSpace()
+
+  - when a namespace prefixe already exists :
+  	-- if the uri is the same => drop
+	-- if the uri is different => error
+
+  - change return code : 
+  	<= 0 => error 
+	> 0 number of prefixes
+
++ parsing and namespaces : XoReadXmlMem() XoReadXmlEx() 
+
+ previously a file with namespace redefinition with a different URI was 
+ silently parsed and the result was wrong; now the parsing is stopped and the
+ return code is -5
+
+ to correctly handle this problem the solution would :
+ - set a mark in the context table namespaces for each new level of parsing
+ - search prefixe in reverse order
+ - pop until mark
+ the difficulty is that xml parsing level does not match exactly xo parsing
+ level
+
+###############################################################################
+4.4.11	2013/10/08
+###############################################################################
+
++ add XoFreeAll() to free all instances of all objects
+
++ free or_from or_alias or_alias_has on XoEnd()
+
+###############################################################################
+4.4.8	2013/05/06
+###############################################################################
+
++ source code of "xo-parser-builder" for xml and exi parser no more depends on 
+libxml2 or libexip. apiXXXread.c is now really shared.
+
+
+###############################################################################
+4.4.7	2013/04/24
+###############################################################################
+
++ source code of "xo-parser-builder" for xml and exi xo-parser-builder is no 
+more duplicated, but is still compiled two times and this is mandatory.
+
+#include "apiXXXread.c" in apixmlread.c and apiexiread.c
+
+
+###############################################################################
+4.4.6	2013/04/22
+###############################################################################
+
++ merge of 4.4.5 (DFR) and 4.2.7 (PCA)
+
++ support of EXI with lib exip 0.5.276
+
++ EXI limitations :
+	- xsi:type is not supported
+
++ report apiexiwrit.c:xowritobj()
+	missing return(1) after "xml end element" when attribut value is NULL.
+
++ add -e and -E options to xoxml.x to generate/serialize object in exi schema 
+less or exi schema informed
+
++ add -x option to xoxml.x to set a list of exi schemas to use with -E
+
++ if xoxml.x / xotoasi.x / xordexi.x can not find xor files in the current 
+directory all files from $ROOTACT/m2mxoref/xoref are loaded.
+
++ At root level when XO/XML and XO/EXI parsers find a OBIX object an automatic
+switch to OBIX parsing is performed if flag XOML_PARSE_OBIX is not set :
+	- option -B for xoxml.x and xordexi.x are useless
+	- functions XoReadObixEx() XoReadObixMem are useless
+	- flag XOML_PARSE_OBIX for functions XoRead???() is useless
+
++ XO EXI API :
+ - void *XoReadExiMem(char *buf,int sz,char *roottype,int flags,int *err);
+ - void *XoReadExiEx(char *filename,char *roottype,int flags,int *err);
+
+ - void *XoWritExiMem(void *obj,int32 flags,char **bufout,char *schemaID, 
+ 								int useRootObj);
+ - void XoWritExiFreeMem(void *buf);
+ - void XoWritExiFreeCtxt(void *pbuf);
+ - int32 XoWritExiEx(char *filename,void *obj,int32 flags,char *schemaID, 
+ 								int useRootObj);
+
+ - void XoLoadEXISchemaFiles(char** fileNames, unsigned int schemaFilesCount);
+ - void XoLoadEXISchemas(char* str);
+ - void XoLoadEXISchemaDir(char *path);
+
+###############################################################################
+4.2.7a	2013/05/23
+###############################################################################
+
++ update apu informations
+
++ link tools with ../lib/libxo.a (~/com/makefile) and no more use shared libs
+
+###############################################################################
+4.2.7	2013/03/29
+###############################################################################
+
++ XoWritXmlXXX() error when saving unset "value$" attribut in base64 format: 
+ Example "m2m:content" is empty in a "m2m:contentInstance".
+
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:contentInstance xmlns:m2m="http://uri.etsi.org/m2m">
+ <m2m:creationTime>2013-03-29T10:14:10.631+01:00</m2m:creationTime>
+ <m2m:contentTypes/>
+ <m2m:contentSize>0</m2m:contentSize>
+ <m2m:content/>
+</m2m:contentInstance>
+
+- api.c:XoGetAttr(void *obj, int32 nrefattr, int32 *lg) :
+- apiexten.c:XoNmGetAttr(void *obj, char *nomChp, int32 *lg,...)
+	set *lg to 0 if lg not null. This avoid to return a random length(lg)
+	when Xo[Nm]GetAttr() returns a NULL value.
+
+- apixmlwrit.c:xowritobj()
+	missing return(1) after "xml end element" when attribut value is NULL,
+	this was the main cause of the error.
+
+This error produced the following traces :
+	### XO :   apixmlwrit.c:585 [writebase64 0]
+	### XO :   apixmlwrit.c:281 [xowritobj 0]
+	### XO :   apixmlwrit.c:640 [xowritattr 0]
+
+
+###############################################################################
+4.2.6	2013/01/10
+###############################################################################
+
++ XoSaveXXX() functions with compression reset compression flag and save object
+in standard binary form when compression size is greater than orginal size. So
+it is logical when loading to verify that compression size is less than original
+size. This avoid crashes when calling XoLoadMem(bufcompr,lgcompr) with a wrong
+buffer lenght. apiload.c:cfg_rdTree()
+
+
+###############################################################################
+4.2.5	2012/12/26
+###############################################################################
+
++ add a new directive "shdico" to attribut in XO defintions. This means that
+data are also searched in shared dictionary. This can be applied to attributs
+which contain a set of defined values, or very frequent values. More if
+data do not match exactly an entry, only the difference between the best match 
+dictionary entry and data is stored. So it applies also to data with common
+prefixe.
+Unlike for object and attribut names, it is not an error when data is not found
+in shared dictionary.
+
+Very good candidates m2m attributs are :
+
+	xmlns and xmlns:xxx
+	name$
+	searchStrings
+	obix.href
+	obix.name
+	obix.int.unit
+	obix.real.unit
+
+
+Rq infos :
+
+normal format for saving XoString : <lg><buffer>
+format for shdico XoString : 
+	- full match <offset_dico><0000>
+	- prefixe match <offset_dico><lg><buffer>
+	- not match <0000><lg><buffer>
+
+
+This means that a "shared dico data" has a cost event if data is found in dico.
+
++ XoBuffer basic type (ie binary in memory) is now supported, decoding and 
+encoding is done using base 64 when saving/loading from XML.
+
+
+
+###############################################################################
+4.2.4	2012/12/20
+###############################################################################
+
++ support of LZ77 compression, use XO_COMPRESS_LZ77 in place of XO_COMPRESS_0
+
++ int32	XoMemCanDeflate(unsigned char *in,int32 lgin) now returns an integer
+between [0..100] which is the estimated compression rate (compresssion 0) :
+	
+		(int)(100 - (size_out/size_in*100.0));
+
+By this way applications can easily choice XO_COMPRESS_0 or XO_COMPRESS_LZ77, if
+by example XO_COMPRESS_0 is less than 20%.
+
+
+###############################################################################
+4.2.3	2012/12/19
+###############################################################################
+
++ when saving Obix object in Xo binary format; do not save the value of "name$"
+attribut if it is equal to the class name (o:obj, o:real, ...). This is normally
+always the case. apisave.c:xosave()
+
++ int32	XoLoadSharedDico(char *file) int32 XoLoadSharedDicoDir(char *path)
+Load shared dictionary. Limited to only one dictionary. Must be called after
+XoInit(). A shared dictionary is just a text file containing all attributs and
+objects names (one by line).  # is supported to comment lines.
+
+WARNING : Once a dictionary has been used to serialize objects :
+	-- do not suppress entries
+	-- do not add entries somewhere else than the end of the file
+	-- in fact one can only add names at the end of the file.
+
+Default file extension is "xdi".
+
+
++ int32	XoFindInSharedDico(char *s) : returns the offset of "s" in the shared 
+dictionary. Normally not used by user land.
+
++ void XoSharedDicoFree() may be used to free the current shared dictionary,
+before loading a new one. Called by XoEnd().
+
+
+
+
++ new functions to serialize object :
+-----------------------------------
+
+++ flags == XO_SHARED_DICO | XO_COMPRESS_0
+	int32 XoSaveFlg (void *obj , int32 fout, int32 flags );
+	int32 XoSaveMemFlg (void *obj , char *fout , int32 flags);
+	int32 XoSaveMemAllocFlg(void *obj,char **fout,int32 *lgout,int32 flags);
+	int32 XoLgSaveFlg (void *obj, int32 flags ); // not tested
+
+	int32 XoExtSaveFlg(char *file, void *obj, char *info,int32 flags);
+
+
+Rq : XO_COMPRESS_0 must be used with XO_SHARED_DICO.
+
+Rq : if compressed binray is greater than original, object is saved as usual and
+flag XO_COMPRESS_0 is reseted.
+
+Rq : XoLgSaveFlg(),XoSaveFlags() and XoExtSaveFlg() do not support XO_COMPRESS_0
+
+Rq : XoLgSave() is pretty useless now and slow, prefer XoSaveMemAlloc() instead.
+
+	ex :
+		lg = XoLgSave(obj);		// first walk through
+		buf= (char *)malloc(lg);
+		XoSaveMem(obj,buf);		// second walk through
+		free(buf)
+	<=>
+		int lg = 0 ; char *buf = NULL;	// but buf can be preallocated
+		XoSaveMemAlloc(obj,&buf,&lg);	// only one walk through
+		free(buf);
+
++ functions to deserialize object :
+---------------------------------
+
+The previous functions void *XoLoad (int32 file), void *XoExtLoad (char *file),
+void *XoLoadMem (char *buf , int32 size ) are compatible with XO_SHARED_DICO and
+XO_SHARED_DICO+XO_COMPRESS_0.
+
+WARNING : XoLoad() is quiet dirty because it loads all the file in memory to
+uncompress it. => XoMemInflateFromFile() needed.
+
+
++ functions to compress uncompress buffer :
+-----------------------------------------
+
+Rq : not very useful in user land.
+
++ int32	XoMemCanDeflate(unsigned char *in,int32 lgin)
+The '\0' compression is possible if the buffer contains at least 13% of '\0'.
+One can use this function to test this, but "normal" xo binaries object with
+shared dictionary contains 30..40% of 0.
+
++ int32	XoMemDeflate(char *in,int32 lgin,char *out) replace XoMemCompress() but
+returns a size in bytes and stores additional bits in out[0].
+
++ int32	XoMemInflate(char *in,int32 lgin,char *out) replace XoMemUnCompress() 
+but uses a lenght in bytes and needs additional bits stored in in[0].
+
++ int32	XoMemUnCompress(unsigned char *in,int32 lginbits,unsigned char *out) ;
+No change. Deprecated.
+
++ int32	XoMemCompress(unsigned char *in,int32 lgin,unsigned char *out)
+now stops and returns 0 (instead of -1), if the encoded lenght is greater than 
+lgin. Assuming that out has at least the same lenght as in.  Deprecated.
+
+WARNING : the value returned is the number of bits (not of bytes) of the encoded
+buffer.
+
+
++ header of Xo binary buffer (information) :
+------------------------------------------
+
+++ serialize in standard binary format with no option :
+	magic == fa da fa da
+	flags == 00 00 
+	standard binary format == 01
+	version == 44
+	offset of dictionary == 78 00 00 00
+
+	ex : fa da fa da 00 00 01 44  78 00 00 00 .....
+
+++ serialize in standard binary format with shared dico option :
+	magic == fa da fa da
+	flags == 01 00 
+	standard binary format == 01
+	version == 44
+	offset of dictionary == 00 00 00 00	// as no dictionary ...
+
+	ex : fa da fa da 01 00 01 44  00 00 00 00 ... object ...
+
+++ serialize in standard binary format with shared dico option and compression0:
+	magic == fa da fa da
+	flags == 03 00 
+	standard binary format == 01
+	version == 44
+	offset of dictionary == 54 00 00 00 // in fact size of orginal buffer
+
+	ex : fa da fa da 03 00 01 44  54 00 00 00 XX ... compressed buffer ...
+
+						  XX == additional bits
+
+tools :
+-----
+
++ xodico.x dictionary.xdi [string_to_search]
+returns the offset of "string_to_search" in the shared dico.
+ex :
+	xodico.x m2m.xdi "o:obj" => ret=4271 000010af
+
++ xodico.x dictionary.xdi [+offset]
+returns the string at offset (decimal) in the shared dico.
+ex :
+	xodico.x m2m.xdi +4271 => "o:obj"
+
++ xoxml.x :
+ ++ by default try to load "./*.xdi". "-d" to do not load any shared dictionary.
+ ++ "-q fileout" to serialze the object using shared dictionary
+ ++ "-0 fileout" to serialze the object using shared dictionary and compression0
+ ++ "-o" "-q" "-z" are exclusives (but not controled).
+
+
++ xotoascii.x :
+ ++ if "-r" option not set, try to load "./*.xor"
+
+ ++ add "-shdico" option  to xotoasci.x to use a shared dictionary loaded 
+ from "./*.xdi"
+ ex :
+	xotoasci.x -xml -shdico -r ../m2mxoref/xoref/xobix.xor -d report.xo
+
+ ++ add "-xml" option  to xotoasci.x to write output in XML format rather than 
+ XO ascii. "./*.xns" files are loaded".
+ ex :
+	xotoasci.x -xml -r ../m2mxoref/xoref/xobix.xor -d report.xo
+
+
++ correction of offsets in functions XoOffsetDict() and XoLgDict()
+
+###############################################################################
+4.0.32	2012/11/21
+###############################################################################
+
++ add copyrights
+
+###############################################################################
+4.0.31	2012/10/30
+###############################################################################
+
++ first version of json writer. Add -j option to xoxml.x to dump object using xo
+JSON format rather than XML format. THIS IS FOR TESTS ONLY.
+
+see :http://www.utilities-online.info/xmltojson
+
+/*DEF*/	int32	XoWritJsoEx(char *filename,void *obj,int32 flags)
+
+example with obix_report.xml :
+'
+<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="20.00"/>
+'
+
+xoxml.x -B -r ../m2mxoref/xoref/xobix.xor -j obix_report.xml gives :
+
+{ "o:real" : {
+"name$" : "o:real",
+"custom$" : [
+	{ "o:t_xml_obix_attr" : {
+  "name" : "xmlns",
+  "value" : "http://obix.org/ns/schema/1.1"
+	}}
+],
+"val" : "20.00",
+}}
+
+and will give (one day) :
+
+{ "o:real" : { "val" : "20.00" }}
+
+
+The parser side is standby ...
+
+
+###############################################################################
+4.0.30	2012/07/11
+###############################################################################
+
++ XoXmlRead*() add flags XOML_PARSE_AUTOWRAPP
+names without namespace translation.
+
++ "-W" option added to xoxml.x to use XOML_PARSE_AUTOWRAPP.
+
+###############################################################################
+4.0.29	2012/07/05
+###############################################################################
+
++ XoXmlRead*() add flags XOML_PARSE_RETRYATTR, if used we retry to find attribut
+names without namespace translation.
+
++ "-X" option added to xoxml.x to use XOML_PARSE_RETRYATTR.
+
+###############################################################################
+4.0.28	2012/05/21
+###############################################################################
+
++ <attr></attr> or <attr/> were badly serialized with XoString attribut because
+the xo internal value was NULL and not "".
+
+###############################################################################
+4.0.27	2012/05/21
+###############################################################################
+
++ partial decoding : store xmlns* in root object when decoding applies to a 
+basic attributs.
+
++ add : #define		XO_FMT_STD_XML	(0)
+
++ add : void	XoWritXmlFreeCtxt(void *pbuf)
+	Free xml writter context (as XoWritXmlFreeMem) but keep allocated
+	memory containing output xml buffer, which need to be freed later
+	with free().
+
+	XoWritXmlFreeMem() <=> XoWritXmlFreeCtxt() + free()
+
+###############################################################################
+4.0.26	2012/05/03
+###############################################################################
+
++ partial encoding/decoding do not support namespace management.
+
++ XoWritXmlEx() XoWritXmlMem() if flags XOML_PARSE_TARGET is set, a partial
+encoding is done (ie element level 0 is not saved).
+
++ XoWritXmlEx() XoWritXmlMem() in case of partial encoding avoid failure when 
+xmlns attributs are set.
+
+###############################################################################
+4.0.25	2012/04/30
+###############################################################################
+
++ add directive "wraphidden" to attribut declaration; by this way the XML tag
+corresponding to this attribut is no more mandatory for XML parsing. It is also
+dropped when writting.
+An attribut "wraphidden" must be the unique attribut of the object (except 
+embattr and '$' name terminated attributs).
+
+	m2m:APoCPaths from ong:t_xml_obj
+	{
+		m2m:aPoCPath    m2m:APoCPath    { list wraphidden }
+	}
+
+
++ /*DEF*/ int32 XoGetRefObjWrapHidden(int32 obj) : returns the number of
+the attribut "wraphidden" in object type.
+
++ skip mode correction when the unknown element name is a single attribut.
+
++ XoWritXmlEx() XoWritXmlMem() prefixe attribut is optionnal.
+
+
++ XoUnSetAttr() free on basic (lgmax==-1 && (xostring || xobuffer)) values was 
+not done => memory leak. If the attribut is an object, the object is not freed.
+
+
++ add xo_readAbsDir() to xo_openDir()/xo_readDir()/xo_closeDir() for :
+	/*DEF*/	int32	XoExtLoadRefDir(char *path)
+	/*DEF*/	int32	XoLoadNameSpaceDir(char *path)
+the returned file name was relative to <path>, now it is an absolute file name.
+
+
+###############################################################################
+4.0.24	2012/04/25
+###############################################################################
+
++ define {} and DESC = "" in .ref are now optionnal to simplify #include of .ref
+
++ MKXO.sh add a "-p" option to preserve file after preprocessing (*.ref => *.i) 
+
++ add xold.x to runtime list
+
+###############################################################################
+4.0.23	2012/04/25
+###############################################################################
+
++ multiple aliases
+++++++++++++++++++
+
+ - mkxo.x accepts multiple aliases for a same object.
+
+ - list of aliases (alias names separated with ',') can be retrieved with :
+ 	char	*XoGetRefObjNameHasAlias(int32 numobj)
+
++ link .xor to avoid duplicate declaration
+++++++++++++++++++++++++++++++++++++++++++
+
+xold.x [-t] [-o fileout.xor] f1.xor ... fN.xor
+ + link a set of xo declarations files into a single file
+ + duplicate declarations are eliminated
+ + different duplicate declarations cause an abort (obj clash)
+ -o fileout.xor : generate declarations in fileout.xor
+ -v : verbose
+ -t : print tree derivation
+
+
+
+###############################################################################
+4.0.21	2012/04/23
+###############################################################################
+
++ dynamic typing
+++++++++++++++++
+
+ use attribut xsi:type instead of xsd:type
+
+
++ misc
+++++++
+
+ dont skip "extern" object in mkxo.y:find_obj()
+
+###############################################################################
+4.0.20	2012/04/17
+###############################################################################
+
++ shared library
+++++++++++++++++
+
+ - missing -Wl,soname=libxo.so otherwise path is static.
+ 	=> LD_LIBRARY_PATH=$ROOTACT/shlib
+
+ - add -lxml2 for libxo.so
+ 	=> libxml2.so is now loaded if libxo.so is.
+
+
++ XML/Namespace
++++++++++++++++
+
+ - when parsing restablish "search attribut without prefixe first" in case 
+ of OBIX object. All OBIX objects are prefixed with 'o:' attributs are not.
+
+ - if caller knows that an xml document used only prefixes declared in 
+ namespace.xns, it is possible to call XoReadXml() with XOML_PARSE_NATIVENS. In
+ this case the parsing is faster (10%). XoWritXml() also supports this flags and
+ does not transform attributs names.
+
+
+###############################################################################
+4.0.19	2012/04/12
+###############################################################################
+
++ creation of libxo.so
+++++++++++++++++++++++
+
++ XML/Namespace :
++++++++++++++++++
+
+ - namespace.xns file to define internal prefixes :
+
+ example :
+
+	#
+	# our internal prefixes (proposition)
+	#
+
+	xsd	http://www.w3.org/2001/XMLSchema
+	m2m	http://uri.etsi.org/m2m
+	ong	http://uri.actility.com/m2m/ong
+	o	http://obix.org/ns/schema/1.1
+
+
+  - the basic definition for a XML object is (with previous namespace.xns) :
+	t_xml_obj
+	{
+		name$		XoString 	{ }
+		xmlns 		XoString 	{ embattr }
+		xmlns:xsd 	XoString	{ embattr }
+		xmlns:m2m 	XoString	{ embattr }
+		xmlns:ong 	XoString	{ embattr }
+	}
+ example :
+	m2m:FilterCriteriaType from m2m:t_xml_obj
+	{
+		xsd:type 	XoString	{ embattr }
+		m2m:type 	XoString	{ embattr }
+		ifModifiedSince XoString 	{ }
+		...
+		ong:opaque 	XoVoidObj	{ default=ong:Subscription }
+	}
+	alias m2m:FilterCriteriaType with m2m:filterCriteriaType 
+
+	ong:Subscription from ong:t_xml_obj
+	{
+		xsd:type 	XoString	{ embattr }
+		data		XoString
+	}
+	alias ong:Subscription with ong:subscription 
+
+  - the basic definition for an OBIX object is (with previous namespace.xns):
+	o:t_xml_obix_attr
+	{
+		name		XoString	{ }
+		value		XoString	{ }
+	}
+
+	o:t_xml_obix_obj
+	{
+		name$			XoString
+		/* undefined/custom XML attributs list */
+		custom$		o:t_xml_obix_attr	{ EMBATTR LIST }
+	}
+
+	/* 
+	 *	OBIX object class
+	 */
+	o:obj	FROM o:t_xml_obix_obj
+	{
+		/* defined/normative XML attributs */
+		name		XoString	{ EMBATTR }
+		...
+		status		XoString	{ EMBATTR }
+
+
+		/* list of sub-objects */
+		wrapper$	XoVoidObj	{ LIST }
+	}
+
+  - XoReadXmlEx() / XoReadXmlMem() : 
+  	-- xmlns: and xmlns attributs are treated in root and sub-elements. 
+	They are used to create the parsing context. They can not be redefined 
+	at this time.
+  	-- for XML object attributs xmlns:* are stored in XO object if 
+	corresponding attributs xmlns:conversion_to_internal(pref) are found 
+	in xo.def. xmlns is stored in xmlns if defined.
+	-- for Obix object xmlns and xmlns:* are stored in custom$ attribut.
+	-- for both all other attributs/elements are converted according to 
+	namespaces and are searched without prefixe.  If not found, a new search
+	is done by prefixing with the prefixe of the object class, if not found
+	the attribut/element is assumed to be undefined and skip parsing mode 
+	is activated until the end of the undefined element.
+
+
+  - XoWritXmlEx() / XoWritXmlMem() :
+	-- for XML object xmlns is never saved (except if defns is set), but an
+	xmlns:xxx is added, where xxx is the internal prefixe corresponding to 
+	the URI of xmlns.
+	-- for Obix object xmlns is forced with the URI of "o:".
+  	-- for both xmlns:* and name$ are saved as they were stored during 
+	parsing (ie after conversion to internal prefixes). 
+	-- when the object to save does not come from a parsing (ie XoNew()),
+	the application must set xmlns:* with XoSetNameSpace() and must set
+	name$ with the full object class name.  xmlns: attributs can also be set
+	or unset one by one, if not all prefixes are used.
+	If name$ is not set, the value used is the full object class name. 
+	-- for XML all other attributs names are saved as they are defined and
+	the prefixe of the object class is added if attributs names are not 
+	prefixed.
+	-- for Obix all other attributs names are saved without prefixe, as with
+	Obix xmlns is forced to the URI of "o:"
+
+  - void *XoWritXmlMem(void *obj,int32 flags,char **bufout,char *defns)
+  	add defns default namespace parameter.
+
+  - int32 XoWritXmlEx(char *filename,void *obj,int32 flags,char *defns)
+  	add defns default namespace parameter.
+
+  - int32 XoIsObix(void *obj) : returns > 0 if obj is an OBIX object (ie has an
+  attribut named custom$).
+
+  - int32 XoLoadNameSpaceDir(char *dir) : load all files *.xns in the directory 
+  dir. Returns the numbers of namespaces added.
+
+  - int32 XoLoadNameSpace(char *file) : load file an xns file. Returns the 
+  numbers of namespaces added.
+
+  - int32 XoSetNameSpace(void *obj,char *pref) : 
+  	-- if pref is NULL, set all attributs xmlns:pref with the URI associated
+	to pref. Returns the number of attributs set.
+	-- if pref not NULL, only the matched attribut xmlns:pref is set.
+
+  - int32 XoUnSetNameSpace(void *obj,char *pref) : 
+  	-- if pref is NULL, unset all attributs xmlns:pref with the URI 
+	associated to pref. Returns the number of attributs set.
+	-- if pref not NULL, only the matched attribut xmlns:pref is unset.
+
+  - int32 XoAddNameSpace(char *pref,char *uri) : add a namespace. Returns the
+  number of namespaces declared.
+
+  - void XoDumpNameSpace(FILE *fout) : dump all namespaces declared.
+
+
+###############################################################################
+4.0.15	2012/04/03
+###############################################################################
+
++ XML/Namespace :
++++++++++++++++++
+
+ - attribut "xmlns" is no more ignored and is stored in XO objects; now the 
+ basic definition for a XML object is :
+	t_xml_obj
+	{
+		name$		XoString 		{ }
+		xmlns 		XoString 		{ embattr }
+	}
+
+ - in case of dynamic typing with XoVoidObj, the name of the attribut is now :
+ 	"xsd:type"
+
+ - attributs "xmlns:xx" are no more ignored and are kept in the parser context.
+ If a prefixe 'prf' defined by such an attribut "xmlns:prf" refers to 
+ "http://www.w3.org/2001/XMLSchema" this will be used by the parser to search 
+ the attribut 'prf:type' for dynamic typing (xo attribut name "xsd:type").
+ 
+ 
+By this way is possible to parse something like that :
+	<subscription xmlns="http://uri.etsi.org/m2m" 
+		xmlns:zzz="http://www.w3.org/2001/XMLSchema">
+
+	...
+  	<filterCriteria zzz:type="ContentInstanceFilterCriteriaType">
+	...
+
+	</subscription>
+
+and the result of the serialization will be :
+
+	<subscription xmlns="http://uri.etsi.org/m2m" 
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	...
+  	<filterCriteria xsd:type="ContentInstanceFilterCriteriaType">
+	...
+
+	</subscription>
+
+Rem about serialization :
+ - original prefixe 'zzz' is lost and is forced to 'xsd'
+ - xmlns:xsd="...." is added even xsd:type is not used
+ - xmlns* attributs orders may be changed
+
+###############################################################################
+4.0.14	2012/03/26
+###############################################################################
+
++ OBIX :
+++++++++
+
+
+ - obix objects can be loaded with :
+
+void *XoReadObixEx(char *filename,void *unused,int flags,int *err);
+void *XoReadObixMem(char *buf,int sz,void *unused,int flags,int *err);
+
+ - obix objects can be saved with standard XoWritXml*() functions
+
+ - shortcuts for "XoPath" with XoNm*Attr() functions : attribut wrapper$ is 
+ automaticaly added when missing :
+	'[name=children].[1].href' == 'wrapper$[name=children].wrapper$[1].href'
+	'[]' == 'wrapper$'
+	'[name=interfaces].[]' == 'wrapper$[name=interfaces].wrapper$'
+
+
+###############################################################################
+4.0.12	2012/03/23
+###############################################################################
+
++ OBIX :
+++++++++
+
+- OBIX definitions
+
+  an obix object is an xo/xml object which contains "wrapper$" and "custom$"
+  attributs.
+  actually, as it is an xo/xml object it must contain "name$" attribut, although
+  "name$" is the obix type (obj,str,int,list,op, ...).
+
+  XO definition can be found in wo/obix/xobix.ref
+
+- XML reader : manage objects list with auto wrapped attribut of name "wrapper$"
+
+- XML writter : do not save element name "wrapper$"
+
+- add -U option to xomk.x : all keywords language must be in upper case 
+	(list->LIST, from->FROM, ...)
+
+
+
+###############################################################################
+4.0.11	2012/03/20
+###############################################################################
+
++ Multi threading :
++++++++++++++++++++
+
+- XO API is thread safe, but :
+	- XoInit() is not
+	- class adding functions (XoExtLoadRef(), XoAddObjRef(), ...) are not
+	- an instance of an object must be GET/SET only by one thread at a time
+	- the linked list of objects of a same class is not, and all functions
+	that apply to all objects of a class are not.
+	- XoLoadAscii*() are not.
+	- XoSaveAscii(FILE *,...) is thread safe, but fprintf() is not.
+
+ - Load allclasses definitions (*.xor) from a path directory  : 
+
+	int32	XoExtLoadRefDir(char *pathdir);
+	TODO :
+	the loading order must be improved ... filename_xxx.xor where xxx is a
+	number between [000...999]
+
++ Others :
+++++++++++
+
+ - Save in memory with binary format, memory is allocated as needed and returned
+ in fout. Must be freed after use. *fout can be not NULL, in this case it is 
+ assumed that memory is preallocated (malloc(3C)) by the caller and *lgout must
+ give the size. If preallocated size is to small, it will be reallocated. By 
+ this way each process (thread) can have its own and unique memory space to 
+ serialize any objects without taking care of space required.
+
+	int32	XoSaveMemAlloc(void *obj, char **fout, int32 *lgout)
+
+ - XoVoidObj in list, search type="..." or default type or element name.
+
+
+###############################################################################
+4.0.7	2012/03/13
+###############################################################################
+
++ XoXml :
++++++++++
+
+- load from XML format using xmlTextReader API :
+
+void	*XoReadXmlReader(/*xmlTextReaderPtr*/ void *preader,char *roottype,int flags,int *err)
+void	*XoReadXmlEx(char *filename,char *roottype,int flags,int *err)
+void	*XoReadXmlMem(char *buf,int sz,char *roottype,int flags,int *err)
+
+	- filename : a source file
+
+	- buf : a memory address containing a XML data
+
+	- sz : the size of buf in bytes
+
+	- roottype :
+		- forced root element type
+		- or used with partial addressing mode
+
+	- flags are :
+		- XOML_PARSE_ONLY	// parse only, object not allocated
+		- XOML_PARSE_INTERACTIF	// ...
+		- XOML_PARSE_TRACE	// ...
+		- XOML_PARSE_TARGET	// partial addressing
+
+	- err > 0 : error when parsing (line number)
+	- err < 0 : error when loading (code number)
+
+	- RETURN :
+		- NULL on errors (err set)
+		- the XO handle object
+
+- save to XML format using xmlTextWritter API :
+
+void	*XoWritXmlMem(void *obj,int32 flags,char **bufout)
+int32	XoWritXmlEx(char *filename,void *obj,int32 flags)
+
+	- obj : an Xo handle
+
+	- filename : a destination file
+
+	- flags is for futur extensions, use 0.
+
+	- bufout : a pointer to the string (char *) data
+
+	- RETURN :
+		- NULL on errors
+		- an handle on memory allocated to contains XML data,once bufout
+		is used, the handle must be freed with XoWritXmlFreeMem.
+
+void	XoWritXmlFreeMem(void *buf)
+
+	- buf : the return of previous call to XoWritXmlMem().
+
+- save to XML format (no output API) :
+
+int32	XoSaveXml(void *obj, FILE *fout,int flags)
+void	XoStartEndFluxXml(char *pstart,char *pend)
+
++ Partial addressing :
+++++++++++++++++++++++
+
+- it is possible to decode XML data which are not a complete object. To do this
+you have to give the context (or the target) in which XML must be decoded :
+
+-- xml source :
+<?xml version="1.0" encoding="UTF-8"?>
+<expirationTime>2012-02-01T21:00:00+01:00</expirationTime>
+
+o = XoReadXmlEx("in.xml","subscription",XOML_PARSE_TARGET,&parseerr);
+
+-- ascii format :
+
+Subscription
+{
+name$  = <dont_save_this_tag>
+expirationTime  = 2012-02-01T21:00:00+01:00
+}
+
+- once a piece a XML is loaded in a partial context, it will be save partialy :
+
+-- xml output :
+
+XoWritXmlEx("out.xml",o,0)
+<?xml version="1.0" encoding="UTF-8"?>
+<expirationTime>2012-02-01T21:00:00+01:00</expirationTime>
+
+- but it is possible to change this by setting the real element name :
+
+XoNmSetAttr(o,"name$",XoNmType(o),0);	// XoNmType(o) -> "subscription"
+
+###############################################################################
+4.0.6	2012/03/12
+###############################################################################
+
++ XoHeader :
+++++++++++++
+
+- XoHeader object no more saved or searched in binary format.
+
+
+
+###############################################################################
+4.0.4	2012/03/01
+###############################################################################
+
+
++ Alias :
++++++++++
+
+- xo schema compilator (mkxo.x) :
+
+it is possible to give an 'alias' (and only one) to a previously defined class
+, the class can not be an external one :
+
+t_my_object
+{
+	// ...
+}
+alias t_my_object with a_my_alias
+
+- Call to obj=WoNmNew("a_my_alias") will have the same effect than 
+WoNmNew("t_my_object"), and the result of XoGetRefObjName(XoType(obj)) will
+return "t_my_object".
+
+- Call to XoGetRefObjNameHasAlias(XoType(obj)) will return "a_my_alias".
+
+
+- destruction (XoDelObjRef()) of class which is an alias or which has an alias
+are not managed. Following calls to WoNmNew() will fail.
+
+- internals attributs for alias are :
+	- XoObjRefAlias
+	- XoObjRefAliasHas
+
+- code C generation (mkwo.x -g) actually does not work for aliases.
+
+
++ xml attribut management :
++++++++++++++++++++++++++++
+
+- xo schema compilator (mkxo.x) :
+
+xml attributs must be declared with the 'embattr' directive. By this way, when
+objects are serialized, we know where to save this kind of attributs.
+
+t_my_object
+{
+	xsi		XoString	{ embattr }
+}
+
+will give : <elem_name xsi="...">...</elem_name>
+
+- for the Xo API, embattr are considered as "basic attribut" (ie no list, XoString only).
+
+
++ xml element name management :
++++++++++++++++++++++++++++++++
+
+- if you plan to use an Xo object with XML, you have to declared a special attr
+called 'name$' which will contain the tag really (-prefixe) got when parsing 
+XML object, and it will be used to serialize it.
+
+- to anticipate future extensions a good idea is to define a primitive xml object and to derive it.
+
+t_xml_obj0
+{
+	name$			XoString
+}
+
+
+t_my_object from t_xml_obj0
+{
+	// ...
+}
+
+- for Xo API 'name$' is a basic attribute, and can be get/set by standard ways.
+
+
++ single type extension :
++++++++++++++++++++++++++
+
+
+- xo schema compilator (mkxo.x) :	// TODO
+
+- for Xo API 'value$' is a basic attribute, and can be get/set by standard ways.
+
+- int32 XoGetRefObjStExt(int32 obj) returns a positive value if obj is declared
+as a single type extension.
+
+
++ Hierarchie of derivation :
+++++++++++++++++++++++++++++
+
+- int32 XoGetRefObjFromList(int32 obj,char *tab[],int32 lev /* =0 */) gives the
+list of derivation names in tab[]. Must be called with lev=0 and tab[] great
+enough.
+
+
++ Object attribut with dynamic and default type :
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+- when an Xo attribut is defined as XoVoidObj, its type can be precised in the
+xml attribut 'type' otherwise the default type is used.
+
+t_variable from t_xml_obj0
+{
+	type			XoString	{ embattr }
+	data			XoString	{ }
+}
+
+t_parametre from t_variable
+{
+	parametre		XoString	{ }
+}
+
+t_my_object from t_xml_obj0
+{
+	// ...
+	variable		XoVoidObj	{ default="t_variable" }
+	// ...
+}
+
+can be decoded from :
+<t_my_object>
+  <variable>
+    <data>somedata</donnees>
+  </variable>
+</t_my_object>
+
+or from :
+<t_my_object>
+  <variable type="t_parametre">
+    <data>somedata</donnees>
+    <parametre>param</parametre>
+  </variable>
+</t_my_object>
+
++ Name space suppression :
+++++++++++++++++++++++++++
+
+- xml attributes begining with prefixe "xmlns" are ignored.
+- prefixes are suppressed in xml attributs and xml tags.
+
+

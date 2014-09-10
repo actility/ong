@@ -1,0 +1,21 @@
+#make $*
+source $ROOTACT/rtbase/base/system
+where=`uname -n`
+
+if [ "$SYSTEM" = "android_panrouter" ]
+then
+	exit 0
+fi
+
+make $*
+
+#if [ "$where" = "pca-ESPRIMO-P5730" && "$ROOTACT" = "/home/pierrecaillot/Travail" ]
+#if [ "$ROOTACT" = "/home/pierrecaillot/Travail" ]
+#then
+#	make -f makefile.pca $*
+#else
+#	make $*
+#fi
+#
+
+exit $?

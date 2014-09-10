@@ -1,0 +1,1 @@
+sudo tcpdump -i any -X -s 0 -n -v port 5683

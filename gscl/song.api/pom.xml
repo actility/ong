@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright   Actility, SA. All Rights Reserved.
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+  
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License version
+  2 only, as published by the Free Software Foundation.
+  
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  General Public License version 2 for more details (a copy is
+  included at /legal/license.txt).
+  
+  You should have received a copy of the GNU General Public License
+  version 2 along with this work; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA
+  
+  Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+  or visit www.actility.com if you need additional
+  information or have any questions.
+  
+  id $Id: pom.xml 7987 2014-03-07 14:53:50Z JReich $
+  author $Author: JReich $
+  version $Revision: 7987 $
+  lastrevision $Date: 2014-03-07 15:53:50 +0100 (Fri, 07 Mar 2014) $
+  modifiedby $LastChangedBy: JReich $
+  lastmodified $LastChangedDate: 2014-03-07 15:53:50 +0100 (Fri, 07 Mar 2014) $
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.actility.m2m</groupId>
+    <artifactId>java.cdc.pom</artifactId>
+    <version>3.0.0</version>
+  </parent>
+  <artifactId>song.api</artifactId>
+  <version>4.0.0</version>
+  <packaging>bundle</packaging>
+
+  <name>[API] Song Service</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Export-Package>
+              com.actility.m2m.servlet;version=${project.version},
+              com.actility.m2m.servlet.ext;version=${project.version},
+              com.actility.m2m.servlet.service;version=${project.version},
+              com.actility.m2m.servlet.service.ext;version=${project.version},
+              com.actility.m2m.servlet.song;version=${project.version},
+              com.actility.m2m.servlet.song.ext;version=${project.version},
+              com.actility.m2m.servlet.song.service;version=${project.version},
+              com.actility.m2m.servlet.song.service.ext;version=${project.version}
+            </Export-Package>
+            <Import-Package>
+              javax.servlet;version="[2.5,3)",
+              *
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

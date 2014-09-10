@@ -1,0 +1,69 @@
+
+minimal functions list :
+
+// init
+int32 XoInit (int32 flags );	// must be 0
+int32 XoEnd (void );
+
+// alloc
+void *XoNmNew (char *nameclass );
+void *XoNewCopy (void *obj , int32 reccur );
+
+// free
+int32 XoFree (void *obj , int32 reccur );
+
+// xopath
+void *XoNmGetAttr (void *obj , char *nomChp , int32 *lg , ...);
+int32 XoNmSetAttr (void *obj , char *nomChp , void *val , int32 lg , ...);
+int32 XoNmUnSetAttr(void *obj, char *nomChp,...);
+
+// xopath in list attributs
+int32 XoNmNbInAttr (void *obj , char *nomChp , ...);
+int32 XoNmAddInAttr (void *obj , char *nomChp , void *val , int32 lg , ...);
+int32 XoNmInsInAttr (void *obj , char *nomChp , void *val , int32 lg , ...);
+int32 XoNmSupInAttr (void *obj , char *nomChp , ...);
+
+// infos
+char *XoNmType (void *obj );
+
+// xml load
+void *XoReadXmlMem(char *buf,int sz,char *roottype,int flags,int *err);
+void *XoReadXmlEx(char *filename,char *roottype,int flags,int *err);
+
+// xml save
+void *XoWritXmlMem(void *obj,int32 flags,char **bufout,char *defns);
+void XoWritXmlFreeMem(void *buf);
+int32 XoWritXmlEx(char *filename,void *obj,int32 flags,char *defns);
+
+// xml/obix load
+void *XoReadObixMem(char *buf,int sz,void *unused,int flags,int *err);
+void *XoReadObixEx(char *filename,void *unused,int flags,int *err);
+
+// binary load
+void *XoLoadMem (char *buf , int32 size );
+void *XoLoad (int32 fd );
+void *XoExtLoad (char *file );
+
+// binary save
+int32 XoLgSave (void *obj );
+int32 XoSaveMem (void *obj , char *fout );
+int32 XoSaveMemAlloc(void *obj, char **fout, int32 *lgout);
+int32 XoSave (void *obj , int32 fd );
+int32 XoExtSave (char *file , void *obj , char *info );
+
+// binary load + class declaration
+void *XoLoadRef (int32 fd );
+int32 XoExtLoadRef (char *file );
+int32 XoExtLoadRefDir(char *pathdir);
+
+// namespace
+int32	XoAddNameSpace(char *pname,char *uri);
+int32	XoLoadNameSpace(char *file);
+int32	XoLoadNameSpaceDir(char *path);
+int32	XoSetNameSpace(void *obj,char *apref /*NULL for all*/);
+int32	XoUnSetNameSpace(void *obj,char *apref /*NULL for all*/);
+
+// misc and debug
+int32 XoIsObix(void *obj);
+int32 XoSaveAscii (void *obj , FILE *fout );
+int32 XoDumpNbOcc (FILE *fout , int32 not0 , int32 notpredef );

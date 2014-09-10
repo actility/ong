@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resourceModeling
+	xmlns="http://uri.actility.com/m2m/ong">
+
+    <!-- OnOff (ZigBee server cluster) -->
+<!--
+    <interface filter="zigbee:/server/0x0006">
+-->
+    <interface filter="zigbee:/client/0x0006">
+        <descriptor>
+            <attr name="zbOnOff" config="retargeting" accessRight="level3"/>
+            <cmd name="zbOff" accessRight="level2"/>
+            <cmd name="zbOn" accessRight="level2"/>
+            <cmd name="zbToggle" accessRight="level2"/>
+            <point name="m2mOnOff" config="logging"/>       
+        </descriptor>
+	<covConfigurations>
+            <covConfiguration filter="zigbee:/attribute/0x0000" 
+	        minInterval="PT5M" maxInterval="PT1H" minCOV="1"/>
+	</covConfigurations>
+    </interface>
+    
+    <!-- Simple Metering (ZigBee server cluster) -->
+<!--
+    <interface filter="zigbee:/server/0x0702">
+-->
+    <interface filter="zigbee:/server/0x0052">
+        <descriptor>
+            <point name="m2mCurrentSummationDelivered" config="logging" />
+            <point name="m2mInstantaneousDemand" config="logging" />
+            <point name="extCurrentSummationDeliveredR" config="logging" />
+            <point name="extInstantaneousDemandR" config="logging" />
+        </descriptor>
+	<covConfigurations>
+            <covConfiguration  filter="zigbee:/attribute/0x0000" 
+	        minInterval="PT1M" maxInterval="PT5M" minCOV="50:50:10:5:5"/>
+	</covConfigurations>
+    </interface>  
+
+    <!-- TIC ICE Metering -->
+    <interface filter="zigbee:/server/0x0053">
+        <descriptor>
+            <point name="extTicIceData" config="logging" />
+            <point name="extTicIcePeriode0" config="logging" />
+            <point name="extTicIcePeriode1" config="logging" />
+            <point name="extTicIceType" config="logging" />
+        </descriptor>
+	<covConfigurations>
+            <covConfiguration  filter="zigbee:/attribute/0x0000" 
+	        minInterval="PT0M" maxInterval="PT0M" 
+		minCOV="$00$00$1f$80$00$00$00$1a$00$00$00$00$00$00$00$02$00$00$00$00$01$00" />
+            <covConfiguration  filter="zigbee:/attribute/0x0001" 
+	        minInterval="PT0M" maxInterval="PT0M" 
+		minCOV="$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00" />
+            <covConfiguration  filter="zigbee:/attribute/0x0002" 
+	        minInterval="PT0M" maxInterval="PT0M" 
+		minCOV="$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00" />
+	</covConfigurations>
+    </interface>  
+
+    <!-- TIC CBE Metering -->
+    <interface filter="zigbee:/server/0x0054">
+        <descriptor>
+            <point name="extTicCbeData" config="logging" />
+            <point name="extTicCbeType" config="logging" />
+        </descriptor>
+	<covConfigurations>
+            <covConfiguration  filter="zigbee:/attribute/0x0000" 
+	        minInterval="PT1M" maxInterval="PT5M" 
+		minCOV="$ff$ff$ff$ff$ff$ff$ff$ff$00$00$00$01$00$00$00$00$00$00$00$32"/>
+	</covConfigurations>
+    </interface>  
+
+    <!-- TIC CJE Metering -->
+    <interface filter="zigbee:/server/0x0055">
+        <descriptor>
+            <point name="extTicCjeData" config="logging" />
+            <point name="extTicCjeType" config="logging" />
+        </descriptor>
+	<covConfigurations>
+            <covConfiguration  filter="zigbee:/attribute/0x0000" 
+	        minInterval="PT1M" maxInterval="PT5M" 
+		minCOV="$ff$ff$ff$ff$ff$ff$ff$ff$00$00$00$00$00$00$00$00"/>
+	</covConfigurations>
+    </interface>  
+
+    <!-- Illuminance Measurement (ZigBee server cluster) -->
+    <interface filter="zigbee:/server/0x0400">
+        <descriptor>
+            <point name="m2mMeasuredValue" config="logging"/>
+        </descriptor>
+	<covConfigurations>
+        <covConfiguration filter="zigbee:/attribute/0x0000" 
+	    minInterval="PT5M" maxInterval="PT1H" minCOV="50"/>
+	</covConfigurations>
+    </interface>    
+
+    <!-- Temperature Measurement (ZigBee server cluster) -->
+    <interface filter="zigbee:/server/0x0402">
+        <descriptor>
+            <point name="m2mMeasuredValue" config="logging"/>
+        </descriptor>
+	<covConfigurations>
+        <covConfiguration filter="zigbee:/attribute/0x0000" 
+	    minInterval="PT5M" maxInterval="PT1H" minCOV="50"/>
+	</covConfigurations>
+    </interface>    
+
+    <!-- Relative Humidity Measurement (ZigBee server cluster) -->
+    <interface filter="zigbee:/server/0x0405"> 
+        <descriptor>
+            <point name="m2mMeasuredValue" config="logging"/>
+        </descriptor>
+	<covConfigurations>
+        <covConfiguration filter="zigbee:/attribute/0x0000" 
+	    minInterval="PT5M" maxInterval="PT1H" minCOV="50"/>
+	</covConfigurations>
+    </interface>
+
+    <!-- Occupancy Measurement (ZigBee server cluster) -->
+    <interface filter="zigbee:/server/0x0406"> 
+        <descriptor>
+            <point name="m2mMeasuredValue" config="logging"/>
+        </descriptor>
+	<covConfigurations>
+        <covConfiguration filter="zigbee:/attribute/0x0000" 
+	    minInterval="PT5M" maxInterval="PT1H" minCOV="1"/>
+	</covConfigurations>
+    </interface>
+
+    <!-- Analogic Measurement (Watteco server cluster) -->
+    <interface filter="zigbee:/server/0x000c"> 
+        <descriptor>
+            <point name="m2mMeasuredValue" config="logging"/>
+        </descriptor>
+	<covConfigurations>
+        <covConfiguration filter="zigbee:/attribute/0x0055" 
+	    minInterval="PT5M" maxInterval="PT1H" minCOV="50"/>
+	</covConfigurations>
+    </interface>
+
+    <!-- Binary Measurement (Watteco server cluster) -->
+    <interface filter="zigbee:/server/0x000f"> 
+        <descriptor>
+            <point name="m2mMeasuredValue" config="logging"/>
+            <point name="extCounter" config="logging"/>
+        </descriptor>
+	<covConfigurations>
+        <covConfiguration filter="zigbee:/attribute/0x0055" 
+	    minInterval="PT5M" maxInterval="PT1H" minCOV="1"/>
+        <covConfiguration filter="zigbee:/attribute/0x0402" 
+	    minInterval="PT5M" maxInterval="PT1H" minCOV="1"/>
+	</covConfigurations>
+    </interface>
+
+</resourceModeling>

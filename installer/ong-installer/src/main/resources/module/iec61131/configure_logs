@@ -1,0 +1,1 @@
+sed -i -e "s|^<list name=\"parameters\">|<list name=\"parameters\">\n  <int name=\"tracesize\" val=\"$LOG_IEC61131_SIZE\"/>|" $ROOTACT/usr/etc/iec61131/spvconfig.xml

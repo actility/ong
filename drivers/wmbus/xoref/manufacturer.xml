@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resourceManufacturer xmlns="http://uri.actility.com/m2m/adaptor-wmbus">
+    <preprocessor min="00110000000000" max="001100FFFFFFFF" module="nxp" fcnt="OM13006" />
+    <preprocessor min="0000" max="FFFF" module="other" fcnt="other" />
+</resourceManufacturer>

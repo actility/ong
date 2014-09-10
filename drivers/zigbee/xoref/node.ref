@@ -1,0 +1,41 @@
+
+#include "misc.ref"
+
+zigb:attribute from ong:t_xml_obj
+{
+  zigb:clusterId    XoString          { }
+  zigb:attrId       XoString          { }
+  zigb:manuCode     XoString          { }
+  zigb:dataType     XoString          { }
+  zigb:value        XoString          { }
+}
+
+zigb:endPoint from ong:t_xml_obj
+{
+  zigb:endPointId   XoString          { }
+  zigb:appProfId    XoString          { }
+  zigb:appDeviceId  XoString          { }
+  zigb:appDevVer    XoString          { }
+	zigb:clusterIn		XoString	        { list }
+	zigb:clusterOut		XoString	        { list }
+  zigb:attributes   zigb:attribute    { list }
+}
+
+zigb:node	from ong:t_xml_obj
+{
+	zigb:panId     		XoString	        { }
+	zigb:extPanId  		XoString	        { }
+	zigb:rfChan   		XoString	        { }
+	zigb:manuCode 		XoString	        { }
+	zigb:nodeType 		XoString	        { }
+	zigb:powerMode 		XoString	        { }
+	zigb:powerSource	XoString	        { }
+	zigb:powerLevel		XoString	        { }
+	zigb:ieeeAddr 		XoString	        { }
+	zigb:shortAddr 		XoString	        { }
+  zigb:toDelete     XoString          { default="0" }
+  zigb:endPoints    zigb:endPoint     { list } 
+}
+
+
+

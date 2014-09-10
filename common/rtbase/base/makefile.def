@@ -1,0 +1,290 @@
+
+#
+#	included by all makefile
+#
+
+include $(ROOTACT)/rtbase/base/TARGET
+include $(ROOTACT)/rtbase/base/command.def
+
+THREADLD=-lpthread
+
+XML2INC=$(ROOTACT)/include/libxml2
+XML2LIB=$(ROOTACT)/lib/libxml2.a
+XML2LD=-lxml2
+
+DEFINC=-I$(ROOTACT)/rtbase/include
+DEFLIB=\
+	$(ROOTACT)/rtbase/lib/librtbase.a
+
+ifeq ($(SYSTEM),linux-x86)
+#	on generic linux we use the default xml2
+	XML2INC=/usr/include/libxml2
+	XML2LIB  = $(shell pkg-config --variable=libdir libxml-2.0)/libxml2.a
+	XML2LIB ?= /usr/lib/libxml2.a
+
+	CC=gcc
+	CFLAGS=-m32 -Wall -O3 -fPIC -DLINUX -fPIC -g
+	CFLAGSNOO=-m32 -Wall -fPIC -DLINUX -fPIC -g
+	CCFLAGS=$(CFLAGS)
+
+	LD=$(CC)
+	CCLD=$(CC)
+	LDFLAGS=-m32 -lrt
+
+	LDSOFLAGS=-m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+	AR=ar
+	ARFLAGS=rv
+endif
+
+ifeq ($(SYSTEM),linux-x86_64)
+#	on generic linux we use the default xml2
+	XML2INC=/usr/include/libxml2
+	XML2LIB  = $(shell pkg-config --variable=libdir libxml-2.0)/libxml2.a
+	XML2LIB ?= /usr/lib/libxml2.a
+
+	CC=gcc
+	CFLAGS=-Wall -O3 -fPIC -DLINUX -g
+	CFLAGSNOO=-Wall -fPIC -DLINUX -g
+	CCFLAGS=$(CFLAGS)
+
+	LD=$(CC)
+	CCLD=$(CC)
+	LDFLAGS=-lrt
+	LDSOFLAGS=-shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+	AR=ar
+	ARFLAGS=rv
+endif
+
+#
+# kerlink wirmav2
+# this a ARM but in little endian mode like x86 !!!!!!!!!!!!!!!!
+#
+ifeq ($(SYSTEM),wirmav2)
+    CC=arm-none-linux-gnueabi-gcc
+    CFLAGS=-Wall -O3 -fPIC -DLINUX -DARCHARM -DWIRMAV2
+    CFLAGSNOO=-Wall -fPIC -DLINUX -DARCHARM -DWIRMAV2
+    CCFLAGS=$(CFLAGS)
+
+    LD=$(CC)
+    CCLD=$(CC)
+    LDFLAGS=-L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lrt
+    LDSOFLAGS=-m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+    AR=ar
+    ARFLAGS=rv
+endif
+
+#
+# panrouter watteco linux angstrom
+# toolchain :
+#http://www.codesourcery.com/sgpp/lite/arm/portal/package4573/public/
+#	arm-none-linux-gnueabi/arm-2009q1-203-arm-none-linux-gnueabi.bin
+#
+ifeq ($(SYSTEM),angstrom_panrouter)
+    CC=arm-none-linux-gnueabi-gcc
+    CFLAGS=-Wall -O3 -fPIC -DLINUX -DARCHARM
+    CFLAGSNOO=-Wall -fPIC -DLINUX -DARCHARM
+    CCFLAGS=$(CFLAGS)
+
+    LD=$(CC)
+    CCLD=$(CC)
+    LDFLAGS=-L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lrt
+    LDSOFLAGS=-m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+    AR=ar
+    ARFLAGS=rv
+endif
+
+#
+# panrouter watteco android
+# toolchain :
+# wget http://dl.google.com/android/ndk/android-ndk-r7-linux-x86.tar.bz2
+# wget http://dl.dropbox.com/u/1213413/htdocs/agcc/agcc.bash
+#
+ifeq ($(SYSTEM),android_panrouter)
+    CC=$(ROOTACT)/agcc.bash
+    CFLAGS=-Wall -O3 -fPIC -DLINUX -DANDROID -DARCHARM
+    CFLAGSNOO=-Wall -fPIC -DLINUX -DANDROID -DARCHARM
+    CCFLAGS=$(CFLAGS)
+
+    LD=$(CC)
+    CCLD=$(CC)
+    LDFLAGS=-L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lz -ldl -lrt
+    LDSOFLAGS=-m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+    AR=ar
+    ARFLAGS=rv
+
+    THREADLD=
+endif
+
+
+
+ifeq ($(SYSTEM),cov1)
+	CC=arm-linux-gcc
+	CFLAGS=-Wall -O3 -fPIC -mcpu=arm920t -DLINUX -DARCHARM
+	CFLAGSNOO=-Wall -fPIC -mcpu=arm920t -DLINUX -DARCHARM
+	CCFLAGS=$(CFLAGS)
+
+	LD=$(CC)
+	CCLD=$(CC)
+	LDFLAGS=-mcpu=arm920t -L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lrt
+	LDSOFLAGS=-mcpu=arm920t -m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+	AR=ar
+	ARFLAGS=rv
+endif
+
+ifeq ($(SYSTEM),cov1_debug)
+	CC=arm-linux-gcc
+	CFLAGS=-Wall -O3 -fPIC -mcpu=arm920t -DLINUX -DARCHARM -g
+	CFLAGSNOO=-Wall -fPIC -mcpu=arm920t -DLINUX -DARCHARM -g
+	CCFLAGS=$(CFLAGS)
+
+	LD=$(CC)
+	CCLD=$(CC)
+	LDFLAGS=-mcpu=arm920t -L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lrt
+	LDSOFLAGS=-mcpu=arm920t -m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+	AR=ar
+	ARFLAGS=rv
+endif
+
+ifeq ($(SYSTEM),cov2)
+    CC=arm-none-linux-gnueabi-gcc
+    CFLAGS=-Wall -O3 -fPIC -mcpu=arm920t -DLINUX -DARCHARM
+    CFLAGSNOO=-Wall -fPIC -mcpu=arm920t -DLINUX -DARCHARM
+    CCFLAGS=$(CFLAGS)
+
+    LD=$(CC)
+    CCLD=$(CC)
+    LDFLAGS=-mcpu=arm920t -L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lrt
+    LDSOFLAGS=-mcpu=arm920t -m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+    AR=ar
+    ARFLAGS=rv
+endif
+
+ifeq ($(SYSTEM),cov2_debug)
+    CC=arm-none-linux-gnueabi-gcc
+    CFLAGS=-Wall -O3 -fPIC -mcpu=arm920t -DLINUX -DARCHARM -g
+    CFLAGSNOO=-Wall -fPIC -mcpu=arm920t -DLINUX -DARCHARM -g
+    CCFLAGS=$(CFLAGS)
+
+    LD=$(CC)
+    CCLD=$(CC)
+    LDFLAGS=-mcpu=arm920t -L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lrt
+    LDSOFLAGS=-mcpu=arm920t -m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+    AR=ar
+    ARFLAGS=rv
+endif
+
+ifeq ($(SYSTEM),lpv3)
+    CC=mips-openwrt-linux-uclibc-gcc
+    CFLAGS=-Wall -O3 -fPIC -DLINUX -DARCHARM -DWORDS_BIGENDIAN=1
+    CFLAGSNOO=-Wall -fPIC -DLINUX -DARCHARM -DWORDS_BIGENDIAN=1
+    CCFLAGS=$(CFLAGS)
+
+    LD=$(CC)
+    CCLD=$(CC)
+    LDFLAGS=-L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lrt
+    LDSOFLAGS=-m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+    AR=ar
+    ARFLAGS=rv
+endif
+
+ifeq ($(SYSTEM),lpv3_debug)
+    CC=mips-openwrt-linux-uclibc-gcc
+    CFLAGS=-Wall -O3 -fPIC -DLINUX -DARCHARM -DWORDS_BIGENDIAN=1 -g
+    CFLAGSNOO=-Wall -fPIC -DLINUX -DARCHARM -DWORDS_BIGENDIAN=1 -g
+    CCFLAGS=$(CFLAGS)
+
+    LD=$(CC)
+    CCLD=$(CC)
+    LDFLAGS=-L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lrt
+    LDSOFLAGS=-m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+    AR=ar
+    ARFLAGS=rv
+endif
+
+
+ifeq ($(SYSTEM),centos6-x86)
+	CC=gcc
+	CFLAGS=-m32 -Wall -O3 -fPIC -DLINUX -g
+	CFLAGSNOO=-m32 -Wall -fPIC -DLINUX -g
+	CCFLAGS=$(CFLAGS)
+
+	LD=$(CC)
+	CCLD=$(CC)
+	LDFLAGS=-m32 -L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lrt
+
+	LDSOFLAGS=-m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+	AR=ar
+	ARFLAGS=rv
+endif
+
+ifeq ($(SYSTEM),centos6-x86_64)
+    CC=gcc
+    CFLAGS=-Wall -O3 -fPIC -DLINUX -g
+    CFLAGSNOO=-Wall -fPIC -DLINUX -g
+    CCFLAGS=$(CFLAGS)
+
+    LD=$(CC)
+    CCLD=$(CC)
+    LDFLAGS=-L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lrt
+
+    LDSOFLAGS=-shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+    AR=ar
+    ARFLAGS=rv
+endif
+
+ifeq ($(SYSTEM),macosx-x86)
+	CC=gcc
+	CFLAGS=-m32 -Wall -O3 -DLINUX -DMACOSX -g
+	CFLAGSNOO=-m32 -Wall -DLINUX -DMACOSX -g
+	CCFLAGS=$(CFLAGS)
+
+	LD=$(CC)
+	CCLD=$(CC)
+	LDFLAGS=-m32 -lrt
+	LDSOFLAGS=-m32 -shared -fPIC
+
+	AR=ar
+	ARFLAGS=rv
+endif
+
+#
+# raspberry pi, with Actility OS choice
+# toolchain is poky linux-gnueabi 1.4.1
+#
+ifeq ($(SYSTEM),rpib)
+  CC=arm-poky-linux-gnueabi-gcc  -march=armv6 -mthumb-interwork -mfloat-abi=softfp --sysroot=$(TOOLCHAIN_HOME)/sysroots/armv6-vfp-poky-linux-gnueabi -I$(TOOLCHAIN_HOME)/sysroots/armv6-vfp-poky-linux-gnueabi/usr/include
+  CFLAGS=-pipe -g -feliminate-unused-debug-types -Wall -O3 -fPIC -DLINUX -DARCHARM
+  CFLAGSNOO=-pipe -g -feliminate-unused-debug-types -Wall -fPIC -DLINUX -DARCHARM
+  CCFLAGS=$(CFLAGS)
+  
+  LD=arm-poky-linux-gnueabi-gcc  -march=armv6 -mthumb-interwork -mfloat-abi=softfp --sysroot=$(TOOLCHAIN_HOME)/sysroots/armv6-vfp-poky-linux-gnueabi
+  CCLD=$(CC)
+  LDFLAGS=-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+  LDSOFLAGS=-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+  
+  AR=ar
+  ARFLAGS=rv
+endif
+
+
+
+
+MKWHAT=$(ROOTACT)/rtbase/shells/mkwhat.sh
+
+#$@ : target name
+#$* : target name without suffixe
+#$< : first dependency name
+#$^ : dependency list

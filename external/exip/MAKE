@@ -1,0 +1,81 @@
+if [ -z "$ROOTACT" ]
+then
+	Error "ROOTACT not specified"
+	exit 1
+fi
+source $ROOTACT/rtbase/base/system
+
+SELF=exip
+EXIP_VERSION=`cat ./Version`
+echo "#####"
+echo	"$SELF for $SYSTEM"
+
+Compile()
+{
+# TARGET=pc|android|contiki
+
+	(cd build/gcc && make TARGET=pc $*)
+#	(cd actility && make)
+	cp ./bin/lib/libexip.so.${EXIP_VERSION} $ROOTACT/shlib
+#	cp ./examples/*/*.exi ./bin/examples
+#	cp ./ENC ./DEC ./bin/examples
+	(cd $ROOTACT/shlib && ln -sf ./libexip.so.${EXIP_VERSION} ./libexip.so)
+}
+
+Clean()
+{
+	(cd build/gcc && make TARGET=pc $*)
+	(cd actility && make $*)
+}
+
+# frequemment oublié dans les makefile
+CleanPlus()
+{	
+	rm */core.* > /dev/null 2>&1
+	rm */core > /dev/null 2>&1
+	rm */TRACE_* > /dev/null 2>&1
+	rm */*.log > /dev/null 2>&1
+}
+
+
+case  $# in
+	0)
+#		Compile act_dynlib examples utils
+		Compile act_dynlib
+		exit 0
+		;;
+	*)	case $1 in
+			src|source)
+				shift
+				./MAKE clean
+				sh ${MKPKGSOURCE} -p $SELF $*
+				exit 0
+			;;
+			runtime)
+				shift
+				./MAKE
+				sh ${MKPKGRUNTIME} -p $SELF
+				exit 0
+			;;
+			clean)
+				shift
+				CleanPlus
+				Clean clean
+				exit 0
+				;;
+			config)
+				shift
+				vi ./build/gcc/pc/exipConfig.h
+				exit 0
+				;;
+			*)
+				Compile $*
+				exit 0
+				;;
+		esac
+	;;
+esac
+
+echo "Usage: MAKE [clean|runtime|src|source]"
+exit 1
+

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright   Actility, SA. All Rights Reserved.
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+  
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License version
+  2 only, as published by the Free Software Foundation.
+  
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  General Public License version 2 for more details (a copy is
+  included at /legal/license.txt).
+  
+  You should have received a copy of the GNU General Public License
+  version 2 along with this work; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA
+  
+  Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+  or visit www.actility.com if you need additional
+  information or have any questions.
+  
+  id $Id: pom.xml 6703 2013-12-05 14:33:39Z JReich $
+  author $Author: JReich $
+  version $Revision: 6703 $
+  lastrevision $Date: 2013-12-05 15:33:39 +0100 (Thu, 05 Dec 2013) $
+  modifiedby $LastChangedBy: JReich $
+  lastmodified $LastChangedDate: 2013-12-05 15:33:39 +0100 (Thu, 05 Dec 2013) $
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.actility.m2m</groupId>
+    <artifactId>java.pom</artifactId>
+    <version>2.0.0</version>
+  </parent>
+  <artifactId>java.cdc.pom</artifactId>
+  <version>3.0.0</version>
+  <packaging>pom</packaging>
+
+  <name>Actility CDC Parent POM</name>
+
+  <licenses>
+    <license>
+      <name>GPL v2.0</name>
+      <url>http://www.gnu.org/licenses/gpl-2.0.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <profiles>
+    <profile>
+      <id>cov1</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>cov1</value>
+        </property>
+      </activation>
+      <properties>
+        <build.type>cov1</build.type>
+        <build.arch>arm</build.arch>
+      </properties>
+    </profile>
+    <profile>
+      <id>cov2</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>cov2</value>
+        </property>
+      </activation>
+      <properties>
+        <build.type>cov2</build.type>
+        <build.arch>arm</build.arch>
+      </properties>
+    </profile>
+    <profile>
+      <id>lpv3</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>lpv3</value>
+        </property>
+      </activation>
+      <properties>
+        <build.type>lpv3</build.type>
+        <build.arch>mips</build.arch>
+      </properties>
+    </profile>
+  </profiles>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.sun</groupId>
+        <artifactId>jsse</artifactId>
+        <version>1.0.3_04</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.sun</groupId>
+        <artifactId>jnet</artifactId>
+        <version>1.0.3_04</version>
+        <scope>provided</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>1.3</source>
+            <target>1.3</target>
+          </configuration>
+          <executions>
+            <execution>
+              <id>default-testCompile</id>
+              <phase>process-test-sources</phase>
+              <goals>
+                <goal>testCompile</goal>
+              </goals>
+              <configuration>
+                <source>1.5</source>
+                <target>1.5</target>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

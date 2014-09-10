@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<knx xmlns="http://uri.actility.com/m2m/adaptor-knx" gateway="ip:127.0.0.1">
+   <devices>
+      <device addr="1.1.10"
+              area="Nouvelle zone"
+              line="Nouvelle ligne"
+              manufacturer="M-0001"
+              fw="981D-01-54E8"
+              name="Load switch N 511/02 (8-fold), blink before off"
+              description="8 x 16A">
+         <groupAddr name="gogogo" addr="1" dptId="1.001"/>
+         <groupAddr name="Nouvelle adresse de groupe" addr="2" dptId="1.001"/>
+         <groupAddr name="Nouvelle adresse de groupe" addr="3" dptId="1.001"/>
+         <groupAddr name="Nouvelle adresse de groupe" addr="4" dptId="1.001"/>
+         <groupAddr name="Nouvelle adresse de groupe" addr="5" dptId="1.001"/>
+         <groupAddr name="Nouvelle adresse de groupe" addr="6" dptId="1.001"/>
+         <groupAddr name="Nouvelle adresse de groupe" addr="7" dptId="1.001"/>
+         <groupAddr name="Nouvelle adresse de groupe" addr="8" dptId="1.001"/>
+      </device>
+      <device addr="1.1.11"
+              area="Nouvelle zone"
+              line="Nouvelle ligne"
+              manufacturer="M-006A"
+              fw="0002-22-311F-O0079"
+              name="KNX/EIB Universal Präsenzmelder 360 KLR"
+              description="KNX/EIB Universal Präsenzmelder 360 KLR">
+         <groupAddr name="gogogo" addr="1" dptId="1.001"/>
+      </device>
+   </devices>
+</knx>

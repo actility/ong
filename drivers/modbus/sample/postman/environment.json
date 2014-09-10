@@ -1,0 +1,12 @@
+{
+    "id": "6d77cbe2-88dd-7483-72a4-bac8ddc23ceb",
+    "name": "Actility",
+    "values": [
+        {
+            "key": "GSC",
+            "value": "192.168.1.170:8080",
+            "type": "text"
+        }
+    ],
+    "timestamp": 1384765168040
+}

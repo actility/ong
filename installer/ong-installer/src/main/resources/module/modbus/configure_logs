@@ -1,0 +1,1 @@
+sed -i -e "s|^<list name=\"parameters\">|<list name=\"parameters\">\n  <int name=\"tracesize\" val=\"$LOG_KNX_SIZE\"/>|" $ROOTACT/usr/etc/modbus/spvconfig.xml

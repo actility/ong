@@ -1,0 +1,31 @@
+From 19525577f2dc2309f089a7a26908ff2b1cf260ca Mon Sep 17 00:00:00 2001
+From: jreich <jreich@CentOS6-jreich.(none)>
+Date: Tue, 13 Nov 2012 18:00:17 +0100
+Subject: [PATCH] remove debug loadlibrary
+
+---
+ .../cdc/src/share/native/java/lang/System.c        |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/share/native/java/lang/System.c b/phoneme_advanced_mr2_b167/cdc/src/share/native/java/lang/System.c
+index fe69031..6498728 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/share/native/java/lang/System.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/share/native/java/lang/System.c
+@@ -301,10 +301,10 @@ Java_java_lang_System_mapLibraryName(JNIEnv *env, jclass ign, jstring libname)
+     cpchars(chars, JNI_LIB_PREFIX, prefix_len);
+     (*env)->GetStringRegion(env, libname, 0, len, chars + prefix_len);
+     len += prefix_len;
+-#ifdef CVM_DEBUG
+-    chars[len++] = '_';
+-    chars[len++] = 'g';
+-#endif
++//#ifdef CVM_DEBUG
++//    chars[len++] = '_';
++//    chars[len++] = 'g';
++//#endif
+     cpchars(chars + len, JNI_LIB_SUFFIX, suffix_len);
+     len += suffix_len;
+ 
+-- 
+1.7.1
+

@@ -1,0 +1,158 @@
+
+DEFINE
+{
+}
+
+DESC	= "xo-obix-description"
+
+o:t_xml_obix_attr
+{
+	name		XoString	{ }
+	value		XoString	{ }
+}
+
+/*
+ *	OBIX objects are generic XO/XML objects with possible custom attributs
+ */
+o:t_xml_obix_obj
+{
+	name$			XoString
+	/* undefined/custom XML attributs list */
+	custom$		o:t_xml_obix_attr	{ EMBATTR LIST }
+}
+
+/* 
+ *	OBIX object class
+ */
+o:obj	FROM o:t_xml_obix_obj
+{
+	/* defined/normative XML attributs */
+	name		XoString	{ EMBATTR }
+	href		XoString	{ EMBATTR }
+	is		XoString	{ EMBATTR }
+	null		XoString	{ EMBATTR /*DEFAULT="false"*/ 
+						VALUE="true|false" LGMAX=5 }
+	icon		XoString	{ EMBATTR }
+	displayName	XoString	{ EMBATTR }
+	display		XoString	{ EMBATTR }
+	writable	XoString	{ EMBATTR /*DEFAULT="false"*/
+						VALUE="true|false" LGMAX=5 }
+	status		XoString	{ EMBATTR }
+
+
+	/* list of sub-objects */
+	wrapper$	XoVoidObj	{ LIST }
+}
+
+
+/* 
+ *	OBIX sub-objects classes : list, op, feed, ref, err
+ */
+o:list	FROM o:obj
+{
+	of		XoString	{ EMBATTR }
+	wrapper$	XoVoidObj	{ LIST }
+
+}
+
+o:op	FROM o:obj
+{
+	in		XoString	{ EMBATTR }
+	out		XoString	{ EMBATTR }
+
+}
+
+o:feed	FROM o:obj
+{
+	in		XoString	{ EMBATTR }
+	of		XoString	{ EMBATTR }
+
+}
+
+o:ref	FROM o:obj
+{
+}
+
+o:err	FROM o:obj
+{
+}
+
+/* 
+ *	OBIX "value sub-objects" classes : bool,int,real,str,enum,uri,
+ *	abstime,reltime,date,time
+ */
+o:bool	FROM o:obj
+{
+	val		XoString	{ EMBATTR /*DEFAULT="false"*/
+						VALUE="true|false" LGMAX=5 }
+}
+
+o:int	FROM o:obj
+{
+	val		XoString	{ EMBATTR }
+	min		XoString	{ EMBATTR }
+	max		XoString	{ EMBATTR }
+	unit		XoString	{ EMBATTR }
+
+}
+
+o:real	FROM o:obj
+{
+	val		XoString	{ EMBATTR }
+	min		XoString	{ EMBATTR }
+	max		XoString	{ EMBATTR }
+	unit		XoString	{ EMBATTR }
+	precision	XoString	{ EMBATTR }
+
+}
+
+o:str	FROM o:obj
+{
+	val		XoString	{ EMBATTR }
+	min		XoString	{ EMBATTR }
+	max		XoString	{ EMBATTR }
+}
+
+o:enum	FROM o:obj
+{
+	val		XoString	{ EMBATTR }
+	range		XoString	{ EMBATTR }
+}
+
+o:uri	FROM o:obj
+{
+	val		XoString	{ EMBATTR }
+}
+
+o:abstime	FROM o:obj
+{
+	val		XoString	{ EMBATTR }
+	min		XoString	{ EMBATTR }
+	max		XoString	{ EMBATTR }
+	tz		XoString	{ EMBATTR }
+}
+
+o:reltime	FROM o:obj
+{
+	val		XoString	{ EMBATTR }
+	min		XoString	{ EMBATTR }
+	max		XoString	{ EMBATTR }
+}
+
+o:date	FROM o:obj
+{
+	val		XoString	{ EMBATTR }
+	min		XoString	{ EMBATTR }
+	max		XoString	{ EMBATTR }
+	tz		XoString	{ EMBATTR }
+}
+
+o:time	FROM o:obj
+{
+	val		XoString	{ EMBATTR }
+	min		XoString	{ EMBATTR }
+	max		XoString	{ EMBATTR }
+	tz		XoString	{ EMBATTR }
+}
+
+

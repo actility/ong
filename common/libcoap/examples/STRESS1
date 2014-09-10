@@ -1,0 +1,6 @@
+function req()
+{
+	./coap-client -S100 -T1234 /toto?RequestingEntity=hello 2>/dev/null
+}
+
+while true; do req; done

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+x-template="${w_template}"
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="OccupancyMeasurement.Srv" status="cfg-mandatory"/>
+    <str name="clusterID" val="0x0406" status="cfg-mandatory"/>
+    <enum name="clusterType" val="server" status="cfg-mandatory"/>
+            
+    <op name="zbCovConfig"
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x0406.0xFF.ope"/>
+
+    <!-- ZigBee attributes -->
+    <!-- ZigBee commands -->
+            
+    <!-- M2M POINTS  -->
+    <int name="m2mMeasuredValue" unit="" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0406.0x0000.0.m2m/contentInstances/latest/content"/>
+</obj>

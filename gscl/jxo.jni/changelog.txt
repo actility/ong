@@ -1,0 +1,33 @@
+-------------------------------------------------------------------------------
+JXo native Service implementation for JNI - changelog
+-------------------------------------------------------------------------------
+Version: 1.2.1
+Date: 2014-06-10
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Unary tests didn't pass under target centos6-x86_64; fixed.
+ - Updated APU dependencies for native part (libxml2-2.7.8-1 ->
+   libxml2-2.7.8-2)
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2014-03-26
+
+New Features:
+-------------
+ - Added EXI support for centos6-x86 target
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2014-03-21
+
+Initial version

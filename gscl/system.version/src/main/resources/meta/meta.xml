@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<obj href="/gsc/apps/system/">
+  <str href="meta/" writable="false" displayName="Meta description" display="Describes retargeted resources" />
+  <list href="config/" writable="false" displayName="Configuration" display="Retrieves the deployed bundles" of="obix:obj">
+    <obj writable="false" displayName="BundleConfig" display="Configuration and state of the deployed bundles">
+    <!-- 
+      <str writable="false" name="name" displayName="SymbolicName" display="Symbolic name of the bundle" />
+      <str writable="false" name="version" displayName="Version" display="Version of the bundle" />
+      <enum writable="false" name="state" range="#RBundleState" displayName="State" display="Current state of the bundle">
+       -->
+      <str writable="false" name="name" displayName="SymbolicName" display="Symbolic name of the bundle" />
+      <str writable="false" name="vers" displayName="Version" display="Version of the bundle" />
+      <enum writable="false" name="st" range="#RBundleState" displayName="State" display="Current state of the bundle">
+        <list href="#RBundleState" is="obix:Range">
+          <obj name="UNINSTALLED" />
+          <obj name="INSTALLED" />
+          <obj name="RESOLVED" />
+          <obj name="STARTING" />
+          <obj name="STOPPING" />
+          <obj name="ACTIVE" />
+        </list>
+      </enum>
+    </obj>
+  </list>
+  <op href="openSshTunnel" in="#SshTunnelIn" out="obix:null" displayName="openSshTunnel">
+    <obj href="#SshTunnelIn">
+      <int name="remotePort" display="listening port on centralized server" displayName="remotePort" />
+      <reltime name="maxDuration" display="Connection maximum duration" displayName="maxDuration" />
+    </obj>
+  </op>
+  <op href="closeSshTunnel" in="obix:null" out="obix:null" displayName="closeSshTunnel" />
+</obj>

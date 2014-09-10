@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <list name="parameters">
+	    <int name="tracelevel" val="0"/>
+	    <int name="tracedebug" val="0"/>
+	    <int name="withdia" val="1"/>
+	    <int name="tracedia" val="0"/>
+	    <int name="pseudoong" val="0"/>
+    </list>
+
+    <list name="variables">
+        <str name="w_nsclbaseuri" val="http://nsc1.actility.com:8088/m2m"/>
+	    <str name="w_tpkdev" val=""/>
+	    <str name="w_domainname" val="actility.com"/>
+	    <str name="w_driverpath" val="modbus"/>
+	    <str name="w_ipuid" val="IPU_MODBUS"/>
+	    <str name="s_telnetkey" val="123"/>
+	    <str name="s_telnetport" val="2005"/>
+	    <str name="w_coapaddr_l" val="::1"/>
+	    <str name="w_coapport_l" val="5689"/>
+	    <str name="w_coapaddr_r" val="::1"/>
+	    <str name="w_coapport_r" val="5683"/>
+	    
+	    <!-- Specific to modbus -->
+	    <str name="loggingDefaultCovMinInterval" val="PT5S"/>
+	    <str name="loggingDefaultCovMaxInterval" val="PT1H"/>
+    </list>
+</obj>
+

@@ -1,0 +1,12 @@
+chmod 755 $ROOTACT/etc/init.d/wmbus
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/init.d/wmbus
+mkdir -p $ROOTACT/etc/rc.d
+cd $ROOTACT/etc/rc.d
+ln -fs ../init.d/wmbus S08wmbus
+chmod 755 $ROOTACT/bin/wmbus.x
+mkdir -p $ROOTACT/usr/etc/wmbus/
+[ -f $ROOTACT/usr/etc/wmbus/modelconfig.xml ] || \
+cp $ROOTACT/etc/wmbus/modelconfig.xml $ROOTACT/usr/etc/wmbus/
+[ -f $ROOTACT/usr/etc/wmbus/spvconfig.xml ] || \
+cp $ROOTACT/etc/wmbus/spvconfig.xml $ROOTACT/usr/etc/wmbus/
+

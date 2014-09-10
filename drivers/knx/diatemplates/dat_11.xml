@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<date val="${dpt_value}" xmlns="http://obix.org/ns/schema/1.1">
+    <int name="Year" val="${raw_Year}"/>
+    <int name="Month" val="${raw_Month}"/>
+    <int name="Day" val="${raw_Day}"/>
+    <str name="raw" val="0x${dpt_raw}"/>
+</date>

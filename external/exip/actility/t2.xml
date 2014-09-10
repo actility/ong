@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:subscription xmlns:m2m="http://uri.etsi.org/m2m" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="m2m:ContentInstanceFilterCriteriaType">
+  <creator>http://www.creator.org</creator>
+</m2m:subscription>

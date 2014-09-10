@@ -1,0 +1,110 @@
+-------------------------------------------------------------------------------
+Maven Cocoon Plugin changelog
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+- Added the possibility to exclude products or modules
+
+Bug Fixes:
+----------
+- Fixed bundle configuration which was broken
+
+-------------------------------------------------------------------------------
+Version: 1.4.2
+Date: 2013-01-08
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Fixed. Do not hide RuntimeException while executing
+
+-------------------------------------------------------------------------------
+Version: 1.4.1
+Date: 2012-11-27
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Fixed. Now prints the classifier of all dependency
+
+-------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2012-11-22
+
+New Features:
+-------------
+- Added the possibility to specify architectures to exclude when generating
+  rootact directory
+- Changed project name from maven-cocoon-plugin to cocoon-maven-plugin
+
+Bug Fixes:
+----------
+- N/A
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2012-10-05
+
+New Features:
+-------------
+- Added new generate-kf-init goal
+- Added new generate-cocoon-rootact goal
+
+Bug Fixes:
+----------
+- N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2012-06-05
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Fixed firmwareEntriesConfiguration must be optional
+
+-------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2012-05-03
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- <firmwareEntriesConfiguration> tag did not allow specifying the package
+  version for building firmware file. Fixed: this is now required to generate 
+  two firmware files, one with ZigBee HA Standard security and one without 
+  ZigBee security. 
+
+-------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2012-04-18
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Firmware version number string was wrongly generated in 
+  "firmware-manifest.properties" file, suffixed with ".null" string when no
+  qualifier is set.     
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2012-03-13
+Initial version

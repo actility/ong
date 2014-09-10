@@ -1,0 +1,17 @@
+
+#
+# Post a configuration and a mapping into the GSCL
+# Usage : post <local application> <GSC application>
+#
+
+USER="http%3a//nsc1.actility.com%3a8088/m2m/applications/SYSTEM:"
+TYPE="Content-Type: application/xml"
+App=$2
+
+RES="http://192.168.1.116:8080/m2m/applications/${App}/containers/configurations/contentInstances/"
+FILE=@"$1"/plc.xml
+curl -v -H "$TYPE" -X POST --data-binary $FILE -u "$USER" $RES
+
+FILE=@"$1"/m2mMapping.xml
+RES="http://192.168.1.116:8080/m2m/applications/${App}/containers/mappings/contentInstances/"
+curl -v -H "$TYPE" -X POST --data-binary $FILE -u "$USER" $RES

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list name="ranges" xmlns="http://obix.org/ns/schema/1.1">
+    <!--
+        DPT 2.xxx
+    -->
+    <list href="knx:ranges/dpt2_001" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlOff" val="2"/>
+	    <int name="controlOn" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_002" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlFalse" val="2"/>
+        <int name="controlTrue" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_003" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlDisable" val="2"/>
+	    <int name="controlEnable" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_004" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlNoRamp" val="2"/>
+	    <int name="controlRamp" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_005" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlNoAlarm" val="2"/>
+	    <int name="controlAlarm" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_006" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlLow" val="2"/>
+	    <int name="controlHigh" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_007" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlDecrease" val="2"/>
+	    <int name="controlIncrease" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_008" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlUp" val="2"/>
+	    <int name="controlDown" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_009" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlOpen" val="2"/>
+	    <int name="controlClose" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_010" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlStop" val="2"/>
+	    <int name="controlStart" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_011" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlInactive" val="2"/>
+	    <int name="controlActive" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt2_012" is="obix:range">
+	    <int name="noControl" val="0"/>
+	    <int name="noControl" val="1"/>
+	    <int name="controlNotInverted" val="2"/>
+	    <int name="controlInverted" val="3"/>
+    </list>
+
+    <!--
+        DPT 20.xxx
+    -->
+    <list href="knx:ranges/dpt20_001" is="obix:range">
+	    <int name="autonomous" val="0"/>
+	    <int name="slave" val="1"/>
+	    <int name="master" val="2"/>
+    </list>
+    <list href="knx:ranges/dpt20_002" is="obix:range">
+	    <int name="buildingInUse" val="0"/>
+	    <int name="buildingNotUsed" val="1"/>
+	    <int name="buildingProtection" val="2"/>
+    </list>
+    <list href="knx:ranges/dpt20_003" is="obix:range">
+	    <int name="occupied" val="0"/>
+	    <int name="standby" val="1"/>
+	    <int name="notOccupied" val="2"/>
+    </list>
+    <list href="knx:ranges/dpt20_004" is="obix:range">
+	    <int name="high" val="0"/>
+	    <int name="medium" val="1"/>
+	    <int name="low" val="2"/>
+	    <int name="void" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt20_005" is="obix:range">
+	    <int name="normal" val="0"/>
+	    <int name="presenceSimulation" val="1"/>
+	    <int name="nightRound" val="2"/>
+    </list>
+    <list href="knx:ranges/dpt20_006" is="obix:range">
+	    <int name="noFault" val="0"/>
+	    <int name="systemAndFunctionsOfCommonInterest" val="1"/>
+	    <int name="HVAC_GeneralFBs" val="10"/>
+	    <int name="HVAC_HotWaterHeating" val="11"/>
+	    <int name="HVAC_DirectElectricalHeating" val="42"/>
+	    <int name="HVAC_TerminalUnits" val="13"/>
+	    <int name="HVAC_VAC" val="14"/>
+	    <int name="lighting" val="20"/>
+	    <int name="security" val="30"/>
+	    <int name="loadManagement" val="40"/>
+	    <int name="shuttersAndBlinds" val="50"/>
+    </list>
+    <list href="knx:ranges/dpt20_007" is="obix:range">
+	    <int name="basicAlarm" val="1"/>
+	    <int name="extendedAlarm" val="2"/>
+	    <int name="void" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt20_008" is="obix:range">
+	    <int name="disabled_PSU_DPSU_fixedOff" val="0"/>
+	    <int name="enabled_PSU_DPSU_fixedOn" val="1"/>
+	    <int name="auto_PSU_DPSU_automaticOnOff" val="2"/>
+    </list>
+    <list href="knx:ranges/dpt20_011" is="obix:range">
+	    <int name="noFault" val="0"/>
+	    <int name="generalDeviceFault" val="1"/>
+	    <int name="communicationFault" val="2"/>
+	    <int name="configurationFault" val="3"/>
+	    <int name="hardwareFault" val="4"/>
+	    <int name="softwareFault" val="5"/>
+	    <int name="insufficientNonVolatileMemory" val="6"/>
+	    <int name="insufficientVolatileMemory" val="7"/>
+	    <int name="memoryAllocationCommandWithSize_0_Received" val="8"/>
+	    <int name="CRC_error" val="9"/>
+	    <int name="watchdogResetdetected" val="10"/>
+	    <int name="invalidOpcodeDetected" val="11"/>
+	    <int name="generalProtectionFault" val="12"/>
+	    <int name="maximalTableLength exceeded" val="13"/>
+	    <int name="undefinedLoadCommandReceived" val="14"/>
+	    <int name="groupAddressTable is not sorted" val="15"/>
+	    <int name="invalidConnectionNumber_TSAP" val="16"/>
+	    <int name="invalidGroupObjectNumber_ASAP" val="17"/>
+	    <int name="groupObjectTypeExceeds" val="18"/>
+    </list>
+    <list href="knx:ranges/dpt20_012" is="obix:range">
+	    <int name="noFault" val="0"/>
+	    <int name="sensorFault" val="1"/>
+	    <int name="processFault_controllerFault" val="2"/>
+	    <int name="actuatorFault" val="3"/>
+	    <int name="otherFault" val="4"/>
+    </list>
+    <list href="knx:ranges/dpt20_013" is="obix:range">
+	    <int name="notActive" val="0"/>
+	    <int name="1s" val="1"/>
+	    <int name="2s" val="2"/>
+	    <int name="3s" val="3"/>
+	    <int name="5s" val="4"/>
+	    <int name="10s" val="5"/>
+	    <int name="15s" val="6"/>
+	    <int name="20s" val="7"/>
+	    <int name="30s" val="8"/>
+	    <int name="45s" val="9"/>
+	    <int name="1min" val="10"/>
+	    <int name="1,25min" val="11"/>
+	    <int name="1,5min" val="12"/>
+	    <int name="2min" val="13"/>
+	    <int name="2,5min" val="14"/>
+	    <int name="3min" val="15"/>
+	    <int name="5min" val="16"/>
+	    <int name="15min" val="17"/>
+	    <int name="20min" val="18"/>
+	    <int name="30min" val="19"/>
+	    <int name="1h" val="20"/>
+	    <int name="2h" val="21"/>
+	    <int name="3h" val="22"/>
+	    <int name="5h" val="23"/>
+	    <int name="12h" val="24"/>
+	    <int name="24h" val="25"/>
+    </list>
+    <list href="knx:ranges/dpt20_017" is="obix:range">
+	    <int name="inactive" val="0"/>
+	    <int name="digitalInputNotInverted" val="1"/>
+	    <int name="digitalInputInverted" val="2"/>
+	    <int name="analogInput_0_to_100_percent" val="3"/>
+	    <int name="temperatureSensorInput" val="4"/>
+    </list>
+
+    <!--
+        DPT 23.xxx
+    -->
+    <list href="knx:ranges/dpt23_001" is="obix:range">
+	    <int name="off" val="0"/>
+	    <int name="on" val="1"/>
+	    <int name="offOn" val="2"/>
+	    <int name="onOff" val="3"/>
+    </list>
+    <list href="knx:ranges/dpt23_002" is="obix:range">
+	    <int name="noAlarmIsUsed" val="0"/>
+	    <int name="alarmPositionIsUp" val="1"/>
+	    <int name="alarmPositionIsDown" val="2"/>
+    </list>
+    <list is="obix:range" href="knx:ranges/dpt23_003">
+        <int name="Up" val="0"/>
+        <int name="Down" val="1"/>
+        <int name="UpDown" val="2"/>
+        <int name="DownUp" val="3"/>
+    </list>
+</list>

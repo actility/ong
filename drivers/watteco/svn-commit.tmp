@@ -1,0 +1,30 @@
+
+--Cette ligne, et les suivantes ci-dessous, seront ignorées--
+
+M    History.txt
+M    supervisor/awspv.sh
+M    supervisor/sensor.c
+M    supervisor/covconfig.c
+M    supervisor/sensor.h
+M    xoref/sensor.xor
+M    xoref/sensor.ref
+M    xoref/watteco.xor
+M    tunslip/tunslip6.sh
+M    snif/snifwatt.sh
+M    drvcommon/diaserver.c
+M    config/modelconfig.xml
+M    lib/encode.c
+A    svn
+A    svn/svn.sh
+M    diatemplates/itf_inst_0006_client.xml
+M    diatemplates/itf_inst_000f_server.xml
+M    diatemplates/itf_inst_0400_server.xml
+M    diatemplates/itf_inst_0402_server.xml
+M    diatemplates/itf_inst_0006_server.xml
+M    diatemplates/itf_inst_0052_server.xml
+M    diatemplates/itf_inst_0054_server.xml
+M    diatemplates/itf_inst_0406_server.xml
+M    diatemplates/itf_inst_000c_server.xml
+M    diatemplates/itf_inst_0053_server.xml
+M    diatemplates/itf_inst_0405_server.xml
+M    diatemplates/itf_inst_0055_server.xml

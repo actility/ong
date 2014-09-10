@@ -1,0 +1,28 @@
+
+for extension in extensions/extension* 
+do
+  (
+    if [ -d "$extension" ]
+    then
+      cd $extension
+      if [ -f MAKE ]
+      then
+        echo "#####"
+        echo "##### $extension"
+        echo "#####"
+        sh ./MAKE $*
+      fi
+    fi
+  )
+  if [ $? -ne 0 ]
+  then
+    exit 1
+  fi
+done
+
+make $*
+if [ $? -ne 0 ]
+then
+  exit 1
+fi
+

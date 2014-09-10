@@ -1,0 +1,43 @@
+GIT_GOOD_PRACTICES
+
+Reduire la taille du .git :
+git repack && git prune
+
+Envoyer un patch :
+git diff -p
+
+GIT AVEC PLUSIEURS MACHINES :
+ong-dk :
+cd /tmp
+git clone ssh://denis@dfr-mac/tmp/git
+git branch travail
+git checkout travail
+…
+git commit -a -m "xxx"
+git checkout master
+# les modifs de dfr-mac
+git pull
+# avec les motifs de travail
+git merge travail
+# le tout renvoyé sur dfr-mac
+git push origin master:refs/heads/from-ong-dk
+
+dfr-mac :
+git merge from-ong-dk
+git branch -d from-ong-dk
+
+
+Plus simple sans branch travail
+
+ong-dk :
+cd /tmp
+git clone ssh://denis@dfr-mac/tmp/git
+…
+git commit -a -m "xxx"
+git pull
+git push origin master:refs/heads/from-ong-dk
+
+dfr-mac :
+git merge from-ong-dk
+git branch -d from-ong-dk
+

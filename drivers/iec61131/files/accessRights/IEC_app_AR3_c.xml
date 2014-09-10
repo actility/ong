@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:accessRight xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="${APPLICATION}_AR3">
+  <m2m:permissions>
+    <m2m:permission m2m:id="crwd">
+      <m2m:permissionFlags>
+        <m2m:flag>CREATE</m2m:flag>
+        <m2m:flag>READ</m2m:flag>
+        <m2m:flag>WRITE</m2m:flag>
+        <m2m:flag>DELETE</m2m:flag>
+      </m2m:permissionFlags>
+      <m2m:permissionHolders>
+        <m2m:holderRefs>
+          <m2m:holderRef>${w_nsclbaseuri}/applications/SYSTEM</m2m:holderRef>
+          <m2m:holderRef>coap://${w_boxname}.${w_domainname}:${w_coapport_r}${s_rootapp}/${w_driverid}</m2m:holderRef>
+        </m2m:holderRefs>
+      </m2m:permissionHolders>
+    </m2m:permission>
+    <m2m:permission m2m:id="rw">
+      <m2m:permissionFlags>
+        <m2m:flag>READ</m2m:flag>
+        <m2m:flag>WRITE</m2m:flag>
+      </m2m:permissionFlags>
+      <m2m:permissionHolders>
+        <m2m:holderRefs>
+          <m2m:holderRef>${w_nsclbaseuri}/applications/SUPPORT</m2m:holderRef>
+          <m2m:holderRef>coap://${w_boxname}.${w_domainname}:${w_coapport_r}${s_rootapp}/GA</m2m:holderRef>
+          <m2m:holderRef>http://${w_boxname}.${w_domainname}:${w_scl_httpport}${s_rootapp}/GA</m2m:holderRef>
+          <m2m:holderRef>${w_tpkdev}</m2m:holderRef>
+        </m2m:holderRefs>
+      </m2m:permissionHolders>
+    </m2m:permission>
+  </m2m:permissions>
+  <m2m:selfPermissions>
+    <m2m:permission m2m:id="crwd">
+      <m2m:permissionFlags>
+        <m2m:flag>CREATE</m2m:flag>
+        <m2m:flag>READ</m2m:flag>
+        <m2m:flag>WRITE</m2m:flag>
+        <m2m:flag>DELETE</m2m:flag>
+      </m2m:permissionFlags>
+      <m2m:permissionHolders>
+        <m2m:holderRefs>
+          <m2m:holderRef>${w_nsclbaseuri}/applications/SYSTEM</m2m:holderRef>
+          <m2m:holderRef>coap://${w_boxname}.${w_domainname}:${w_coapport_r}${s_rootapp}/${w_driverid}</m2m:holderRef>
+        </m2m:holderRefs>
+      </m2m:permissionHolders>
+    </m2m:permission>
+    <m2m:permission m2m:id="r">
+      <m2m:permissionFlags>
+        <m2m:flag>READ</m2m:flag>
+      </m2m:permissionFlags>
+      <m2m:permissionHolders>
+        <m2m:holderRefs>
+          <m2m:holderRef>${w_nsclbaseuri}/applications/SUPPORT</m2m:holderRef>
+          <m2m:holderRef>coap://${w_boxname}.${w_domainname}:${w_coapport_r}${s_rootapp}/GA</m2m:holderRef>
+          <m2m:holderRef>http://${w_boxname}.${w_domainname}:${w_scl_httpport}${s_rootapp}/GA</m2m:holderRef>
+          <m2m:holderRef>${w_tpkdev}</m2m:holderRef>
+        </m2m:holderRefs>
+      </m2m:permissionHolders>
+    </m2m:permission>
+  </m2m:selfPermissions>
+</m2m:accessRight>

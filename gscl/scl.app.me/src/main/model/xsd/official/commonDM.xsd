@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:tns="http://uri.etsi.org/m2m" xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://uri.etsi.org/m2m">
+	
+	<include schemaLocation="common.xsd" />
+
+	<element name="moID" type="string" />
+
+	<element name="originalMO" type="string" />
+
+	<element name="description" type="string" />
+
+	<element name="parametersCollection" type="tns:NamedReferenceCollection" />
+
+	<element name="moAttribute" type="anyType" abstract="true">
+		<annotation>
+			<documentation>To be substituted by specific MO resource attributes,
+				e.g. ramTotal</documentation>
+		</annotation>
+	</element>
+
+	<complexType name="ActionStatus">
+		<sequence>
+			<element name="action" type="anyURI" />
+			<element name="progress">
+				<simpleType>
+					<restriction base="short">
+						<minInclusive value="0" />
+						<maxInclusive value="100" />
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="finalStatus" type="tns:FinalStatus" />
+		</sequence>
+	</complexType>
+
+
+	<simpleType name="FinalStatus">
+		<restriction base="string">
+			<enumeration value="SUCCESS" />
+			<enumeration value="FAILURE" />
+		</restriction>
+	</simpleType>
+
+	<element name="rcatList" type="tns:RcatList" />
+	<complexType name="RcatList">
+		<sequence>
+			<element ref="tns:rcatType" minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+	<element name="rcatType" type="tns:RcatType" />
+
+
+
+	<element name="firmwareVersion" type="string"/>
+	
+		<element name="softwareVersion" type="tns:swVersion"/>
+
+	<simpleType name="swVersion">
+		<restriction base="string">
+			<maxLength value="32"/>
+		</restriction>
+	</simpleType>
+
+</schema>

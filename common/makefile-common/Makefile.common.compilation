@@ -1,0 +1,52 @@
+#
+# Copyright   Actility, SA. All Rights Reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version
+# 2 only, as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License version 2 for more details (a copy is
+# included at /legal/license.txt).
+#
+# You should have received a copy of the GNU General Public License
+# version 2 along with this work; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+#
+# Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+# or visit www.actility.com if you need additional
+# information or have any questions.
+#
+# id $Id: Makefile.common.compilation 5323 2013-06-25 14:31:38Z JReich $  
+# author $Author: JReich $
+# version $Revision: 5323 $
+# lastrevision $Date: 2013-06-25 16:31:38 +0200 (Tue, 25 Jun 2013) $
+# modifiedby $LastChangedBy: JReich $
+# lastmodified $LastChangedDate: 2013-06-25 16:31:38 +0200 (Tue, 25 Jun 2013) $
+
+###############################################################################
+# Common makefile for all compilation options
+# Author: mlouiset
+# Date: 2010-09-23
+###############################################################################
+
+ifdef EXTRA_CFLAGS
+  CFLAGS += $(EXTRA_CFLAGS)
+endif
+
+INC_OPTIONS := $(foreach file,$(INCLUDES), -I$(file))
+DEF_OPTIONS := $(foreach var,$(DEFINES), -D$(var))
+
+empty :=
+space := $(empty) $(empty)
+SRC_VPATH = $(subst $(space),:,$(strip $(SRC_PATH)))
+
+vpath %.o $(OBJS_TARGET)
+vpath %.c $(SRC_VPATH)
+vpath %.cxx $(SRC_VPATH)
+
+

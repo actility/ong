@@ -1,0 +1,249 @@
+#!(SHELL)
+#
+# gscl:       Starts the GSCL
+
+exec 2> /dev/null
+
+CURRENT_DIR=$(dirname $0)
+. $CURRENT_DIR/../ong.cfg
+. $CURRENT_DIR/../functions
+
+
+GSCL_DATA=$ROOTACT/usr/data/gscl
+GSCL_CONF=$ROOTACT/usr/etc/gscl
+INIT=0
+DBCLEAN=0
+KF_EXTRA_OPTIONS=""
+
+SERVICE="GSCL"
+PIDFILE=$GSCL_DATA/gscl.pid
+STOPFILE=$GSCL_DATA/stop
+FORCE="0"
+
+usage() {
+    echo "Usage: gscl [<options>] {start|stop|status|restart}"
+    echo "  Where options are:"
+    echo "   -j|--java          Use java instead of cvm (java must be in the PATH)"
+    echo "   -g|--debug         Starts a JVMTI debug server on port 1044"
+    echo "   -v|--visualprofile Activates visual VM profiling. Forces use of java which must be in the PATH"
+    echo "   -p|--hprof <value> Activates HPROF profiling"
+    echo "   -d|--dbclean       Cleans local DB storage"
+    echo "   -f|--force         Forces shutdown"
+    echo "   -h|--help          Prints this help message"
+    echo "   -i|--init          Re-initializes framework"
+    echo "   -I|--inspector     Starts cvm under inspector"
+}
+
+frameworkLaunched() {
+    launchedStr=$(grep "SCL is ready" $ROOTACT/var/log/gscl/out_*)
+    if [ -n "$launchedStr" ]; then
+        ret=0
+    else
+        ret=1
+    fi
+    return $ret
+}
+
+alterLogs() {
+    sed -i -e "s|SCL is ready|SCL_is_ready|" $ROOTACT/var/log/gscl/out_*
+}
+
+# Called before starting the service
+# Can be use to init and prepare the startService function (which occurs in a child process)
+# Available parameters:
+#  * SERVICE_NAME (in) = name that is used to start the service
+#  * OPTIONS (out) = options that will be passed to _startService function
+preStart() {
+    if [ $INIT -eq 1 -o $DBCLEAN -eq 1 ]; then
+        [ -f $GSCL_DATA/storage.db ] && rm -f $GSCL_DATA/storage.db
+        [ -f $GSCL_DATA/storage.db-shm ] && rm -f $GSCL_DATA/storage.db-shm
+        [ -f $GSCL_DATA/storage.db-wal ] && rm -f $GSCL_DATA/storage.db-wal
+    fi
+    if [ $INIT -eq 1 ]; then
+        [ -d $GSCL_DATA ] && rm -rf $GSCL_DATA
+        [ -d $GSCL_CONF ] && rm -rf $GSCL_CONF
+    fi
+
+    if [ ! -d $GSCL_DATA ]; then
+        mkdir -p $GSCL_DATA
+    fi
+    if [ ! -d $GSCL_CONF ]; then
+        mkdir -p $GSCL_CONF
+    fi
+    if frameworkLaunched; then
+        alterLogs
+    fi
+    cd $ROOTACT/etc/gscl/knopflerfish
+}
+
+# Prints the service command that will be executed through a respawn script. This function is called in a child process
+# Available parameters:
+#  * <empty>
+serviceCommand() {
+    # the default java command
+    JAVA=cvm
+    # the bootclass path flag for the specific
+    BOOTCLASSPATH_FLAG="-Xbootclasspath/a:"
+    BOOTCLASSPATH=
+    # the class path flag for the specific
+    CLASSPATH_FLAG="-classpath "
+    # all -xargs and -init args
+    ARGS_ORIG=""
+    # like args excepts for -xargs and -init args
+    ARGS=$ARGS" -Fcom.actility.m2m.framework.config.launch.date="$(date "+%s")
+    ARGS=$ARGS" -Fcom.actility.m2m.framework.config.rootact="$ROOTACT
+    # arguments for the jre
+    JRE_ARGS=""
+    # default framework dir
+    FWDIR="$(pwd)/fwdir"
+    # constants
+    # path to main class
+    KF_MAIN_CLASS=org.knopflerfish.framework.Main
+    # the class path to use
+    KF_CLASSPATH=$ROOTACT/lib/java/framework-${kf.framework.version}.jar:$CLASSPATH
+    # args always sent to the JRE
+    KF_JRE_ARGS="-Dorg.knopflerfish.framework.usingwrapperscript=true"
+
+    if [ "$INIT" = "1" ]; then
+        if [ -d "$FWDIR" ] ; then
+            rm -rf $FWDIR
+        fi
+        ARGS_ORIG=$ARGS_ORIG" -init"
+        # Only init the first time !
+        INIT=0
+    fi
+    if [ "$INSPECTOR" = "1" ]; then
+        KF_CLASSPATH=$KF_CLASSPATH"$ROOTACT/bin/phoneme/lib/testclasses.zip:"
+        # this one must be passed as a single arg
+        ARGS="--X verbose --X startServer $KF_MAIN_CLASS $ARGS"
+        KF_MAIN_CLASS=cvmsh 
+    fi
+    if [ "$FORCE_JAVA" = "1" ]; then
+        JAVA=java
+    fi
+    if [ -n "$HPROF" ]; then
+        JAVA=$JAVA" -agentlib:jvmtihprof="$HPROF
+        JRE_ARGS=$JRE_ARGS" -Dorg.osgi.framework.bootdelegation=com.sun.demo.jvmti.hprof.*"
+        BOOTCLASSPATH="$BOOTCLASSPATH$ROOTACT/bin/phoneme/lib/java_crw_demo.jar:"
+    fi
+    if [ "$VISUALVM" = "1" ]; then
+        JAVA=java
+        BOOTCLASSPATH="$BOOTCLASSPATH${VISUALVM_HOME}/profiler/lib/jfluid-server.jar:"
+        JRE_ARGS=$JRE_ARGS" -Dorg.osgi.framework.bootdelegation=org.netbeans.lib.profiler.*"
+    fi
+    if [ "$DEBUG" = "1" ]; then
+        JRE_ARGS=$JRE_ARGS" -Xdebug -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=n"
+    fi
+
+    if [ -r $FWDIR/boot_cp -o -n "$BOOTCLASSPATH" ] ; then
+        BOOTCLASSPATH=$BOOTCLASSPATH_FLAG$BOOTCLASSPATH$(cat $FWDIR/boot_cp)
+    fi
+    CLASSPATH=$CLASSPATH_FLAG$KF_CLASSPATH
+
+    echo "$JAVA $BOOTCLASSPATH $JRE_ARGS $KF_JRE_ARGS $CLASSPATH $KF_MAIN_CLASS $ARGS_ORIG $ARGS 2>&1 | stdin-logger $ROOTACT/var/log/gscl/ out 32 5 1 1"
+}
+
+# Called after the service is started in a child process
+# Perform post installation actions like waiting that the the service is effectively started
+# Available parameters:
+#  * SERVICE_NAME (in) = name that is used to start the service
+#  * SERVICE_PID (in) = pid of the child process which has started the service
+#  * $1 (in) = status of the previously started service (if different from 0, the service has not been started)
+postStart() {
+    cd - > /dev/null
+
+    ret=$1
+    if [ $ret = "0" ]; then
+        # Wait for the GSCL to be ready
+        NB_ATTEMPTS=0
+        while serviceStarted && [ $NB_ATTEMPTS -lt 24 ] && ! frameworkLaunched; do
+            sleep 5
+            NB_ATTEMPTS=$(expr $NB_ATTEMPTS + 1)
+        done
+        if ! serviceStarted || ! frameworkLaunched; then
+            ret=1
+        fi
+    fi
+
+    return $ret
+}
+
+printCvmPids() {
+    ALL_PIDS=$($ROOTACT/etc/pids $SERVICE_PID | tr -s '\n' ' ')
+    if [ -n "$ALL_PIDS" ]; then
+        for pid in $ALL_PIDS; do
+            PID_PRGM_NAME=$(cat /proc/$pid/stat 2> /dev/null | cut -d " " -f2)
+            if [ -n "$PID_PRGM_NAME" -a "$PID_PRGM_NAME" = "(cvm)" ]; then
+                echo $pid
+            fi
+            if [ -n "$PID_PRGM_NAME" -a "$PID_PRGM_NAME" = "(java)" ]; then
+                echo $pid
+            fi
+        done
+    fi
+}
+
+# Called for stopping the service
+# Available parameters:
+#  * SERVICE_NAME (in) = name that is used to start the service
+#  * SERVICE_PID (in) = pid of the child process which has started the service
+stopService() {
+    CVM_PIDS=$(printCvmPids | tr -s '\n' ' ')
+    [ -n "$CVM_PIDS" ] && kill -TERM $CVM_PIDS
+}
+
+abortService() {
+    ALL_PIDS=$($ROOTACT/etc/pids $SERVICE_PID | tr -s '\n' ' ')
+    [ -n "$ALL_PIDS" ] && kill -KILL $ALL_PIDS
+}
+
+printInfos() {
+    echo "------------------------------------------------------"
+    echo "- netstat -an"
+    netstat -an
+}
+
+dumpState() {
+    BACKUP_DIR=$1
+    DATE=$2
+
+    # USR1 triggers a stack trace in out_x.log
+    CVM_PIDS=$(printCvmPids | tr -s '\n' ' ')
+    [ -n "$CVM_PIDS" ] && kill -USR1 $CVM_PIDS
+}
+
+health() {
+    # TODO
+    :
+}
+
+
+
+GETOPTTEMP=$(getopt -o jgvp:dfhiI --long java,debug,visualprofile,hprof:,dbclean,force,help,init,inspector -- $@)
+if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments
+while [ -n "$1" ]
+do
+    case "$1" in
+        "-j"|"--java") FORCE_JAVA=1; OPTIONS=$OPTIONS" -j";;
+        "-g"|"--debug") DEBUG=1; OPTIONS=$OPTIONS" -g";;
+        "-v"|"--visualprofile") VISUALVM=1; OPTIONS=$OPTIONS" -v";;
+        "-p"|"--hprof") shift; HRPOF=$1; OPTIONS=$OPTIONS" -p $1";;
+        "-d"|"--dbclean") DBCLEAN=1; OPTIONS=$OPTIONS" -d";;
+        "-f"|"--force") FORCE=1; OPTIONS=$OPTIONS" -f";;
+        "-h"|"--help") usage; exit;;
+        "-i"|"--init") INIT=1; OPTIONS=$OPTIONS" -i";;
+        "-I"|"--inspector") INSPECTOR=1; OPTIONS=$OPTIONS" -I";;
+        "--") shift; break ;;
+        * ) echo "Internal error ($*)!"; exit 1;;
+    esac
+    shift
+done
+
+
+handleParams $*
+
+exit $?
+

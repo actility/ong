@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<real val="${dpt_value}" unit="${dpt_unit}" xmlns="http://obix.org/ns/schema/1.1">
+    <int name="CountVal" val="${raw_CountVal}"/>
+    <int name="ValInfField" val="${raw_ValInfField}"/>
+    <bool name="OutOfService" val="${raw_OutOfService}" />
+    <bool name="Fault" val="${raw_Fault}" />
+    <bool name="Overridden" val="${raw_Overridden}" />
+    <bool name="InAlarm" val="${raw_InAlarm}" />
+    <bool name="AlarmUnAck" val="${raw_AlarmUnAck}" />
+    <str name="raw" val="0x${dpt_raw}"/>
+</real>

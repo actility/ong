@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- etsiPerformanceLog resource type -->
+	<complexType name="EtsiPerformanceLog">
+		<complexContent>
+			<extension base="tns:MgmtObj">
+				<sequence>
+					<element ref="tns:logTypeId" minOccurs="0"/>
+					<element ref="tns:logData" minOccurs="0"/>
+					<element ref="tns:perfoLogActionStatus" minOccurs="0"/>
+				</sequence>
+				<!-- attribute ref="tns:id" use="required" fixed="etsiPerformanceLog"/ -->
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="logTypeId" type="tns:logTypId" /> 
+
+	<simpleType name="logTypId">
+		<restriction base="string">
+			<enumeration value="systLog"/>
+			<enumeration value="appLog"/>
+		</restriction>
+	</simpleType>
+
+	<element name="logData" type="tns:LogDataFile"/>
+
+	<complexType name="LogDataFile">
+		<sequence>
+			<any processContents="lax"/>
+		</sequence>
+	</complexType>
+
+	<element name="perfoLogActionStatus" type="tns:ActionStatus" />
+
+</schema>

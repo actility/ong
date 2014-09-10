@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj
+xmlns="http://obix.org/ns/schema/1.1">
+   <str name="dstAddr" val="${a_configVal0}" />
+   <enum name="status" val="${a_configVal1}" />
+   <str name="nextHopAddress" val="${a_configVal2}" />
+</obj>
+

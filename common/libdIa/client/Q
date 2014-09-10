@@ -1,0 +1,1 @@
+./client.x -m retrieve -v9 $* "/query?first=1&second=2&third=3"

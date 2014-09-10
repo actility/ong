@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:subscription xmlns:m2m="http://uri.etsi.org/m2m" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <m2m:expirationTime>${expirationTime}</m2m:expirationTime>
+  <m2m:minimalTimeBetweenNotifications>10000</m2m:minimalTimeBetweenNotifications>
+</m2m:subscription>

@@ -1,0 +1,21 @@
+
+A := 1;
+
+IF A EQ 1 THEN B := 5; END_IF
+
+IF A NE 1 THEN
+	B := 1;
+ELSE
+	C := 99;
+	IF B EQ 2 THEN
+		D := 2000;
+	ELSIF B EQ 3 THEN
+		D := 3000;
+	ELSIF B EQ 4 THEN
+		D := 4000;
+	ELSE
+		D := 9999;
+	END_IF
+END_IF
+
+(A EQ 1) AND (D = 9999)

@@ -1,0 +1,8 @@
+
+eval $( grep ONG_HOME $PROFILE )
+
+if [ "x$ONG_HOME" != "x" ]; then
+ [ -f $ONG_HOME/ong ] && $ONG_HOME/ong stop
+ sed -i -e "/^.*ONG_HOME.*$/d" $PROFILE
+ sed -i -e "/^.*PHONEME_HOME.*$/d" $PROFILE
+fi

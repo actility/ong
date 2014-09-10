@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<int val="${raw_RelSignedValue}"  xmlns="http://obix.org/ns/schema/1.1">
+    <int name="RelSignedValue" val="${raw_RelSignedValue}"/>
+    <bool name="OutOfService" val="${raw_OutOfService}"/>
+    <bool name="Fault" val="${raw_Fault}"/>
+    <bool name="Overridden" val="${raw_Overridden}"/>
+    <bool name="InAlarm" val="${raw_InAlarm}"/>
+    <bool name="AlarmUnAck" val="${raw_AlarmUnAck}"/>
+    <str name="raw" val="0x${dpt_raw}"/>
+</int>

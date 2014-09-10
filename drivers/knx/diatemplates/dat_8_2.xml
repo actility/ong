@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reltime val="${dpt_value}" xmlns="http://obix.org/ns/schema/1.1">
+    <int name="DeltaTime" val="${raw_DeltaTime}"/>
+    <str name="raw" val="0x${dpt_raw}"/>
+</reltime>

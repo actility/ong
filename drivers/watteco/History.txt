@@ -1,0 +1,1987 @@
+
+###############################################################################
+1.4.11	2014/02/07
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ diatemplates/dat_cont.xml
+change
+  <m2m:accessRightID>${s_rootacc}/Locadmin_AR1</m2m:accessRightID>
+to
+  <m2m:accessRightID>{s_rootacc}/APP_${d_ieee}.${a_num}_AR</m2m:accessRightID>
+
+
+
+SPECIFIC :
+
+###############################################################################
+1.4.10	2014/02/04
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
+SPECIFIC :
+
++ -lxml2 after -o
+
++ apu deps
+
+###############################################################################
+1.4.9	2013/12/26
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
+SPECIFIC :
+
++ monotonic clock with rtbase 1.2.1 : 
+	- rtl_tmmsmono() instead of rtl_tmms()
+	- rtl_timemono() instead of time()
+
+
++ no exit in preinst postinst apu shells
+
+###############################################################################
+1.4.8	2013/12/09
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
+SPECIFIC :
+
++ Access Rights :
+
+- "Locadmin_AR" is renamed "Locadmin_AR1" in diatemplates/*
+
+- add "<m2m:holderRef>" elements to rights in acc_elem_AR*.xml :
+ -- coap://${w_boxname}.${w_domainname}:${w_coapport_r}${s_rootapp}/GA
+ -- http://${w_boxname}.${w_domainname}:${w_scl_httpport}${s_rootapp}/GA
+
+- add variable "w_scl_httpport" default value 8080
+
++ drvcommon is no more part of watteco driver. Now use the commun package
+$ROOTACT/drvcommon.
+Sources are preserved in drvcommun_v1 and driver can always be compiled using
+makefile.old in directorie supervisor.
+
++ apu/runtime/postint :
+files ~/usr/etc/watteco/modelconfig.xml and ~/usr/etc/watteco/spvconfig.xml are
+no more created/copied if they already exist.
+
++ add delete operation at SCL device level (DEV_) :
+- delete operation :
+	+ delete SCL device-apps, containers, ...
+	+ delete SCL access rights for the apps
+	+ delete SCL device itself
+	if SCL device deletion is OK
+		+ delete context file in knwonsensors 
+		+ delete in memory device
+		+ update list of devices for SCL network
+
+	if the device is already present/active, all the SCL tree will be 
+	rebuilt, the device will be reconfigured, just as if it was plug for the
+	first time.
+
+- rebuild operation :
+	+ delete SCL device-apps, containers, ...
+	+ delete SCL access rights for the apps
+	+ delete SCL device itself
+	if SCL device deletion is OK
+		+ delete in memory device
+		+ update list of devices for SCL network
+		+ rebuild all SCL tree for the device
+
+- although these treatments are asynchronous, the return of these operations is 
+immediate, so it is difficult to be sure that the SCL tree will be well 
+reconstructed.
+
++ use apu libpcap in $ROOTACT for all targets when building snifwatt.x
+
+#if 0
++ multiusb dongles
+
+	- main modifications to awspv.x code :
+	-- bind the receiving udp socket on [::]:47002 (as in software sensor 
+	mode) and do not use prefixe of ipv6 interfaces (aaaa, bbbb, ...).
+	-- bind the sending udp socket on [<prefixe_of_destination>::1]:47004.
+	Each time the prefixe of destination changes a new socket is used.
+
+	These modifications do not work on centos6 : restore bind aaaa::1:47002
+	see zclupd.c:ZclUdpBind()
+#endif
+
+###############################################################################
+1.4.7	2013/11/19
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ drvcommon/diatools.c:WDiaParseMethod() :
+ now accept method on device with cluster and attribut numbers. Mainly for
+ reboot command on watteco devices.
+
+SPECIFIC :
+
++ add implicite configuration cluster (0050) & power descriptor attribut (0006):
+
+- we assume implicite clusters are defined for endpoint 0 => APP.1
+
+- devices are not automaticaly configured to report power descriptor it is
+necessary to send the configuration reporting command manualy for each device :
+	-- via telnet 0 2000
+		sendsensor aaaa::ff:ff00:2d08 +cov 0050 0006 minT maxT mode:srce
+	-- or via ONG browser node DEVICE/APP.1/Configuration.SRV
+		Min Cov : mode:srce
+
+	the recommended value for minCov/mode:srce is "0:0"
+	the recommended values for minT/maxT are xxxx yyyy
+	power values criteria are not treated
+
+- reporting values are actually stored in raw mode in attribut rawPower :
+	"power value of current source" + mode + source + "power values list"
+
+	example : 3566 0x3 0x11 3566,3700,...
+
+- note : actualy nothing precise the current source, the first value gived is 
+supposed to be the current one and is repeated first to allow ONGBrowser to draw
+a graph.
+
+- the 3 current values are also reported at SCL DEVICE level :
+	powerMode	0x03
+	powerSource	const|rechar|dispos|solar|tic
+	powerLevel
+	powerValue	3566
+
+- note : the powerLevel (L33,L66,L99) is actualy not computed because we dont
+have a reference value
+
+- added diatemplates :
+	-- itf_inst_0050_server.xml
+	-- dat_inst_0050_0006_0.xml
+
+- modified diatemplate :
+	-- dev_inst.xml
+
+- simulations :
+	-- recvsensor aaaa::ff:ff00:2d08 110a0050 0006 41 04 03 10 0e06
+
++ add reboot operation at SCL device level (DEV_)
+
+###############################################################################
+1.4.6	2013/10/03
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ if DiaCtxt is not created do not call dia_nextTimer()
+drvcommon/diaclient.c:DiaFlushRequest()
+
++ Add AdmTcpClose() and DiaUdpClose()
+
++ Add DIA_LEAK IpuExecuteMethod() and error code STATUS_SERVICE_UNAVAILABLE(503)
+
++ Add void DiaNetStartWithSerial(int dev,int serial,
+				t_cmn_sensor *(*fct)(int dev,int serial))
+this is to send requests for networks and to treat them as requests on devices,
+the difference is that (*fct) is called instead of CmnSensorNumSerial() to 
+retrieve the context of the requests. This is useful (mandatory) with multi 
+networks.
+
+Do not forget that serial == 0 is forbidden because drvcommon already tries to 
+retrieve network/ipu IDs by calling GetNetId() and GetIpuId(). By this way old
+drivers (watteco, zigbee, wmbus) will continue to work without change.
+
++ Add void DiaIpuStartWithSerial() same as DiaNetStartWithSerial()
+
++ Add :
+	void DiaIpuDelete(void);
+	void DiaIpuDeleteWithSerial(int dev,int serial,
+				t_cmn_sensor *(*fct)(int dev,int serial));
+	void DiaNetDelete(void);
+	void DiaNetDeleteWithSerial(int dev,int serial,
+				t_cmn_sensor *(*fct)(int dev,int serial));
+	void DiaDevDelete(int dev, int serial);
+	void DiaAppDelete(int dev, int serial, int app);
+	void DiaAccDelete(int dev, int serial, int app, int acc);
+
+	and associated WEAK functions :
+	 WDiaUCBRequestOk_Dia???DelOk(t_dia_req *preq, t_cmn_sensor *cmn)
+	
+
+SPECIFIC :
+
++ restore echo 2 > /proc/cpu/alignment !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+---------------------------------------------------------------------------
+
++ radio mode rf212 vs lora :
+it is now possible to specify the radio type of the USB router and to set 
+additional parameters.
+
+	<str name="radiomode" val="rf212" />
+	<int name="rf212_sleeptime" val="660" />
+	<real name="rf212_msgfrequence" val="1.0" />
+	<int name="lora_sleeptime" val="4000" />
+	<real name="lora_msgfrequence" val="0.2" />
+
+	- xxxx_sleeptime is the sleeping time of sensors.
+
+	- xxxx_msgfrequence is the frequence of outgoing messages sent to the
+	USB router [0.1 .. 10].
+	Commands to sensors like on/off get/attribut are not controlled by
+	xxxx_msgfrequence
+
+	- radiomode can be : "rf212" or "lora" to set radio mode. If the mode is
+	prefixed by '?' (?rf212 or ?lora), the configured value can be changed 
+	dynamicaly by informations set by the dongle in file "routeraddr.txt".
+	The expected format is :
+		radio:{
+		type=lora
+		}
+
+	- if these parameters are not found in "spvconfig.xml", the default 
+	values are :
+		radiomode = "?rf212"
+		rf212_sleeptime = 660
+		rf212_msgfrequence = 1.0
+		lora_sleeptime = 4000
+		lora_msgfrequence = 0.2
+
+
+
++ with a view to use more than one USB dongle a new command replace tunslip.sh
+which is limited to one USB dongle and one IP tunnel interface.
+This new command is "multiusb.sh" 
+
+	- !!!!! at this time "multiusb.sh" requires a manual configuration
+	based on USB serial ID. A future version will build automaticaly an 
+	initial configuration at first launch and will detect new dongles.
+
+	- !!!!! for the M2M point of vue there is only one sensors network
+	managed by only one dongle (the main dongle). The MAC address of this
+	dongle is still used as M2M network ID.
+
+	- !!!!! set <int name="httpsensorlist" val="0"/>
+
+	- !!!!! shell for service tunslip must be uninstalled or deactivated
+
+
+	The main tasks of multiusb.sh are to :
+	-- ensure that ipv6 messages are always delivered to the right dongle
+	without depending on /dev/ttyUSBx assignments
+	-- start and monitor tunslip.x processes
+	-- designate the dongle which will act as M2M network ID
+	-- maintain the list of sensors by requesting each dongle via HTTP
+
+
+	- "~/usr/data/watteco/confusb.conf" file format :
+"
+#
+# USB ID	PAN ID	Flags	prefix	IPV6 addr		Tunnel
+#
+A100E38C	43981	m	aaaa	aaaa::ff:ff00:23f4	tun0
+AM018H73	43982	-	bbbb	bbbb::ff:ff00:29f1	tun1
+# AX000102	43983	-	cccc	cccc::ff:ff00:1234	tun2
+"
+
+	-- the file is not reloaded dynamicaly, restart service on changes
+	-- to find the usb serial id of dongles look in /dev/serial/by-id
+	-- comments must start with "# " ('#' + space)
+	-- one line per dongle
+	-- pan ids are in decimal form
+	-- "m" indicates the dongle acting as M2M network
+
+	- main modifications to awspv.x code :
+	-- bind the receiving udp socket on [::]:47002 (as in software sensor 
+	mode) and do not use prefixe of ipv6 interfaces (aaaa, bbbb, ...).
+	-- bind the sending udp socket on [<prefixe_of_destination>::1]:47004.
+	Each time the prefixe of destination changes a new socket is used.
+
+
++ snifwatt.x
+	- no more use pcap_lookupnet() which causes "no ipv4 address" on tun0
+
+###############################################################################
+1.4.5	2013/09/09
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
+SPECIFIC :
+
++ new version of tunslip6.c to :
+- avoid malformed ipv6 addresses
+- get router address in -@routeraddr.txt in any cases :
+	-- reboot
+	-- ong stop/start
+	-- unplug dongle
+
++ tunslip6.sh :
+- suppress /proc/cpu/alignment
+- simplify the way to get traces of tunslip.x (see TRACE=)
+
+
+
+###############################################################################
+1.4.4	2013/08/27
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ retry mechanism on dia requests is no more activated :
+
+#define	INIT_TIMEOUT_DIA	180	// client side before request sent
+#define	REQUEST_TIMEOUT_DIA	180	// client side after request sent
+#define	MAX_RETRY_DIA		0	// number of retries
+
+
++ add UCB functions :
+	- WDiaUCBRequestOk_DiaXXXOk()
+	- WDiaUCBPreLoadTemplate_DiaXXXInstCreate()
+	- WDiaUCBPreLoadTemplate_DiaXXXContCreate()
+	- WDiaUCBPreLoadTemplate_DiaXXXElemCreate()
+	- WDiaUCBPostLoadTemplate_DiaXXXInstCreate()
+	- WDiaUCBPostLoadTemplate_DiaXXXContCreate()
+	- WDiaUCBPostLoadTemplate_DiaXXXElemCreate()
+
++ add t_dia_rspparam *rq_par member to struct t_dia_req which contains the last
+response to a dia request.
+Use void *WDiaXoLoadResponse(t_dia_req *req,int parseflags) to decode the xo
+object associated to the request (Xo object must be freed).
+
++ drvcommon/diaserver.c:cb_diaUpdateRequest(), add
+
+  else if (0 == ret)
+  {
+    // success, and no response expected from the device
+    retcode = "STATUS_OK";
+  }
+
+otherwise a STATUS_NOT_FOUND (404) is returned in case of synchronous response.
+
+SPECIFIC :
+
++ add variable "r_boolvalue" which is the "true|false" form of "r_value". Used
+in diatemplate for :
+	- dat_inst_0006_0000_0.xml
+	- dat_inst_000f_0054_0.xml
+	- dat_inst_000f_0055_0.xml
+
+
++ tunslip.x : some corrections from watteco
+
++ support of multi endpoints on watteco device, mainly :
+ - endpoints are seen as applications (endpoint number + 1) in M2M/SCL. 
+   Applications can have different structures (ie clusters set) ...
+ - report events are stored in application[1..N] resources 
+ - operations (read/write attributs) can address endpoints
+ - cov configuration by endpoint
+
++ new attribut W_ATT_CONFIGURATION_DESCEPN (4) in cluster W_CLU_CONFIGURATION to
+get in/out clusters description by end point number. 
+
+As old sensors do not support this attribut, <int name="multiendpoint" val="0"/>
+must be set in parameter list for backward compatibility. Obviously in this case
+all endpoints other than 0 are ignored.
+
++ xml file per sensor in "knownsensor"
+
+- add "nbep" element to save the number of endpoints for this sensor
+
+- add endpoint number to "clusterIn" element :
+	 <clusterIn>0054:0</clusterIn>
+	 <clusterIn>0052:0</clusterIn>
+	 <clusterIn>000f:0</clusterIn>
+	 <clusterIn>000f:1</clusterIn>
+
+- add "tictype" element to save the last known TIC type
+
++ <int name="softwaresensors" val="0"/> default configuration value for this
+parameter is now "0" because it is not full compatible with "multiendpoint".
+
++ in CLI add a description of the endpoint/cluster mapping :
+>> sensor
+current sensors detected :
+[000] self=0x8277a18 serial=1 softw=000 addr=[aaaa::ff:ff00:803b]
+[000] ieee=[020000ffff00803b] nicename=[]
+[000] state=[CP_RUNNING] (0:03:11) stateP=[CP_DISCONNECTED]
+[000] configured=1 cfglock=0 simulated=0 onoff='on' tictype=3
+[000] nbep=2
+[000] clin=4 [0054 0052 000f 000f] [0 0 0 1]
+[000] clout=0  
+[000] minMincov=600 minMaxcov=180
+[000] nbcov=6 [82792c0 8277708 82bb788 82bb7b8 82bb788 82bb7b8]
+[000] epcov [0 0 0 0 1 1]
+[000] nbitf=4 [0054 0052 000f 000f]
+[000] epitf [0 0 0 1]
+[000] nbdat=16 nbmet=0
+[000] zclsend=2 zclrecv=62 zclmeth=0 zclcmnd=2 zclresp=1 zclevnt=61 zclrerr=0
+[000] zclwait=0 zclclat=0 (0:03:11)
+[000] diadev=1 diaapp=2 diaacc=6 diadat=16 diamet=0  diareportok=65 diareporterr=0
+
++ "t_zcl_simple_desc" structure is now :
+	unsigned	char	m_nbclin;
+	unsigned	short	m_clin[10];
+	unsigned	char	m_epin[10];
+	unsigned	char	m_nbclout;
+	unsigned	short	m_clout[10];
+	unsigned	char	m_epout[10];
+	unsigned	char	m_nbep;
+
++ lib/decode.c:AwZclDecodeSimpleDesc()
+
++ zcllike/descepn.sh to test new attribut W_ATT_CONFIGURATION_DESCEPN, example :
+	./xxcode.x "11 01 0050 0004 00 4C 0017 04 \
+		00 02 0402 0405 00 \
+		01 01 000F 00 \
+		02 01 000F 00 \
+		03 00 01 000F"
+	gives :
+	[11 01 00 50 00 04 00 4c 00 17 04 00 02 04 02 04 05 00 01 01 00 0f 00 02 01 00 0f 00 03 00 01 00 0f ]
+	./0/response/read-attribut/configuration/simple-descepn/?status=0&appt=4c&clat=00500004&nbep=4&clusterinput=temperature-measurement.0,humidity-measurement.0,binary-input.1,binary-input.2&clusteroutput=binary-input.3
+
+	decode ret=00500004 5242884
+	cmd=1 size=33
+	status=0 direction=0
+	cluster=0050
+	attr=0004
+	appt=4c
+	decode success
+
++ tic type is saved in context file.
+
+###############################################################################
+1.2.7	2013/07/08
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
+SPECIFIC :
+
++ multiple occurences of a same cluster on a device are ignored, only one is 
+kept.
+sensor.c:NoDuplicateCluster()
+
++ ZCL messages on end_point_name != 0 are dropped. (wrong test in 1.2.6)
+sensor.c:iSensorEvent()
+
++ the "binary cluster" has 4 new attributs. Results with old version of watteco
+sensors are unknown. At least sensors will stick at state CONFIGURING.
+
++ for "binary cluster" attributs polarity/edgeselection/debounce must be 
+writtable and readable from ong browser. "itf_inst_000f_server.xml" is updated
+with following M2M attributs :
+    <bool name="extPolarity" 
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting1/0x000f.0x0054.0.attr"/>
+    <int name="extEdgeSelect" 
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting1/0x000f.0x0400.0.attr"/>
+    <int name="extDebounce" 
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting1/0x000f.0x0401.0.attr"/>
+
+
+NOTES : as watteco ZCL protocole does not provide ACK to write action, the result
+of a write attribut is not guaranted. It is necessary to verify with read action.
+
+NOTES : as watteco ZCL protocole does not provide cross reference identifier to 
+read action, the number of pending read per sensor is limited to 1.
+
+sensor.c:
+	- char	*getErrorInfoResponse() 
+	- void	iSensorRetrieveAttrCompletion()
+	- int   iCmnSensorRetrieveAttrValue()
+	- int   iCmnSensorUpdateAttrValue()
+
++ diatemplates add files :
+	- "dat_inst_000f_0054_0.xml"
+	- "dat_inst_000f_0400_0.xml"
+	- "dat_inst_000f_0401_0.xml"
+	- "dat_inst_000f_0402_0.xml"
+	- "err_info.xml"
+
++ add mapping keys for binary cluster attributs in "config/spvconfig.xml" :
+	<str name="0x000f.0x0054.0.attr"	val="extPolarity"/>
+	<str name="0x000f.0x0400.0.attr"	val="extEdgeSelect"/>
+	<str name="0x000f.0x0401.0.attr"	val="extDebounce"/>
+
+###############################################################################
+1.2.4a	2013/07/02
+###############################################################################
+
+WARNINGS :
+
++ for Watteco sensors the "binary cluster" has 4 new attributs. Results with
+old version of watteco sensors are unknown. At least sensors will stick at
+state CONFIGURING.
+
+REQUIREMENTS :
+
+COMMON :
+
+SPECIFIC :
+
++ lib decode/encode watteco (encode.c decode.c infoproto.c) : 
+	- add following attributs to W_CLU_BINARYINPUT :
+		-- W_ATT_BINARYINPUT_POLARITY	(0x0054,1B)
+		-- W_ATT_BINARYINPUT_EDGE_SELECT(0x0400,1B)
+		-- W_ATT_BINARYINPUT_DEBOUNCE	(0x0401,2B)
+		-- W_ATT_BINARYINPUT_COUNTER	(0x0402,4B)
+	- max attributs per cluster from 5 to 10 (W_ZCL_ATTR_MAX)
+	- create a new file test "zcllike/binary.sh" to verify encoding/decoding
+	of reading/configuring/reporting for all binary cluster attributs.
+
++ as attribut numbers are no more less than 0x100 (ie 0x040?) the loop in
+sensor.c:iSensorDiaStartDataSrvClt :
+	FOR ([1..maxnbcluster] * [1..maxnbattributs] * [1..maxnbmembers] 
+is now unbearable. Now use tables of attribut numbers per cluster built at start
+time, based on lib/infoproto.c:TbAttribut[] global table.
+
++ always expose and report CUR_VALUE and COUNTER attributs for BINARY cluster :
+	- "itf_inst_000f_server.xml" (add extCounter)
+	- "dat_inst_000f_0402_0.xml" (created)
+	- "dat_inst_000f_0055_0.xml" (no change)
+
+
++ add mapping keys for binary cluster attributs in "config/spvconfig.xml" :
+	<str name="0x000f.0x0402.0.m2m"	val="extCounter"/>
+
++ modify modeling configuration for binary cluster in "config/modelconfig.xml".
+        <covConfiguration filter="zigbee:/attribute/0x0055" 
+	    minInterval="PT5M" maxInterval="PT1H" minCOV="1"/>
+        <covConfiguration filter="zigbee:/attribute/0x0402" 
+	    minInterval="PT5M" maxInterval="PT1H" minCOV="1"/>
+Technical attributs (polarity/edge/debounce) are not part of cov configuration.
+
++ sensor.c:iSensorZclEvent() : report W_ATT_BINARYINPUT_COUNTER u_int4
+
+
+
+###############################################################################
+1.2.2	2013/06/20
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ wrong trace in diaserver.c
+
+SPECIFIC :
+
+
+###############################################################################
+NOTES : how to use curl instead of POSTMAN-chrome
+
+Example, we want to get the latest value from a container :
+
+The user for authentification is (note %3a in place of ":") :
+USER="http%3a//nsc1.actility.com%3a8088/m2m/applications/SYSTEM"
+
+The ONG resource name is :
+RES='http://192.168.1.98:8080/m2m/applications/APP_020000ffff002290.1/containers/0x000c.0x0055.0.m2m/contentInstances'
+
+curl -v -X GET -u "$USER" $RES/latest | xmllint --format -
+
+Example, we want to add a value in a container. The value comes from a
+local file /tmp/zz.xml :
+
+<<
+<?xml version="1.0" encoding="UTF-8"?>
+<real xmlns="http://obix.org/ns/schema/1.1" val="3000"/>
+>>
+
+The content type is :
+TYPE="Content-Type: application/xml"
+
+curl -v -H "$TYPE" -X POST --data "@/tmp/zz.xml" -u "$USER" $RES
+
+
+###############################################################################
+1.2.1	2013/05/27
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
++ rtbase	1.0.33
+
++ with firefox/copper/coap :
+	- set coap version/draft to 08
+	- unset block2 block1 and set auto block mode.
+
+COMMON :
+
++ update apu/dependencies
+
++ pseudo ong now :
+	- answers to GET on "coap://[::1]:5683/.well-known/core"
+	- send "application/link-format" document when there is now "create.xml"
+	file under a resource directory or when resource name is ended by "/*"
+
++ pseudo ong now :
+	- maintains a history of ten samples for each content instances :
+Example for a resource named "app/APP_xxx.1/containers/yyy.m2m/contentInstances"
+you find in the corresponding directory :
+
+	create-0.xml		// latest sample linked to latest/create.xml
+	create-1.xml		// sample period -1
+	create-2.xml
+	create-3.xml
+	create-4.xml
+	create-5.xml
+	create-6.xml
+	create-7.xml
+	create-8.xml
+	create-9.xml		// sample period -9, oldest sample
+	latest/create.xml	// linked to create-0.xml
+
+	- supports retrieve requests on the content instances history.
+Examples :
+	"app/APP_xxx.1/containers/yyy.m2m/contentInstances/0"
+	..
+	"app/APP_xxx.1/containers/yyy.m2m/contentInstances/9"
+
+	".../contentInstances/0" == ".../contentInstances/latest"
+	".../contentInstances"   == ".../contentInstances/latest"
+
+
++ howto use POSTMAN
+
+- Basic auth : Username must be set with :
+http://nsc1.actility.com:8088/m2m/applications/SYSTEM
+where ':' must be replaced by "%3a"
+button "refresh Headers"
+
+http://nsc1.actility.com%3a8088/m2m/applications/SYSTEM
+
+- 192.168.1.XXX:8080/m2m/applications button "GET" button "Send"
+
+- 192.168.1.xxx:8080/m2m/applications/APP_xxx.y/containers/zzz/contentInstances
+
+It also works with POST but the content can not be got from a file ...
+
+
+SPECIFIC :
+
++ function var.c:GetPlcTarget() was bugous when variables w_plcaddr and 
+w_plcport were not set: "coap://:" was returned.
+
+
++ suppress this modification
+
+if an unsolicited configuration description is received from a sensor at any 
+state, the sensor is forced to ALLOCATED state. 
+
+###############################################################################
+1.2.0	2013/05/14
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ x-date attribut added to xml documents for reporting is now in ISO8601 format.
+
+see supervisor/var.c:GetDate() and rtl_getCurrentIso8601date()
+
++ as Iso8601 date contains HH:MM:SS.MSS suppress w_time for x-date in all 
+diatemplates (dat_inst_*).
+
++ in some cases (ex: ong link definitively done) libdIa consums memory because
+dia_nextTimer() was not called.
+
+~/drvcommon/diaclient.c:DiaFlushRequest()
+
++ it is possible to duplicate all events report DIA/COAP messages to an IP
+destination by setting variables : w_plcaddr and w_plcport.
+
+~/drvcommon/diaclient.c:WDiaInitRequest()
+~/drvcommon/diarep.c:DiaReportValue() + req.rq_plcDup	= 1;
+
+This is done for PLC/IEC to facilitate tests.
+
+<!--	plc on localhost6
+-->
+	<str name="w_plcaddr" val="::1"/>
+	<str name="w_plcport" val="5683"/>
+
+
++ pseudo ONG now adds "/latest" to targetID when the targetID is terminated by:
+"contentInstances"
+~/watteco/pseudoong/main.c:DoTarget()
+
++ new prototype/feature for call back WDiaUCBPreLoadTemplate() :
+
+int	WDiaUCBPreLoadTemplate(char *reqname,t_dia_req *preq,char *target,
+		t_cmn_sensor *cmn,void **xo,char *templatename);
+
+The legacy case is to set variables which will used to evalute the template file
+(ex : sprintf(tmp,"dat_inst_%04x_%04x_%d.xml",preq->rq_cluster,preq->rq_attribut,preq->rq_member);). Now the call back can (XOR) :
+ - change the name of the template file
+ - allocate and set a xo object (*xo = XoNew()) in this case no template is used
+
++ new version of drvcommon for dIa network management : 
+
+the goal is to have a better flow control on dia messages from application, 
+mainly because lib micro dia can manage only one message at a time and because
+micro controllers can not store pending messages.
+
+It is quiet transparent for applications which can always send more than one 
+request simultaneously (outwardly !) and the "API" is not changed.
+
+- functions DiaXXXStart() no more sent the first microrequest DIA immediatly.
+All parameters are stored, serialisation is done and the result (final xml doc)
+is stored in the initiated request.
+
+This implies one more state for DIA requests not sent on network but ready to be :
+	- NOT USED		// NUSE_REQUEST_DIA
+	- INITIALIZED (new)	// INIT_REQUEST_DIA
+	- SENT on network	// SENT_REQUEST_DIA
+
+- the number of requests sent on network waiting for a response can be tuned
+with MAX_PENDING_DIA (default value 1) in drvcommon/cmndefine.h
+
+- each time a response is received (it is proceed) we try to send waiting 
+requests in the limit of MAX_PENDING_DIA.
+
+- in DiaClientClockSc() and DiaClientClockMs() we also try to send waiting 
+requests.
+
+- applications can directly call DiaFlushRequest() in main loop (poll() to 
+speed up requesting.
+
++ previous version of drvcommon is stored in drvcommon_v0
+
+
+
+SPECIFIC :
+
++ do not declare retargeting on zbOnOff in itf_inst_0006_server.xml and
+itf_inst_0006_client.xml as watteco driver does not support retargeting.
+
++ switch operation num=2 on cluster 0006 accepts an obix object as parameter
+
+coap://[::1]:5684/6lowpan/APP_xxxxxxxxxxxxxxxx.1/retargeting/0x0006.0x02.ope
+<?xml version="1.0" encoding="UTF-8"?>
+<bool val="value" xmlns="http://obix.org/ns/schema/1.1"/>
+
+where value can be true|false|0|1
+
+This is done for PLC/IEC to facilitate tests on resources of ON/OFF type.
+
++ if an unsolicited configuration description is received from a sensor at any 
+state, the sensor is forced to ALLOCATED state. 
+
++ add 2 attributs to known sensor files "multiplyvalue" and "addvalue" by this
+way it is possible to change values reported by 4-20 sensors.
+
++ the new default value for $w_nsclbaseuri is now :
+	<str name="w_nsclbaseuri" val="http://nsc1.actility.com:8088/m2m"/>
+instead of
+	<str name="w_nsclbaseuri" val="http://nsc1.actility.com:8086/m2m"/>
+
+
++ bad cast conversion on temperature measurement (negative values lost).
+
++ it is possible to use a PANID by setting ~/usr/data/watteco/panid.txt file.
+Do not forget that PANID are given in decimal form : 0xabcd => 43981.
+Service tunslip must be restarted.
+Current PANID from USB router is saved in ~/usr/data/watteco/panid_out.txt file
+
++ the default "modelconfig.xml" configuration reporting for TIC ICE Metering is 
+adapted to a more realistic situation :
+
+    <!-- TIC ICE Metering -->
+    <interface filter="zigbee:/server/0x0053">
+        <descriptor> ... </descriptor>
+	<covConfigurations>
+            <covConfiguration  filter="zigbee:/attribute/0x0000" 
+	        minInterval="PT0M" maxInterval="PT0M" 
+		minCOV="$00$00$1f$80$00$00$00$1a$00$00$00$00$00$00$00$02$00$00$00$00$01$00" />
+            <covConfiguration  filter="zigbee:/attribute/0x0001" 
+	        minInterval="PT0M" maxInterval="PT0M" 
+		minCOV="$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00" />
+            <covConfiguration  filter="zigbee:/attribute/0x0002" 
+	        minInterval="PT0M" maxInterval="PT0M" 
+		minCOV="$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00$00" />
+	</covConfigurations>
+    </interface>  
+
+
++ it is now possible to configure a sensor with specific parameters through ONG 
+browser using COV configuration method ("zbCovConfig").  Expected parameters are
+the same as those defined in "modelconfig.xml" file plus the attribut/point 
+number (hex form) which must be configured. The sensor must be in RUNNING state.
+
+The method is declared in each dia template interface file :
+
+<op name="zbCovConfig"
+href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x${cluster}.0xFF.ope"/>
+
+call example :
+<obj xmlns="http://obix.org/ns/schema/1.1" href="zbCovConfig">
+    <reltime name="minInterval" val="PT1M" />
+    <reltime name="maxInterval" val="PT1H" />
+    <str name="minCov" val="10:10:10:10:10" />
+    <str name="numPoint" val="0000" />
+</obj>
+
+
++ new attribut in knownsensors contexts : "<configurationLock>1</configurationLock>"
+Once this attribut is set, the sensor is considered as "user configured". The
+sensor will never be automaticaly (re)configured (even if it does not report).
+
+This appears when the sensor is configured with specific parameters through
+ONG browser using COV configuration method.
+
+Actualy the specific paramters are not saved.
+
++ min max reporting time (before considering sensor is not well configured) was
+too strict. This time is now multiplicated by 3.
+
+/* not available
++ min min reporting time (before considering sensor is not well configured) is
+added. This time is multiplicated by 2. This verification does not apply to
+cluster on-off, simplemetering, TICs.
+*/
+
++ snifwatt.x 100% cpu usage, because of wrong timer :
+	pcap_open_live(dev,BUFSIZ,0,-1,errbuf);
+	=>
+	pcap_open_live(dev,BUFSIZ,0,100 /* ms */,errbuf);
+
+
++ new ZCL counters by sensor for "ss" and "sensor" commands :
+	zclsent = s = count of messages sent to sensor
+	zclrecv = r = count of messages received from sensor
+	zclcmnd = m = count of methods messages sent (no wait for ack)
+	zclcmnd = c = count of commands messages sent
+	zclresp = a = count of responses messages received (ack command)
+	zclevnt = v = count of report messages
+	zclrerr = e = count of wrong messages (can not be decoded)
+
+	s == m + c
+	r == a + v + e
+
+[000] a=[aaaa::ff:ff00:2516] s=[CP_RUNNING] n=[]
+[000] s=00000004 r=00000034 m=00000000 c=00000004 a=00000004 v=00000030 e=00000
+[001] a=[aaaa::ff:ff00:262c] s=[CP_RUNNING] n=[]
+[001] s=00000003 r=00000010 m=00000000 c=00000003 a=00000003 v=00000007 e=00000
+[002] a=[aaaa::ff:ff00:2b0a] s=[CP_RUNNING] n=[]
+[002] s=00000006 r=00000023 m=00000002 c=00000004 a=00000004 v=00000019 e=00000
+--DIA--dev=3 app=3 acc=9 dat=8 met=0  repok=107 reperr=0
+
+
++ AwZclEncode() now set m_xxcode to '\0' when an encoding error occurs.
+m_xxcode already set to 'E' when full encoding is right.
+
+
+###############################################################################
+1.0.61	2012/12/10
+###############################################################################
+
+WARNINGS :
+
++ if you do not run the driver on the same host than the ONG, you have to set
+w_boxname to the name of the ONG host.
+
+REQUIREMENTS :
+
++ ONG 2.0.12
+
+COMMON :
+
+SPECIFIC :
+
++ diatemplates for access rights, holderRef for GIP CoAP remote port required:
+<m2m:holderRef>coap://${w_boxname}.${w_domainname}:${w_coapport_r}${s_rootapp}/${w_driverid}</m2m:holderRef>
+
++ requesting identity also requires CoAP remote port (var.c:GetReqId()) :
+
++ $w_boxname, $w_domainname are always converted in lower case (main.c:main()).
+
+###############################################################################
+1.0.60	2012/11/23
+###############################################################################
+
+REQUIREMENTS :
+
+COMMON :
+
++ include files in drvcommon are protected against multiple inclusions
+
++ include files concerning sockets and inet are unnecessary in most source files
+
+SPECIFIC :
+
++ $w_domainname default value change "actility" -> "actility.com"	(var.c)
+
++ $w_boxname is set to gethostname(2) before reading configuration files. The
+result of gethostname(2) is converted in lower case. But $w_boxname can be 
+changed in spvconfig.xml.
+
++ $w_nsclbaseuri default value is "http://nsc1.actility.com:8086/m2m"	(var.c)
+
++ add $w_tpkdev variable with "" as default value			(var.c)
+
++ var.c:GetHostName() suppress "m2m" prefixe before boxname.
+
++ spvconfig.xml :
+
+	<list name="variables">
+	  <str name="w_nsclbaseuri" val="http://nsc1.actility.com:8086/m2m"/>
+	  <str name="w_domainname" val="actility.com"/>
+	  <str name="w_tpkdev" val=""/>
+	</list>
+
++ diatemplates for access rights :
+	-- update acc_elem_*.xml
+	-- update app_elem.xml app_cont.xml
+	-- update ipu_elem.xml net_elem.xml dev_elem.xml
+
+###############################################################################
+1.0.59	2012/11/21
+###############################################################################
+
+REQUIREMENTS :
+
++ libdIai	:1.0.15
+
+COMMON :
+
++ libdIa 1.0.15 correction for memory leak (100b per create request)
+
++ copyrgihts
+
+SPECIFIC :
+
++ copyrgihts
+
+###############################################################################
+1.0.58	2012/11/14
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
+SPECIFIC :
+
++ tunslip.sh : if command tty_mapper is present and returns "<unknown>" the 
+previous treatement was to use ttyUSB0. That is wrong, now we assume that it
+means the dongle is not present.
+
++ "diatemplates/itf_inst_0052_server.xml" units are :
+	- obix:units/watt_hour
+	- obix:units/watt
+	- obix:units/volt_ampere_reactive_hour
+	- obix:units/volt_ampere_reactive
+
+
++ "diatemplates/dat_inst_*.xml" suppress x-unit attribut, exception for TIC
+attributs : x-unit="ERDF-NOI-CPT_02E"
+
+
+###############################################################################
+1.0.57	2012/11/12
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
+SPECIFIC :
+
++ minmaxcov = ( minmaxcov * 30 ) / 20	// * 1.5
+
++ add cluster 0053 (TIC/ICE)
+
++ add cluster 0054 (TIC/CBE)
+
++ add cluster 0055 (TIC/CJE)
+
++ add tic encoding for reporting configuration (as hexa binary data)
+
++ tic data report are saved as ERDF frames.
+
+TESTS :
+
++ TIC/ICE 3 attributs
+
++ TIC/CBE 1 attribut
+
++ tests reporting configuration
+
+
+###############################################################################
+1.0.55	2012/10/26
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ it is possible to customize XML diatemplate files (drvcommon/xmltools.c).
+Search order is now :
+	-- !operating :
+		--- ~/usr/data/<adaptor>/diatemplates
+		--- ~/<adaptor>/diatemplates
+	-- operating :
+		--- ~/usr/etc/<adaptor>/diatemplates
+		--- ~/etc/<adaptor>/diatemplates
+
+SPECIFIC :
+
++ improve delayed start of sensors to avoid dongle congestion; for each sensor
+the start delay (in ms) is now :
+
+	delay	= (nballocated * 1000 ) + 1000;
+
+where nballocated is (number of sensor waiting to start) - 1
+
++ when a report event is received treat it but do not try to speed up sensor
+configuration.
+
++ discoversoft.txt : if "+s" appears in sensor address, it is supposed to be a
+software and simulated sensor. By this way it is not necessary to create 
+knownsensors files to indicate that sensor is a simulated one.
+
+###############################################################################
+1.0.54	2012/10/26
+###############################################################################
+
+WARNINGS :
+
++ alignement error on ARM+COV2
+	echo 3 > /proc/cpu/alignment   # fixup and warn
+  this value slows down too much the CPU (supposition warn => printf), use
+	echo 2 > /proc/cpu/alignment   # fixup
+
+
++ it seems that others part of code than decoding watteco protocol provocok this
+problem
+
+REQUIREMENTS :
+
+SPECIFIC :
+
++ tunslip.sh "echo 2 > /proc/cpu/alignment"
+
++ add notion of simulated sensor to software sensor, mainly :
+	- to use the same supposed sleeping period (10m) than physical sensor
+	- to always start with unknown capacities and not configured
+
+	add <simulated>1</simulated> in knownsensors files
+
+
++ add ntemp.x which simulates upto 50 temperature measurement sensors.
+
+	ntemp.x [-d lost]
+		-d lost : if lost > 0 one message of <lost> is ignored
+
+###############################################################################
+1.0.53	2012/10/22
+###############################################################################
+
+WARNINGS :
+
++ *(ushort *)pt : alignement error on ARM+COV2 if param %2!=0 are ignored !!!
+	to fix them :
+	echo 3 > /proc/cpu/alignment   # fixup and warn
+
++ dev_elem.xml : ETSI.AN_DEV -> ETSI.AN_NODE
+
+
+REQUIREMENTS :
+
+libcoap		:1.8.4
+libdIa		:1.0.10
+m2mxoref	:1.1.6
+rtbase		:1.0.26
+watteco		:1.0.53
+xo		:4.0.30
+
+COMMON :
+
++ diatemplate/itf_inst_0052_server.xml add .m2m to href of points
++ diatemplate/itf_inst_0053_server.xml add .m2m to href of points
+
++ diatemplate : add <m2m:maxNrOfInstances>1</m2m:maxNrOfInstances> to :
+	net_cont.xml app_cont.xml dev_cont.xml ipu_cont.xml
+
++ diatemplate : accessRightID => "${s_rootacc}/Locadmin_AR" for all retargeting
+levels :
+	app_elem.xml dev_elem.xml ipu_elem.xml net_elem.xml
+
+
+SPECIFIC :
+
++ max sensor per router (MAX_SSR_PER_RTR) from 25 to 50
+
++ improved cli command "sendsensor index|addr|* zclmessage"
+   where zclmessage is a full message xx yy zz tt ...
+   or -wip|-panid|-sdesc|-cov cluster [attr]
+   or +cov cluster attr mint maxt val0[:val1[:val2]]]
+
++ add "diatrace [level]" command to CLI. If awspv.x is started with awspv.sh,
+dia traces are redirected to $ROOTACT/watteco/supervisor/stdouterr.log
+
++ no more use ntohs() and ntohl() on uchar *pt, in lib/decode.c to avoid 
+alignement errors
+
++ tunslip.sh calls (if possible) tty_mapper to discover what /dev/tty is used
+for watteco USB dongle. tty_mapper is called with :
+	PRODUCT="FT232R USB UART"
+	TTY_PREFIX="ttyUSB"
+
++ tunslip.sh calls "echo 3 > /proc/cpu/alignment" ...
+
+###############################################################################
+1.0.52	2012/10/17
+###############################################################################
+
+WARNINGS :
+
+COMMON :
+
++ timeout on dia request from 5 to 40 sec. (REQUEST_TIMEOUT_DIA)
+
++ add a retry (3) mechanisme inside macro request DIA, by this way a macro is no
+more fully restarted if a micro request fails on timeout. For each try the
+timeout is (nbretry+1)*REQUEST_TIMEOUT_DIA.
+
+There is still no retry mechanisme for macro request, applications must do
+something in WDiaUCBRequestTimeout() or must use cmn_dia_xxx counters to decide
+what to do.
+
++ add drvcommon/diaclient.c:int DiaFull75() if number of pending request is 75%
+of the maximum of requests.
+
++ add drvcommon/diaclient.c:DiaFindRequestByDevSerial(int dev,int serial) to
+known if pending requests exist for a (device,serial)
+
++ add option -m sleep_msec to simong.x to sleep X millisec after each request
+
++ add option -P to simong.x to suppress piggy backing
+
++ dev_elem.xml : ETSI.AN_DEV -> ETSI.AN_NODE
+
+SPECIFIC :
+
++ sensor.c:iSenSorDiaDeclaration() :
+	-- drop treatement if DiaFull75()
+	-- drop treatement if DiaFindRequestByDevSerial()
+	-- avoid call to DiaFindRequestByDevSerial when possible
+
++ do not reset dia counters on transtion DISCONNECTED -> ALLOCATED
+
++ short list sensors gives a summary of dia counters for all devices :
+	>>ss
+	current sensors detected :
+	[000] a=[aaaa::ff:ff00:263a] s=[CP_RUNNING] n=[detecteur-presence]
+	[000] s=00000000 r=00000000 e=00000000
+	....
+	[014] a=[aaaa::ff:ff00:2271] s=[CP_RUNNING] n=[SO]
+	[014] s=00000000 r=00000000 e=00000000
+	--DIA--dev=15 app=15 acc=45 dat=29 met=0  repok=1 reperr=0
+	>>
+
+
+###############################################################################
+1.0.51	2012/10/16
+###############################################################################
+
+WARNINGS :
+
++ there is now 2 running modes :
+	- one for operation	(Operating=1,default)
+	- one for developpement	(Operating=0)
+
+COMMON :
+
++ drvcommon/diaserver.c add treatement for asynchronous request on server side
+
++ several corrections around valgrind warnings.
+
++ depending on operating mode (default 1) search resources files in :
+	~/etc/xo	(m2m.xor xobix.xor)
+	~/etc/<adaptor-name> (watteco.xor modelconfig.xml spvconfig.xml *.xns)
+	~/etc/<adaptor-name>/templates (*.xml)
+	~/usr/etc/<adaptor-name> (modelconfig.xml spvconfig.xml)
+
+
+SPECIFIC :
+
++ --dev option to run in developpement mode (force Operating=0)
+
++ data conversion :
+	temperature	: /= 100
+	humidity	: /= 100
+	illuminance	: 10 ^ (value-1)/10000
+
++ TIC
+++ add ticdata command in CLI to show history of tic data received 
+
+++ request TIC counter for its counter type
+
+++ report tic type and tic data in binary form to ONG
+
+++ increase size of "dat_inst_0053_0000_0.xml" with comments because $value
+is 400 bytes long (ascii hexa of the tic binary frame)
+
++ support number of endpoint in place of 0x11 flag (3 MSB bits).
+
++ drop report event value depending on modeling. As it is necessary to add a 
+variable in "spvconfig.xml" to map a (cluster,attr,member) to a m2m identifier 
+name, we use the presence of this variable to authorize report event from sensor
+to ong.
+
+
+
+###############################################################################
+1.0.50	2012/10/01
+###############################################################################
+
+WARNINGS :
++ futur watteco sensors will definitively declare clusters which produce data 
+as INPUT clusters and they will be exposed as server clusters.
+
+
+COMMON :
+
+
+SPECIFIC :
+
++ changes all conversions (input/output <-> server/client)
+
++ as old sensors mainly declare output clusters, add key "allinputcluster"
+	<int name="allinputcluster" val="1"/>
+which move output declaration into input declaration.
+
+###############################################################################
+1.0.50	2012/10/01
+###############################################################################
+
+WARNINGS : 
++ libpcap.so is required if snifwatt.x is used.
+
+COMMON :
++ wrong trace in diaserver.c:cb_diaCreateRequest() may cause a crash.
+
+SPECIFIC :
+
++ command "tcpdump like" to capture/analyze watteco protocole on SLIP interface
+
+~/watteco/snif/snifwatt.x [-e] [-i ip_itf_name] [pcap_filters]:
+
+16:10:13.901 aaaa::1 > aaaa::ff:ff00:240f
+#[1150000602]
+OK 0x00060000 ./command/command/on-off/?value=2
+
+16:10:17.242 aaaa::1 > aaaa::ff:ff00:240f
+# [1150000602]
+OK 0x00060000 ./command/command/on-off/?value=2
+
+16:10:18.273 aaaa::ff:ff00:240f -> aaaa::1
+# [110a00520000410c00009400000015a300040000]
+OK 0x00520000 ./response/report-attribut-event/simple-metering/cur-value/?clat=00520000&size=12&xsumwh=000094&xsumvarh=000000&count=5539&xcurwh=0004&xcurvarh=0000
+
+Rq : 
+	- aaaa::1 is the default ONG/driver/watteco IPV6 address
+	- the default filter is "(udp and port 47002 or port 47004)"
+	- it is possible to add conditions to this filter (ex host addr), but
+	it can not be removed.
+	- if a decoding error appears on watteco protocole the process exit 
+	if -e set
+
+
++ add a counter per sensor when a decoding error appears. (rerr=)
+
+###############################################################################
+1.0.49	2012/09/31
+###############################################################################
+
+WARNINGS : 
+COMMON :
+
++ add GetHostTarget() ($w_hosttarget) to all targets in pseudo ong mode.
+So it is now possible to have a pseudo ong on a remote host.
+
++ in simong.x (pseudoong.sh) skip coap://host:port/ in targetID.
+
+
+
+SPECIFIC :
+
++ by default rotative trace files are created in $ROOTACT/var/log/watteco, file
+names are watteco_XX.log (where XX is the day of week); watteco.log is a link
+to the current day file.
+
+Maximun size for each files is 200*1024 bytes.
+
+To change these default values tracefile and tracefile can be used :
+	<list name="parameters">
+		<int name="tracefile" val="/tmp/TRACE.log"/>
+		<int name="tracesize" val="101000000"/>
+	</list>
+
++ process ID is saved in $ROOTACT/var/run/watteco.pid. $ROOTACT can be empty.
+The file is deleted when process exit.
+
++ default spvconfig.xml <int name="httpsensorlist" val="1"/>
+
++ change trace level to 1 for "router address (@1) not found" once reported.
+
++ redirect tunslip.x traces to /dev/null
+
++ a sensor without cov configuration should not remain in configuring state.
+
+
+###############################################################################
+1.0.48	2012/09/24
+###############################################################################
+
+WARNINGS : 
+
++ default application data and configuration directory see below
+
+COMMON :
+
++ see ~/etc/init.d/awspv and code in main.c for UNIX services, and choose what
+is reusable.
+
++ diatools.c:WDiaParseMethod() skip ${w_driverpath} instead of SCL_ROOT_APP
+coap://[::1]:5684/6lowpan/APP_020000ffff00240f.1/retargeting/0x0006.0x02.ope
+
++ diatemplates/ipu_elem.xm : add IPU prefix to aPOC
+
+SPECIFIC :
+
++ default application data and configuration directory is changed to
+ $ROOTACT/usr/data/watteco. If not set, AW_DATA_DIR is forced to this default
+ value, otherwise AW_DATA_DIR can always points to a any other directory.
+
++ in ~/etc/init.d add the file script "awspv" for services:
+
+	Usage: awspv [<options>] {start|stop|status|statusext|restart}
+	  Where options are:
+	 -h|--help    Print this help message
+	 -i|--init    Re-initialize watteco data
+
+  service command does not start $ROOTACT/watteco/awspv.x but starts in fact
+  $ROOTACT/watteco/awspv.sh which can be overloaded by $AW_DATA_DIR/shells/?
+
+  The real executable awspv.x must be started with nohup (otherwise in some
+  cases pidof does not run on boxcov2).
+	
+  statusext not only verify if process exists, but try to establish a simple
+  dialog (via USR1/file) with the process to see if it is not freezed :
+  	- responding to signal
+	- internal message queue running
+
+  --init option calls $ROOTACT/shells/clean_before_start.sh which can be
+  overloaded by $AW_DATA_DIR/shells/?
+
++ add source /etc/profile in ~/etc/init.d/awspv and ~/tunslip/tunslip6.sh to get
+ROOTACT
+
++ awspv no more sends "PANID request" for new detected sensors.
+
++ "configure reporting request" is now based on "modelconfig.xml"
+
+To use previous mechanism with files in $AW_DATA_DIR/sensorconfig set parameter
+"covconfig" to 0.
+
++ extend sendsensor command to configure dynamicaly COV parameters :
+
+	sendsensor addr +cov clusterid attrid mint maxt params
+	- clusterid and attrid must be given in hexa
+	- mint and maxt are given in seconds
+	- params : depends on the cluster/attr destination.If there are more one
+	than one value, use ':' as separtor. Actuly the only cluster concerned 
+	is 0052.
+
+
+	ex :
+
+	sendsensor aaaa::ff:ff00:2516 +cov 000c 0055 30 60 15
+	sendsensor aaaa::ff:ff00:240f +cov 0052 0000 30 60 60:60:10:10:10
+
+
++ add covcfg and configsensor commands to cli.
+
+
+
+###############################################################################
+1.0.47	2012/09/24
+###############################################################################
+
+WARNINGS : 
+
++ param n for MdlGetCovConfigurationByNumEntry() is [0..n-1]
+
++ change prototype of function iCmnSensorExecuteMethod() now it is :
+
+int iCmnSensorExecuteMethod(t_cmn_sensor *cmn,int app,int cluster,int numm,
+	int targetlevel,void *obix,char *targetID);
+
++ if compiled with libdIa 1.0.6 ONG must be updated with the same version
+	(see copper : firefox coap plugin)
+
+COMMON :
+
++ each time a (macro) DIA request (diaxxx.c) ended new mandatory user functions
+are called :
+
+- int	WDiaUCBRequestOk(char *reqname,t_dia_req *preq,t_cmn_sensor *cmn)
+- int	WDiaUCBRequestTimeout(char *reqname,t_dia_req *preq,t_cmn_sensor *cmn)
+- int	WDiaUCBRequestError(char *reqname,t_dia_req *preq,t_cmn_sensor *cmn)
+
+Just use the 6 first characters of reqname (DiaIpu, DiaDev, DiaNet, ...)
+preq->rq_name is a micro request name (DiaIpuXXXXCreate,DiaNetXXXXRetrieve ...)
+cmn can be NULL
+
+It is possible to desynchorise treatements and stop stack growth by sending
+messages (with rtl_imsgAdd()) in these callbacks.
+
+It is possible to ask for a new DIA request (see supervisor/diaucb.c)
+
++ add MdlGetNbCovConfigurationEntries() and MdlGetCovConfigurationByNumEntry()
+
++ add a mandatory function for execution method on network :
+int	CmnNetworkExecuteMethod(char *ident,int targetlevel,void *obix,char *targetid)
+
++ for iCmnSensorExecuteMethod & CmnNetworkExecuteMethod data associated with
+the create request are parsed (obix mode) if present.
+
++ attr/command/point suppression in itf_inst*.xml for modeling is no more based
+on the href attribut bcause it could be not present (val used). To avoid
+suppression of interfaceID clusterID clusterType, attribut status is used and
+is cleared before serialization by calling MdlUnsetStatusInterfaceTemplate(itf)
+
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="OnOff.Srv" status="cfg-mandatory"/>
+    <str name="clusterID" val="0x0006" status="cfg-mandatory"/>
+    <enum name="clusterType" val="server" status="cfg-mandatory"/>
+
+    ...
+
+</obj>
+
+SPECIFIC :
+
++ add covconfig parameter in spvconfig.xml to activate/deactivate the COV
+configuration for the sensors. add -C option to disable COV configuration.
+
+
++ add reactive energy for cluster 0x0052 :
+	- sensor.c:iSensorZclEvent() 
+		value	= zmsg->u_param.m_metering_value.m_sumVarh;
+		value3	= zmsg->u_param.m_metering_value.m_curVarh;
+	- update itf_inst_0052_server.xml with
+		-- extCurrentSummationDeliveredR
+		-- extInstantaneousDemandR
+	- add dat_inst_0052_0000_1.xml
+	- add dat_inst_0052_0000_4.xml
+
+
+
++ TIC counters :
+	"include/watteco.h"
+	- W_CLU_COUNTERTIC (0x0053) cluster "TicMetering"  with 2 attributs
+		-- W_ATT_COUNTERTIC_DATA (0x0000) raw data in hexa ascii string
+		-- W_ATT_COUNTERTIC_TYPE (0x0001) 1 byte
+	- for raw data :
+		typedef	struct
+		{
+			unsigned	char	m_sz;
+			unsigned	char	*m_ptr;	// in data message
+		}	STRUCTPACKED	t_zcl_raw_data_ptr;
+
+	"diatemplates"
+	- itf_inst_0053_server.xml with :
+		-- extCounterData (obix:str)
+		-- extCounterType (obix:int)
+	- dat_inst_0053_0000_0.xml
+	- dat_inst_0053_0001_0.xml
+
+	"lib/infoproto.c" update clusters and attributs tables
+
+	"lib/decode.c" update AwZclEncodeReadAttrResp()
+
+	"lib/encode.c" update AwZclDecodeReadAttrResp()
+
+
+###############################################################################
+1.0.46	2012/09/13
+###############################################################################
+
++ max sensors per router-controller from 10 to 25 (aw.h:MAX_SSR_PER_RTR)
+
++ add occupancy sensor (0x406) :
+	- diatemplates/itf_inst_0406_server.xml
+	- diatemplates/dat_inst_0406_0000_0.xml
+	- config/spvconfig.sh
+		<str name="0x0406.0x0000.0.m2m"	val="m2mMeasuredValue"/>
+	- sensor.c:iSensorZclEvent() add report value (binary like)
+
++ attr/command/point suppression in itf_inst*.xml for modeling is no more based
+on the href attribut because it could be not present (val used). To avoid
+suppression of interfaceID clusterID clusterType, attribut status is used and
+is cleared before serialization by calling MdlUnsetStatusInterfaceTemplate(itf)
+
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="OnOff.Srv" status="cfg-mandatory"/>
+    <str name="clusterID" val="0x0006" status="cfg-mandatory"/>
+    <enum name="clusterType" val="server" status="cfg-mandatory"/>
+
+    ...
+
+</obj>
+
++ separation of common and specific sources :
+	- in drvcommon add speccproto.h and specextern.h to define/declare
+	global variables and functions specific to a driver
+	- suppression of DRIVER_DATA_DIR replaced by char *GetEnvVarName();
+	- replace AwVersion() by GetAdaptorVersion()
+
+sources in drvcommon can now be compiled without sources in supervisor and
+without important warnings.
+
++ tunslip.sh verify/create /dev/ttyUSB0 and /dev/net/tun (c 10 200)
+
++ correction iso8601.c
+
++ libdIa 1.0.6 : URI paths are splited in several pieces (/), each element of 
+path is stored in the correct coap option. It is now possible to use copper
+coap plugin with M2M real resource names:
+
+Debug Options : X
+Token : [1-9][0-9]*
+POST :
+coap://[::1]:5684/6lowpan/APP_020000ffff00240f.1/retargeting/0x0006.0x02.ope
+
++ when reading knownsensor files the number of cluster IN/OUT are now controled
+and limited to 10 (total 20).
+
+
+###############################################################################
+1.0.45	2012/09/13
+###############################################################################
+
++ each time the DIA layer (diaxxx.c) access to templates, 2 users call backs
+are called :
+- int	WDiaUCBPreLoadTemplate(char *reqname,t_dia_req *preq,char *target,t_cmn_sensor *cmn,void *xo)
+
+- int	WDiaUCBPostLoadTemplate(char *reqname,t_dia_req *preq,char *target,t_cmn_sensor *cmn,void *xo)
+
+The first is called just before loading the template file, the second one is
+called just after loading the file. By this way all specific code can be removed
+from dia???.c files and is reported in diaucb.c depending on the dia request
+name.
+
+###############################################################################
+1.0.44	2012/09/13
+###############################################################################
+
++ create drvcommon/libdrivercommon.a with :
+	admtcp.c
+	ctools.c
+	diaacc.c
+	diaapp.c
+	diadat.c
+	diadev.c
+	diaipu.c
+	diakal.c
+	dianet.c
+	diarep.c
+	diaclient.c
+	diaserver.c
+	diatools.c
+	iso8601.c
+	model.c
+	vartools.c
+	xmltools.c
+
++ ignore (trap) SIGHUP SIGINT SIGINT in tunslip.sh
+
++ add dianet command in admin CLI
+
++ It was not possible to communicate with a remote ONG because of a wrong used 
+of spvconfig.variables.w_coapaddr_r (var.c:GetHostTarget). [] are added to URI
+if IPV6 addresses are used.
+
+Tested values :
+	<str name="w_coapaddr_r" val="::1"/>
+	<str name="w_coapaddr_r" val="fe80::219:99ff:fe62:8a90"/>
+	<str name="w_coapaddr_r" val="fc00::219:99ff:fe62:8a90"/>
+	<str name="w_coapaddr_r" val="pseudoong"/>	=> /etc/hosts
+
++ return code "STATUS_CONFLICT" from DIA is treated as "STATUS_CREATED".
+libdIa >= 1.0.5 required 409 => "STATUS_CONFLICT" and not "STATUS_BAD_REQUEST"
+
++ MAX_ATT_PER_CLS from 5 to 256 for searching dat_inst_%04x_%04x_%d.xml file
+templates for a cluster. This #define has a bad impact on performances, but the
+attribut numbers for watteco are not consecutive and it seems there is no rule.
+See sensor.c:iCmnSensorDiaStartDataMethod.
+
++ Search strings declaration (sensor.c:iCmnSensorSetSearchStringInObj) :
+	- "Cli" -> "Clt"
+#TODO???- reverse client/server role for ZigBee.InterfaceID == "Clt|Srv"
+	- do not add search string if not present in modeling configuration
+
++ In all XML templates change "{s_rootact}/accessRights/X" by "{s_rootact}/X"
+because $s_rootact already contains /accessRights/
+
++ For "dat_cont.xml" add namespace xmlns:acy="http://uri.actility.com/m2m" if
+necessary (model.c:MdlConfigureDataContainerTemplate)
+
++ add a parameter "modeling" in spvconfig to activate/deactivate the modeling
+configuration event if a modeling file is present :
+	<int name="modeling" val="0"/>
+
++ add config/modelconfig.xml to package runtime list : by default no modeling,
+see parameter "modeling".
+
++ sensor.c:iCmnSensorDiaStartDataMethod do not verify (m2mid=GetVarNoWarn(map))
+if parameter modeling is not set (ie MdlCfg is NULL).
+
++ Sensors configuration are no more searched in deliverie but only in
+$AW_DATA_DIR/sensorconfig. If sensors configuration is required copy files
+from $ROOTACT/watteco/sensorconfig to $AW_DATA_DIR/sensorconfig.
+
++ In all XML templates change "zcl" by "zb" (zclOnOff -> zbOnOff)
+
++ in diaserver.c:cb_diaCreateRequest substitute '\' by '/' in param targetID.
+By this way it is possible to call a method with the copper coap plugin firefox.
+
+Debug Options : X
+Token : [1-9][0-9]*
+POST :
+coap://[::1]:5684/m2m\applications\APP_020000ffff00240f.1\retargeting\0x0006.0x02.ope
+
++ in adaptor.h add #define DRIVER_DATA_DIR to define the environment variable
+associated to the driver.
+
+
+###############################################################################
+1.0.43	2012/09/10
+###############################################################################
+
++ if $AW_DATA_DIR is not set for process :
+	- watteco/tunslip/tunslip.sh
+	- watteco/supervisor/awspv.x
+we use "$ROOTACT/data/watteco" to read/write application datas. This mainly 
+concerns "knownsensors" directory (which keeps records of already known sensors)
+and configuration files.
+
+As consequences :
+
+- "spvconfig.xml" is read from (both) :
+	- $ROOTACT/watteco/config
+	- $ROOTACT/data/watteco/config
+
+- "modelconfig.xml" is read from (exclusive or) :
+	- $ROOTACT/data/watteco/config
+	- $ROOTACT/watteco/config
+
+- "knownsensors/*.xml" are read from :
+	- $ROOTACT/data/watteco/knownsensors/*.xml
+
+
++ bug in sensor.c:SensorCreateKnown() list of sensors was badly read.
+
++ add analogic (0x000c) and binary (0x000f) clusters for watteco.
+
++ add diatemplates/*.xml to package runtime list.
+
+
+###############################################################################
+1.0.42	2012/08/22
+###############################################################################
+
++ read "modelconfig.xml" from $AW_DATA_DIR/config or $ROOTACT/watteco/config :
+
+ - mapping between m2m names and clusters/attributs paths in "spvconfig.xml" :
+
+<!--
+     m2m mapping cluster.attribut.member.type => m2m attribut/point/cmd name
+     	0x%04x.0x%04x.%d.m2m
+     	0x%04x.0x%04x.%d.attr
+     	0x%04x.0x%02x.ope
+-->
+<list name="mapping">
+	<str name="0x0006.0x00.ope"	val="zclOff"/>
+	<str name="0x0006.0x01.ope"	val="zclOn"/>
+	<str name="0x0006.0x02.ope"	val="zclToggle"/>
+	<str name="0x0006.0x0000.0.attr"	val="zclOnOff"/>
+	<str name="0x0006.0x0000.0.m2m"	val="m2mOnOff"/>
+	<str name="0x0052.0x0000.0.m2m"	val="m2mCurrentSummationDelivered"/>
+	<str name="0x0052.0x0000.3.m2m"	val="m2mInstantaneousDemand"/>
+	<str name="0x0400.0x0000.0.m2m"	val="m2mMeasuredValue"/>
+	<str name="0x0402.0x0000.0.m2m"	val="m2mMeasuredValue"/>
+	<str name="0x0405.0x0000.0.m2m"	val="m2mMeasuredValue"/>
+</list>
+
+The mapping is not read from customer configuration "$AW_DATA_DIR/config" but
+only in the package configuration "$ROOTACT/watteco/config".
+
+
+ - delete attributs/points/commands in templates "itf_inst_*.xml" which are not
+ defined in "modelconfig.xml". 
+
+ Done by calling MdlConfigureInterfaceTemplate() and MdlGetInterface() in 
+ sensor.c:iCmnSensorSetInterfaceListInObj()
+
+
+ - add attributs "m2m:maxNrOfInstances" "m2m:maxByteSize" "m2m:maxInstanceAge"
+ to containers template "dat_cont.xml" (m2m:container type) with values defined
+ in "modelconfig.xml".
+
+ Done by calling MdlConfigureDataContainerTemplate() and MdlGetInterface() in
+ diadat.c:DiaDatContCreate()
+
+ - add "<x-acy-storageConfiguration>" to templates "dat_cont.xml" with
+ values defined in "modelconfig.xml" :
+ 	"ong:storageDriver" => 
+	<m2m:container>
+		...
+		<acy:storageConfiguration>
+			<acy:param name="store:driver" val="ram"/>
+		</acy:storageConfiguration>
+	</m2m:container>
+
+ Done by calling MdlConfigureDataContainerTemplate() and MdlGetInterface() in
+ diadat.c:DiaDatContCreate()
+
+
+ - TODO resources associated to "dat_cont.xml" must be updated if they already
+ exist in the SCL, this is to take into account changes in "modelconfig.xml"
+ when AWSPV is restarted.
+
+ - TODO covConfiguration
+
+
++ a command "tmodel.x" in ~/watteco/supervisor can perform tests on modeling 
+configuration.
+
++ it is possible to configure a specific "dat_cont.xml" template for each
+containers by creating "dat_cont_%04x_%04x_%d.xml". In this case containers
+modeling is not performed.
+
+
+
+###############################################################################
+1.0.41	2012/07/24
+###############################################################################
+
++ function 'char *WDiaInterfaceName(int cluster)' is moved from diatools.c to 
+sensor.c and is renamed char *SensorClusterToInterfaceName(int cluster)
+
++ specific watteco : max members per attribut
+	include/aw.h : MAX_MBR_PER_ATT from 3 to 5
+
++ diatemplates corrections :
+
+    <m2m:accessRightID>${s_rootacc}/Locadmin_AR</m2m:accessRightID>
+    =>
+    <m2m:accessRightID>${s_rootacc}/accessRights/Locadmin_AR</m2m:accessRightID>
+
++ diatemplates "dat_cont.xml" diadat.c:DiaDatContCreate()
+
+  -search for optionnal "dat_cont_%04x_%04x_%d.xml" before using "dat_cont.xml",
+  this is useful to set standard (and non standard) storage parameters like :
+    <m2m:maxNrOfInstances>100</m2m:maxNrOfInstances>
+    <m2m:maxInstanceAge>P1M</m2m:maxInstanceAge>
+    <x-acy-storageConfiguration>
+          <param name="store:driver" val="ram"/>
+    </x-acy-storageConfiguration>
+
+
+###############################################################################
+1.0.40	2012/07/13
+###############################################################################
+
+
++ main functions (non static one) are in lines documented in doxygen forms.
+
++ hmlt results of doxygen (default options) is delivered as is :
+	~/watteco/supervisor/html/*
+
++ add variable "$s_telnetkey" for cli password
+
++ add variable "$s_telnetport" for cli tcp/port
+
++ 'admtcp.c' now contains only generic code for Command Line Interface. 
+Features :
+	- init / bind (use $s_telnetkey and $s_telnetport)
+	- asynchronous read / write
+	- basic password management
+	- built in commands
+		-- stop
+		-- who
+		-- exit | quit
+		-- core
+		-- close
+		-- xoocc
+		-- getvar setvar addvar
+	- possible call back for specific commands : if a command is not found
+	in built in commands, a user call back is used. To set this call back :
+
+		void	AdmTcpSetCB(int (*fct)(t_cli *,char *))
+
+
++ specific code for Watteco Command Line Interface is now in "admcli.c"
+
++ 'struct.h' now contains only generic structures
+
++ 'sensor.h' contains specific "t_sensor" structure which must include a common 
+sensor structure of type "t_common_sensor" defined in struct.h. By this way, the
+only file depending on 't_sensor' (specific to watteco) is 'sensor.c'.
+
++ acquisition and treatement of the network ID is watteco dependent, the code is
+now in sensor.c When this ID is ready, sensor.c:SensorSetNetId() set the 
+variable "w_netid" and send a IM_NETWORK_ID_UPDATE message to the main loop 
+which can call DiaIpuStart() and DiaNetStart().
+
+
+###############################################################################
+1.0.39	2012/06/29
+###############################################################################
+
+
++ when starting use the known sensors list (from $AW_DATA_DIR/knownsensors dir) rather than from $AW_DATA_DIR/discover*.txt. This because the http server of the router gives a list of "active" sensors and no more a list of already known sensors.
+
++ by default http request to get sensor list from router is active.
+	* -H option to desactivate it
+	* <int name="httpsensorlist" val="0|1"/> to change configuration
+
+  vsize from 4341760 to 13783040 ! (stack size by thread ?)
+
++ ./pseudoong/simong.x now uses static libcoap & libdIa libraries
+
+
+###############################################################################
+1.0.38	2012/06/22
+###############################################################################
+
++ split dia code in several parts :
+	- diatools.c	: interface with dia/coap/udp
+	- diaclient.c	: DIA client side (create/retrieve requests)
+	- diaxxx.c	: for DIA macro requests used by client side
+	- diadef.h	: define to develop macro requests
+	- diaserver.c	: DIA server side (retargeting/method)
+
++ change name space for watteco driver :
+
+watt	http://uri.actility.com/m2m/adaptor-watteco
+
+###############################################################################
+1.0.37	2012/06/19
+###############################################################################
+
++ add a configuration file read from :
+	1) $ROOTACT/watteco/config/spvconfig.xml
+	2) $AW_DATA_DIR/config/spvconfig.xml
+
++ use libdIa/Version 1.0.2p  (with tid+peer as transaction identifier)
+
+###############################################################################
+1.0.36	2012/06/19
+###############################################################################
+
++ new URL format :
+	- Attribute:	0xClusterId.0xAttributId[.MemberId].attr
+
+	- Point:	0xClusterId.0xAttributId[.MemberId].m2m
+
+	- Command:	0xClusterId.0xCommandId.ope
+
++ error on targetID for app/containers/contentInstance
+
+	   
+
+###############################################################################
+1.0.35	2012/06/15
+###############################################################################
+
+- add -X option to get a full traces of DIA requests/responses on stdout.
+
+- diatemplates :
+	<m2m:path>/retargeting1</m2m:path> =>  <m2m:path>retargeting1</m2m:path>
+
+- add coap://localhost to all targetid
+
+- use :
+	- rtbase/Version	1.0.17
+	- libcoap/Version	1.8.2
+	- libdIa/Version	1.0.2
+	- xo/Version		4.0.28
+	- m2mxoref/Version	1.1.3
+
+
+###############################################################################
+1.0.34	2012/06/15
+###############################################################################
+
+- first integration with ONGV2 :
+	- some little problems with dia/song requests mapping (create => get...)
+	- some docs created (IPU NETWORK elem and cont)
+	- STATUS_PERMISSION_DENIED because of accessRights
+	- crash in libcoap
+	- perhaps a problem with xoref version (xsd like)
+
+
+###############################################################################
+1.0.32	2012/06/13
+###############################################################################
+#
+###############################################################################
+1.0.20	2012/05/06
+###############################################################################

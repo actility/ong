@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+#
+#	w_ipuid
+#	w_netid
+#	w_panid
+#
+-->
+<obj 
+x-template="${w_template}"
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="networkID" val="NW_${w_netid}"/>
+    <str name="extendedPanID" val="0x${w_netid}"/>
+    <str name="panID" val="0x${w_panid}"/>
+    <list name="nodes">
+<!--
+     See sensor.c:SensorSetDeviceListInObj()
+
+        <ref href="${s_rootapp}/DEV_0b435eff56a3bbbb/containers/DESCRIPTOR/contentInstances/latest/content"/>
+-->
+    </list>
+</obj>

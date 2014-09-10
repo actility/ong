@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:contentInstance xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="cis0" href="href for cis0">
+  <m2m:creationTime>2012-02-01T21:00:00+01:00</m2m:creationTime>
+  <m2m:contentTypes>
+    <m2m:contentType>base16 cis</m2m:contentType>
+    <m2m:contentType>base64 cis</m2m:contentType>
+  </m2m:contentTypes>
+  <m2m:content xmime:contentType="base64 cis">cGxlYXN1cmUu</m2m:content>
+</m2m:contentInstance>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="OnOff.Clt" status="cfg-mandatory"/>
+    <str name="zbClusterID" val="0x0006" status="cfg-mandatory"/>
+    <enum name="zbClusterType" val="client" status="cfg-mandatory"/>
+
+    <!-- ZigBee attributes -->
+            
+    <!-- ZigBee commands -->
+    <op name="zbBind" href="${s_rootapp}/APP_${d_ieee}.${a_num}/${r_pathOpe0}/0x0006/zbBind"/>
+    <op name="zbUnbind" href="${s_rootapp}/APP_${d_ieee}.${a_num}/${r_pathOpe1}/0x0006/zbUnbind"/>
+
+</obj>

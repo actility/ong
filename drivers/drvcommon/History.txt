@@ -1,0 +1,242 @@
+
+###############################################################################
+1.4.14	2014/02/04
+###############################################################################
+
++ apu dependencies
+
+###############################################################################
+1.4.13	2013/12/20
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ monotonic clock : 
+	- rtl_tmmsmono() instead of rtl_tmms()
+	- rtl_timemono() instead of time()
+
+###############################################################################
+1.4.12	2013/12/10
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ add "containers" resources deletion via :
+ - void	DiaDatContDelete(t_dia_req *preq,t_dia_rspparam *par,...)
+ - void	DiaDatDelete(int dev,int serial,int app,int cluster,int attr,int member)
+
++ add devel apu
+
+
+###############################################################################
+1.4.11	2013/12/08
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ the library is renamed "lib/libdrvcommon.a"
+
++ RQT_UPDATE_ELEM|RQT_UPDATE_CONT was erroneous when RETRIEVE request returns 
+"STATUS_NOT_FOUND", this status must be kept and the flags UPDATE are reset.
+
++ tests only : it is possible to set a default request mode for all requests
+using DiaSetDefaultRequestMode(int flags);
+
++ <m2m:accessRight> UPDATE request must delete m2m:id attribut.
+
++ if a context error happen (*) the request is immediatly set in NUSE state to
+avoid loop ... this is quiet rough (**), a special state should be created
+to deal this case.
+
+(*) CmnSensorNumSerial() or rq_cbserial() or rq_cbuserctxt() return an error
+when called in WDiaUserContext().
+(**) probably memory leak
+
++ diaIncomingRequestCompletion() add a control on dia context 
+
+###############################################################################
+1.4.10	2013/12/03
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ the following functions are no more declared as static (private) :
+	void DiaAccElemDelete(t_dia_req *preq,t_dia_rspparam *par,...);
+	void DiaAccElemRetrieve(t_dia_req *preq,t_dia_rspparam *par,...);
+	void DiaAppElemDelete(t_dia_req *preq,t_dia_rspparam *par,...);
+	void DiaAppElemRetrieve(t_dia_req *preq, t_dia_rspparam *par, ...);
+	void DiaDatElemRetrieve(t_dia_req *preq, t_dia_rspparam *par, ...);
+	void DiaDevElemDelete(t_dia_req *preq,t_dia_rspparam *par,...);
+	void DiaDevElemRetrieve(t_dia_req *preq, t_dia_rspparam *par, ...);
+	void DiaIpuElemDelete(t_dia_req *preq,t_dia_rspparam *par,...);
+	void DiaIpuElemRetrieve(t_dia_req *preq, t_dia_rspparam *par, ...);
+	void DiaNetElemDelete(t_dia_req *preq,t_dia_rspparam *par,...);
+	void DiaNetElemRetrieve(t_dia_req *preq, t_dia_rspparam *par, ...);
+	void DiaRepInstCreate(t_dia_req *preq,t_dia_rspparam *par,...);
+
+ and now can be used directly from drivers.
+
+
++ to finally and completely overload the retrieval mechanism for driver context,
+two fields are added to structure t_dia_req :
+
+	void	*rq_userctxt;	// user context used with rq_cbuserctxt
+	t_cmn_context *(*rq_cbuserctxt)(struct s_dia_req *req);
+
+The rules to select the retrieval type are (see diatools.c:WDiaUserContext) :
+
+ if (rq_serial && rq_userctxt == NULL && preq->rq_cbserial == NULL)
+ {
+ 	cmn = CmnSensorNumSerial(rq_dev,rq_serial);
+	return;
+ }
+ if (rq_serial && rq_userctxt == NULL && preq->rq_cbserial != NULL)
+ {
+ 	cmn = rq_serial(rq_dev,rq_serial);
+	return;
+ }
+ if (rq_cbuserctxt)
+ {
+ 	cmn = rq_cbuserctxt(preq);
+	return;
+ }
+// this is not an error, ie DiaIpuXXXX & DiaNetXXXX watteco & zigbee
+ return;
+
+ It is strongly recommended to verify that rq_userctxt is still allocated and
+ corresponds to a driver structure for the initial/same "object" (rq_serial).
+
+
+
+
+###############################################################################
+1.4.9	2013/11/29
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ add WDiaStatusCode(int crudtype,int ret) function to try to establish relation
+between DIA/COAP status code and callbacks return codes. Note that the result
+depends on the requestype (create,retrieve,update,delete).
+
++ it is now possible to call diaIncomingRequestCompletion(tid,ctt,len,cttType,re
+tcode) with tid < 0 directly from driver callbacks :
+	- IpuExecuteMethod()
+	- CmnNetworkExecuteMethod()
+	- iCmnSensorExecuteMethod()
+	- iCmnSensorRetrieveAttrValue()
+	- iCmnSensorUpdateAttrValue()
+
+By this way drivers can sent response at any time and/or can have full control
+on the DIA retcode status.
+
+If diaIncomingRequestCompletion() is used the return code of the callback is
+ignored.
+
++ Summuray of callback return codes treatement :
+	- if the callback has called diaIncomingRequestCompletion() with tid=-1
+	the return code is ignored and drvcommon does nothing more.
+	- if the callback returns a code > 0, this indicates that the driver
+	itself will send a response later using diaIncomingRequestCompletion()
+	and a valid tid.
+	- if the callback returns a code <= 0, this means that the driver asks
+	for an automatic response (without document) and a status code string
+	got with WDiaStatusCode(return_code). So a negative code does mean an
+	error. Return code 0 means 201, 202, 204, 205 depending on the context.
+
+Example :
+
+int iCmnSensorUpdateAttrValue(...,int tid)
+{
+	if	(....)
+	{
+		return	NEGATIVE_VALUE;	
+		// a default response will be sent by libdrvcommon immediatly
+	}
+	if	(....)
+	{
+		return	POSITIVE_VALUE;
+		// tell drvcommon we shall sent a response later
+	}
+	if	(....)
+	{
+		char *xml	= "....";
+		char *type	= "application/xml";
+		char *status	= WDiaStatusCode(DIA_UPDATE,204);
+		diaIncomingRequestCompletion(-1,xml,sz,type,status);
+		return	xxxx;
+		// we have sent a response, drvcommon will do nothing more
+	}
+	if	(....)
+	{
+		return	0;
+		// a default "OK" response will be sent by libdrvcommon
+	}
+
+	return	NEGATIVE_VALUE;	
+	// a default response will be sent by libdrvcommon
+}
+
+
+
+###############################################################################
+1.4.8	2013/11/27
+###############################################################################
+
+WARNINGS :
+
++ struct t_dia_req has a new member rq_flags
+
+REQUIREMENTS :
+
+COMMON :
+
++ DiaSetRequestMode(int flags);
+ 	where flags can be RQT_UPDATE_ELEM|RQT_UPDATE_CONT
+
+ This function can be used to update document associated to "elem" or "cont"
+ parts of a resource before adding a "inst" document. The scope is limited to
+ the next request posted by Dia[Ipu|Net|Dev|App|Acc|Dat]Start() functions. Flags
+ are reset to 0 after each call to DiaXXXStart() DiaXXXDelete().
+
+ All works as if the "elem" or "cont" documents need to be created, the same
+ callbacks and templates are used. A small difference is that xo.appId and
+ xo.m2m:id are removed from the document (respectively "elem" and "cont").
+
+ Example :
+	DiaSetRequestMode(RQT_UPDATE_ELEM|RQT_UPDATE_CONT);
+	DiaNetStart();
+
+###############################################################################
+1.4.7	2013/11/19
+###############################################################################
+
+WARNINGS :
+
+REQUIREMENTS :
+
+COMMON :
+
++ drvcommon/diatools.c:WDiaParseMethod() :
+ now accept method on device with cluster and attribut numbers. Mainly for
+ reboot command on watteco devices.

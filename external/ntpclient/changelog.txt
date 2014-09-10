@@ -1,0 +1,60 @@
+-------------------------------------------------------------------------------
+ntpclient changelog
+-------------------------------------------------------------------------------
+Version: 2010.365
+Revision: 9
+Date: 2014-02-04
+
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Few fixes for raspberry-pi compilation.
+
+Dependencies:
+-------------
+- N/A 
+
+-------------------------------------------------------------------------------
+Version: 2010.365
+Revision: 8
+Date: 2013-12-13
+
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Change ntp init script to take into account apu-install new model.
+
+Dependencies:
+-------------
+- N/A 
+
+-------------------------------------------------------------------------------
+Version: 2010.365
+Revision: 7
+Date: 2013-07-11
+
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Change ntp init script so that the NTP server and NTP port to use are loaded
+  from $ROOTACT/etc/ntp.conf file. This aims at making it easier to configure 
+  the service if the ONG runs behind a firewall.
+
+Dependencies:
+-------------
+- N/A 
+
+-------------------------------------------------------------------------------
+

@@ -1,0 +1,4 @@
+
+if [ -f /etc/init.d/rcS -a -z "`grep \"ROOTACT/etc/ong start\" /etc/init.d/rcS`" ]; then
+ echo -e "\nsource "$PROFILE" && \$ROOTACT/etc/ong start\n" >> /etc/init.d/rcS
+fi

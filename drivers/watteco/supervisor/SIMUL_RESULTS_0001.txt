@@ -1,0 +1,26 @@
+09:52:58.010 :
+
+start watteco simulator in degraded mode (1 of 3 message is willfully ignored)
+
+09:53:03.021 :
+------------
+start watteco driver
+
+10:03:54.866 :
+------------
+
+11 sensors are at RUNNING state
+8 sensors are at WAITINGDESC state (waiting for simple-desc response)
+5 sensors are at CONFIGURING state (waiting for report-config response)
+
+8 sensors have reported
+
+
+10:45:33.534 :
+------------
+23 sensors are at RUNNING state
+1 sensors are at CONFIGURING state (waiting for report-config response)
+
+10:51:47.604 :
+------------
+24 sensors are at RUNNING state

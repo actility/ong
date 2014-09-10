@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <!-- M2M -->
+    <str name="nodeID" val="DEV_${d_ieee}"/>
+    <list name="applications">
+    </list>
+    
+    <!-- KNX -->
+    <str name="knxGroupAddress" val="${knxGroupAddress}"/>
+</obj>

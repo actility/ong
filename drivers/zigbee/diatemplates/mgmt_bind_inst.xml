@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj
+xmlns="http://obix.org/ns/schema/1.1">
+   <str name="srcAddr" val="${a_configVal0}" />
+   <int name="srcEndpoint" val="${a_configVal1}" />
+   <str name="clusterId" val="${a_configVal2}" />
+   <enum name="dstAddrMode" val="${a_configVal3}" />
+   <str name="dstAddr" val="${a_configVal4}" />
+   <int name="dstEndpoint" val="${a_configVal5}" />
+</obj>
+

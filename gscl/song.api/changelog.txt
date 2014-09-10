@@ -1,0 +1,125 @@
+-------------------------------------------------------------------------------
+SONG API changelog
+-------------------------------------------------------------------------------
+Version: 4.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - report patches for IS2T VM compatibility.
+ - Changed the groupId for com.actility.m2m (was com.actility).
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.6.0
+Date: 2013-10-07
+
+New Features:
+-------------
+ - Added new statistics to SONG layer
+ - Added new SONG servlet attribute "com.actility.servlet.song.DomainName"
+   which declares the default domain name in the Servlet container
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.4.1
+Date: 2012-10-31
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. A 202 response was interpreted as a provisional response instead
+   instead of a success response
+
+-------------------------------------------------------------------------------
+Version: 3.4.0
+Date: 2012-10-23
+
+New Features:
+-------------
+ - Added API to export SONG statistics
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.2.0
+Date: 2012-07-12
+
+New Features:
+-------------
+ - Now SONG message id is directly accessible through the method getId
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2012-06-05
+
+New Features:
+-------------
+ - New proxy API
+ - Re-aligned version according to ETSI transport specification
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2012-03-13
+
+New Features:
+-------------
+ - Updated project artifactId to fit bundle-coding-rules + updated dependencies
+   accordingly
+ - Use new java.cdc.pom 2.0.0
+ - Added new scheduleTimer API method in ExtServletService to centralize timers
+   in the servlet container
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2011-11-03
+
+New Features:
+-------------
+ - Moved SongNode to com.actility.servlet.song.ext to decouple dependencies
+   between packages
+ - Added getReasonPhrase in SongServletResponse
+ - Use new java-cdc-pom 1.4.0
+
+Bug Fixes:
+----------
+ - Removed Cloneable interface from Parameterable class
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2011-08-04
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed use javax.servlet version 2.5
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Initial version

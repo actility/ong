@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- etsiTrapEvent resource type -->
+	<complexType name="EtsiTrapEvent">
+		<complexContent>
+			<extension base="tns:MgmtObj">
+				<!-- attribute ref="tns:id" use="required" fixed="etsiTrapEvent"/ -->
+			</extension>
+		</complexContent>
+	</complexType>
+
+</schema>

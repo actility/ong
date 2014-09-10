@@ -1,0 +1,10 @@
+make $*
+if [ $? -ne 0 ]
+then
+  exit 1
+fi
+mkdir -p $ROOTACT/bin/
+if [ -f azbspv.x ]
+then
+  cp -vf azbspv.x $ROOTACT/bin/
+fi

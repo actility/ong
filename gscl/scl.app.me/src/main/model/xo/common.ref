@@ -1,0 +1,103 @@
+/*
+ * Copyright (C) Actility, SA. All Rights Reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details (a copy is
+ * included at /legal/license.txt).
+ *
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA
+ *
+ * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+ * or visit www.actility.com if you need additional
+ * information or have any questions.
+ */
+#ifndef COMMON_REF
+#define COMMON_REF
+
+#include "misc.ref"
+
+
+stext m2m:ReferenceToNamedResource from ong:t_xml_obj
+{
+    value$    XoString    {  } // xsd:anyURI
+    id    XoString    { embattr } // (optional) (xmlType: xsd:anySimpleType) 
+}
+alias m2m:ReferenceToNamedResource with m2m:namedReference
+alias m2m:ReferenceToNamedResource with m2m:latest
+alias m2m:ReferenceToNamedResource with m2m:oldest
+
+m2m:NamedReferenceCollection from ong:t_xml_obj
+{
+    m2m:namedReference    m2m:ReferenceToNamedResource    { list wraphidden } // (list size: [0, infinity[) 
+}
+alias m2m:NamedReferenceCollection with m2m:accessRightCollection
+alias m2m:NamedReferenceCollection with m2m:accessRightAnncCollection
+alias m2m:NamedReferenceCollection with m2m:containerCollection
+alias m2m:NamedReferenceCollection with m2m:containerAnncCollection
+alias m2m:NamedReferenceCollection with m2m:locationContainerCollection
+alias m2m:NamedReferenceCollection with m2m:locationContainerAnncCollection
+alias m2m:NamedReferenceCollection with m2m:subscriptionCollection
+alias m2m:NamedReferenceCollection with m2m:groupCollection
+alias m2m:NamedReferenceCollection with m2m:groupAnncCollection
+alias m2m:NamedReferenceCollection with m2m:notificationChannelCollection
+alias m2m:NamedReferenceCollection with m2m:sclCollection
+alias m2m:NamedReferenceCollection with m2m:m2mPocCollection
+alias m2m:NamedReferenceCollection with m2m:applicationCollection
+alias m2m:NamedReferenceCollection with m2m:applicationAnncCollection
+
+m2m:SearchStrings from ong:t_xml_obj
+{
+    m2m:searchString    XoString    { list shdico } // (xmlType: xsd:string) (list size: [0, infinity[) 
+}
+alias m2m:SearchStrings with m2m:searchStrings
+
+m2m:AnyURIList from ong:t_xml_obj
+{
+    reference    XoString    { list } // (xmlType: xsd:anyURI) (list size: [0, infinity[) 
+}
+alias m2m:AnyURIList with m2m:sclList
+alias m2m:AnyURIList with m2m:discoveryURI
+alias m2m:AnyURIList with m2m:pocs
+alias m2m:AnyURIList with m2m:members
+
+m2m:AnnounceTo from ong:t_xml_obj
+{
+    m2m:activated    XoString    { } // (optional) (xmlType: xsd:boolean) 
+    m2m:sclList    m2m:AnyURIList    { }
+    m2m:global    XoString    { } // (optional) (xmlType: xsd:boolean) 
+}
+alias m2m:AnnounceTo with m2m:announceTo
+
+m2m:FilterCriteriaType from ong:t_xml_obj
+{
+    xsi:type    XoString    { embattr } // (optional) (xmlType: xsd:QName)
+    ifModifiedSince    XoString    { } // (optional) (xmlType: xsd:dateTime) 
+    ifUnmodifiedSince    XoString    { } // (optional) (xmlType: xsd:dateTime) 
+    ifMatch    XoString    { list } // (xmlType: xsd:string) (list size: [0, infinity[) 
+    ifNoneMatch    XoString    { list } // (xmlType: xsd:string) (list size: [0, infinity[) 
+}
+alias m2m:FilterCriteriaType with m2m:filterCriteria
+
+m2m:Schedule from ong:t_xml_obj
+{
+    scheduleString    XoString    { list } // (xmlType: xsd:string) (list size: [0, infinity[) 
+}
+alias m2m:Schedule with m2m:schedule
+
+m2m:TrpdtType from ong:t_xml_obj
+{
+    tolerableDelay    XoString    { } // (optional) (xmlType: xsd:duration) 
+    tolerableTime    XoString    { } // (optional) (xmlType: xsd:time) 
+}
+
+#endif // COMMON_REF

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="common.xsd" />
+
+	<element name="accessRight" type="tns:AccessRight"/>
+
+	<complexType name="AccessRight">
+		<sequence>
+			<element ref="tns:expirationTime" minOccurs="0" />
+			<element ref="tns:searchStrings" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0" />
+			<element ref="tns:lastModifiedTime" minOccurs="0" />
+			<element ref="tns:announceTo" minOccurs="0" />
+			<element ref="tns:permissions" minOccurs="0" />
+			<element ref="tns:selfPermissions" />
+			<!-- subresources -->
+			<element ref="tns:subscriptionsReference" minOccurs="0" />
+		</sequence>
+		<attribute ref="tns:id" />
+	</complexType>
+
+	<element name="permissions" type="tns:PermissionListType"/>
+	<element name="selfPermissions" type="tns:PermissionListType"/>
+
+	<complexType name="PermissionListType">
+		<sequence>
+			<element ref="tns:permission" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<element name="permission" type="tns:PermissionType"/>
+
+	<complexType name="PermissionType">
+		<sequence>
+			<element ref="tns:permissionFlags" minOccurs="1" maxOccurs="1" />
+			<element ref="tns:permissionHolders" minOccurs="1" maxOccurs="1" />
+		</sequence>
+		<attribute ref="tns:id" />
+	</complexType>
+
+	<element name="permissionFlags" type="tns:PermissionFlagListType"/>
+
+	<element name="permissionHolders" type="tns:PermissionHolderType"/>
+
+	<complexType name="PermissionHolderType">
+		<sequence>
+			<element ref="tns:holderRefs" minOccurs="0" maxOccurs="1" />
+			<element ref="tns:applicationIDs" minOccurs="0" maxOccurs="1" />
+			<element ref="tns:sclIDs" minOccurs="0" maxOccurs="1" />
+			<element ref="tns:all" minOccurs="0" maxOccurs="1" />
+			<element ref="tns:domains" minOccurs="0" maxOccurs="1" />
+		</sequence>
+	</complexType>
+
+	<element name="holderRefs" type="tns:HolderRefListType" />
+	<element name="domains" type="tns:DomainListType" />
+
+	<complexType name="HolderRefListType">
+		<sequence>
+			<element ref="tns:holderRef" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<complexType name="DomainListType">
+		<sequence>
+			<element ref="tns:domain" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<element name="holderRef" type="anyURI"/>
+
+	<element name="all">
+		<complexType>
+			<complexContent>
+				<restriction base="anyType" />
+			</complexContent>
+		</complexType>
+	</element>
+
+	<element name="domain" type="anyURI"/>
+
+	<simpleType name="PermissionFlagType">
+		<restriction base="string">
+			<enumeration value="READ"/>
+			<enumeration value="WRITE"/>
+			<enumeration value="DISCOVER"/>
+			<enumeration value="DELETE"/>
+			<enumeration value="CREATE"/>
+		</restriction>
+	</simpleType>
+
+	<element name="flag" type="tns:PermissionFlagType"/>
+
+	<complexType name="PermissionFlagListType">
+		<sequence>
+			<element ref="tns:flag" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<element name="applicationIDs" type="tns:ApplicationIDs" />
+	
+	<complexType name="ApplicationIDs">
+		<sequence>
+			<element ref="tns:applicationID" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<element name="applicationID" type="string" />
+
+	<element name="sclIDs" type="tns:SclIDs" />
+	
+	<complexType name="SclIDs">
+		<sequence>
+			<element ref="tns:sclID" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<element name="sclID" type="string" />
+
+</schema>

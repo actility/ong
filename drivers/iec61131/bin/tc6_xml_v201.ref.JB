@@ -1,0 +1,406 @@
+#ifndef TC6_XML_V201_REF
+#define TC6_XML_V201_REF
+
+#include "misc.ref"
+
+
+ppx:position from null:t_xml_obj
+{
+}
+
+ppx:AnonData from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: anyURI) 
+    handleUnknown    XoString    { embattr } // (xmlType: AnonHandleUnknown) 
+}
+
+ppx:addData from null:t_xml_obj
+{
+    ppx:data    ppx:AnonData    { list wraphidden } // (list size: [0, infinity[) 
+}
+
+ppx:connection from null:t_xml_obj
+{
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    refLocalId    XoString    { embattr } // (xmlType: unsignedLong) 
+    formalParameter    XoString    { embattr } // (optional) (xmlType: string) 
+    ppx:position    ppx:position    { list } // (list size: [0, infinity[) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+}
+
+ppx:rangeSigned from null:t_xml_obj
+{
+}
+
+ppx:connectionPointOut from null:t_xml_obj
+{
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:relPosition    ppx:position    {  } // (optional) 
+    ppx:expression    XoString    {  } // (optional) (xmlType: string) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+}
+
+ppx:connectionPointIn from null:t_xml_obj
+{
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:relPosition    ppx:position    {  } // (optional) 
+    ppx:connection    ppx:connection    { list } // (list size: [1, infinity[) 
+    ppx:expression    XoString    {  } // (xmlType: string) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+}
+
+ppx:formattedText from null:t_xml_obj
+{
+}
+
+ppx:pouInstance from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: string) 
+    typeName    XoString    { embattr } // (xmlType: string) 
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonInfo from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: anyURI) 
+    version    XoString    { embattr } // (optional) (xmlType: decimal) 
+    vendor    XoString    { embattr } // (xmlType: anyURI) 
+    ppx:description    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:addDataInfo from null:t_xml_obj
+{
+    ppx:info    ppx:AnonInfo    { list wraphidden } // (list size: [0, infinity[) 
+}
+
+ppx:AnonFBD from null:t_xml_obj
+{
+}
+
+ppx:AnonLD from null:t_xml_obj
+{
+}
+
+ppx:AnonSFC from null:t_xml_obj
+{
+}
+
+ppx:body from null:t_xml_obj
+{
+    WorksheetName    XoString    { embattr } // (optional) (xmlType: string) 
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:IL    ppx:formattedText    {  }
+    ppx:ST    ppx:formattedText    {  }
+    ppx:FBD    ppx:AnonFBD    {  }
+    ppx:LD    ppx:AnonLD    {  }
+    ppx:SFC    ppx:AnonSFC    {  }
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:dataType from null:t_xml_obj
+{
+}
+
+ppx:AnonSimpleValue from null:t_xml_obj
+{
+}
+
+ppx:AnonValue from null:t_xml_obj
+{
+}
+
+ppx:AnonArrayValue from null:t_xml_obj
+{
+    ppx:value    ppx:AnonValue    {  }
+}
+
+ppx:AnonStructValue from null:t_xml_obj
+{
+    ppx:value    ppx:AnonValue    {  }
+}
+
+ppx:value from null:t_xml_obj
+{
+    ppx:simpleValue    ppx:AnonSimpleValue    {  }
+    ppx:arrayValue    ppx:AnonArrayValue    {  }
+    ppx:structValue    ppx:AnonStructValue    {  }
+}
+
+ppx:AnonVariable from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: string) 
+    address    XoString    { embattr } // (optional) (xmlType: string) 
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:type    ppx:dataType    {  }
+    ppx:initialValue    ppx:value    {  } // (optional) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:varListPlain from null:t_xml_obj
+{
+    ppx:variable    ppx:AnonVariable    { list } // (list size: [0, infinity[) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:varList from null:t_xml_obj
+{
+}
+
+ppx:rangeUnsigned from null:t_xml_obj
+{
+}
+
+ppx:AnonAccessVariable from null:t_xml_obj
+{
+    alias    XoString    { embattr } // (xmlType: string) 
+    instancePathAndName    XoString    { embattr } // (xmlType: string) 
+    direction    XoString    { embattr } // (optional) (xmlType: ppx:accessType) 
+    ppx:type    ppx:dataType    {  }
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:varListAccess from null:t_xml_obj
+{
+    ppx:accessVariable    ppx:AnonAccessVariable    { list } // (list size: [0, infinity[) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonConfigVariable from null:t_xml_obj
+{
+    instancePathAndName    XoString    { embattr } // (xmlType: string) 
+    address    XoString    { embattr } // (optional) (xmlType: string) 
+    ppx:type    ppx:dataType    {  }
+    ppx:initialValue    ppx:value    {  } // (optional) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:varListConfig from null:t_xml_obj
+{
+    ppx:configVariable    ppx:AnonConfigVariable    { list } // (list size: [0, infinity[) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonFileHeader from null:t_xml_obj
+{
+}
+
+ppx:AnonPageSize from null:t_xml_obj
+{
+}
+
+ppx:AnonScaling from null:t_xml_obj
+{
+}
+
+ppx:AnonFbd from null:t_xml_obj
+{
+    ppx:scaling    ppx:AnonScaling    {  }
+}
+
+ppx:AnonLd from null:t_xml_obj
+{
+    ppx:scaling    ppx:AnonScaling    {  }
+}
+
+ppx:AnonSfc from null:t_xml_obj
+{
+    ppx:scaling    ppx:AnonScaling    {  }
+}
+
+ppx:AnonCoordinateInfo from null:t_xml_obj
+{
+    ppx:pageSize    ppx:AnonPageSize    {  } // (optional) 
+    ppx:fbd    ppx:AnonFbd    {  }
+    ppx:ld    ppx:AnonLd    {  }
+    ppx:sfc    ppx:AnonSfc    {  }
+}
+
+ppx:AnonContentHeader from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: string) 
+    version    XoString    { embattr } // (optional) (xmlType: string) 
+    modificationDateTime    XoString    { embattr } // (optional) (xmlType: dateTime) 
+    organization    XoString    { embattr } // (optional) (xmlType: string) 
+    author    XoString    { embattr } // (optional) (xmlType: string) 
+    language    XoString    { embattr } // (optional) (xmlType: language) 
+    ppx:Comment    XoString    {  } // (optional) (xmlType: string) 
+    ppx:coordinateInfo    ppx:AnonCoordinateInfo    {  }
+    ppx:addDataInfo    ppx:addDataInfo    {  } // (optional) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+}
+
+ppx:AnonDataType from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: string) 
+    ppx:baseType    ppx:dataType    {  }
+    ppx:initialValue    ppx:value    {  } // (optional) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonDataTypes from null:t_xml_obj
+{
+    ppx:dataType    ppx:AnonDataType    { list wraphidden } // (list size: [0, infinity[) 
+}
+
+ppx:AnonLocalVars from null:t_xml_obj
+{
+}
+
+ppx:AnonTempVars from null:t_xml_obj
+{
+}
+
+ppx:AnonInputVars from null:t_xml_obj
+{
+}
+
+ppx:AnonOutputVars from null:t_xml_obj
+{
+}
+
+ppx:AnonInOutVars from null:t_xml_obj
+{
+}
+
+ppx:AnonExternalVars from null:t_xml_obj
+{
+}
+
+ppx:AnonGlobalVars from null:t_xml_obj
+{
+}
+
+ppx:AnonInterface from null:t_xml_obj
+{
+    ppx:returnType    ppx:dataType    {  } // (optional) 
+    ppx:localVars    ppx:AnonLocalVars    {  }
+    ppx:tempVars    ppx:AnonTempVars    {  }
+    ppx:inputVars    ppx:AnonInputVars    {  }
+    ppx:outputVars    ppx:AnonOutputVars    {  }
+    ppx:inOutVars    ppx:AnonInOutVars    {  }
+    ppx:externalVars    ppx:AnonExternalVars    {  }
+    ppx:globalVars    ppx:AnonGlobalVars    {  }
+    ppx:accessVars    ppx:varList    {  }
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonAction from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: string) 
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:body    ppx:body    {  }
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonActions from null:t_xml_obj
+{
+    ppx:action    ppx:AnonAction    { list wraphidden } // (list size: [0, infinity[) 
+}
+
+ppx:AnonTransition from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: string) 
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:body    ppx:body    {  }
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonTransitions from null:t_xml_obj
+{
+    ppx:transition    ppx:AnonTransition    { list wraphidden } // (list size: [0, infinity[) 
+}
+
+ppx:AnonPou from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: string) 
+    pouType    XoString    { embattr } // (xmlType: ppx:pouType) 
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:interface    ppx:AnonInterface    {  } // (optional) 
+    ppx:actions    ppx:AnonActions    {  } // (optional) 
+    ppx:transitions    ppx:AnonTransitions    {  } // (optional) 
+    ppx:body    ppx:body    { list } // (list size: [0, infinity[) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonPous from null:t_xml_obj
+{
+    ppx:pou    ppx:AnonPou    { list wraphidden } // (list size: [0, infinity[) 
+}
+
+ppx:AnonTypes from null:t_xml_obj
+{
+    ppx:dataTypes    ppx:AnonDataTypes    {  }
+    ppx:pous    ppx:AnonPous    {  }
+}
+
+ppx:AnonTask from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: string) 
+    single    XoString    { embattr } // (optional) (xmlType: string) 
+    interval    XoString    { embattr } // (optional) (xmlType: string) 
+    priority    XoString    { embattr } // (xmlType: AnonPriority) (min inclusive value: 0) (max inclusive value: 65535) 
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:pouInstance    ppx:pouInstance    { list } // (list size: [0, infinity[) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonResource from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: string) 
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:task    ppx:AnonTask    { list } // (list size: [0, infinity[) 
+    ppx:globalVars    ppx:varList    { list } // (list size: [0, infinity[) 
+    ppx:pouInstance    ppx:pouInstance    { list } // (list size: [0, infinity[) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonConfiguration from null:t_xml_obj
+{
+    name    XoString    { embattr } // (xmlType: string) 
+    globalId    XoString    { embattr } // (optional) (xmlType: ID) 
+    ppx:resource    ppx:AnonResource    { list } // (list size: [0, infinity[) 
+    ppx:globalVars    ppx:varList    { list } // (list size: [0, infinity[) 
+    ppx:accessVars    ppx:varListAccess    {  } // (optional) 
+    ppx:configVars    ppx:varListConfig    {  } // (optional) 
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+
+ppx:AnonConfigurations from null:t_xml_obj
+{
+    ppx:configuration    ppx:AnonConfiguration    { list wraphidden } // (list size: [0, infinity[) 
+}
+
+ppx:AnonInstances from null:t_xml_obj
+{
+    ppx:configurations    ppx:AnonConfigurations    {  }
+}
+
+ppx:AnonProject from null:t_xml_obj
+{
+    ppx:fileHeader    ppx:AnonFileHeader    {  }
+    ppx:contentHeader    ppx:AnonContentHeader    {  }
+    ppx:types    ppx:AnonTypes    {  }
+    ppx:instances    ppx:AnonInstances    {  }
+    ppx:addData    ppx:addData    {  } // (optional) 
+    ppx:documentation    ppx:formattedText    {  } // (optional) 
+}
+alias ppx:AnonProject with ppx:project
+
+#endif // TC6_XML_V201_REF

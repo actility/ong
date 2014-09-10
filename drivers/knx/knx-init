@@ -1,0 +1,64 @@
+#!(SHELL)
+#
+# KNX:       Starts the KNX driver
+
+exec 2> /dev/null
+
+CURRENT_DIR=`dirname $0`
+. $CURRENT_DIR/../ong.cfg
+. $CURRENT_DIR/../functions
+
+OPTIONS=""
+KNX_DATA=$ROOTACT/usr/data/knx
+SERVICE="knx"
+PIDFILE=$KNX_DATA/knx.pid
+STOPFILE=$KNX_DATA/stop
+
+usage() {
+    echo "Usage: KNX [<options>] {start|stop|status|restart}"
+    echo "  Where options are:"
+    echo "   -h|--help    Print this help message"
+    echo "   -i|--init    Re-initialize ONG"
+}
+
+preStart() {
+  mkdir -p $KNX_DATA
+}
+
+serviceCommand() {
+  echo "knx.x "$OPTIONS
+}
+
+stopService() {
+  KNX_PIDS=$(pidof knx.x)
+  [ -n "$KNX_PIDS" ] && kill -TERM $KNX_PIDS
+  killall eibd
+}
+
+abortService() {
+  KNX_PIDS=$(pidof knx.x)
+  [ -n "$KNX_PIDS" ] && kill -KILL $KNX_PIDS
+  killall eibd
+}
+
+GETOPTTEMP=`getopt -o a:hi --long help,init -- $@`
+if [ $? != 0 ] ; then usage ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments
+while [ -n "$1" ]
+do
+    case "$1" in
+        "-a") shift; OPTIONS=$OPTIONS" -a "$1;;
+        "-h"|"--help") usage; exit;;
+        "-i"|"--init") OPTIONS=$OPTIONS" -i";;
+        "--") shift; break ;;
+        * ) echo "Internal error ($*)!"; exit 1;;
+    esac
+    shift
+done
+
+handleParams $*
+
+exit $?
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <bool name="Ack_Sup" val="${raw_Ack_Sup}"/>
+    <bool name="TS_Sup" val="${raw_TS_Sup}"/>
+    <bool name="AlarmText_Sup" val="${raw_AlarmText_Sup}"/>
+    <bool name="ErrorCode_Sup" val="${raw_ErrorCode_Sup}"/>
+    <bool name="InAlarm_Sup" val="${raw_InAlarm}"/>
+    <bool name="AlarmUnAck_Sup" val="${raw_AlarmUnAck}"/>
+    <bool name="Locked_Sup" val="${raw_Locked}"/>
+    <int name="LogNumber" val="${raw_LogNumber}"/>
+    <int name="AlarmPriority" val="${raw_AlarmPriority}"/>
+    <int name="ApplicationArea" val="${raw_ApplicationArea}"/>
+    <int name="ErrorClass" val="${raw_ErrorClass}"/>
+    <str name="raw" val="0x${dpt_raw}"/>
+</obj>
+
+
+
+
+
+
+
+
+
+
+
+

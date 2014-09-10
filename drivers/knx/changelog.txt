@@ -1,0 +1,75 @@
+-------------------------------------------------------------------------------
+KNX GIP driver changelog
+-------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2014-02-06
+
+
+New features:
+-------------
+ - N/A
+ 
+Bug Fixes:
+----------
+ - Data containers for device applications were created using "Locadmin_AR" as
+   "accessRightID" instead of using the one created for the device 
+   application. Fixed.
+	 
+dependencies:
+-------------
+ - eibd: 0.0.5
+ - rtbase: 1.2.3
+ - libxo: 4.2.10
+ - libdIa: 1.0.25
+ - drvcommon: 1.4.14
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2014-02-05
+
+
+New features:
+-------------
+ - N/A
+ 
+Bug Fixes:
+----------
+ - Few fixes for raspberry-pi compilation.
+	 
+dependencies:
+-------------
+ - eibd: 0.0.5
+ - rtbase: 1.2.3
+ - libxo: 4.2.10
+ - libdIa: 1.0.25
+ - drvcommon: 1.4.14
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2014-01-23
+
+New features:
+-------------
+ - N/A
+ 
+Bug Fixes:
+----------
+ - Upgrade dependencies: rtbase-1.2.1, drvcommon-1.4.13
+ - Changed normal clock function (time) by monotonic functions.
+	 
+dependencies:
+-------------
+ - eibd: 0.0.5
+ - rtbase: 1.2.1
+ - libxo: 4.2.8
+ - libdIa: 1.0.24
+ - drvcommon: 1.4.13
+ - m2mxoref: 1.1.12
+				 
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2014-01-07
+Initial version
+

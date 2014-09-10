@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     this diatemplates is quiet special because r_value can be 400 bytes long
+     because of ascii hexa tic data
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+-->
+<str val="${r_value}" 
+x-template="${w_template}"
+x-date="${w_date}" x-unit="ERDF-NOI-CPT_02E" 
+xmlns="http://obix.org/ns/schema/1.1"/>

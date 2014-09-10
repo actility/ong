@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- etsiReboot resource type -->
+	<complexType name="EtsiReboot">
+		<complexContent>
+			<extension base="tns:MgmtObj">
+				<sequence>
+					<element ref="tns:rebootLevel" minOccurs="0"/>
+					<element ref="tns:rebootTiming" minOccurs="0"/>
+					<element ref="tns:applicationRef" minOccurs="0"/>
+					<element ref="tns:rebootActionStatus" minOccurs="0"/>
+				</sequence>
+				<!-- attribute ref="tns:id" use="required" fixed="etsiReboot"/ -->
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="rebootLevel" type="tns:RebootLevel">
+		<annotation>
+			<documentation>
+			Indicates the level at which the reboot operation has to be performed.
+			</documentation>
+		</annotation>
+	</element>
+
+	<simpleType name="RebootLevel" >
+		<restriction base="string" >
+			<enumeration value="RESTART_OS" />
+			<enumeration value="RESTART_ALL_APPLS" />
+			<enumeration value="RESTART_ONE_APPL" />
+		</restriction>
+	</simpleType>
+
+	<element name="applicationRef" type="string"/>
+
+	<element name="rebootTiming" type="tns:RebootTiming">
+		<annotation>
+			<documentation>
+			Indicates the timing of the requested reboot.
+			</documentation>
+		</annotation>
+	</element>
+
+	<simpleType name="RebootTiming" >
+		<restriction base="string" >
+			<enumeration value="IMMEDIATE" />
+			<enumeration value="ASAP" />
+		</restriction>
+	</simpleType>
+
+	<element name="rebootActionStatus" type="tns:ActionStatus"/>
+
+</schema>

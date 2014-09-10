@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+
+	<!-- softwareAction resource type -->
+	<complexType name="SoftwareAction">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:swDownload"/>
+					<element ref="tns:swDownloadAndInstall"/>
+					<element ref="tns:swInstall"/>
+					<element ref="tns:swRemove"/>
+					<element ref="tns:swActivate"/>
+					<element ref="tns:swDeactivate"/>
+				</sequence>
+				<!-- attribute ref="tns:id" use="required" fixed="softwareAction"/ -->
+			</extension >
+		</complexContent>
+	</complexType>
+
+	<element name="swDownload" type="anyURI"/>
+	<element name="swDownloadAndInstall" type="anyURI"/>
+	<element name="swInstall" type="anyURI"/>
+	<element name="swRemove" type="anyURI"/>
+	<element name="swActivate" type="anyURI"/>
+	<element name="swDeactivate" type="anyURI"/>
+
+</schema>

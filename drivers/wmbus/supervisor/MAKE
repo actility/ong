@@ -1,0 +1,11 @@
+make $*
+if [ $? -ne 0 ]
+then
+  exit 1
+fi
+mkdir -p $ROOTACT/bin/
+if [ -f wmbus.x ]
+then
+  cp -vf wmbus.x $ROOTACT/bin/
+fi
+

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xyz:product xmlns:xyz="http://www.exemple.com/XMLNameSpace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <xyz:subproduct xsi:type="xyz:ShirtType">
+    <xyz:number>1111</xyz:number>
+    <xyz:size>44</xyz:size>
+  </xyz:subproduct>
+</xyz:product>

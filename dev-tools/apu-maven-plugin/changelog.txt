@@ -1,0 +1,30 @@
+-------------------------------------------------------------------------------
+Maven APU plugin changelog
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2013-10-14
+
+New Features:
+-------------
+- Changed the groupId for com.actility.m2m (was com.actility).
+
+Bug Fixes:
+----------
+- N/A
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2012-xx-xx
+
+New Features:
+-------------
+- Changed project name from maven-apu-plugin to apu-maven-plugin
+
+Bug Fixes:
+----------
+- N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2012-10-05
+Initial version

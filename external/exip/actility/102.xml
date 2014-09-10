@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:subscription xmlns:m2m="http://uri.etsi.org/m2m" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" m2m:id="test/">
+ <m2m:expirationTime>2012-02-01T21:00:00+01:00</m2m:expirationTime>
+ <m2m:minimalTimeBetweenNotifications>10</m2m:minimalTimeBetweenNotifications>
+ <m2m:creationTime>2012-01-01T21:00:00+01:00</m2m:creationTime>
+ <m2m:lastModifiedTime>2012-10-01T22:00:00+02:00</m2m:lastModifiedTime>
+ <m2m:filterCriteria xsi:type="m2m:ContentInstanceFilterCriteriaType">
+    <ifModifiedSince>2012-03-01T21:00:00+01:00</ifModifiedSince>
+    <ifUnmodifiedSince>2012-03-01T21:00:00+01:00</ifUnmodifiedSince>
+    <ifMatch>match1</ifMatch>
+    <ifMatch>match2</ifMatch>
+    <ifNoneMatch>noneMatch1</ifNoneMatch>
+    <ifNoneMatch>noneMatch2</ifNoneMatch>
+
+    <creator>http://www.creator.org/</creator>
+    <searchString>saerchString1</searchString>
+    <searchString>saerchString2</searchString>
+    <createdSince>2012-10-01T22:00:00+02:00</createdSince>
+    <createdUntil>2012-10-01T22:00:00+02:00</createdUntil>
+    <sizeFrom>10</sizeFrom>
+    <sizeUntil>10000</sizeUntil>
+    <contentType>application/xml</contentType>
+    <contentType>application/exi</contentType>
+    <metaDataOnly>true</metaDataOnly>
+    <attributeAccessor>accessor/</attributeAccessor>
+  </m2m:filterCriteria>
+ <m2m:subscriptionType>SYNCHRONOUS</m2m:subscriptionType>
+ <m2m:contact>contact/</m2m:contact>
+</m2m:subscription>

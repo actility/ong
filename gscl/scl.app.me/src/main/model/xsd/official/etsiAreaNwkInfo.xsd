@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	
+	<include schemaLocation="mgmtObj.xsd"/>
+
+	<!-- etsiAreaNwkInfo resource type -->
+	<complexType name="EtsiAreaNwkInfo">
+		<complexContent>
+			<extension base="tns:MgmtObj">
+				<sequence>					
+					<element ref="tns:numOfAreaNwks" minOccurs="0"/>					
+				</sequence>
+				<!-- attribute ref="tns:id" use="required" fixed="etsiAreaNwkInfo"/ -->
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="numOfAreaNwks" type="long"/>
+</schema>

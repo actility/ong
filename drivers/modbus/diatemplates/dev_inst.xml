@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <!-- M2M -->
+    <str name="nodeID" val="DEV_${d_ieee}"/>
+    <list name="applications"/>
+    
+    <!-- MODBUS -->
+    <str name="modbusManufacturerName" val="${modbus_dev_manufacturer_name}"/>
+    <str name="modbusDeviceName" val="${modbus_dev_name}"/>
+    <str name="modbusDeviceVersion" val="${modbus_dev_version}"/>
+    <ref name="modbusProductDescriptor" href="${s_rootapp}/${w_ipuid}/containers/products/contentInstances/${modbus_dev_ref}/content"/>
+    <op name="modbusDeleteDevice" href="${s_rootapp}/DEV_${d_ieee}/retargeting1/modbusDeleteDevice"/>
+</obj>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:container xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="appLogs">
+  <m2m:accessRightID>/m2m/accessRights/Locadmin_AR1/</m2m:accessRightID>
+  <m2m:maxNrOfInstances>20</m2m:maxNrOfInstances>
+  <m2m:maxByteSize>1000000</m2m:maxByteSize>
+  <m2m:maxInstanceAge>30</m2m:maxInstanceAge>
+</m2m:container>

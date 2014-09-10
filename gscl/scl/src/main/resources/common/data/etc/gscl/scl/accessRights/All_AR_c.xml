@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:accessRight xmlns:m2m="http://uri.etsi.org/m2m" m2m:id="All_AR">
+  <m2m:permissions>
+    <m2m:permission>
+      <m2m:permissionFlags>
+        <m2m:flag>CREATE</m2m:flag>
+        <m2m:flag>READ</m2m:flag>
+        <m2m:flag>WRITE</m2m:flag>
+        <m2m:flag>DELETE</m2m:flag>
+      </m2m:permissionFlags>
+      <m2m:permissionHolders>
+        <m2m:holderRefs>
+          <m2m:holderRef>${NSCL_BASE_URI}/applications/SYSTEM</m2m:holderRef>
+          <m2m:holderRef>${GSCL_COAP_BASE_URI}/applications/GIP</m2m:holderRef>
+          <m2m:holderRef>${GSCL_COAP_BASE_URI}/applications/GA</m2m:holderRef>
+          <m2m:holderRef>${GSCL_HTTP_BASE_URI}/applications/GA</m2m:holderRef>
+          <m2m:holderRef>${NSCL_BASE_URI}/applications/SUPPORT</m2m:holderRef>
+          $[if(TPK_DEV_URI) <m2m:holderRef>${TPK_DEV_URI}</m2m:holderRef>]
+        </m2m:holderRefs>
+        <m2m:domains>
+          <m2m:domain>http://${DOMAIN_NAME}</m2m:domain>
+        </m2m:domains>
+      </m2m:permissionHolders>
+    </m2m:permission>
+  </m2m:permissions>
+  <m2m:selfPermissions>
+    <m2m:permission>
+      <m2m:permissionFlags>
+        <m2m:flag>CREATE</m2m:flag>
+        <m2m:flag>READ</m2m:flag>
+        <m2m:flag>WRITE</m2m:flag>
+        <m2m:flag>DELETE</m2m:flag>
+      </m2m:permissionFlags>
+      <m2m:permissionHolders>
+        <m2m:holderRefs>
+          <m2m:holderRef>${NSCL_BASE_URI}/applications/SYSTEM</m2m:holderRef>
+          <m2m:holderRef>${GSCL_COAP_BASE_URI}/applications/GIP</m2m:holderRef>
+          <m2m:holderRef>${GSCL_COAP_BASE_URI}/applications/GA</m2m:holderRef>
+          <m2m:holderRef>${GSCL_HTTP_BASE_URI}/applications/GA</m2m:holderRef>
+        </m2m:holderRefs>
+      </m2m:permissionHolders>
+    </m2m:permission>
+    <m2m:permission>
+      <m2m:permissionFlags>
+        <m2m:flag>READ</m2m:flag>
+      </m2m:permissionFlags>
+      <m2m:permissionHolders>
+        <m2m:holderRefs>
+          <m2m:holderRef>${NSCL_BASE_URI}/applications/SUPPORT</m2m:holderRef>
+          $[if(TPK_DEV_URI) <m2m:holderRef>${TPK_DEV_URI}</m2m:holderRef>]
+        </m2m:holderRefs>
+      </m2m:permissionHolders>
+    </m2m:permission>
+  </m2m:selfPermissions>
+</m2m:accessRight>

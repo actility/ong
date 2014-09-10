@@ -1,0 +1,1 @@
+./client.x -m create -f temp.xml -v9 -A ::1 coap://[::1]:5684/test

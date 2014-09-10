@@ -1,0 +1,4 @@
+pushd .
+cd /home/ongv2/knopflerfish/osgi
+./kf2 -init
+popd

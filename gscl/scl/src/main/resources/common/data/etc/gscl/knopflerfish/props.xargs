@@ -1,0 +1,122 @@
+#
+# Common properties used by different init.xargs files
+#
+
+#-Forg.osgi.framework.storage=fwdir
+
+# The Service Platform ID should be used by bundles needing to
+# a unique ID for the platform itself
+-Forg.osgi.provisioning.spid=knopflerfish
+
+# Initial startup verbosity, 0 is low verbosity
+#-Forg.knopflerfish.framework.main.verbosity=0
+
+# Security
+#-Forg.osgi.framework.security=osgi
+#-Forg.knopflerfish.framework.all_signed=false
+#-Forg.knopflerfish.framework.validator=JKSValidator
+
+# File storage properties
+#-Forg.knopflerfish.framework.bundlestorage.file.trusted=false
+#-Forg.knopflerfish.framework.bundlestorage.file.unpack=false
+#-Forg.knopflerfish.framework.bundlestorage.file.always_unpack=true
+-Forg.knopflerfish.framework.bundlestorage.file.reference=true
+
+# JKSValidator properties (JVM default if not set).
+#-Forg.knopflerfish.framework.validator.jks.ca_certs=
+#-Forg.knopflerfish.framework.validator.jks.ca_certs_password=
+
+# Various debug flags
+#-Forg.knopflerfish.framework.debug.packages=true
+-Forg.knopflerfish.framework.debug.errors=true
+#-Forg.knopflerfish.framework.debug.warnings=true
+#-Forg.knopflerfish.framework.debug.classloader=true
+#-Forg.knopflerfish.framework.debug.startlevel=true
+#-Forg.knopflerfish.framework.debug.ldap=true
+#-Forg.knopflerfish.framework.debug.service_reference=true
+#-Forg.knopflerfish.framework.debug.bundle_resource=true
+#-Forg.knopflerfish.framework.debug.permissions=true
+#-Forg.knopflerfish.framework.debug.lazy_activation=true
+#-Forg.knopflerfish.framework.debug.framework=true
+#-Forg.knopflerfish.framework.debug.certificates=true
+
+# Complete comma-separated list of packages exported by the system bundle
+# 
+#-Forg.osgi.framework.system.packages=
+
+# Comma-separated list of packages exported by the system bundle. The
+# osgi packages provided by the framework will be added to this list.
+# Only used when org.osgi.framework.system.packages is not set.
+#
+-Forg.knopflerfish.framework.system.packages.base=com.sun.cdc, com.sun.cdc.config, sun.util, sun.util.calendar,\
+    sun.tools.java, sun.io, sun.text, sun.text.resources, sun.net, sun.net.www, sun.net.spi, sun.net.spi.nameservice,\
+    sun.security.util, sun.security.action, sun.security.x509, sun.security.pkcs, sun.security.provider, sun.misc,\
+    com.sun.cdc, com.sun.cdc.config, com.sun.cdc.io, com.sun.cdc.io.j2me, com.sun.cdc.io.j2me.file,\
+    com.sun.cdc.io.j2me.datagram, com.sun.cdc.io.j2me.serversocket, com.sun.cdc.io.j2me.http, com.sun.cdc.io.j2me.socket,\
+    com.sun.cdc.i18n, javax.sql, javax.microedition.io, javax.microedition.pki, sun.io, sun.text, sun.text.resources, sun.net,\
+    sun.net.www, sun.net.www.http, sun.net.www.protocol, sun.net.www.protocol.file, sun.net.www.protocol.http,\
+    sun.net.www.protocol.jar, sun.security, sun.security.util, sun.security.x509, sun.security.pkcs, sun.security.provider,\
+    sun.misc
+
+# Comma-separated list of packages to be added to the set of packages
+# exported by the system bundle.
+#
+#-Forg.osgi.framework.system.packages.extra=
+
+# Comma-separated list of packages that must be loaded by system classloader
+#
+#-Forg.osgi.framework.bootdelegation=*
+
+# If set to true, use strict rules for loading classes from the boot
+# class loader.
+# If false, accept class loading from the boot class path from classes
+# themselves on the boot class.
+# Default is false
+#
+#-Forg.knopflerfish.framework.strictbootclassloading=false
+
+# If set to true, export all framework properties as system properties.
+#
+#-Dorg.knopflerfish.framework.xargs.writesysprops=false
+
+# Framework properties
+-Fcom.actility.m2m.framework.config.os.shell=(SHELL) -c
+
+# Log properties
+-Fcom.actility.m2m.log.config.logDirectory=var/log/gscl
+
+# CM properties
+-Fcom.actility.m2m.cm.config.etcConfigDir=etc/gscl/cm
+-Fcom.actility.m2m.cm.config.usrConfigDir=usr/etc/gscl/cm
+
+# SCL properties
+-Fcom.actility.m2m.scl.app.me.config.nsclUri=
+-Fcom.actility.m2m.scl.app.me.config.tpkDevUri=
+-Fcom.actility.m2m.scl.app.me.config.defaultResourcesFolder=etc/gscl/scl
+
+# Storage properties
+-Fcom.actility.m2m.storage.config.defaultDriverName=sqlite
+
+# SONG properties
+-Fcom.actility.m2m.song.config.serverInfo=ONG/0.0.0
+-Fcom.actility.m2m.song.config.hostName=
+-Fcom.actility.m2m.song.config.domainName=actility.com
+
+# SONG HTTP binding properties
+-Fcom.actility.m2m.song.binding.http.config.proxyHost=
+-Fcom.actility.m2m.song.binding.http.config.proxyPort=
+
+#consoletelnet properties
+-Fcom.actility.m2m.felix.shell.telnet.config.user=admin
+-Fcom.actility.m2m.felix.shell.telnet.config.password=admin
+-Fcom.actility.m2m.felix.shell.telnet.config.port=2323
+
+#System version properties
+#-Fcom.actility.m2m.system.version.config.supportServerPort=81
+-Fcom.actility.m2m.system.version.config.supportSshOptions=
+
+# Xo library
+-Fcom.actility.m2m.jxo.jni.config.namespacesFile=etc/xo/namespace.xns
+-Fcom.actility.m2m.jxo.jni.config.refsFile=etc/xo/m2m.xor
+-Fcom.actility.m2m.jxo.jni.config.dictFile=etc/xo/m2m.xdi
+

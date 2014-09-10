@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<real val="${r_value}" 
+x-template="${w_template}"
+x-date="${w_date}"
+xmlns="http://obix.org/ns/schema/1.1"/>

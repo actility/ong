@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resourceDevice xmlns="http://uri.actility.com/m2m/adaptor-wmbus">
+    <device min="0x3b100300000000" max="0x3b1003FFFFFFFF">
+            <profile id="0x0003"/>
+    </device>
+    <!--
+    <device min="0x00000000000000" max="0xFFFFFFFFFFFFFF">
+            <profile id="0x0003"/>
+    </device>
+    -->
+</resourceDevice>

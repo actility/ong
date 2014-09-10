@@ -1,0 +1,1 @@
+killall awspv.x

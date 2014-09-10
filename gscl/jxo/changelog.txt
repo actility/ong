@@ -1,0 +1,203 @@
+-------------------------------------------------------------------------------
+Xo Service changelog
+-------------------------------------------------------------------------------
+Version: 3.0.1
+Date: 2014-05-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Changed BundleLogger to use a static method instead of a static variable
+
+-------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - Split jxo into two parts: the part that contains the Java statements and
+   the part that contains the native statements (jxo.native.api, 
+	 jxo.native.jni, jxo.native.sni and jxo).
+ - report patches for IS2T VM compatibility.
+ - Changed the groupId for com.actility.m2m (was com.actility).
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.8.0
+Date: 2013-09-24
+
+
+New Features:
+-------------
+ - Updated to new JXO API 1.8.0
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.6.1
+Date: 2013-09-05
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Updated dependency to rtbase 1.0.38-0
+ - Updated dependency to xo-4.2.8-0
+
+-------------------------------------------------------------------------------
+Version: 1.6.0
+Date: 2013-01-23
+
+New Features:
+-------------
+ - Updated dependency to rtbase 1.0.27-1
+ - Updated dependency to xo-4.2.5-1
+ - Updated to new JXO API 1.6.0
+ - Now supports XO Dictionary feature
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.4.6
+Date: 2012-12-11
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Unit tests can now be executed
+
+-------------------------------------------------------------------------------
+Version: 1.4.5
+Date: 2012-11-30
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Now native compilation is linked to maven build process
+
+-------------------------------------------------------------------------------
+Version: 1.4.4
+Date: 2012-11-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Updated pom according to the new java.cdc.pom parent POM
+
+-------------------------------------------------------------------------------
+Version: 1.4.3
+Date: 2012-11-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed missing LDFLAGS when generating native library
+
+-------------------------------------------------------------------------------
+Version: 1.4.2
+Date: 2012-11-13
+
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Changed compilation flags for native code. Updated centos5-x86 target to
+   centos6-x86
+
+-------------------------------------------------------------------------------
+Version: 1.4.1
+Date: 2012-10-23
+
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Removed useless jboolean parameter when copying Java arrays to Native arrays
+
+-------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2012-10-05
+
+
+New Features:
+-------------
+ - Renamed project from XO to JXO
+
+Bug Fixes:
+----------
+ - Added new versions of rtbase and xo libs
+
+-------------------------------------------------------------------------------
+Version: 1.2.2
+Date: 2012-08-30
+
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Added support for MIPS processors
+
+-------------------------------------------------------------------------------
+Version: 1.2.1
+Date: 2012-08-17
+
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Library was not working on 64 bits architecture
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2012-07-12
+
+
+New Features:
+-------------
+ - addAll method is now implemented in XoList
+ - update of the ARM library libJniXo
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2012-06-05
+Initial version

@@ -1,0 +1,9 @@
+# Post install props.xargs
+sed -i -e "s|^-Fcom.actility.m2m.scl.app.me.config.nsclUri=.*$|-Fcom.actility.m2m.scl.app.me.config.nsclUri=$NSCL_URI|" $ROOTACT/etc/gscl/osgime/props.xargs
+sed -i -e "s|^-Fcom.actility.m2m.song.binding.http.config.proxyHost=.*$|-Fcom.actility.m2m.song.binding.http.config.proxyHost=$PROXY_HOST|" $ROOTACT/etc/gscl/osgime/props.xargs
+sed -i -e "s|^-Fcom.actility.m2m.song.binding.http.config.proxyPort=.*$|-Fcom.actility.m2m.song.binding.http.config.proxyPort=$PROXY_PORT|" $ROOTACT/etc/gscl/osgime/props.xargs
+sed -i -e "s|^-Fcom.actility.m2m.song.config.hostName=.*$|-Fcom.actility.m2m.song.config.hostName=$ONG_NAME|" $ROOTACT/etc/gscl/osgime/props.xargs
+sed -i -e "s|^-Fcom.actility.m2m.song.config.domainName=.*$|-Fcom.actility.m2m.song.config.domainName=$DOMAIN_NAME|" $ROOTACT/etc/gscl/osgime/props.xargs
+sed -i -e "s|^-Fcom.actility.m2m.song.config.serverInfo=.*$|-Fcom.actility.m2m.song.config.serverInfo=ONG/$ONG_VERSION|" $ROOTACT/etc/gscl/osgime/props.xargs
+sed -i -e "s|^-Fcom.actility.m2m.system.version.config.supportSshOptions=.*$|-Fcom.actility.m2m.system.version.config.supportSshOptions=$SSH_OPTIONS|" $ROOTACT/etc/gscl/osgime/props.xargs
+sed -i -e "s|^-Fcom.actility.m2m.scl.app.me.config.tpkDevUri=.*$|-Fcom.actility.m2m.scl.app.me.config.tpkDevUri=$TPK_DEV_URI|" $ROOTACT/etc/gscl/osgime/props.xargs

@@ -1,0 +1,186 @@
+-------------------------------------------------------------------------------
+Storage Driver SQLite changelog
+-------------------------------------------------------------------------------
+Version: 0.2.2
+Date: 2014-05-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Changed BundleLogger to use a static method instead of a static variable
+
+-------------------------------------------------------------------------------
+Version: 0.2.1
+Date: 2014-04-03
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Use new API storage.driver.sqlite.ni.api-2.0.0 and let DB usage management
+   in the native bundle
+
+-------------------------------------------------------------------------------
+Version: 0.2.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - Split storage.driver.sqlite into two parts: the part that contains the Java
+   statements and the part that contains the native statements
+   (storage.driver.sqlite.ni.api, storage.driver.sqlite.jni,
+   storage.driver.sqlite.sni and storage.driver.sqlite).
+ - report patches for IS2T VM compatibility.
+ - Changed the groupId for com.actility.m2m (was com.actility).
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 0.0.9
+Date: 2013-10-04
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. The file descriptor for the "storage.driver.sqlite-err_0.log" file
+   was not freed when recycling.
+
+-------------------------------------------------------------------------------
+Version: 0.0.8
+Date: 2013-09-04
+
+New Features:
+-------------
+ - N/A
+ 
+Bug Fixes:
+----------
+ - Fixed. Added a transaction where missing
+ - Fixed. Block the possibility to create a storage condition with a null or
+   unknown type operand.
+ - Add error log stream for native part, 
+   in $(ROOTACT)/var/log/scl/storage.driver.sqlite-err_0.log. It is enabled 
+   through the new "logLevel" cm entry.
+ - Add trace details on API call (debug level).
+
+-------------------------------------------------------------------------------
+Version: 0.0.7-006
+Date: 2013-03-01
+
+New Features:
+-------------
+ N/A
+ 
+Bug Fixes:
+----------
+ - Fixed. Removed NOT NULL constraint on string_value in ATTRIBUTE table which
+   was blocking creation of integer and date attributes
+ - Fixed. Changed string_value in ATTRIBUTE from type varying(32) to text
+ - Fixed. Changed date_value in ATTRIBUTE from type text to varying(32)
+
+-------------------------------------------------------------------------------
+Version: 0.0.7-005
+Date: 2013-02-28
+
+New Features:
+-------------
+ N/A
+ 
+Bug Fixes:
+----------
+ - Fixed. Stack overflow in InternalAttribute instances manipulation on Update
+   requests, due to Java/Native allocation misuse.
+ - Fixed. Database was re-opened on each new transaction.
+
+
+-------------------------------------------------------------------------------
+Version: 0.0.7-004
+Date: 2013-01-23
+
+New Features:
+-------------
+ - Added a numeric index between DOCUMENT and ATTRIBUTE tables to speed up
+   joins and decrease database size
+
+Bug Fixes:
+----------
+ - Fixed. Updated -O3 to -O1 for lpv3 compilation as it triggers segv
+ - Fixed. Updated 'retrive' to 'retrieve'
+
+
+-------------------------------------------------------------------------------
+Version: 0.0.7-003
+Date: 2013-01-10
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Added loadLibrary directive into swig description file
+
+
+-------------------------------------------------------------------------------
+Version: 0.0.7-002
+Date: 2013-01-02
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - The last memory leak fix had introduced a crash down, on a double free
+   instruction. Fixed.
+
+
+-------------------------------------------------------------------------------
+Version: 0.0.7-001
+Date: 2012-12-20
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed memory leaks on InternalCondition data structure. Members where not 
+   freed.
+
+
+-------------------------------------------------------------------------------
+Version: 0.0.7
+Date: 2012-12-19
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Merge with Lirex delivery.
+
+
+-------------------------------------------------------------------------------
+Version: 0.0.6-005
+Date: 2012-12-10
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Removed freeSearchReturn call as the native object is already deleted
+   when finalized

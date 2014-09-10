@@ -1,0 +1,91 @@
+
+08:45:00.415 :
+------------
+start watteco simulator in safety mode (no message willfully ignored)
+
+08:45:03.021 :
+------------
+start watteco driver
+
+08:57:37.792 :
+------------
+all sensors are at RUNNING state :
+	=> capabilities retrieved (simple-desc response received)
+	=> configuration done (report-config response received)
+most (19) sensors have reported at least one value :
+	r=00000003 => simple-desc response + report-config response + 1 event
+	r=00000004 => simple-desc response + report-config response + 2 events
+	r=00000002 => simple-desc response + report-config response + 0 event
+no repeated messages :
+	s=00000002 => simple-desc request + report-config request
+	=> no lost messages
+
+[000] a=[19-temp@::1] s=[CP_RUNNING] n=[]
+[000] s=00000002 r=00000003 e=00000000
+[001] a=[9-temp@::1] s=[CP_RUNNING] n=[]
+[001] s=00000002 r=00000003 e=00000000
+[002] a=[16-temp@::1] s=[CP_RUNNING] n=[]
+[002] s=00000002 r=00000003 e=00000000
+[003] a=[12-temp@::1] s=[CP_RUNNING] n=[]
+[003] s=00000002 r=00000003 e=00000000
+[004] a=[13-temp@::1] s=[CP_RUNNING] n=[]
+[004] s=00000002 r=00000003 e=00000000
+[005] a=[22-temp@::1] s=[CP_RUNNING] n=[]
+[005] s=00000002 r=00000004 e=00000000
+[006] a=[25-temp@::1] s=[CP_RUNNING] n=[]
+[006] s=00000002 r=00000004 e=00000000
+[007] a=[10-temp@::1] s=[CP_RUNNING] n=[]
+[007] s=00000002 r=00000003 e=00000000
+[008] a=[7-temp@::1] s=[CP_RUNNING] n=[]
+[008] s=00000002 r=00000003 e=00000000
+[009] a=[14-temp@::1] s=[CP_RUNNING] n=[]
+[009] s=00000002 r=00000004 e=00000000
+[010] a=[2-temp@::1] s=[CP_RUNNING] n=[]
+[010] s=00000002 r=00000002 e=00000000
+[011] a=[20-temp@::1] s=[CP_RUNNING] n=[]
+[011] s=00000002 r=00000003 e=00000000
+[012] a=[18-temp@::1] s=[CP_RUNNING] n=[]
+[012] s=00000002 r=00000002 e=00000000
+[013] a=[5-temp@::1] s=[CP_RUNNING] n=[]
+[013] s=00000002 r=00000004 e=00000000
+[014] a=[23-temp@::1] s=[CP_RUNNING] n=[]
+[014] s=00000002 r=00000003 e=00000000
+[015] a=[6-temp@::1] s=[CP_RUNNING] n=[]
+[015] s=00000002 r=00000002 e=00000000
+[016] a=[4-temp@::1] s=[CP_RUNNING] n=[]
+[016] s=00000002 r=00000002 e=00000000
+[017] a=[24-temp@::1] s=[CP_RUNNING] n=[]
+[017] s=00000002 r=00000002 e=00000000
+[018] a=[21-temp@::1] s=[CP_RUNNING] n=[]
+[018] s=00000002 r=00000003 e=00000000
+[019] a=[15-temp@::1] s=[CP_RUNNING] n=[]
+[019] s=00000002 r=00000004 e=00000000
+[020] a=[3-temp@::1] s=[CP_RUNNING] n=[]
+[020] s=00000002 r=00000003 e=00000000
+[021] a=[8-temp@::1] s=[CP_RUNNING] n=[]
+[021] s=00000002 r=00000004 e=00000000
+[022] a=[11-temp@::1] s=[CP_RUNNING] n=[]
+[022] s=00000002 r=00000002 e=00000000
+[023] a=[1-temp@::1] s=[CP_RUNNING] n=[]
+[023] s=00000002 r=00000003 e=00000000
+--DIA--dev=24 app=24 acc=72 dat=24 met=0  repok=24 reperr=0
+
+09:21:03.227 :
+------------
+all sensors have reported at least 5 values :
+	r>=00000007
+--DIA--dev=24 app=24 acc=72 dat=24 met=0  repok=134 reperr=0
+
+
+09:33:20.27 :
+-----------
+
+ask reconfiguration of all sensors from CLI as if each sensor did not report a
+value after 1 hour and reset counter r=XXXXXXXX
+
+
+09:43:24.723 :
+------------
+
+all sensors are anew at RUNNING state and each of them has report at least one
+value (r>=00000003) since reconfiguration starting.

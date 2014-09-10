@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obix:obj xmlns:obix="http://obix.org/ns/schema/1.1">
+
+  <str name="thingletID" val="IEC_61131_VM" />
+  
+  <op name="iecCreateInstance" href="/m2m/applications/IEC_61131_VM/retargeting1/createInstance" />
+
+  <list name="interfaces">
+    <obj>
+      <str name="interfaceID" val="AppLogs.Srv"/>
+      <uri name="appLogs" href="/m2m/applications/IEC_61131_VM/containers/appLogs"/>
+    </obj>
+  </list>
+</obix:obj>

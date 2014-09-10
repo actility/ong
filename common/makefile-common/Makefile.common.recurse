@@ -1,0 +1,28 @@
+#
+# <Copyright>
+#
+# id $Id: Makefile.common.recurse 102 2011-03-23 15:02:40Z MLouiset $  
+# author $Author: MLouiset $
+# version $Revision: 102 $
+# lastrevision $Date: 2011-03-23 16:02:40 +0100 (mer., 23 mars 2011) $
+# modifiedby $LastChangedBy: MLouiset $
+# lastmodified $LastChangedDate: 2011-03-23 16:02:40 +0100 (mer., 23 mars 2011) $
+
+###############################################################################
+# Common makefile for all recursives make invocation
+# Author: mlouiset
+# Date: 2010-09-23
+###############################################################################
+
+.PHONY: clean subdirs $(SUBDIRS) $(foreach subdir,$(SUBDIRS),_subclean_$(subdir))
+
+subdirs: $(SUBDIRS)
+
+clean: $(foreach subdir,$(SUBDIRS),_subclean_$(subdir))
+
+$(foreach subdir,$(SUBDIRS),_subclean_$(subdir)):
+	@$(MAKE) -C $(subst _subclean_,,$@) clean
+
+$(SUBDIRS):
+	@$(MAKE) -C $@ $+ 
+

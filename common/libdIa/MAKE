@@ -1,0 +1,88 @@
+if [ -z "$ROOTACT" ]
+then
+	Error "ROOTACT not specified"
+	exit 1
+fi
+source $ROOTACT/rtbase/base/system
+
+SELF=libdIa
+echo "#####"
+echo	"$SELF for $SYSTEM"
+
+Compile()
+{
+	make $*
+	for i in bouchon client getaddrinfo DiaJni microdIa
+	do
+		pushd $i >/dev/null
+		echo "Entering "$i
+		make $*
+		popd >/dev/null
+	done
+}
+
+Test()
+{
+	pushd unitTest >/dev/null
+	make
+	make test
+	[ $? != 0 ] && echo "[31;7m[unitTest] Error ![0m" || echo "[32;7m[unitTest] OK[0m"
+	popd >/dev/null
+}
+
+# frequemment oublié dans les makefile
+CleanPlus()
+{	
+	rm */core.* > /dev/null 2>&1
+	rm */core > /dev/null 2>&1
+	rm */TRACE_* > /dev/null 2>&1
+	rm */*.log > /dev/null 2>&1
+}
+
+
+case  $# in
+	0)
+		Compile
+		exit 0
+		;;
+	*)	case $1 in
+			src|source)
+				shift
+				./MAKE clean
+				sh ${MKPKGSOURCE} -p $SELF $*
+				exit 0
+			;;
+			runtime)
+				shift
+				MAKE
+				sh ${MKPKGRUNTIME} -p $SELF
+				exit 0
+			;;
+			clean)
+				shift
+				CleanPlus
+				Compile clean
+				exit 0
+				;;
+			test)
+				shift
+				Test
+				exit 0
+				;;
+			svn*)
+				svncmd=$1
+				shift
+				sh ${MKSVN} -p $SELF -c $svncmd $*
+				exit 0
+			;;
+			*)
+				Compile $*
+				exit 0
+				;;
+		esac
+	;;
+esac
+
+echo "Usage: MAKE [clean|runtime|src|source]"
+exit 1
+

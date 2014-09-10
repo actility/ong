@@ -1,0 +1,585 @@
+
+############################################################################
+1.0.35
+############################################################################
+- [IEC-PLC 0001043]: hostname must be lowercase when building the requesting entity
+
+############################################################################
+1.0.34
+############################################################################
+
+- [IEC-PLC 0000944] : add the "iec" prefix to all attributes and commands that exposes the IEC-engine in all the resources representation it creates in the SCL tree
+- [IEC-PLC 0000956]: No IEC-engine logs outside IEC-applications
+  A new CLI command has been added to set the M2M level : trace m2m <level>
+  New config parameter : <int name="tracem2m" val="9"/>
+
+
+############################################################################
+1.0.33
+############################################################################
+ONG integration
+  - don't crash when spvconfig.xml not found. just exit properly with err code
+  - applying patch from Mathias
+  - log filenames badly formated :
+    should be /home/ongs/ong-2.4.0/var/log/iec61131/TRACE_05.log
+    instead of /home/ongs/ong-2.4_05.0/var/log/iec61131
+  - w_boxname set by default to gethostname()
+  - w_reqEntity calculated as : "coap://" + $w_boxname + "." + $w_domainname + ":" + $w_coapport_r + $s_rootapp + "/" + $w_driverid
+  - spvconfig.std.xml should be installed in the target box
+  - ./MAKE install creates $ROOTACT/etc/iec61131/files and $ROOTACT/usr/etc/iec61131/config
+    and copies spvconfig.std.xml into $ROOTACT/usr/etc/iec61131/config/spvconfig.xml
+
+- bug introduced in 1.0.29 when pre-compiling ST code
+- added apu/package_sources (patch from Mathias)
+
+- [IEC-PLC 0000703] : <m2m:maxNrOfInstances> set to 1
+- [IEC-PLC 0000705] : useless SYSTEM templates installed on target
+- [IEC-PLC 0000711] : appdiscover set to TRUE by default
+- [IEC-PLC 0000708] : appLogs bad href (in 2 files)
+- [IEC-PLC 0000714] : removed OASIS.OBIX_1_1 from 2 files
+- [IEC-PLC 0000715] : added IEC_ prefix to thingletID
+- [IEC-PLC 0000713] :
+	1. Locadmin_AR changed in Locadmin_AR1
+	2. added holder reference "GA" to <app>_AR, <app>_AR2, <app>_AR3 and <app>_AR4
+- [IEC-PLC 0000713] :
+	Correct GA flavors are :
+          <m2m:holderRef>coap://${w_boxname}.${w_domainname}:${w_coapport_r}${s_rootapp}/GA</m2m:holderRef>
+          <m2m:holderRef>http://${w_boxname}.${w_domainname}:${w_scl_httpport}${s_rootapp}/GA</m2m:holderRef>
+- [IEC-PLC 0000749] : delete op
+- [IEC-PLC 0000750] : commit and rollback ops
+- [IEC-PLC 0000752] : The attributes values for "iecConfigurations", "iecMappings", "iecCommittedConf"
+and "iecCommittedMapping" must contain uri that point at the respective
+<container> resources, but they actually point at the latest <contentInstance>
+value.
+- [IEC-PLC 0000753]: Wrong m2m:maxByteSize should be a calculation
+- [IEC-PLC 0000755]: m2m:maxNrOfInstances value of mappings <container> should be set to maxVarMappings
+- [IEC-PLC 0000742]: when no appId provided, PLC creates one with name "IEC_app<time>_<pid>"
+  (locally unique identifier)
+- [IEC-PLC 0000718]: createInstance operation succeeds even if an IEC-application with the same name already exists.
+- [IEC-PLC 0000747]: obix with empty value (val="") is filtered and not sent
+- [IEC-PLC 0000765]: Wrong oBIX search string value on <container>
+  mappings, configurations, committedConf and committedMappings
+- [IEC-PLC 0000768]:
+- [IEC-PLC 0000772]: creating an already existing app should return 4.00
+- appLogs : added CLI command 'log', with a parameter (appId #) or -1 (IEC_VM log)
+- [IEC-PLC 0000779]: m2m:maxByteSize computation issue on configurations <container> when maxConfSize not provided
+- [IEC-PLC 0000841]: factory settings fallback
+- [IEC-PLC 0000842]: -i option not supported by iec61131 init script
+
+- cov2 compilation : issues dues to Makefiles (-ly, CC=gcc, LDFLAGS+=/usr/local/lib removed)
+
+- [IEC-PLC 0000843]: Errors in AccessRights
+- [IEC-PLC 0000943]: Read on runningStatus retargeting attribute return a wrong formatted oBIX buffer
+- [IEC-PLC 0000945]: Support of "-h|--help" and "--version" argument
+
+############################################################################
+1.0.32
+############################################################################
+- EXIP as a compilation option
+
+############################################################################
+1.0.31
+############################################################################
+- unitTest library
+
+- more details about validation errors, returned to the ONG and to the
+  CLI board of errors
+
+- write unit tests for calendar, astro and bin
+- ./MAKE test : make all tests in sub-directories
+
+- calendar code cleanup and unit tests
+
+- re-write initial ENGINE existance check and discover
+
+- work on EXI support
+- added sleep(1) if discover fails
+
+- TIP : how to transform plc.xml into plc.exi
+  $ROOTACT/exip/actility/sax.x -f plc.xml -I project -o plc.exi
+  cd shells
+  ./post_exi $ROOTACT/iec61131-reference-projects/Thermostat_Simple Thermostat
+
+- TIP : plc.exi => plc.exi.xml
+  $ROOTACT/exip/actility/sax.x -f plc.exi -o __tmp__
+  xmllint --format __tmp__ > plc.exi.xml
+  rm __tmp__
+
+- POST an exi configuration :
+./post_exi $ROOTACT/iec61131-reference-projects/Thermostat_Simple Thermostat
+
+############################################################################
+1.0.30
+############################################################################
+
+- startup change to handle the case the ONG is unavailable: firstly a discover
+  is made. If the discover fails, then we attempt a create_IEC_ENGINE, and
+  then another discover, until the ONG responds.
+
+- new validation directory. usage : validation.x <plc.xml>
+
+- CLI : new command to watch subscriptions :
+>>sub
+PLC var : %IX1.1
+  targetID : /m2m/applications/APP_00137a0000005daa.10/containers/0x0402.0x0000.0.m2m/contentInstances
+  subscription_ref : (No Reference Has Been Received)
+  tid : 57552309
+  nextSubscription : ASAP
+  msg : m2m:expirationTime attribute value is too short: 2013-10-22T21:39:58.000+02:00
+
+- Handling subscription errors : no response, error response, expiration
+
+############################################################################
+1.0.29
+############################################################################
+- validation : configuration aborts when one error occurs
+  - block without executionOrderId
+  - ST code pre-compilation error
+
+- code cleanup (DEPRECATED)
+
+- re-subscription now made with an UPDATE (PUT).
+
+- New log that better explain why a block can't be started :
+  "FBD_TRACE_BlockStart %s needs an input variable %s. This can be an Execution Order issue"
+
+- added templates in OUT mapping. This permits a fine control on the real output.
+  <map comment="Plug ON"        output="%OX2.1" value="TRUE"
+    targetID="/m2m/applications/APP_00137a00000080d6.10/retargeting2/0x0006.0x01.ope">
+    <![CDATA[<bool      val="TRUE" />]]>
+  </map>
+
+- Bug in PID function block : when the parameter TR is 0, a division by zero occured
+  causing XOUT to be +/- infinite.
+
+- ONG BOX version : if $ROOTACT/usr/etc/iec61131 exists, config files are taken
+  from $ROOTACT/usr/etc/iec61131/config, template files from $ROOTACT/usr/etc/iec61131/templates
+  and logs writen into $ROOTACT/var/log/iec61131
+- ONG BOX version : added apu for installation
+
+- changes for conformity with ref-ongv2.0-iec-engine-integration-rev7.docx
+- WARNING : 'configuration' becomes 'configurations' and 'mapping' becomes 'mappings'
+
+- As ONG returns first Notify before the subscription reference, XpathAnalyzeInput()
+  now checks not only the reference but the targetID too.
+- Add a check if the configuration is in incorrect format : don't create 'user'.
+
+
+############################################################################
+1.0.28
+############################################################################
+- If lastModifiedTime undefined, the output variable is forced on the network (see TIME_NOT_DEFINED macro)
+- for minCyclicInterval and outTokenBucketRate, we support the XML 'reltime' type, ie. PT1S, PT0.250S ...
+- added a fifo for dIa creation requests : requests are sequentialized.
+- Operations addition, substraction and multiply are authorized in templates files like :
+  <m2m:maxByteSize>${maxConf*maxConfSize}</m2m:maxByteSize>
+  Beware the syntax. Calculus embedded in a ${} token. Only one calculus by token.
+- Compliance with 3.5 Outgoing M2M requests : 3 cases with retargeting4
+  Notice : All_AR access right must be created in your ONG
+- Bug in RETAIN : all variables where saved
+
+############################################################################
+1.0.27
+############################################################################
+- watchdog : a watchdog thread detects no response of the main thread for a specified time
+  (default 60 seconds), then abort process :
+  The watchdog time is specified in spvconfig.xml : <int name="watchdog" val="60"/>
+- cpu : process's cpu is checked and 3 levels of gravity are defined in spvconfig.xml :
+  <int name="cpu_warning" val="50"/>
+  <int name="cpu_danger" val="70"/>
+  <int name="cpu_fatal" val="90"/>
+
+############################################################################
+1.0.26
+############################################################################
+- Xpath : job completed
+- Notifications are filtered on subscription reference
+- Board of errors :
+  The 20 last errors are reported in a board, accessible via the CLI command 'err'
+  Here is an example :
+>>err
+### List of last errors ###
+GSC ERROR : An Application resource already exists with the appId IEC_61131_VM
+GSC ERROR : A Container resource already exists with the id DESCRIPTOR
+GSC ERROR : A Container resource already exists with the id appLogs
+GSC ERROR : m2m:expirationTime attribute value is too short: 2013-08-26T14:45:14.000+02:00
+GSC ERROR : m2m:expirationTime attribute value is too short: 2013-08-26T14:45:14.000+02:00
+GSC ERROR : m2m:expirationTime attribute value is too short: 2013-08-26T14:45:14.000+02:00
+### End                 ###
+- code cleanup
+- removed compilation warnings
+- handled all errors with Board_Put(), GSC_logs() and User_GSC_logs()
+- secures all sprintf() with iec_asprintf() and iec_vasprintf() : dynamic sprintf.
+- removed the most of char bigbuf[1024], replaced with iec_asprintf
+- tracked memory leaks with valgrind
+- found an issue in dIa_split_uri. Corrected in libdIa 1.0.21
+- xml loading optimization : SAX used to filter unwanted elements => reduce memory footprint
+
+############################################################################
+1.0.25
+############################################################################
+- Xpath : job started. Not entirely connected.
+- CLI : display of time spent in every task
+- malloc failure catched -> aborting process
+- runST function : runs a ST piece of code. Version II : this enhanced version pre-compile
+ *        the code and store its syntax tree into the attribute "tree".
+ *        The code is compiled only the first time.
+
+- User_GSC_log function
+- implementation of maxINvariable, maxOUTvariable, maxTasks, minCyclicInterval
+- code cleanup
+- starting configuration with a full bucket
+- send subscriptions when receiving each configuration
+- spvconfig.xml : <bool name="delete_IEC_61131_VM" val="TRUE"/>
+  Force a deletion of IEC_61131_VM
+- priority="HIGH" in m2mMapping.xml means the variable is not using the bucket
+  tocken mechanism.
+- iso8601 date : don't handle timezone offset
+
+############################################################################
+1.0.24	Working version
+############################################################################
+- integration with true sensors/plugs
+
+- tasks without pou are removed
+
+- CLI displays lastModifiedTime for all input mapped variables : lastModifiedTime
+is taken from m2m:lastModifiedTime element (notify).
+
+- check for appId when receiving a notify : two configurations can have the same
+  %I/%O variables names. Variables are sandboxed.
+
+- handles default configuration : when restarted, the IEC VM looks for commited
+configurations, then if not commited, for LATEST configurations.
+
+- commit/rollback support
+
+- runningStatus/loadedConf/loadedMapping
+
+- BUG correction : actions of type pulse (P) situated after a FBD are never activated.
+- MEMORY LEAK correction :
+  - in ST interpreter when calling functions
+  - in ST interpreter return
+  - in getDuration() function
+- BUG correction : ST code with only comments or empty caused a Syntax Error.
+- BUG correction : after all actions runned, SFC must schedule another program, then wait for
+  a tick (this avoids infinite loops)
+
+- function TIME ageOfVariable(STRING varName) : returns the age of the variable.
+
+- added ageOfVariable, lastModifiedTime and forceUpdate functions into Beremiz
+
+- new calendar API using IEC types (DATE, TOD)
+
+############################################################################
+1.0.23	Working version
+############################################################################
+- bug correction : plc.x crashed when a FBD parameter was not connected
+- appLogs are working
+- IEC_ENGINE renamed IEC_61131_VM (in files/applications)
+- new ST Function : BOOL forceUpdate(STRING varName)
+  Force a variable to be updated in the GSCL, even if the new value is the same as the previous.
+- new ST function : DT lastModifiedTime(STRING varName)
+
+- compliance with ref-ongv2.0-iec-engine-integration-rev2.docx : 
+  - changed refreshProg into reload
+  - installation of appLogs : don't work yet due to the missing of AppLogs.Srv
+  - handling accessRIghts
+
+- plc.x can be started with a folder name :
+  plc.x -f <folder>
+  <folder>/plc.xml and <folder>/m2mAccess.xml are then loaded
+
+- STANDARD_FBS.xml and ACTILITY_FBS.xml moved into ./files
+- m2mConfig.xml deprecated
+- ./config/spvconfig.xml is the new config file, in the same format as other ONG subsystems.
+
+<list name="parameters">
+        <int name="tracedia" val="9"/>
+        <int name="subscriptions_time" val="60"/>
+        <int name="accessVars_time" val="1"/>
+</list>
+<list name="variables">
+        <str name="s_telnetkey" val="123"/>
+        <str name="s_telnetport" val="2004"/>
+        <str name="w_nsclbaseuri" val="http://nsc1.actility.com:8088/m2m"/>
+        <str name="w_reqEntity" val="coap://plciecong.actility.com:5683/m2m/applications/GIP"/>
+        <str name="w_contact" val="/contact"/>
+	<str name="w_boxname" val="plciecong"/>
+	<str name="w_domainname" val="actility.com"/>
+	<str name="s_rootapp" val="/m2m/applications"/>
+	<str name="w_driverid" val="GIP"/>
+
+        <str name="w_tpkdev" val=""/>
+
+        <str name="w_coapaddr_l" val="192.168.1.75"/>
+        <str name="w_coapport_l" val="5688"/>
+        <str name="w_coapaddr_r" val="192.168.1.116"/>
+        <str name="w_coapport_r" val="5683"/>
+</list>
+
+*** NOTE ***
+The new telnet port 2004 and the new coap port 5688.
+
+- creation of the shells folder : these shells are used to test ONG-IEC interaction using curl commands
+  ./ope_ENGINE createInstance A1
+  ./post ../demos/WAVE_test A1
+  ./ope_APP refreshProg A1
+  ./ope_APP pause A1
+  ./ope_APP resume A1
+  ./ope_APP reset A1
+  ./ope_ENGINE deleteInstance A1
+
+- ./files/accessRights folder contains xml documents used to define application rights
+- ./files/applications folder contains xml documents used to define IEC_ENGINE and applications
+These xml documents are templates containing variables like ${w_boxname}. These variables will be
+replaced with the value read in the configuration file spvconfig.xml.
+
+
+############################################################################
+1.0.22	Working version
+############################################################################
+- When a step was replaced by a new one (Replace_Step), the current context's name
+  wasn't modified. This troubled traces.
+
+- m2m mapping : work complete on implementing refreshProg, suspend, resume, reset
+
+- File m2mConfig.xml contains the base M2M configuration (not to be confused with
+  m2mMapping.xml that contains M2M INPUT and OUTPUT mapping).
+  Example of m2mConfig.xml :
+	<config>
+	  <self address="192.168.1.75" port="3398" contact="/contact"
+	    reqEntity="coap://plciecong.actility.com:5683/m2m/applications/GIP" />
+	  <ong address="coap://192.168.1.116:5683" />
+	  <subscriptions time="60" />
+	  <accessVars time="1" />
+	  <logLevel val="9" />
+	</config>
+  Fields :
+    self.address/port : local binding of the dIa link
+    self.contact : contact for notifications
+    reqEntity : requesting entity that is passed to the GSCL
+    ong.address : address of the GSCL
+    subscriptions : time in sec between two subscriptions
+    accessVars : time in sec for the task that checks changes in access variables
+    logLevel : log level of the M2M mapper and libdIa
+
+- File m2mMapping.xml still exists on each configuration, in the same place as plc.xml
+
+############################################################################
+1.0.21	2013/06/18
+############################################################################
+- m2m mapping : work in progress on implementing refreshProg, suspend, resume, reset
+- ISSUE : when a SFC step has a single transition, and this transition is not
+  validated, then the step's actions are no more activated (only the first time)
+- return to the full version with 1150 functions :
+  work in progress to develop a functions generator based on a list of types
+
+############################################################################
+1.0.20	2013/06/13
+############################################################################
+- changes after june 12 meeting about M2M mapping : Added createInstance, deleteInstance, reset, suspend.
+- removed a bad trace "[plc.c:2527] ERROR linking externalVar" (between two calls to a pou,
+its variables are not reset).
+
+- BUG : force_reschedule must be defined on every program object. It was defined on task.
+
+
+
+############################################################################
+1.0.19	2013/06/10
+############################################################################
+- Result of the division of two DINT is a DINT (was REAL)
+- interv2 : ST interpreter in C (avoid C++)
+- mxlmReduce : remove OPAQUE and unused graphics elements
+  Tested with demos/WAVE_test :
+  Without reduce : total allocated space:  325728 bytes
+  With reduce    : total allocated space:  170496 bytes
+- -DREDUCED_VERSION : reduce the number of STD functions by 70% : text segment 470K => 270K
+- structures alignment
+- interv2 : added (* comments *)
+- CLI : coredump in inter command if number of parameters is incorrect
+
+- work code optimization (not yet supported in main product) :
+  - In _work : microplc.c loads plc.xml into C structures
+
+############################################################################
+1.0.18	2013/05/27
+############################################################################
+- added ¨SQUAREWAVE Generator¨ Actility Function Block
+- added ¨DERIVATE¨ Standard Function Block
+ 
+beremiz.addons:
+- updated MAKE
+- copy of Actility Splash screen and versioning
+
+- retain.txt renamed retain.xml
+- retain.xml per configuration
+
+############################################################################
+1.0.17	NOT RELEASED
+############################################################################
+
+############################################################################
+1.0.16	2013/05/10
+############################################################################
+- blocks sorted by executionOrderId
+
+############################################################################
+1.0.15	2013/05/07
+############################################################################
+- M2M access :
+  - dIa link
+  - enhancement of m2mMapping.xml : ong address is reported in a config section,
+  - some output variables are operations : they map to different URIs,
+  - the network part of targetID is not used to map input variables
+  - Support of subscriptions
+  - Support of notifications
+  - Variables %I (input) have a last modification time
+  - m2mMapping.xml reloaded when changes detected
+
+- VAR :
+  - optimization. When changing a variable with the same value, it is not
+  marked as Changed.
+
+- CLI : new commands watch and unwatch (watching global variables change)
+- CLI : it is now possible to change an access variable with the 'inter' command.
+      eg. inter 0.0.0.0 REP:=FALSE;
+
+- plc.x : when a program ends by itself (case of simple FBD), it is restarted (RedoFromStart)
+
+############################################################################
+1.0.14	2013/04/26
+############################################################################
+- enhancement of logging information (integration of Laurent's enhancement)
+- m2mMapping.xml and dIa link (alpha)
+- m2m global variables : shared between configurations. These m2m global
+  variables are Configuration global variables + declared in m2m-mapping
+
+############################################################################
+1.0.13	2013/04/24
+############################################################################
+- implements multi-resource
+- implements configuration global variables
+- implements resource global variables
+- CLI inter new syntax : inter c.r.t.p <code> where c.r.t.p equals
+  <configuration>.<resource>.<task>.<pouInstance>
+
+############################################################################
+1.0.12	2013/04/21
+############################################################################
+- multi-tasks and multi-pou instances
+- CLI modified to change trace level for each task/instance
+- saveRetain : bug introduced in 1.0.11. Variables not saved
+- CLI : info command displays Heap addr
+- Optimisation : reduced the number of calloc for variables.
+
+############################################################################
+1.0.11	2013/04/17
+############################################################################
+- Mem optimization : variables have a constant memory address
+- Implement externalVars => link to global var
+- Implement reference count for variable
+
+############################################################################
+1.0.10	2013/04/15
+############################################################################
+- waveGen function share the same code between plc.x and waveGen.x
+- New function JD() in astro, to calculate the Julian Date
+- enhanced astro calculation for high latitude areas
+- Handle time glitches (new addtime directory)
+- iec_User_Reschedule used 10ms sleep. This is reduced to 0ms
+- FBD : same work as SFC (iec_User_Reschedule called)
+- ST : fail if variable not declared
+- ST : if variable declared as REAL, ST accepts DINT input and convert the type to REAL.
+- waveGen : float bug correction
+- ST : handles 2#1110_0000, 8#340 and 16#E0
+
+############################################################################
+1.0.9	2013/04/09
+############################################################################
+- implements Hysteresis FB
+- bug correction : SUB_DT_DT don't worked. Correction in inter_cb.c
+- enhanced astro calculation : TL_epoch (sunrise) and TC_epoch (sunset)
+- detecting date changes (backward and foreward)
+
+############################################################################
+1.0.8	2013/4/05
+############################################################################
+
+- CurrentTime() deprecated. LocalDT() replaces it. LocalDT() returns a DT.
+- enhancement in the PulseTestAndSet() function
+  Warning : max 32 "N" actions per each actionBlock
+- bug in __time_to_timespec() : T#-1s correctly handled
+- CLI command "run <filename>" where filename doesn't exist, crashed plc.x
+- ST : strings with double quotes are accepted.
+- CPU optimization : ST real variables are by default REAL (was LREAL)
+- CLI : command ctx displays global variables
+- CLI : enhanced run, trace commands
+- plc.x multi application and multi log levels : -f<xml1> -t<level1> -f<xml2> -t<level2> ...
+- trace levels : 0=ERROR 1=STEP/SET/BLOCK 2=ACTION/TRANSITION/ST 3=GET 9=DETAIL
+
+
+############################################################################
+1.0.7	2013/4/02
+############################################################################
+
+- bug correction in all functions XXX_TO_YYY(). They returned BOOLtype instead YYYtype.
+- ST interpreter supports now <>
+- actionBlock is performed each time a step is run, even if no transition is activated
+- ST : handle negative numbers
+
+############################################################################
+1.0.6	2013/4/02
+############################################################################
+
+- The function TIME getDuration(char *str) has been changed to correct an issue
+  in handling times like T#10s0ms
+- <action> of type FBD is now handled by Type=Variable Value=FBD in beremiz
+- Speeds startup (user/task creation)
+- option -p <CLI port>
+  <CLI port> : listen port for CLI, default 2002
+- CLI trace command correctly handled
+- enhancement of DATE,TIME,DT,TOD traces
+- handle of N and P flags in SFC actions
+
+############################################################################
+1.0.5	2013/3/22
+############################################################################
+
+- WaveGenerator
+- CLI : call interpreter
+- memory check (stability) with valgrind
+- plcopen.addons : integration with plcopen (screens)
+- run your application with : ./bin/plc.x -f <yourScript>.xml -t <traceLevel> -I <stdInclude>
+  <traceLevel> : [0-9], default 9
+  <stdInclude> : include directory for standards FBS (default is $ROOTACT/iec61131/bin)
+
+
+
+############################################################################
+############################################################################
+############################################################################
+############################################################################
+Know issues and work in progress
+############################################################################
+
+- Statictics : should implement processing time of each task/pou instance, # of ticks
+- API : should implement start/stop task/pou instance
+- --check : static analysis of the application
+
+- Should implement STEP.X and STEP.T
+- Should implement OnDelay.PT = 5; (access invariables of a FBD using the ST language)
+
+- CPU optimization : work with objects and integer Ids instead of xml and strings.
+- CPU optimization : some matiec functions (date/time manipulation) use double
+  and long double. This is time consuming in ARM. Replace with integer calculation ?
+- ARM target : if fpu unavailable, should use IEEE 754 library ?
+
+- Server side : prepare code to be in server side, eg. hundreds of occurences of plc.x
+- Timezone computed using Lat/Lon (setenv() + tzset()) ?
+
+- Restriction : loops in a FBD are not supported. FBD must use a local variable.
+
+############################################################################
+

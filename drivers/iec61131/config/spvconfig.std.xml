@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     Do not modify this file which is included in delivery.
+     Copy it in $AW_DATA_DIR and edit the copy.
+-->
+<obj xmlns="http://obix.org/ns/schema/1.1">
+
+<!-- parameters -->
+<list name="parameters">
+	<bool name="withdia" val="TRUE"/>
+	<bool name="appdiscover" val="TRUE"/>
+	<int name="subscriptions_time" val="3600"/>
+	<int name="accessVars_time" val="1"/>
+	<int name="tracesizemax" val="500000000"/>
+	<int name="tracelevel" val="0"/>
+	<int name="tracedia" val="0"/>
+	<int name="tracem2m" val="0"/>
+</list>
+
+<!-- variables -->
+<list name="variables">
+	<str name="s_telnetkey" val="123"/>
+	<str name="s_telnetport" val="2004"/>
+	<str name="w_nsclbaseuri" val="http://nsc1.actility.com:8088/m2m"/>
+	<str name="w_domainname" val="actility.com"/>
+	<str name="s_rootapp" val="/m2m/applications"/>
+	<str name="w_driverid" val="GIP"/>
+	<str name="w_tpkdev" val=""/>
+
+<!-- variables for ONG DIA/COAP link local side -->
+	<str name="w_coapaddr_l" val="::1"/>
+	<str name="w_coapport_l" val="5688"/>
+<!-- variables for ONG DIA/COAP link remote side -->
+	<str name="w_coapaddr_r" val="::1"/>
+	<str name="w_coapport_r" val="5683"/>
+</list>
+</obj>

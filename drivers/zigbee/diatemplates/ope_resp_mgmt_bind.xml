@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+xmlns="http://obix.org/ns/schema/1.1">
+    
+    <int name="zbBindingTableEntries" val="${a_configVal0}" />
+    <int name="zbStartIndex" val="${a_configVal1}" /> 
+    <int name="zbBindingTableListCount" val="${a_configVal2}" />
+    <list name="zbBindingTableList">
+      <!-- elements added here are built from mgmt_bind_inst.xml -->
+    </list>
+</obj>
+

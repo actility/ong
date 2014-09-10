@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     this diatemplates is quiet special because r_value can be 400 bytes long
+     because of ascii hexa tic data
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+     do not suppress this comment which is here to increase the file size
+-->
+<str val="  CONTRAT BASE_A5 K DATECOUR 07/11/12 19/40/10 N EA 06573 K ERP 02887 0 PTCOUR P - DATEPA1 07/11/12 19/40/00 V PA1 16196kW K DATEPA2 07/11/12 19/30/00 V PA2 0kW 5 DATEPA3 07/11/12 19/20/00 V PA3 0kW 6 DATEPA4 07/11/12 19/10/00 V PA4 0kW 7 DATEPA5 07/11/12 19/00/00 V PA5 0kW 8 DATEPA6 07/11/12 18/50/00 [ PA6 0kW 9 KDC 95% % KDCD 81% $ PSP 15046kW 5 PSHPH 25531kW E PSHPD 14458kW G PSHCH 29272kW ? PSHCD 26530kW 4 PSHPE 32134kW ? PSHCE 32581kW 8 PSJA 435kW L PA1MN 24961kW % PA10MN 6223kW \ PREA1MN -17437kvar [ PREA10MN -476kvar & TGPHI 37750 B U10MN 58V T   " 
+x-template="dat_inst_0053_0000_0.xml"
+x-date="20121108 11:22:34.090 " x-unit="hexa" 
+xmlns="http://obix.org/ns/schema/1.1"/>
+

@@ -1,0 +1,3 @@
+sed -i "s,^prefix=.*,prefix=\"$ROOTACT\"," $ROOTACT/bin/pthsem-config
+chmod 755 $ROOTACT/bin/pthsem-config
+

@@ -1,0 +1,49 @@
+2012-03-23  Olaf Bergmann  <bergmann@tzi.org>
+
+	* examples/client.c (clear_obs): clear observation relationship after
+	user-specified duration
+
+2012-03-21  Olaf Bergmann  <bergmann@tzi.org>
+
+	* resource.c (print_wellknown): filtering by attributes
+
+2012-03-19  Olaf Bergmann  <bergmann@tzi.org>
+
+	* pdu.c (coap_add_option): allow more than 15 options.
+
+2012-03-15  Olaf Bergmann  <bergmann@tzi.org>
+
+	* examples/client.c (cmdline_uri): split path and query here to
+	make it easier to include these options in subsequent requests for
+	block transfer.
+
+2012-03-14  Olaf Bergmann  <bergmann@tzi.org>
+
+	* examples/etsi_iot_01.c: Support for POST, PUT, DELETE on /test
+
+2012-03-13  Olaf Bergmann  <bergmann@tzi.org>
+
+	* encode.c (coap_encode_var_bytes): more efficient coding for 0
+
+2012-03-11  Olaf Bergmann  <bergmann@tzi.org>
+
+	* examples/etsi_iot_01.c: Test cases for 1st ETSI CoAP Plugtest,
+	March 24/25, 2012 in Paris, France.
+
+2012-03-10  Olaf Bergmann  <bergmann@tzi.org>
+
+	* block.c: support for block transfer.
+
+2012-03-07  Olaf Bergmann  <bergmann@tzi.org>
+
+	* examples/client.c (usage): new command line options
+	-B to set timeout after which the main loop is left.
+	-e to specify a payload (incompatible with -f)
+	(message_handler): bugfixes
+
+	* resource.h: (coap_method_handler_t): new API for method handlers.
+
+
+Copyright 2012 Olaf Bergmann, TZI
+Copying and distribution of this file, with or without modification, are
+permitted provided the copyright notice and this notice are preserved.

@@ -1,0 +1,107 @@
+
+/*
+* Copyright (C) Actility, SA. All Rights Reserved.
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License version
+* 2 only, as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful, but
+* WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* General Public License version 2 for more details (a copy is
+* included at /legal/license.txt).
+*
+* You should have received a copy of the GNU General Public License
+* version 2 along with this work; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+* 02110-1301 USA
+*
+* Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+* or visit www.actility.com if you need additional
+* information or have any questions.
+*/
+
+#ifndef ACCESSRIGHT_REF
+#define ACCESSRIGHT_REF
+
+#include "misc.ref"
+#include "common.ref"
+
+
+m2m:ApplicationIDs from ong:t_xml_obj
+{
+    m2m:applicationID    XoString    { list } // (xmlType: xsd:string) (list size: [0, infinity[) 
+}
+alias m2m:ApplicationIDs with m2m:applicationIDs
+
+m2m:SclIDs from ong:t_xml_obj
+{
+    m2m:sclID    XoString    { list } // (xmlType: xsd:string) (list size: [0, infinity[) 
+}
+alias m2m:SclIDs with m2m:sclIDs
+
+m2m:PermissionFlagListType from ong:t_xml_obj
+{
+    m2m:flag    XoString    { list } // (xmlType: m2m:PermissionFlagType) (list size: [0, infinity[) (enum: READ WRITE DISCOVER DELETE CREATE ) 
+}
+alias m2m:PermissionFlagListType with m2m:permissionFlags
+
+m2m:HolderRefListType from ong:t_xml_obj
+{
+    m2m:holderRef    XoString    { list } // (xmlType: xsd:anyURI) (list size: [0, infinity[) 
+}
+alias m2m:HolderRefListType with m2m:holderRefs
+
+m2m:AnonAll from ong:t_xml_obj
+{
+}
+alias m2m:AnonAll with m2m:all
+
+m2m:DomainListType from ong:t_xml_obj
+{
+    m2m:domain    XoString    { list } // (xmlType: xsd:anyURI) (list size: [0, infinity[) 
+}
+alias m2m:DomainListType with m2m:domains
+
+m2m:PermissionHolderType from ong:t_xml_obj
+{
+    m2m:holderRefs    m2m:HolderRefListType    {  } // (optional) 
+    m2m:applicationIDs    m2m:ApplicationIDs    {  } // (optional) 
+    m2m:sclIDs    m2m:SclIDs    {  } // (optional) 
+    m2m:all    m2m:AnonAll    {  } // (optional) 
+    m2m:domains    m2m:DomainListType    {  } // (optional) 
+}
+alias m2m:PermissionHolderType with m2m:permissionHolders
+
+m2m:PermissionType from ong:t_xml_obj
+{
+    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:permissionFlags    m2m:PermissionFlagListType    {  }
+    m2m:permissionHolders    m2m:PermissionHolderType    {  }
+}
+alias m2m:PermissionType with m2m:permission
+
+m2m:PermissionListType from ong:t_xml_obj
+{
+    m2m:permission    m2m:PermissionType    { list wraphidden } // (list size: [0, infinity[) 
+}
+alias m2m:PermissionListType with m2m:permissions
+alias m2m:PermissionListType with m2m:selfPermissions
+
+m2m:AccessRight from ong:t_xml_obj
+{
+    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:expirationTime    XoString    {  } // (optional) (xmlType: xsd:dateTime) 
+    m2m:searchStrings    m2m:SearchStrings    {  } // (optional) 
+    m2m:creationTime    XoString    {  } // (optional) (xmlType: xsd:dateTime) 
+    m2m:lastModifiedTime    XoString    {  } // (optional) (xmlType: xsd:dateTime) 
+    m2m:announceTo    m2m:AnnounceTo    {  } // (optional) 
+    m2m:permissions    m2m:PermissionListType    {  } // (optional) 
+    m2m:selfPermissions    m2m:PermissionListType    {  }
+    m2m:subscriptionsReference    XoString    {  } // (optional) (xmlType: xsd:anyURI) 
+}
+alias m2m:AccessRight with m2m:accessRight
+
+#endif // ACCESSRIGHT_REF

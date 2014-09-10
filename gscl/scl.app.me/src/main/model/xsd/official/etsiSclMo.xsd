@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:tns="http://uri.etsi.org/m2m" xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd" />
+	<include schemaLocation="parameters.xsd" />
+	<include schemaLocation="common.xsd" />
+	
+	<!-- etsiSclMo resource type -->
+	<complexType name="EtsiSclMo">
+		<complexContent>
+			<extension base="tns:MgmtObj">
+				<sequence>
+					<element ref="tns:regTargetNsclList" minOccurs="0" />
+					<element ref="tns:regExpirationDuration" minOccurs="0" />
+					<element ref="tns:regAccessRightID" minOccurs="0" />
+					<element ref="tns:regSearchStrings" minOccurs="0" />
+					<element ref="tns:announcedToSclList" minOccurs="0" />
+					<element ref="tns:maxNumberOfDiscovRecords" minOccurs="0" />
+					<element ref="tns:maxSizeOfDiscovAnswer" minOccurs="0" />
+					<element ref="tns:sclActionStatus" minOccurs="0" />
+					<!--attribute ref="tns:id" use="required" fixed="etsiSclMo"/ -->
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="regTargetNsclList" type="tns:AnyURIList" />
+	<element name="regExpirationDuration" type="duration" />
+	<element name="regAccessRightID" type="anyURI" />
+	<element name="regSearchStrings" type="tns:SearchStrings" />
+	<element name="announcedToSclList" type="tns:AnyURIList" />
+	<element name="maxNumberOfDiscovRecords" type="long" />
+	<element name="maxSizeOfDiscovAnswer" type="long" />
+	<element name="sclActionStatus" type="tns:ActionStatus" />
+
+</schema>

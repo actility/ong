@@ -1,0 +1,8 @@
+
+RED=`basename $1 .xml`_red.xml
+SAX=`basename $1 .xml`_sax.xml
+DIC=`basename $1 .xml`_dic.xml
+
+./filterxml.x -f $1 -w -t reduce | xmllint --format - > $RED
+./filterxml.x -f $1 -w -t sax    | xmllint --format - > $SAX
+./filterxml.x -f $1 -w -t sax -d | xmllint --format - > $DIC

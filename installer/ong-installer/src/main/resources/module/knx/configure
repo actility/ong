@@ -1,0 +1,13 @@
+
+sed -i -e "s|<str name=\"w_coapaddr_r\" val=\"[^\"]*\"/>|<str name=\"w_coapaddr_r\" val=\"$GSCL_COAP_HOST\"/>|" $ROOTACT/usr/etc/knx/spvconfig.xml
+sed -i -e "s|<str name=\"w_coapport_r\" val=\"[^\"]*\"/>|<str name=\"w_coapport_r\" val=\"$GSCL_COAP_PORT\"/>|" $ROOTACT/usr/etc/knx/spvconfig.xml
+sed -i -e "s|<str name=\"w_tpkdev\" val=\"[^\"]*\"/>|<str name=\"w_tpkdev\" val=\"$TPK_DEV_URI\"/>|" $ROOTACT/usr/etc/knx/spvconfig.xml
+sed -i -e "s|<str name=\"w_nsclbaseuri\" val=\"[^\"]*\"/>|<str name=\"w_nsclbaseuri\" val=\"$NSCL_URI\"/>|" $ROOTACT/usr/etc/knx/spvconfig.xml
+if [ -n "$ONG_NAME" ]; then
+  if [[ $(cat $ROOTACT/usr/etc/knx/spvconfig.xml) =~ w_boxname ]]; then
+    sed -i -e "s|<str name=\"w_boxname\" val=\"[^\"]*\"/>|<str name=\"w_boxname\" val=\"$ONG_NAME\"/>\n|" $ROOTACT/usr/etc/knx/spvconfig.xml
+  else
+    sed -i -e "s|^\([ \t]*\)<str name=\"w_domainname\" val=\"\(.*\)\"/>|\1<str name=\"w_domainname\" val=\"\2\"/>\n\1<str name=\"w_boxname\" val=\"$ONG_NAME\"/>|" $ROOTACT/usr/etc/knx/spvconfig.xml
+  fi
+fi
+sed -i -e "s|<str name=\"w_domainname\" val=\"[^\"]*\"/>|<str name=\"w_domainname\" val=\"$DOMAIN_NAME\"/>|" $ROOTACT/usr/etc/knx/spvconfig.xml

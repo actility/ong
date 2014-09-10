@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m"
+	xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="common.xsd" />
+
+	<element name="scl" type="tns:Scl" />
+
+	<complexType name="Scl">
+		<sequence>
+			<element ref="tns:pocs" minOccurs="0" />
+			<element ref="tns:remTriggerAddr" minOccurs="0" />
+			<element ref="tns:onlineStatus" minOccurs="0" />
+			<element ref="tns:serverCapability" minOccurs="0" />
+			<element ref="tns:link" minOccurs="0" />
+			<element ref="tns:schedule" minOccurs="0" />
+			<element ref="tns:expirationTime" minOccurs="0" />
+			<element ref="tns:accessRightID" minOccurs="0" />
+			<element ref="tns:searchStrings" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0" />
+			<element ref="tns:lastModifiedTime" minOccurs="0" />
+			<element ref="tns:locTargetDevice" minOccurs="0" />
+			<element ref="tns:mgmtProtocolType" minOccurs="0" />
+			<element ref="tns:integrityValResults" minOccurs="0" />
+			<element ref="tns:aPocHandling" minOccurs="0" />
+			<!-- subresources -->
+			<element ref="tns:containersReference" minOccurs="0" />
+			<element ref="tns:groupsReference" minOccurs="0" />
+			<element ref="tns:applicationsReference" minOccurs="0" />
+			<element ref="tns:accessRightsReference" minOccurs="0" />
+			<element ref="tns:subscriptionsReference" minOccurs="0" />
+			<element ref="tns:mgmtObjsReference" minOccurs="0" />
+			<element ref="tns:notificationChannelsReference" minOccurs="0" />
+			<element ref="tns:m2mPocsReference" minOccurs="0" />
+			<element ref="tns:attachedDevicesReference" minOccurs="0" />
+		</sequence>
+		<attribute name="sclId" type="anyURI"/>
+	</complexType>
+
+	<element name="pocs" type="tns:AnyURIList" />
+	<element name="serverCapability" type="boolean" />
+	<element name="schedule" type="tns:Schedule" />
+	<element name="remTriggerAddr" type="anyURI" />
+	<element name="locTargetDevice" type="anyType" /> <!-- TODO - should this not be restricted -->
+	<element name="mgmtProtocolType" type="tns:MgmtProtocolType" />
+	<element name="integrityValResults" type="tns:IntegrityValResults" />
+	<element name="m2mPocsReference" type="anyURI" />
+	<element name="attachedDevicesReference" type="anyURI" />
+
+	<simpleType name="MgmtProtocolType">
+		<restriction base="string">
+			<enumeration value="OMA DM"></enumeration>
+			<enumeration value="BBF TR 069"></enumeration>
+		</restriction>
+	</simpleType>
+
+	<complexType name="IntegrityValResults">
+		<sequence>
+			<element name="ivalResults" type="long" />
+			<element name="signedIvalResult" type="long" />
+			<element name="secureTimeStamp" type="dateTime" />
+		</sequence>
+	</complexType>
+
+</schema>

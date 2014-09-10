@@ -1,0 +1,69 @@
+/*
+ * Copyright (C) Actility, SA. All Rights Reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details (a copy is
+ * included at /legal/license.txt).
+ *
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA
+ *
+ * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+ * or visit www.actility.com if you need additional
+ * information or have any questions.
+ */
+#ifndef SCL_REF
+#define SCL_REF
+
+#include "misc.ref"
+#include "common.ref"
+
+
+m2m:IntegrityValResults from ong:t_xml_obj
+{
+    ivalResults    XoString    { } // (xmlType: xsd:long) 
+    signedIvalResult    XoString    { } // (xmlType: xsd:long) 
+    secureTimeStamp    XoString    { } // (xmlType: xsd:dateTime) 
+}
+alias m2m:IntegrityValResults with m2m:integrityValResults
+
+m2m:Scl from ong:t_xml_obj
+{
+    sclId    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:pocs    m2m:AnyURIList    { } // (optional) 
+    m2m:remTriggerAddr    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:onlineStatus    XoString    { } // (optional) (xmlType: m2m:OnlineStatus) (enum: ONLINE OFFLINE NOT_REACHABLE ) 
+    m2m:serverCapability    XoString    { } // (optional) (xmlType: xsd:boolean) 
+    m2m:link    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:schedule    m2m:Schedule    { } // (optional) 
+    m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
+    m2m:accessRightID    XoString    { shdico } // (optional) (xmlType: xsd:anyURI) 
+    m2m:searchStrings    m2m:SearchStrings    { } // (optional) 
+    m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
+    m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
+    m2m:locTargetDevice    XoString    { } // (optional) (xmlType: xsd:anyType) 
+    m2m:mgmtProtocolType    XoString    { } // (optional) (xmlType: m2m:MgmtProtocolType) (enum: OMA DM BBF TR 069 ) 
+    m2m:integrityValResults    m2m:IntegrityValResults    { } // (optional) 
+    m2m:aPocHandling    XoString    { } // (optional) (xmlType: m2m:APocHandling) (enum: SHALLOW DEEP ) 
+    m2m:containersReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:groupsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:applicationsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:accessRightsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:subscriptionsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:mgmtObjsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:notificationChannelsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:m2mPocsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:attachedDevicesReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+}
+alias m2m:Scl with m2m:scl
+
+#endif // SCL_REF

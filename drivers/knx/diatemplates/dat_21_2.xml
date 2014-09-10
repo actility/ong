@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bool val="${raw_UserStopped}" xmlns="http://obix.org/ns/schema/1.1">
+    <bool name="UserStopped" val="${raw_UserStopped}" />
+    <bool name="OwnIA" val="${raw_OwnIA}" />
+    <bool name="VerifyMode" val="${raw_VerifyMode}" />
+    <str name="raw" val="0x${dpt_raw}"/>
+</bool>

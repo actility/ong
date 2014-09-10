@@ -1,0 +1,1 @@
+sed -i -e "s|<int name=\"tracesize\" val=\"[0-9]*\"/>|<int name=\"tracesize\" val=\"$LOG_WMBUS_SIZE\"/>|" $ROOTACT/usr/etc/wmbus/spvconfig.xml

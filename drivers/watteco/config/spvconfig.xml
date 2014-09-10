@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     Do not modify this file which is included in delivery.
+     Copy it in $AW_DATA_DIR and edit the copy.
+-->
+<obj xmlns="http://obix.org/ns/schema/1.1">
+
+<!--
+     parameters
+-->
+<list name="parameters">
+	<int name="tracelevel" val="-1"/>
+	<int name="tracedebug" val="1"/>
+	<int name="withdia" val="1"/>
+	<int name="tracedia" val="0"/>
+	<int name="pseudoong" val="0"/>
+	<int name="softwaresensors" val="0"/>
+	<int name="httpsensorlist" val="1"/>
+	<int name="modeling" val="0"/>
+	<int name="covconfig" val="1"/>
+	<int name="allinputcluster" val="1"/>
+	<int name="multiendpoint" val="1"/>
+
+<!--
+	<str name="radiomode" val="lora" />
+-->
+	<str name="radiomode" val="rf212" />
+
+	<int name="rf212_sleeptime" val="660" />
+	<real name="rf212_msgfrequence" val="1.0" />
+
+	<int name="lora_sleeptime" val="4000" />
+	<real name="lora_msgfrequence" val="0.2" />
+</list>
+
+<!--
+     variables
+-->
+<list name="variables">
+	<str name="s_telnetkey" val="123"/>
+	<str name="s_telnetport" val="2000"/>
+	<str name="w_nsclbaseuri" val="http://nsc1.actility.com:8088/m2m"/>
+	<str name="w_driverid" val="GIP"/>
+	<str name="w_driverpath" val="6lowpan"/>
+	<str name="w_ipuid" val="IPU_6LoWPAN"/>
+	<str name="w_manufacturer" val="1234"/>
+	<str name="w_panid" val="0000"/>
+
+	<str name="w_domainname" val="actility.com"/>
+<!-- now get by gethostname(2) but you can force it here
+	<str name="w_boxname" val="CYH-00FADAFADAFA"/>
+	<str name="w_boxname" val="pca-esprimo-p5730"/>
+-->
+	<str name="w_tpkdev" val=""/>
+
+<!--
+     variables for ONG DIA/COAP link local side
+-->
+	<str name="w_coapaddr_l" val="::1"/>
+	<str name="w_coapport_l" val="5684"/>
+
+<!--
+     variables for ONG DIA/COAP link remote side
+-->
+	<str name="w_coapaddr_r" val="::1"/>
+	<str name="w_coapport_r" val="5683"/>
+</list>
+
+<!--
+     m2m mapping cluster.attribut.member.type => m2m attribut/point/cmd name
+     	0x%04x.0x%04x.%d.m2m
+     	0x%04x.0x%04x.%d.attr
+     	0x%04x.0x%02x.ope
+-->
+<list name="mapping">
+	<str name="0x0006.0x00.ope"	val="zbOff"/>
+	<str name="0x0006.0x01.ope"	val="zbOn"/>
+	<str name="0x0006.0x02.ope"	val="zbToggle"/>
+	<str name="0x0006.0x0000.0.attr" val="zbOnOff"/>
+	<str name="0x0006.0x0000.0.m2m"	val="m2mOnOff"/>
+
+	<str name="0x0052.0x0000.0.m2m"	val="m2mCurrentSummationDelivered"/>
+	<str name="0x0052.0x0000.1.m2m"	val="extCurrentSummationDeliveredR"/>
+	<str name="0x0052.0x0000.3.m2m"	val="m2mInstantaneousDemand"/>
+	<str name="0x0052.0x0000.4.m2m"	val="extInstantaneousDemandR"/>
+
+	<str name="0x0053.0x0000.0.m2m"	val="extTicIceData"/>
+	<str name="0x0053.0x0001.0.m2m"	val="extTicIcePeriode0"/>
+	<str name="0x0053.0x0002.0.m2m"	val="extTicIcePeriode1"/>
+	<str name="0x0053.0x0010.0.m2m"	val="extTicIceType"/>
+
+	<str name="0x0054.0x0000.0.m2m"	val="extTicCbeData"/>
+	<str name="0x0054.0x0010.0.m2m"	val="extTicCbeType"/>
+
+	<str name="0x0055.0x0000.0.m2m"	val="extTicCjeData"/>
+	<str name="0x0055.0x0010.0.m2m"	val="extTicCjeType"/>
+
+	<str name="0x0400.0x0000.0.m2m"	val="m2mMeasuredValue"/>
+
+	<str name="0x0402.0x0000.0.m2m"	val="m2mMeasuredValue"/>
+
+	<str name="0x0405.0x0000.0.m2m"	val="m2mMeasuredValue"/>
+
+	<str name="0x0406.0x0000.0.m2m"	val="m2mMeasuredValue"/>
+
+	<str name="0x000c.0x0055.0.m2m"	val="m2mMeasuredValue"/>
+
+	<str name="0x000f.0x0055.0.m2m"	val="m2mMeasuredValue"/>
+	<str name="0x000f.0x0402.0.m2m"	val="extCounter"/>
+	<str name="0x000f.0x0054.0.attr"	val="extPolarity"/>
+	<str name="0x000f.0x0400.0.attr"	val="extEdgeSelect"/>
+	<str name="0x000f.0x0401.0.attr"	val="extDebounce"/>
+</list>
+
+</obj>

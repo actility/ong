@@ -1,0 +1,25 @@
+include $(ROOTACT)/rtbase/base/makefile.def
+
+MODBUSLIB= $(ROOTACT)/modbus/lib/libmodbus-acy.a \
+           $(ROOTACT)/lib/libmodbus.a
+
+INC = -I$(ROOTACT)/ \
+      -I$(ROOTACT)/xo/include \
+      -I$(ROOTACT)/drvcommon/lib \
+      -I$(ROOTACT)/libdIa \
+      -I$(ROOTACT)/libcoap \
+      -I$(ROOTACT)/modbus/include \
+      -I$(ROOTACT)/modbus/lib \
+      -I$(ROOTACT)/modbus/drvcommon \
+      -I$(ROOTACT)/modbus/supervisor \
+      -I$(ROOTACT)/modbus/supervisor \
+      -I$(ROOTACT)/include \
+      $(DEFINC)
+
+LDPATH = -L$(ROOTACT)/shlib
+
+SHLIB = -lpthread -lrtbase -lxo -ldIa -ldrvcommon
+
+# Add version define
+CCFLAGS += -g -O0 -D__MODBUS_DRIVER_VERSION__=`cat $(ROOTACT)/modbus/Version`
+

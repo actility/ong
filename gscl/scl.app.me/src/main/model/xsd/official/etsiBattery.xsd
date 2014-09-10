@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd" />
+	<include schemaLocation="parameters.xsd" />
+
+	<!-- etsiBattery resource type -->
+	<complexType name="EtsiBattery">
+		<complexContent>
+			<extension base="tns:MgmtObj">
+				<sequence>
+					<element ref="tns:standbyTime" minOccurs="1" maxOccurs="1"/>
+					<!-- attribute ref="tns:id" use="required" fixed="etsiBattery"/ -->
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="standbyTime" type="long">
+		<annotation>
+			<documentation>
+			Contains the estimated time of operation. It is based on the charge of all the batteries and it is expressed in minutes.
+			</documentation>
+		</annotation>
+	</element>
+ 
+</schema>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.actility.com/m2m" xmlns:tns="http://uri.actility.com/m2m">
+
+  <element name="storageConfiguration" type="tns:StorageConfiguration" />
+
+  <complexType name="StorageConfiguration">
+    <sequence>
+      <element ref="tns:param" minOccurs="0" maxOccurs="unbounded" />
+    </sequence>
+  </complexType>
+
+  <element name="param" type="tns:Param" />
+
+  <complexType name="Param">
+    <sequence />
+    <attribute name="name" type="string" />
+    <attribute name="val" type="string" />
+  </complexType>
+
+</schema>

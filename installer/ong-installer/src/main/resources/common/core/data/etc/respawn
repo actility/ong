@@ -1,0 +1,31 @@
+#!(SHELL)
+
+if [ $# -ne 3 ]
+then
+  echo "Usage: $0 service command stoppingFile"
+  echo "  service:      Name of the service to respawn"
+  echo "  command:      The command to execute in order to launch and respawn the service"
+  echo "  stoppingFile: File that will stop the inifinite respawning loop it is exists on the file system"
+  exit 10
+fi
+
+retval=0
+service=$1
+stoppingFile=$3
+
+rm $stoppingFile
+
+eval $2
+retval=$?
+
+while [ ! -f $stoppingFile ]
+do
+    sleep 5
+    echo "Respawning service $service" | stdin-logger $ROOTACT/var/log/respawn/ respawn 32 2 1 1 0
+    eval $2
+    retval=$?
+done
+
+rm $stoppingFile
+
+exit $retval

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	
+	<include schemaLocation="common.xsd" />
+
+	<element name="groups" type="tns:Groups" />
+
+	<complexType name="Groups">
+		<sequence>
+			<element ref="tns:accessRightID" minOccurs="0"/>
+			<element ref="tns:creationTime" minOccurs="0"/>
+			<element ref="tns:lastModifiedTime" minOccurs="0"/>
+			<!-- subresources -->
+			<element ref="tns:groupCollection" minOccurs="0" />
+			<element ref="tns:groupAnncCollection" minOccurs="0" />
+			<element ref="tns:subscriptionsReference" minOccurs="0"/>
+		</sequence>
+	</complexType>
+
+	<element name="groupCollection" type="tns:NamedReferenceCollection" />
+	<element name="groupAnncCollection" type="tns:NamedReferenceCollection" />
+		
+</schema>

@@ -1,0 +1,25 @@
+From f897d7c8edaa95a47d663fc6387bf4691fb3ba89 Mon Sep 17 00:00:00 2001
+From: jreich_dev <jreich@CentOS-dev-jreich.actility.net>
+Date: Wed, 22 Aug 2012 16:55:43 +0200
+Subject: [PATCH] dns cache ttl
+
+---
+ .../cdc/src/share/lib/security/java.security       |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/share/lib/security/java.security b/phoneme_advanced_mr2_b167/cdc/src/share/lib/security/java.security
+index 493fd9b..dd11767 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/share/lib/security/java.security
++++ b/phoneme_advanced_mr2_b167/cdc/src/share/lib/security/java.security
+@@ -190,7 +190,7 @@ ssl.TrustManagerFactory.algorithm=SunX509
+ #       serious security implications. Do not set it unless 
+ #       you are sure you are not exposed to DNS spoofing attack.
+ #
+-#networkaddress.cache.ttl=-1 
++networkaddress.cache.ttl=1800
+ 
+ # The Java-level namelookup cache policy for failed lookups:
+ #
+-- 
+1.7.3.4
+

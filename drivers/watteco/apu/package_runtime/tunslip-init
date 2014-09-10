@@ -1,0 +1,76 @@
+#!/bin/sh
+#
+# tunslip:       Starts the tunslip driver
+
+CURRENT_DIR=`dirname $0`
+. $CURRENT_DIR/../ong.cfg
+
+usage() {
+    echo "Usage: tunslip [<options>] {start|stop|status|restart}"
+    echo "  Where options are:"
+    echo "   -h|--help    Print this help message"
+    echo "   -i|--init    Re-initialize ONG"
+}
+
+writeStatus() {
+    if [ "$1" = "0" ]; then
+        echo "[OK]"
+        exit 0
+    else
+        echo "[FAILED]"
+        exit $2
+    fi
+}
+
+GETOPTTEMP=`getopt -o hi --long help,init -- $@`
+if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments
+while [ -n "$1" ]
+do
+    case "$1" in
+        "-h"|"--help") usage; exit;;
+        "-i"|"--init") ;;
+        "--") shift; break ;;
+        * ) echo "Internal error ($*)!"; exit 1;;
+    esac
+    shift
+done
+
+case "$1" in
+    start)
+        echo -n "Starting tunslip service: "
+
+        nohup $CURRENT_DIR/../respawn tunslip $ROOTACT/watteco/tunslip/tunslip6.sh $ROOTACT/usr/data/watteco/tunslipStop > /dev/null 2>&1 &
+        ret=$?
+
+        writeStatus $ret 2
+        ;;
+    stop)
+        echo -n "Stopping tunslip service: "
+
+        touch $ROOTACT/usr/data/watteco/tunslipStop
+        kill -9  `pidof tunslip6.x` > /dev/null 2>&1
+        ret=$?
+
+        writeStatus $ret 3
+        ;;
+    status)
+        if [ "x`pidof tunslip6.x`" = "x" ]; then
+            echo "tunslip service is not running"
+        else
+            echo "tunslip service is running"
+        fi
+        ;;
+    restart)
+        $0 stop
+        $0 start
+        rc=$?
+        ;;
+    *)
+        usage
+        exit 1
+esac
+
+

@@ -1,0 +1,9 @@
+# Post install gscl script
+chmod 755 $ROOTACT/etc/init.d/gscl
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/init.d/gscl
+mkdir -p $ROOTACT/etc/rc.d/
+cd $ROOTACT/etc/rc.d
+ln -s ../init.d/gscl S05gscl
+
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/gscl/knopflerfish/props.xargs
+mkdir -p $ROOTACT/var/log/gscl

@@ -1,0 +1,728 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="Actility"
+              productName="iec61131"
+              productVersion="1.0.28"
+              creationDateTime="2013-04-23T20:30:50"
+              contentDescription="Thermostat sample application using the PID defined in the IEC standard"/>
+  <contentHeader name="Thermostat PID"
+                 version="V1.0.0"
+                 modificationDateTime="2013-09-16T15:54:21"
+                 author="Laurent Nicq">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="10" y="10"/>
+      </fbd>
+      <ld>
+        <scaling x="0" y="0"/>
+      </ld>
+      <sfc>
+        <scaling x="10" y="10"/>
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes/>
+    <pous>
+      <pou name="PWM" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="PWM2_Start">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="PWM2_Period">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+          </inputVars>
+          <localVars>
+            <variable name="PWM2_Running_ON_Time">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+          </localVars>
+          <inputVars>
+            <variable name="PWM2_Ratio">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+          </inputVars>
+          <localVars>
+            <variable name="PWM2_Limit_Low">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="PWM2_Limit_High">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="100"/>
+              </initialValue>
+              <documentation>
+<![CDATA[If not set as INPUT, put 100.0 as initial value]]>
+              </documentation>
+            </variable>
+            <variable name="PWM2_ResetMode">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+              <documentation>
+<![CDATA[For simulation]]>
+              </documentation>
+            </variable>
+          </localVars>
+          <outputVars>
+            <variable name="PWM2_Out">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="PWM_HEATING">
+              <type>
+                <derived name="PWM_GENERATOR"/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <FBD>
+            <block localId="43" width="260" height="280" typeName="PWM_GENERATOR" instanceName="PWM_HEATING" executionOrderId="1">
+              <position x="285" y="16"/>
+              <inputVariables>
+                <variable formalParameter="Start">
+                  <connectionPointIn>
+                    <relPosition x="0" y="44"/>
+                    <connection refLocalId="53">
+                      <position x="285" y="60"/>
+                      <position x="150" y="60"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ResetMode">
+                  <connectionPointIn>
+                    <relPosition x="0" y="84"/>
+                    <connection refLocalId="54">
+                      <position x="285" y="100"/>
+                      <position x="210" y="100"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Period">
+                  <connectionPointIn>
+                    <relPosition x="0" y="124"/>
+                    <connection refLocalId="52">
+                      <position x="285" y="140"/>
+                      <position x="210" y="140"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Ratio">
+                  <connectionPointIn>
+                    <relPosition x="0" y="174"/>
+                    <connection refLocalId="47">
+                      <position x="285" y="190"/>
+                      <position x="150" y="190"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Limit_High">
+                  <connectionPointIn>
+                    <relPosition x="0" y="214"/>
+                    <connection refLocalId="46">
+                      <position x="285" y="230"/>
+                      <position x="230" y="230"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Limit_Low">
+                  <connectionPointIn>
+                    <relPosition x="0" y="254"/>
+                    <connection refLocalId="45">
+                      <position x="285" y="270"/>
+                      <position x="230" y="270"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="PWM_Out">
+                  <connectionPointOut>
+                    <relPosition x="260" y="44"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="45" height="30" width="110">
+              <position x="120" y="250"/>
+              <connectionPointOut>
+                <relPosition x="110" y="20"/>
+              </connectionPointOut>
+              <expression>PWM2_Limit_Low</expression>
+            </inVariable>
+            <inVariable localId="46" height="30" width="110">
+              <position x="120" y="210"/>
+              <connectionPointOut>
+                <relPosition x="110" y="20"/>
+              </connectionPointOut>
+              <expression>PWM2_Limit_High</expression>
+            </inVariable>
+            <inVariable localId="47" height="30" width="80">
+              <position x="70" y="170"/>
+              <connectionPointOut>
+                <relPosition x="80" y="20"/>
+              </connectionPointOut>
+              <expression>PWM2_Ratio</expression>
+            </inVariable>
+            <outVariable localId="51" height="30" width="80">
+              <position x="700" y="40"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="43" formalParameter="PWM_Out">
+                  <position x="700" y="60"/>
+                  <position x="545" y="60"/>
+                </connection>
+              </connectionPointIn>
+              <expression>PWM2_Out</expression>
+            </outVariable>
+            <inVariable localId="52" height="30" width="90">
+              <position x="120" y="120"/>
+              <connectionPointOut>
+                <relPosition x="90" y="20"/>
+              </connectionPointOut>
+              <expression>PWM2_Period</expression>
+            </inVariable>
+            <inVariable localId="53" height="30" width="80">
+              <position x="70" y="40"/>
+              <connectionPointOut>
+                <relPosition x="80" y="20"/>
+              </connectionPointOut>
+              <expression>PWM2_Start</expression>
+            </inVariable>
+            <inVariable localId="54" height="30" width="120">
+              <position x="90" y="80"/>
+              <connectionPointOut>
+                <relPosition x="120" y="20"/>
+              </connectionPointOut>
+              <expression>PWM2_ResetMode</expression>
+            </inVariable>
+          </FBD>
+        </body>
+      </pou>
+      <pou name="Thermostat_PID" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="TH_PWM_Period">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="T#20s"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Period in Second]]>
+              </documentation>
+            </variable>
+            <variable name="TH_PWM_Ratio">
+              <type>
+                <DINT/>
+              </type>
+              <documentation>
+<![CDATA[from 0% to 100%]]>
+              </documentation>
+            </variable>
+            <variable name="TH_AUTO">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Thermostat mode]]>
+              </documentation>
+            </variable>
+            <variable name="TH_PWM_Start">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Needs RISING Edge to start]]>
+              </documentation>
+            </variable>
+            <variable name="TH_Setpoint">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="28.0"/>
+              </initialValue>
+            </variable>
+            <variable name="TH_Room_Temperature">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="25.0"/>
+              </initialValue>
+            </variable>
+            <variable name="TH_PROP">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0.5"/>
+              </initialValue>
+            </variable>
+            <variable name="TH_INTEGRAL">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="TH_DERIVATE">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="TH_Manual_Value">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Value when AUTO is False]]>
+              </documentation>
+            </variable>
+            <variable name="TH_PID_Out">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Value when AUTO is False]]>
+              </documentation>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="TH_Relay_Output">
+              <type>
+                <BOOL/>
+              </type>
+              <documentation>
+<![CDATA[PWM result]]>
+              </documentation>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="TH_Cycle">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="T#1s"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Task Cycle]]>
+              </documentation>
+            </variable>
+            <variable name="PWM_For_Thermostat">
+              <type>
+                <derived name="PWM"/>
+              </type>
+            </variable>
+            <variable name="PID_Test_Block">
+              <type>
+                <derived name="PID"/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <FBD>
+            <inVariable localId="2" height="30" width="100">
+              <position x="30" y="500"/>
+              <connectionPointOut>
+                <relPosition x="100" y="20"/>
+              </connectionPointOut>
+              <expression>TH_PWM_Period</expression>
+            </inVariable>
+            <outVariable localId="4" height="30" width="110">
+              <position x="480" y="460"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="12" formalParameter="PWM2_Out">
+                  <position x="480" y="480"/>
+                  <position x="440" y="480"/>
+                </connection>
+              </connectionPointIn>
+              <expression>TH_Relay_Output</expression>
+            </outVariable>
+            <inVariable localId="7" height="30" width="80">
+              <position x="30" y="140"/>
+              <connectionPointOut>
+                <relPosition x="80" y="20"/>
+              </connectionPointOut>
+              <expression>TH_Setpoint</expression>
+            </inVariable>
+            <inVariable localId="8" height="30" width="160">
+              <position x="30" y="90"/>
+              <connectionPointOut>
+                <relPosition x="160" y="20"/>
+              </connectionPointOut>
+              <expression>TH_Room_Temperature</expression>
+            </inVariable>
+            <inVariable localId="10" height="30" width="100">
+              <position x="30" y="220"/>
+              <connectionPointOut>
+                <relPosition x="100" y="20"/>
+              </connectionPointOut>
+              <expression>TH_PROP</expression>
+            </inVariable>
+            <block localId="12" width="200" height="140" typeName="PWM" instanceName="PWM_For_Thermostat" executionOrderId="5">
+              <position x="240" y="440"/>
+              <inputVariables>
+                <variable formalParameter="PWM2_Start">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="13" formalParameter="OUT">
+                      <position x="240" y="480"/>
+                      <position x="210" y="480"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PWM2_Period">
+                  <connectionPointIn>
+                    <relPosition x="0" y="80"/>
+                    <connection refLocalId="2">
+                      <position x="240" y="520"/>
+                      <position x="130" y="520"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PWM2_Ratio">
+                  <connectionPointIn>
+                    <relPosition x="0" y="120"/>
+                    <connection refLocalId="27">
+                      <position x="240" y="560"/>
+                      <position x="130" y="560"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="PWM2_Out">
+                  <connectionPointOut>
+                    <relPosition x="200" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <block localId="13" width="60" height="50" typeName="NOT" executionOrderId="4">
+              <position x="150" y="440"/>
+              <inputVariables>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="14">
+                      <position x="150" y="480"/>
+                      <position x="140" y="480"/>
+                      <position x="140" y="480"/>
+                      <position x="130" y="480"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="60" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="14" height="30" width="100">
+              <position x="30" y="460"/>
+              <connectionPointOut>
+                <relPosition x="100" y="20"/>
+              </connectionPointOut>
+              <expression>TH_PWM_Start</expression>
+            </inVariable>
+            <block localId="15" width="150" height="360" typeName="PID" instanceName="PID_Test_Block" executionOrderId="1">
+              <position x="240" y="30"/>
+              <inputVariables>
+                <variable formalParameter="AUTO">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="19">
+                      <position x="240" y="70"/>
+                      <position x="100" y="70"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PV">
+                  <connectionPointIn>
+                    <relPosition x="0" y="80"/>
+                    <connection refLocalId="8">
+                      <position x="240" y="110"/>
+                      <position x="190" y="110"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="SP">
+                  <connectionPointIn>
+                    <relPosition x="0" y="130"/>
+                    <connection refLocalId="7">
+                      <position x="240" y="160"/>
+                      <position x="110" y="160"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="X0">
+                  <connectionPointIn>
+                    <relPosition x="0" y="170"/>
+                    <connection refLocalId="20">
+                      <position x="240" y="200"/>
+                      <position x="140" y="200"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="KP">
+                  <connectionPointIn>
+                    <relPosition x="0" y="210"/>
+                    <connection refLocalId="10">
+                      <position x="240" y="240"/>
+                      <position x="130" y="240"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="TR">
+                  <connectionPointIn>
+                    <relPosition x="0" y="250"/>
+                    <connection refLocalId="17">
+                      <position x="240" y="280"/>
+                      <position x="120" y="280"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="TD">
+                  <connectionPointIn>
+                    <relPosition x="0" y="290"/>
+                    <connection refLocalId="18">
+                      <position x="240" y="320"/>
+                      <position x="120" y="320"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="CYCLE">
+                  <connectionPointIn>
+                    <relPosition x="0" y="340"/>
+                    <connection refLocalId="21">
+                      <position x="240" y="370"/>
+                      <position x="90" y="370"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="XOUT">
+                  <connectionPointOut>
+                    <relPosition x="150" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="17" height="30" width="90">
+              <position x="30" y="260"/>
+              <connectionPointOut>
+                <relPosition x="90" y="20"/>
+              </connectionPointOut>
+              <expression>TH_INTEGRAL</expression>
+            </inVariable>
+            <inVariable localId="18" height="30" width="90">
+              <position x="30" y="300"/>
+              <connectionPointOut>
+                <relPosition x="90" y="20"/>
+              </connectionPointOut>
+              <expression>TH_DERIVATE</expression>
+            </inVariable>
+            <inVariable localId="19" height="30" width="70">
+              <position x="30" y="50"/>
+              <connectionPointOut>
+                <relPosition x="70" y="20"/>
+              </connectionPointOut>
+              <expression>TH_AUTO</expression>
+            </inVariable>
+            <inVariable localId="20" height="30" width="110">
+              <position x="30" y="180"/>
+              <connectionPointOut>
+                <relPosition x="110" y="20"/>
+              </connectionPointOut>
+              <expression>TH_Manual_Value</expression>
+            </inVariable>
+            <inVariable localId="21" height="30" width="60">
+              <position x="30" y="350"/>
+              <connectionPointOut>
+                <relPosition x="60" y="20"/>
+              </connectionPointOut>
+              <expression>TH_Cycle</expression>
+            </inVariable>
+            <outVariable localId="22" height="30" width="80">
+              <position x="470" y="50"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="15" formalParameter="XOUT">
+                  <position x="470" y="70"/>
+                  <position x="390" y="70"/>
+                </connection>
+              </connectionPointIn>
+              <expression>TH_PID_Out</expression>
+            </outVariable>
+            <block localId="23" width="60" height="70" typeName="MUL" executionOrderId="2">
+              <position x="470" y="90"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="30"/>
+                    <connection refLocalId="15" formalParameter="XOUT">
+                      <position x="470" y="120"/>
+                      <position x="420" y="120"/>
+                      <position x="420" y="70"/>
+                      <position x="390" y="70"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="60"/>
+                    <connection refLocalId="24">
+                      <position x="470" y="150"/>
+                      <position x="460" y="150"/>
+                      <position x="460" y="150"/>
+                      <position x="450" y="150"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="60" y="30"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="24" height="30" width="50">
+              <position x="410" y="130"/>
+              <connectionPointOut>
+                <relPosition x="50" y="20"/>
+              </connectionPointOut>
+              <expression>100.0</expression>
+            </inVariable>
+            <block localId="26" width="100" height="50" typeName="REAL_TO_DINT" executionOrderId="3">
+              <position x="560" y="80"/>
+              <inputVariables>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="23" formalParameter="OUT">
+                      <position x="560" y="120"/>
+                      <position x="530" y="120"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="100" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="27" height="30" width="100">
+              <position x="30" y="540"/>
+              <connectionPointOut>
+                <relPosition x="100" y="20"/>
+              </connectionPointOut>
+              <expression>TH_PWM_Ratio</expression>
+            </inVariable>
+            <outVariable localId="28" height="30" width="100">
+              <position x="560" y="200"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="26" formalParameter="OUT">
+                  <position x="560" y="220"/>
+                  <position x="550" y="220"/>
+                  <position x="550" y="170"/>
+                  <position x="670" y="170"/>
+                  <position x="670" y="120"/>
+                  <position x="660" y="120"/>
+                </connection>
+              </connectionPointIn>
+              <expression>TH_PWM_Ratio</expression>
+            </outVariable>
+          </FBD>
+        </body>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="config">
+        <resource name="Thermostat1">
+          <task name="task1" interval="T#250ms" priority="0">
+            <pouInstance name="PID_Test" typeName="Thermostat_PID"/>
+          </task>
+          <globalVars>
+            <variable name="TH_Room_Temperature_Sensor">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="TH_Relay_Output">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </globalVars>
+        </resource>
+      </configuration>
+    </configurations>
+  </instances>
+</project>

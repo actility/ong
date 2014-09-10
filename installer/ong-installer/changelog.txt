@@ -1,0 +1,1170 @@
+-------------------------------------------------------------------------------
+ONG remote installer
+-------------------------------------------------------------------------------
+Version: 3.4.0
+Date: 2014-06-18
+
+New Features:
+-------------
+ - Integrated Modbus M2M driver installation.
+ - Integrated "centos6-x86_64" new architecture installation type. 
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * gscl-2.4.0
+   * wmbus-1.2.4
+ - Actility added packages:
+   * modbus-1.0.0
+ - Increase the installation size window for Linux; all labels were not 
+   displayed entirely.
+ - Fixed gauge bar progression on ONG installation phase.
+ 
+-------------------------------------------------------------------------------
+Version: 3.2.6
+Date: 2014-04-18
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * gscl-2.2.6
+
+-------------------------------------------------------------------------------
+Version: 3.2.5
+Date: 2014-04-03
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * gscl-2.2.5
+
+-------------------------------------------------------------------------------
+Version: 3.2.4
+Date: 2014-03-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * gscl-2.2.4
+
+-------------------------------------------------------------------------------
+Version: 3.2.4
+Date: 2014-03-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed configuration keys for system.version bundle
+
+-------------------------------------------------------------------------------
+Version: 3.2.3
+Date: 2014-03-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * gscl-2.2.3
+
+-------------------------------------------------------------------------------
+Version: 3.2.2
+Date: 2014-03-26
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed script which checks if ports are already bound because it was also
+   matching any service bound to a port containing the searched port (for example
+   port 42323 matches when we search port 2323)
+ - Actility up-graded packages:
+   * gscl-2.2.2
+
+-------------------------------------------------------------------------------
+Version: 3.2.1
+Date: 2014-03-26
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed gscl.osgi configuration files settings
+ - Actility up-graded packages:
+   * gscl-2.2.1
+
+-------------------------------------------------------------------------------
+Version: 3.2.0
+Date: 2014-03-26
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * gscl-2.2.0
+
+-------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * scl-1.4.3 => gscl-2.0.0
+
+-------------------------------------------------------------------------------
+Version: 2.6.1
+Date: 2014-03-05
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - "sshOptions" in arch.properties for rpib were wrong. Fixed.
+ - Actility up-graded packages:
+   * scl-1.4.3
+   * zigbee-1.8.4
+
+-------------------------------------------------------------------------------
+Version: 2.6.0
+Date: 2014-02-17
+
+New Features:
+-------------
+ - New supported target: Poky 9.0.1 "Dylan" on Raspberry Pi
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * scl-1.4.2
+   * knx-1.0.3
+   * watteco-1.4.11
+   * wmbus-1.2.3
+   * zigbee-1.8.3
+   * mxml-2.7-2
+
+-------------------------------------------------------------------------------
+Version: 2.4.2
+Date: 2014-01-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Added "Auto-detect ong name" checkbox to remove ambiguity about ONG name
+   computation.
+ - IEC-61131 engine installation was depending on "KNX" checkbox. Fixed.
+
+-------------------------------------------------------------------------------
+Version: 2.4.1
+Date: 2014-01-24
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * apu-install-1.1
+	 * zigbee-1.6.1
+	 * wmbus-1.2.1
+	 * knx-1.0.1
+ - "respawn" and "pids" core scripts were pointing at a wrong interpreter
+   path.
+
+-------------------------------------------------------------------------------
+Version: 2.4.0
+Date: 2013-01-21
+
+New Features:
+-------------
+ - Integrate KNX M2M GIP driver installation. 
+ - Integrate IEC61131 engine installation. 
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * scl-1.2.0
+
+-------------------------------------------------------------------------------
+Version: 2.2.2
+Date: 2013-09-10
+
+New Features:
+-------------
+ - N/A
+
+
+Bug Fixes:
+----------
+ - take into account storage.driver.sqlite logs size for global log size 
+   configuration.
+ - Actility up-graded packages:
+   * scl-1.0.16
+   * watteco-1.4.5
+   * zigbee-1.4.2
+
+-------------------------------------------------------------------------------
+Version: 2.2.1
+Date: 2013-09-05
+
+New Features:
+-------------
+ - N/A
+
+
+Bug Fixes:
+----------
+ - Fixed. Properly end opened channels in JSCH library
+ - Actility up-graded packages:
+   * scl-1.0.15
+   * watteco-1.4.4
+   * zigbee-1.4.1
+   * wmbus-1.0.3
+
+
+-------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2013-06-11
+
+
+New Features:
+-------------
+- Integrate Wireless MBus M2M driver installation. 
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * zigbee-1.4.0-0
+  * watteco-1.2.1-0
+  * scl-1.0.14
+- Actility added packages:
+  * tty_mapper-1.0.0-0
+	* wmbus-1.0.2-0
+
+-------------------------------------------------------------------------------
+Version: 2.0.23
+Date: 2013-01-31
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+-  Fixed: now installer also change user's profile under CentOS6 to add 
+   ROOTACT environment variable declaration in $HOME/.bashrc file. 
+
+
+-------------------------------------------------------------------------------
+Version: 2.0.22
+Date: 2013-01-29
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * zigbee-1.2.2-0
+
+-------------------------------------------------------------------------------
+Version: 2.0.21
+Date: 2013-01-24
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * scl-1.0.13
+
+-------------------------------------------------------------------------------
+Version: 2.0.20
+Date: 2013-01-23
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Now installer checks if ports are not bound before installing ONG
+- Actility up-graded packages:
+  * scl-1.0.12
+  * watteco-1.0.61-2
+  * zigbee-1.2.1-0
+
+-------------------------------------------------------------------------------
+Version: 2.0.19
+Date: 2013-01-16
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Fixed changed default NSCL URI to point to 8088 port
+- Fixed replaced 'unsintall' by 'remove' in warning message when asking to back
+  up 'Actility ROOT Path' folder
+- Actility up-graded packages:
+  * scl-1.0.11
+
+-------------------------------------------------------------------------------
+Version: 2.0.18
+Date: 2013-01-15
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * scl-1.0.10
+  * ntpclient-2010.365-6
+
+-------------------------------------------------------------------------------
+Version: 2.0.17
+Date: 2013-01-14
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Fixed configure logs which was not configuring 'functions' respawn logs
+- Fixed configure scl which was not configuring 'tpkDevUri' parameter
+- Fixed configure watteco/zigbee which was configuring anything...
+- POM cleanup
+
+-------------------------------------------------------------------------------
+Version: 2.0.16
+Date: 2013-01-07
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Fixed. In 'serviceStarted' function of 'functions' script, protect against
+  the fact that when starting a process with 'nohup', the created process name
+  is first the calling script name, then 'nohup' and finally the started script
+  name.
+- Add control on each sent shell commands so that it validates that the 
+  command has been read on the target.
+- Add log entries regarding parameters provided to the ONG installer.
+- Actility up-graded packages:
+  * scl-1.0.9
+
+-------------------------------------------------------------------------------
+Version: 2.0.15
+Date: 2013-01-02
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * scl-1.0.8
+
+-------------------------------------------------------------------------------
+Version: 2.0.14
+Date: 2012-12-21
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Updated scripts:
+  * `` are replaced with $()
+  * tests [ "x$VARIABLE" = "x" ] are replaced with [ -z "$VARIABLE" ]
+- Added a "functions" scripts which defines a lot of useful functions to control
+  the service lifecycle and respawn it in case of problem
+- Removed "ACS URL" field
+- Actility up-graded packages:
+  * scl-1.0.7
+
+-------------------------------------------------------------------------------
+Version: 2.0.13
+Date: 2012-12-11
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Fixed log file size configuration which was generating an invalid XML file
+- Added new scripts pids which enables to list pids tree from a given pid
+- Actility up-graded packages:
+  * scl-1.0.6
+  * zigbee-1.0.3-0
+  * watteco-1.0.61-0
+
+-------------------------------------------------------------------------------
+Version: 2.0.12
+Date: 2012-12-05
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Fixed issue on SCL stand-alone installation model; installation stops on 
+  post-configuration phase of the ZigBee configuration files.
+- Added support for size configuration of the log files of ZigBee driver. 
+- Actility up-graded packages:
+  * scl-1.0.5
+  * zigbee-1.0.2-0
+  * watteco-1.0.60-0
+  * ntpclient-2010.365-4
+
+-------------------------------------------------------------------------------
+Version: 2.0.11
+Date: 2012-11-22
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Architecture is now more flexible to add new target architectures
+- Added "ThingPark Dev URI" in installer
+- Added a more flexible way to configure the project
+- Actility up-graded packages:
+  * scl-1.0.4
+  * watteco-1.0.59-0
+  * zigbee-0.0.7-3
+  * ntpclient-2010.365-3
+- Actility added packages:
+  * tcpdump-4.3.0-0
+
+-------------------------------------------------------------------------------
+Version: 2.0.10
+Date: 2012-11-13
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Fixed. Preserve usr was not working at all when NEW_ROOTACT = ROOTACT
+- Fixed. hotplug.sh was not substituted by mdev
+- Fixed. Init with ong script was not working
+- Fixed. Even if connected object v1 was selected, watteco driver was installed
+  while it is not supported
+- Actility up-graded packages:
+  * scl-1.0.3
+  * watteco-1.0.55-2
+  * zigbee-0.0.7-2
+
+-------------------------------------------------------------------------------
+Version: 2.0.9
+Date: 2012-10-31
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Fixed. SSH_OPTIONS were truncated in the post installation script
+- Fixed. Replaced 'source' command by '.' which is more portable
+- Actility up-graded packages:
+  * scl-1.0.2
+  * watteco-1.0.55-1
+  * zigbee-0.0.7-1
+
+-------------------------------------------------------------------------------
+Version: 2.0.8
+Date: 2012-10-26
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * scl-1.0.1
+  * watteco-1.0.54-0
+  * zigbee-0.0.7
+
+-------------------------------------------------------------------------------
+Version: 2.0.7
+Date: 2012-10-23
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- New APU architecture which embeds:
+  * scl-1.0.0
+  * watteco-1.0.52-0
+  * zigbee-0.0.4-0
+  * ntpclient-2010.365-0
+
+-------------------------------------------------------------------------------
+Version: 2.0.6
+Date: 2012-08-30
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * backend-2.6.0
+  * backend.api-2.4.0
+  * backend.command.shell-1.2.0
+  * m2m-1.6.0
+  * m2m.api-1.6.0
+  * scl.app-3.6.0
+  * song-3.4.0
+  * song.binding.http-3.4.0
+  * storage.driver.sqlite-0.0.3
+  * xo-1.2.2
+
+-------------------------------------------------------------------------------
+Version: 2.0.5
+Date: 2012-08-17
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * backend-2.4.2
+  * m2m-1.4.0
+  * m2m.api-1.4.0
+  * scl.app-3.4.0
+  * song.binding.http-3.2.2
+  * util-3.2.1
+  * xo-1.2.1
+- Actility added packages:
+  * storage.api-0.0.2
+  * storage.driver.api-0.0.2
+  * storage-0.0.2
+  * storage.driver.sqlite-0.0.2
+- Actility removed packages:
+  * xmlstorage.api-2.0.0
+  * xmlstorage-2.2.0
+  * xmlstorage.command.shell-1.0.0
+
+-------------------------------------------------------------------------------
+Version: 2.0.4
+Date: 2012-07-18
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * m2m-1.2.1
+  * m2m.api-1.2.1
+  * scl.app-3.2.1
+  * song-3.2.1
+  * song.binding.http-3.2.1
+
+-------------------------------------------------------------------------------
+Version: 2.0.3
+Date: 2012-07-12
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * backend-2.4.1
+  * m2m-1.2.0
+  * m2m.api-1.2.0
+  * scl.app-3.2.0
+  * song-3.2.0
+  * song.api-3.2.0
+  * song.binding.api-3.2.0
+  * song.binding.http-3.2.0
+  * util-3.2.0
+  * xo-1.2.0
+  * xo.api-1.2.0
+
+-------------------------------------------------------------------------------
+Version: 2.0.2
+Date: 2012-06-28
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * m2m-1.0.1
+  * m2m.api-1.0.1
+  * scl.app-3.0.2
+
+-------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2012-06-18
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * song-3.0.1
+  * scl.app-3.0.1
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2012-06-05
+
+New Features:
+-------------
+- ETSI re-alignment
+
+
+Bug Fixes:
+----------
+- External removed packages:
+  * obix-1.1.0
+  * http-3.0.6
+- External up-graded packages:
+  * org.apache.felix.shell.acy-1.0.1
+- Actility added packages:
+  * xo.api-1.0.0
+  * m2m.api-1.0.0
+  * xo-1.0.0
+  * m2m-1.0.0
+- Actility up-graded packages:
+  * song.api-3.0.0
+  * song.binding.api-3.0.0
+  * util-3.0.0
+  * backend-2.4.0
+  * scl.app-3.0.0
+  * shutdown.hook-2.2.0
+  * song.binding.http-3.0.0
+  * song-3.0.0
+  * song.command.shell-2.0.0
+  * song.trace.command.shell-2.0.0
+  * xmlstorage-2.2.0
+  * cm.loader-1.2.0
+  * felix.shell.telnet-1.2.0
+  * modus.config.mapper-1.2.0
+  * modus.stun.client-1.2.0
+  * modus.tr106.device-1.4.0
+- Actility removed packages:
+  * obix.api-2.0.0
+  * rss.api-2.0.0
+  * scl.app.api-2.0.0
+  * song.obix.model.api-2.0.0
+  * song.rss.api-2.0.0
+  * flashprgm.cc2531.api-1.0.0
+  * driver.zigbee.api-2.0.0
+  * driver.wmbus.api-2.0.0
+  * obix-2.0.1
+  * rss-2.0.0
+  * scl.app.command.shell-1.0.0
+  * song.rss-2.0.0
+  * driver.zigbee-2.0.5
+  * flashprgm.cc2531-1.0.1
+  * system.version-3.0.2
+  * ZNP-Prod-25.1.100-002_000-cc2531
+  * ZNP-Prod-25.1.100-002_000-cc2531-ha-std-security
+
+-------------------------------------------------------------------------------
+Version: 1.2.10
+Date: 2012-05-29
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- TR-069 credentials and data session were not backed up when re-installing
+  ONG. As a consequence ONG cannot reconnect TR-069 if ONG already did its 
+  first stage connection. 
+- Only storage.db file was backed up, but not other storage.db-* files. Fixed. 
+- Actility up-graded packages:
+  * system.version-3.0.2
+
+
+-------------------------------------------------------------------------------
+Version: 1.2.9
+Date: 2012-05-24
+
+New Features:
+-------------
+- N/A
+
+
+Bug Fixes:
+----------
+- Changed minInterval and maxInterval of covConfiguration entries in 
+  m2mResourcesModeling.xml file for TemperatureMeasurement and 
+  RelativeHumidityMeasurement clusters because devices stop doing reports when
+  it lost connectivity with the coordinator during more than 5 minutes. They 
+  were previously respectively set to PT5M and PT6M, and are now set to PT3M 
+  and PT4M.
+- Added "-Fcom.actility.system.supportServerPort=81" in "props.xargs" file.
+- Changed default logs file size to 200Ko * 5 gen.
+- Fixed "indeterminated" progress bars for ONG installer, which now goes from 
+  0% to 99% and from 99% to 0% alternatively.
+- Actility up-graded packages:
+  * system.version-3.0.1
+
+
+-------------------------------------------------------------------------------
+Version: 1.2.8
+Date: 2012-05-22
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * driver.zigbee-2.0.5
+  * system.version-3.0.0
+
+
+-------------------------------------------------------------------------------
+Version: 1.2.7
+Date: 2012-05-15
+
+New Features:
+-------------
+- Added button for flashing the CC2531 dongle with the ZStack embedded in the
+  installer.
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * driver.zigbee-2.0.4
+
+
+-------------------------------------------------------------------------------
+Version: 1.2.6
+Date: 2012-05-09
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- CC2531 dongle flashing result was not checked. Fixed. 
+
+-------------------------------------------------------------------------------
+Version: 1.2.5
+Date: 2012-05-04
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Added support for two installation modes: with ZigBee HA Standard security
+  enable or without ZigBee security. The installer then install the 
+  corresponding firmware on target, and propose to flash the CC2531 dongle with
+  the appropriate ZNP firmware. The installer also generates the two 
+  corresponding firmware file for TR-069 upgrades.
+- Actility up-graded packages:
+  * flashprgm.cc2531-1.0.1
+  * driver.zigbee-2.0.3
+  
+-------------------------------------------------------------------------------
+Version: 1.2.4
+Date: 2012-04-18
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- The names for ONG backup folder, logs file and installation persistent 
+  information backup folder were not collision proof enough to protect against 
+  multiple parallel runs (may be a problem for database file restoration for 
+  example).
+- Changed kf2 and ong scripts to be able to enable CVM inspector in remote 
+  mode. When ONG is started using "-I" or "--inspector" option, one can not
+  connect to inspector on port 4321 using following command:
+  cd /usr/local/phoneme/ && ./bin/cvm -classpath testclasses.zip cvmclient
+- Actility up-graded packages:
+  * backend-2.2.2
+  * felix.shell.telnet 1.0.1
+  * modus.stun.client 1.0.1
+  * modus.tr106.device 1.2.1
+  * obix 2.0.1
+  * scl.app 2.2.1
+  * song.binding.http 2.0.2
+  * system.version 2.0.1
+  * xmlstorage 2.0.1
+- Modus up-graded packages:
+  * AddObjectBundle 2.4.0-acy
+  * DeleteObjectBundle 2.4.0-acy
+  * DownloadBundle 2.4.0-acy
+  * FilePersistBundle 2.4.0-acy
+  * GetParameterAttributesBundle 2.4.0-acy
+  * GetParameterNamesBundle 2.4.0-acy
+  * GetParameterValuesBundle 2.4.0-acy
+  * GetRPCMethodsBundle 2.4.0-acy
+  * IPersistBundle 2.4.0-acy
+  * RebootBundle 2.4.0-acy
+  * ServerComBundle 2.4.0-acy
+  * SetParameterAttributesBundle 2.4.0-acy
+  * SetParameterValuesBundle 2.4.0-acy
+  * TR69ClientAPI 2.4.0-acy
+- Firmware version number string was wrongly generated in 
+  "firmware-manifest.properties" file, suffixed with ".null" string when no
+  qualifier is set. Fixed in maven-cocoon-plugin-1.0.1.
+  
+  
+-------------------------------------------------------------------------------
+Version: 1.2.3
+Date: 2012-04-05
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * driver.zigbee-2.0.2
+
+-------------------------------------------------------------------------------
+Version: 1.2.2
+Date: 2012-04-04
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Changed minInterval and maxInterval of covConfiguration entries in 
+  m2mResourcesModeling.xml file to higher values (minInterval and maxInterval 
+  were respectively set to PT15S and PT30S for every clusters, and is now 
+  set to PT1M and PT2M for SimpleMetering cluster and PT5M and PT6M for other
+  ones)
+- Actility up-graded packages:
+  * backend-2.2.1
+  * driver.zigbee-2.0.1
+
+-------------------------------------------------------------------------------
+Version: 1.2.1
+Date: 2012-03-22
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Changed from Knopflerfish console to Apache Felix shell
+- Added an expiration duration of 30 mins for cached DNS entries in phoneME
+- Knopflerfish removed packages:
+  * console
+  * consoletelnet-IMPL
+  * consoletty-IMPL
+  * cm_cmd-IMPL
+  * logcommands-IMPL
+  * frameworkcommands-IMPL
+  * useradmin
+- Felix added packages:
+  * org.apache.felix.shell.acy-1.0.0
+  * org.apache.felix.shell.tui.acy-1.0.0
+- Actility added packages:
+  * backend.command.shell-1.0.0
+  * scl.app.command.shell-1.0.0
+  * song.command.shell-1.0.0
+  * song.trace.command.shell-1.0.0
+  * xmlstorage.command.shell-1.0.0
+  * cm.command.shell-1.0.0
+  * log.command.shell-1.0.0
+  * framework.command.shell-1.0.0
+  * felix.shell.telnet-1.0.0
+- France Telecom up-graded packages:
+  * modus-clientTR69-2.2.0-acy
+- Actility up-graded packages:
+  * backend.api-2.2.0
+  * backend-2.2.0
+  * util-2.2.0
+  * scl.app-2.2.0
+  * song.binding.http-2.0.1
+  * song-2.0.1
+  * modus.tr106.device-1.2.0
+- Actility removed packages:
+  * backend.command.kf
+  * song.command.kf
+  * song.trace.command.kf
+  * xmlstorage.command.kf
+- Authentication key check on update mode; installer delete 'scl' resource on
+  NSC when authentication key changes.
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2012-03-13
+
+New Features:
+-------------
+- Added first set of TR-069 features: Actility bundles update, CC2531 dongle 
+  firmware update.
+- Added bundles:
+  * system.version-1.0.0
+  * flashprgm.cc2531-1.0.0
+- Added a target to kf2 to execute hprof with cpu=samples
+- Added new installation parameters to initialize the TR069 stack
+- Added new framework properties to configure modus and factory and current
+  directory
+- props.xargs realignement with KF trunk
+- Added authentication key to authentify all requests sent by the box
+
+Bug Fixes:
+----------
+- Knopflerfish up-graded packages:
+  * component-3.0.5
+  * event-3.0.5
+  * log-3.1.1 
+  * logcommands-IMPL-3.1.1 
+  * console-3.0.2
+  * consoletelnet-IMPL-3.0.1-acy
+- Actility up-graded packages:
+  * zigbee-driver-api-1.4.0
+- Authentication key check on update mode; installer delete 'scl' resource on
+  NSC when authentication key changes.
+
+
+-------------------------------------------------------------------------------
+Version: 1.0.5
+Date: 2011-11-03
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Knopflerfish up-graded packages:
+  * http-3.0.6
+  * log-3.1.0
+  * logcommands-IMPL-3.1.0
+- Actility up-graded packages:
+  * actility-util-1.2.0
+  * backend-service-1.2.0
+  * backend-service-api-1.2.0
+  * backend-service-kf-command-1.2.0
+  * java-cdc-pom-1.4.0
+  * obix-service-1.6.0
+  * obix-service-api-1.4.0
+  * rss-1.2.0
+  * rssApi-1.2.0
+  * scl-1.4.0
+  * scl-api-1.4.0
+  * shutdown-hook-1.2.0
+  * song-http-binding-1.2.0
+  * song-obix-model-api-1.2.0
+  * song-rss-1.2.0
+  * song-rss-api-1.2.0
+  * song-service-1.4.0
+  * song-service-api-1.4.0
+  * song-service-binding-api-1.4.0
+  * song-service-kf-command-1.2.0
+  * song-trace-kf-command-1.2.0
+  * xmlstorage-1.2.0
+  * xmlstorageApi-1.2.0
+  * zigbee-driver-api-1.2.0
+ - Actility new packages:
+  * wmbus-driver-api-1.2.0
+  * xmlstorage-kf-command-1.0.0
+- Installer release version is now retrieved from 
+  META-INF/application.properties file for Maven usage and source usage.
+- rdate synchronization at ong start-up is now only done if $USER is root.
+- Add support for a proxy web configuration.
+- m2mResourceModeling.xml file update.
+
+-------------------------------------------------------------------------------
+Version: 1.0.4
+Date: 2011-09-30
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Actility up-graded packages:
+  * song-http-binding-1.0.3
+
+-------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2011-09-07
+
+New Features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Added controls on "rdate" return code in "ong" script; ONG now does not 
+  start when time synchronization fails.
+- Actility up-graded packages:
+  * xmlstorage-1.0.3
+  * zigbee-driver-1.0.2
+  
+-------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2011-08-04
+
+New Features:
+-------------
+- ONG remote installer is now written in Java, with a graphical interface
+  (using Swing and AWT), and can run on Windows and Linux OS.
+- Maven POM build the boot-repository under target/boot-repository folder
+
+Bug Fixes:
+----------
+- Removed un-tested ZCL commands of cluster "Simple Metering" from installed
+  zigbeeModeling.xml file.
+- Actility up-graded packages:
+  * actility-util-1.0.2
+  * backend-service-1.0.1
+  * backend-service-kf-command-1.0.1
+  * obix-service-1.2.0
+  * rss-1.0.2
+  * scl-1.2.0
+  * song-http-binding-1.0.2
+  * song-rss-1.0.3
+  * song-service-1.2.0
+  * song-service-kf-command-1.0.1
+  * song-trace-kf-command-1.0.1
+  * xmlstorage-1.0.2
+  * zigbee-driver-1.0.1 
+- Changed rights on cvm, ong and kf2 to allow execution for everyone
+- Fixed use of killall cvm instead of pidof command
+- Fixed replace PT7D by P7D in m2mResourcesModeling.xml file
+- Fixed check if user has right permissions on /var/run before to launch the
+  ong
+
+-------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2011-07-20
+
+New Features:
+-------------
+- Added support for --uninstall feature, that now replace --force option
+
+Bug Fixes:
+----------
+- Fixed bug in props.xargs for NSC framework variable (only -F options are
+  taking into account).
+- Fixed bug on "ong stop" command; when normal shutdown fails, now force
+  shutdown.
+- Changed knopflerfish tiny framework package to 3.2.0 (was 3.1.0)
+- $ONG_HOME was not set correctly on x86 targeted box. Now done in ~/.bashrc
+  (was done on /etc/profile whatever was the targeted plateform)
+- Actility up-graded package:
+  * actility-util-1.0.1
+  * rss-1.0.1
+  * scl-1.0.2
+  * song-http-binding-1.0.1
+  * song-rss-1.0.2
+  * xmlstorage-1.0.1
+- Changed options style for getopt model.
+- Added scripts for building the Actility boot-repository out of a local Maven 
+  repository.
+- Added -f (--force) option to "ong {stop|restart}" command
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2011-07-07 
+Initial version
+
+

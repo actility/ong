@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <!-- M2M -->
+    <str name="interworkingProxyID" val="${w_ipuid}"/>
+    <list name="supportedTechnologies">
+		<obj>
+			<str name="anStandard" val="ISO_14543_3"/>
+		</obj>
+	</list>
+	<list name="networks"/>
+	
+	<!-- KNX -->
+    <op name="knxCreateNetwork" href="${s_rootapp}/IPU_KNX/retargeting1/knxCreateNetwork"/>
+    <ref name="knxTopology" href="/m2m/applications/IPU_KNX/containers/topology"/>
+</obj>

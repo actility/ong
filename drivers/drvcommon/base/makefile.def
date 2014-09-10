@@ -1,0 +1,4 @@
+PRJINC=$(ROOTACT)/drvcommon/lib
+
+#CCFLAGS +=-g
+#LDFLAGS +=-g -lpthread

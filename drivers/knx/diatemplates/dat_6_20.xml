@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <bool name="a" val="${raw_a}"/>
+    <bool name="b" val="${raw_b}"/>
+    <bool name="c" val="${raw_c}"/>
+    <bool name="d" val="${raw_d}"/>
+    <bool name="e" val="${raw_e}"/>
+    <int name="mode" val="${raw_mode}"/>
+    <str name="raw" val="0x${dpt_raw}"/>
+</obj>

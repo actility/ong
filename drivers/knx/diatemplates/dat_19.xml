@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<abstime val="${dpt_value}" xmlns="http://obix.org/ns/schema/1.1">
+    <int name="Year" val="${raw_Year}"/>
+    <int name="Month" val="${raw_Month}"/>
+    <int name="DayOfMonth" val="${raw_DayOfMonth}"/>
+    <int name="DayOfWeek" val="${raw_DayOfWeek}"/>
+    <int name="HourOfDay" val="${raw_HourOfDay}"/>
+    <int name="Minutes" val="${raw_Minutes}"/>
+    <int name="Seconds" val="${raw_Seconds}"/>
+    <bool name="F" val="${raw_F}" />
+    <bool name="WD" val="${raw_WD}" />
+    <bool name="NWD" val="${raw_NWD}" />
+    <bool name="NY" val="${raw_NY}" />
+    <bool name="ND" val="${raw_ND}" />
+    <bool name="NDOW" val="${raw_NDOW}" />
+    <bool name="NT" val="${raw_NT}" />
+    <bool name="SUTI" val="${raw_SUTI}" />
+    <bool name="CLQ" val="${raw_CLQ}" />
+    <str name="raw" val="0x${dpt_raw}"/>
+</abstime>

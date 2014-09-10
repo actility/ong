@@ -1,0 +1,8 @@
+# Post install ong script
+chmod 755 $ROOTACT/etc/ong
+chmod 755 $ROOTACT/etc/respawn
+chmod 755 $ROOTACT/etc/pids
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/ong
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/respawn
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/pids
+mkdir -p $ROOTACT/var/log/respawn/

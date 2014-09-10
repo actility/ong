@@ -1,0 +1,1240 @@
+From 676f923b9f74d9539f732eede16d3eae8bcdc8ca Mon Sep 17 00:00:00 2001
+From: jreich <jreich@CentOS6-jreich.(none)>
+Date: Tue, 9 Apr 2013 15:36:52 +0200
+Subject: [PATCH] android
+
+---
+ .../cdc/build/linux-arm-generic/GNUmakefile        |    2 +-
+ phoneme_advanced_mr2_b167/cdc/build/share/defs.mk  |    4 +-
+ .../linux-arm/javavm/runtime/segvhandler_arch.c    |   36 +++-
+ .../cdc/src/linux/javavm/runtime/globals_md.c      |   10 +-
+ .../cdc/src/linux/javavm/runtime/java_props_md.c   |    5 +-
+ .../cdc/src/linux/javavm/runtime/threads_md.c      |    7 +
+ .../cdc/src/linux/javavm/runtime/timezone_md.c     |    1 +
+ .../src/linux/native/java/io/UnixFileSystem_md.c   |    4 +-
+ .../src/linux/native/java/lang/UNIXProcess_md.c    |    5 +-
+ .../linux/native/java/net/Inet4AddressImpl_md.c    |   16 ++
+ .../src/linux/native/java/net/NetworkInterface.c   |    2 +-
+ .../cdc/src/linux/native/java/net/net_util_md.c    |   12 +
+ .../linux/personal/native/sun/audio/audioDevice.c  |    6 +-
+ .../cdc/src/portlibs/dlfcn/linker_md.c             |   23 ++
+ .../com/sun/cdc/io/InternalConnectorImpl.java      |    2 +-
+ .../com/sun/cdc/io/j2me/file/ProtocolNative.java   |   11 +
+ .../cdc/src/share/javavm/runtime/globals.c         |    4 +-
+ .../cdc/src/share/javavm/runtime/interpreter.c     |    2 +
+ .../midp/build/common/project.gmk                  |    4 +-
+ .../midp/build/linux_fb_gcc/Options.gmk            |    6 +-
+ .../linux_fb/constants_omap730.xml                 |    4 +-
+ .../cdc_vm/linux_fb/native/cdc_natives.c           |   32 +++
+ .../events/input_port/fb/native/fb_handle_input.c  |  124 ++++++++--
+ .../events/input_port/fb/native/fb_keymapping.c    |  260 ++++++++++++++++++++
+ .../events/input_port/fb/native/fb_keymapping.h    |    3 +
+ .../src/events/input_port/fb/native/fb_read_key.c  |    8 +-
+ .../fb_application/reference/native/fbapp_export.c |   15 +-
+ .../midp/src/highlevelui/fb_port/fb/lib.gmk        |    2 +-
+ .../skins/resources/SkinResourcesImpl.jpp          |   10 +-
+ .../i18n/i18n_port/default/native/defaultLocale.c  |    2 +
+ .../rms_base/reference/native/recordStoreUtil.c    |    4 +-
+ .../pcsl/file/posix/pcsl_dir_posix.c               |    4 +-
+ 32 files changed, 571 insertions(+), 59 deletions(-)
+
+diff --git a/phoneme_advanced_mr2_b167/cdc/build/linux-arm-generic/GNUmakefile b/phoneme_advanced_mr2_b167/cdc/build/linux-arm-generic/GNUmakefile
+index d158cfd..074014c 100644
+--- a/phoneme_advanced_mr2_b167/cdc/build/linux-arm-generic/GNUmakefile
++++ b/phoneme_advanced_mr2_b167/cdc/build/linux-arm-generic/GNUmakefile
+@@ -84,7 +84,7 @@ USE_GCC2 ?= false
+ # CVM_DEFINES: Used to add extra compiler defines. This is used to enable
+ # extra VM features, like supporting Intels WMMX coprocessor and other
+ # optimizations that are not normally enabled.
+-CVM_DEFINES +=
++CVM_DEFINES += -D__GLIBC__ -DRTF_POLICY=0 -DRTF_FLOW=0
+ 
+ # USE_AAPCS is used to tell the source to enable AAPCS calling
+ # conventions rather than APCS. This is usually needed for MontaVista.
+diff --git a/phoneme_advanced_mr2_b167/cdc/build/share/defs.mk b/phoneme_advanced_mr2_b167/cdc/build/share/defs.mk
+index d657085..867f8da 100644
+--- a/phoneme_advanced_mr2_b167/cdc/build/share/defs.mk
++++ b/phoneme_advanced_mr2_b167/cdc/build/share/defs.mk
+@@ -2321,8 +2321,8 @@ CFLAGS_LOOP    	= $(CFLAGS) $(CCFLAGS_LOOP)  $(CPPFLAGS)
+ CFLAGS_FDLIB   	= $(CFLAGS) $(CCFLAGS_FDLIB) $(CPPFLAGS)
+ CFLAGS_JCS	= 
+ 
+-LINKFLAGS       += -g -Wl,-export-dynamic $(LINK_ARCH_FLAGS)
+-LINKLIBS     	+= -lpthread -ldl $(LINK_ARCH_LIBS)
++LINKFLAGS       += -Wl,--export-dynamic $(LINK_ARCH_FLAGS)
++LINKLIBS     	+=  -lz -ldl $(LINK_ARCH_LIBS)
+ LINKLIBS_JCS    +=
+ 
+ SO_CCFLAGS   	= $(CCFLAGS_SPEED)
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux-arm/javavm/runtime/segvhandler_arch.c b/phoneme_advanced_mr2_b167/cdc/src/linux-arm/javavm/runtime/segvhandler_arch.c
+index bfbffb9..fb0e075 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux-arm/javavm/runtime/segvhandler_arch.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux-arm/javavm/runtime/segvhandler_arch.c
+@@ -46,6 +46,33 @@
+    doesn't always get it right.
+ */
+ /* avoid conflicting ucontext definitions */
++
++#define sigcontext asm_sigcontext
++struct sigcontext {
++ unsigned long trap_no;
++ unsigned long error_code;
++ unsigned long oldmask;
++ unsigned long arm_r0;
++ unsigned long arm_r1;
++ unsigned long arm_r2;
++ unsigned long arm_r3;
++ unsigned long arm_r4;
++ unsigned long arm_r5;
++ unsigned long arm_r6;
++ unsigned long arm_r7;
++ unsigned long arm_r8;
++ unsigned long arm_r9;
++ unsigned long arm_r10;
++ unsigned long arm_fp;
++ unsigned long arm_ip;
++ unsigned long arm_sp;
++ unsigned long arm_lr;
++ unsigned long arm_pc;
++ unsigned long arm_cpsr;
++ unsigned long fault_address;
++};
++
++
+ #define ucontext asm_ucontext
+ struct ucontext {
+ 	unsigned long	  uc_flags;
+@@ -82,7 +109,12 @@ callSysSigaction(int sig, const struct sigaction *act,
+ 	    dlclose(handle);
+         }
+ #else
++#if 0
+         sysSigaction[idx] = (sigaction_t)dlsym(RTLD_NEXT, sysSigactionName[idx]);
++#else
++	// No -ldl means no dlsym()
++	sysSigaction[idx] = NULL;
++#endif
+ #endif
+         if (sysSigaction[idx] == NULL) {
+ 	    CVMdebugPrintf(("WARNING: lookup of __sigaction failed."));
+@@ -134,13 +166,13 @@ CVMsigaction(int sig, const struct sigaction *act,
+ }
+ 
+ int
+-sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
++sigaction0(int sig, const struct sigaction *act, struct sigaction *oact)
+ {
+     return CVMsigaction(sig, act, oact, 0);
+ }
+ 
+ int 
+-__sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
++__sigaction0(int sig, const struct sigaction *act, struct sigaction *oact)
+ {
+     return CVMsigaction(sig, act, oact, 1);
+ }
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/globals_md.c b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/globals_md.c
+index 6de2859..9e5c119 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/globals_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/globals_md.c
+@@ -185,16 +185,17 @@ CVMBool CVMinitStaticState(CVMpathInfo *pathInfo)
+ 
+     linuxNetInit();
+ 
+-    sigignore(SIGPIPE);
++    /// sigignore(SIGPIPE);
+     
+ #ifdef __VFP_FP__    
+     /* TODO: Needed for armboard5. Should be moved to ARM specific code. */
+-    sigignore(SIGFPE);
++    /// sigignore(SIGFPE);
+ #endif
+ 
+     {
+ 	char buf[MAXPATHLEN + 1], *p0, *p;
+ 
++#if 0
+ 	{
+ 	    Dl_info dlinfo;
+ 	    int l = readlink("/proc/self/exe", buf, sizeof buf - 1);
+@@ -239,6 +240,11 @@ CVMBool CVMinitStaticState(CVMpathInfo *pathInfo)
+ 		}
+ 	    }
+ 	}
++#else
++	// No -ldl means no dladdr()
++	strcpy(buf, "/data/data/be.preuveneers.phoneme.fpmidp/foundation/bin/cvm");
++	p0 = buf;
++#endif
+ 
+ 	/* get rid of .../bin/cvm */
+ 	p = strrchr(p0, '/');
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/java_props_md.c b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/java_props_md.c
+index 1afa270..0417a89 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/java_props_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/java_props_md.c
+@@ -28,7 +28,7 @@
+ #include <pwd.h>
+ #include <locale.h>
+ #include <sys/utsname.h>	/* For os_name and os_version */
+-#include <langinfo.h>           /* For nl_langinfo */
++// #include <langinfo.h>           /* For nl_langinfo */
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/types.h>
+@@ -308,7 +308,7 @@ CVMgetJavaProperties(java_props_t *sprops)
+              * point because that mapping is handled by the character
+              * converter alias table in CharacterEncoding.java.
+              */
+-            p = nl_langinfo(CODESET);
++            // p = nl_langinfo(CODESET);
+ 	    /* SVMC d022301 17.02.2003
+ 	     * it seems that nl_langinfo() does not return standardized
+ 	     * strings. 'locale charmap' return on
+@@ -327,6 +327,7 @@ CVMgetJavaProperties(java_props_t *sprops)
+ 	    } else {
+ 		std_encoding = p;
+ 	    }
++	    std_encoding = "ISO8859_1";
+             /*  
+              * Remap the encoding string to a different value for japanese
+              * locales on linux so that customized converters are used instead
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/threads_md.c b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/threads_md.c
+index 46a2323..76532c2 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/threads_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/threads_md.c
+@@ -92,6 +92,7 @@ linuxCaptureInitialStack()
+     struct rlimit rlim;
+     void *sp = &dummy;
+ 
++#if 0
+ #ifdef LINUX_DLSYM_BUG
+     void * handle = dlopen("libpthread.so.0", RTLD_LAZY);
+     if (handle != NULL) {
+@@ -108,6 +109,12 @@ linuxCaptureInitialStack()
+             (pthread_attr_getstack_t)dlsym(RTLD_DEFAULT, 
+                                            "pthread_attr_getstack");
+ #endif
++#else
++    // No -ldl means no dlopen() or dlsym()
++    pthreadGetAttr = NULL;
++    pthreadAttrGetStack = NULL;
++#endif
++
+     initial_thread_id = pthread_self();
+ 
+     getrlimit(RLIMIT_STACK, &rlim);
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/timezone_md.c b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/timezone_md.c
+index 06902b9..7eb6941 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/timezone_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/timezone_md.c
+@@ -550,6 +550,7 @@ CVMgetGMTOffsetID()
+ {
+     time_t offset;
+     char sign, buf[16];
++    int timezone = 0;
+ 
+     if (timezone == 0) {
+ 	return strdup("GMT");
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/io/UnixFileSystem_md.c b/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/io/UnixFileSystem_md.c
+index 64d8137..ea61492 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/io/UnixFileSystem_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/io/UnixFileSystem_md.c
+@@ -77,11 +77,11 @@ typedef int timestruc_t;
+    (e.g., Solaris 2.5.1).  These definitions are copied from the Solaris 2.6
+    <sys/stat.h> and <sys/types.h> files.
+  */
+-typedef longlong_t      off64_t;        /* offsets within files */
++typedef longlong_t      off64_t_;        /* offsets within files */
+ typedef u_longlong_t    ino64_t;        /* expanded inode type  */
+ typedef longlong_t      blkcnt64_t;     /* count of file blocks */
+ 
+-struct	stat64 {
++struct	stat64_ {
+ 	dev_t	st_dev;
+ 	long	st_pad1[3];
+ 	ino64_t	st_ino;
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/lang/UNIXProcess_md.c b/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/lang/UNIXProcess_md.c
+index a8c9e47..1373bdf 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/lang/UNIXProcess_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/lang/UNIXProcess_md.c
+@@ -34,12 +34,15 @@
+  */
+ 
+ #include <stdlib.h>
+-#include <wait.h>
++// #include <wait.h>
+ #include <signal.h>
+ #include <string.h>
+ #include <errno.h>
+ #include <sys/stat.h>
+ 
++#include <sys/types.h>
++#include <unistd.h>
++
+ #ifdef JDK
+ /* path in the environment */
+ static char **PATH = 0;
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/Inet4AddressImpl_md.c b/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/Inet4AddressImpl_md.c
+index a2704b8..21f8f82 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/Inet4AddressImpl_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/Inet4AddressImpl_md.c
+@@ -321,3 +321,19 @@ Java_java_net_Inet4AddressImpl_getHostByAddr(JNIEnv *env, jobject this,
+     return ret;
+ }
+ 
++int gethostbyaddr_r(const char *addr, socklen_t len, int type, struct hostent *ret, char *buf, size_t buflen,
++               struct hostent **result, int *h_errnop) {
++
++    struct hostent *res;
++
++    res = gethostbyaddr(addr, len, type);
++    *h_errnop = h_errno;
++    if (res == NULL) {
++        *result = NULL;
++        return -1;
++    }
++    memcpy(ret, res, sizeof *ret);
++    *result = ret;
++    return 0;
++}
++
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/NetworkInterface.c b/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/NetworkInterface.c
+index a56be38..04e5602 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/NetworkInterface.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/NetworkInterface.c
+@@ -35,7 +35,7 @@
+ #include <net/if.h>
+ #ifdef __linux__
+ #include <sys/ioctl.h>
+-#include <bits/ioctls.h>
++// #include <bits/ioctls.h>
+ #include <linux/sockios.h>
+ #include <stdio.h>
+ #else
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/net_util_md.c b/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/net_util_md.c
+index 8246a5a..6c86397 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/net_util_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/native/java/net/net_util_md.c
+@@ -255,7 +255,12 @@ jint  IPv6_supported()
+      *  OK we may have the stack available in the kernel,
+      *  we should also check if the APIs are available.
+      */
++#if 0 
+     ipv6_fn = dlsym(RTLD_DEFAULT, "inet_pton");
++#else
++    // No -ldl means no dlsym()
++    ipv6_fn = NULL;
++#endif
+     if (ipv6_fn == NULL ) { 
+ 	close(fd);
+ 	return JNI_FALSE;
+@@ -268,6 +273,7 @@ jint  IPv6_supported()
+      * libraries, therefore we can't have a hard link to these
+      * functions.
+      */
++#if 0
+     getaddrinfo_ptr = (getaddrinfo_f)
+         dlsym(RTLD_DEFAULT, "getaddrinfo");
+ 
+@@ -276,6 +282,12 @@ jint  IPv6_supported()
+ 
+     getnameinfo_ptr = (getnameinfo_f)
+         dlsym(RTLD_DEFAULT, "getnameinfo");
++#else
++    // No -ldl means no dlsym()
++    getaddrinfo_ptr = NULL;
++    freeaddrinfo_ptr = NULL;
++    getnameinfo_ptr = NULL;
++#endif
+ 
+     if (freeaddrinfo_ptr == NULL || getnameinfo_ptr == NULL) {
+         /* We need all 3 of them */
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/personal/native/sun/audio/audioDevice.c b/phoneme_advanced_mr2_b167/cdc/src/linux/personal/native/sun/audio/audioDevice.c
+index b2d3ae8..b7a26c9 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/personal/native/sun/audio/audioDevice.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/personal/native/sun/audio/audioDevice.c
+@@ -31,7 +31,7 @@
+ #include <sys/types.h>
+ #include <sys/errno.h>
+ #include <unistd.h>
+-#include <stropts.h>
++//#include <stropts.h>
+ 
+ #include "sun_audio_AudioDevice.h"
+ 
+@@ -93,14 +93,14 @@ Java_sun_audio_AudioDevice_initIDs(JNIEnv *env, jobject obj)
+ JNIEXPORT jint JNICALL
+ Java_sun_audio_AudioDevice_audioOpen(JNIEnv *env, jobject this)
+ {
+-    extern int errno;
++    int err = ENODEV;
+     int flags = 0;
+ 
+     if (sun_audio_audioFd < 0) {
+         errno = 0;
+         /* Open /dev/dsp as sound sample will be converted to linear encoding */
+         if ((sun_audio_audioFd = open("/dev/dsp", O_SYNC | O_WRONLY | O_NONBLOCK)) < 0) {
+-            switch (errno) {
++            switch (err) {
+               case ENODEV:
+               case EACCES:
+                 /* Dont bother, there is no audio device */
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/portlibs/dlfcn/linker_md.c b/phoneme_advanced_mr2_b167/cdc/src/portlibs/dlfcn/linker_md.c
+index da4a105..1dc7939 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/portlibs/dlfcn/linker_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/portlibs/dlfcn/linker_md.c
+@@ -72,6 +72,7 @@ CVMdynlinkOpen(const void *absolutePathName)
+ {
+     void *handle;
+ 
++#if 0
+     handle = dlopen((const char *) absolutePathName, RTLD_LAZY);
+ #ifdef CVM_DEBUG
+     if (!handle) {
+@@ -79,12 +80,18 @@ CVMdynlinkOpen(const void *absolutePathName)
+         fputs("\n", stderr);         
+     }
+ #endif
++#else
++    // No -ldl means no dlopen()
++    /// fprintf(stderr, "CVMdynlinkOpen(%s)\n", (char *)absolutePathName);
++    handle = NULL;
++#endif
+     return handle;
+ }
+ 
+ void *
+ CVMdynlinkSym(void *dsoHandle, const void *name)
+ {
++#if 0
+     assert(dsoHandle != NULL);
+     /*
+      * Some platforms (namely bsd) require that you prepend the
+@@ -114,12 +121,22 @@ CVMdynlinkSym(void *dsoHandle, const void *name)
+ #else
+     return dlsym(dsoHandle, (const char *) name);
+ #endif
++#else
++    // No -ldl means no dlsym()
++    /// fprintf(stderr, "CVMdynlinkSym(%08x,%s)\n", (int)dsoHandle, (char *)name);
++    return NULL;
++#endif
+ }
+ 
+ void
+ CVMdynlinkClose(void *dsoHandle)
+ {
++#if 0
+     dlclose(dsoHandle);
++#else
++    // No -ldl means no dlclose();
++    /// fprintf(stderr, "CVMdynlinkClose(%08x)\n", (int)dsoHandle);
++#endif
+ }
+ 
+ CVMBool
+@@ -127,10 +144,16 @@ CVMdynlinkExists(const char *name)
+ {
+     void *handle;
+ 
++#if 0
+     handle = dlopen((const char *) name, RTLD_LAZY);
+     if (handle != NULL) {
+         dlclose(handle);
+     }
++#else
++    // No -ldl means no dlopen();
++    /// fprintf(stderr, "CVMdynlinkExists(%s)\n", name);
++    handle = NULL;
++#endif
+     return (handle != NULL);
+ }
+ 
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/share/classes/com/sun/cdc/io/InternalConnectorImpl.java b/phoneme_advanced_mr2_b167/cdc/src/share/classes/com/sun/cdc/io/InternalConnectorImpl.java
+index 9e4cb72..052798d 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/share/classes/com/sun/cdc/io/InternalConnectorImpl.java
++++ b/phoneme_advanced_mr2_b167/cdc/src/share/classes/com/sun/cdc/io/InternalConnectorImpl.java
+@@ -161,7 +161,7 @@ public class InternalConnectorImpl implements InternalConnector {
+              * Use the platform and protocol names to look up
+              * a class to implement the connection
+              */
+-            String className = getClassRoot() + "." + "j2me"+ "." + protocol +
++            String className = "com.sun.cdc.io.j2me." + protocol +
+                ".Protocol";
+             Class clazz = Class.forName(className, true,
+                                         getProtocolClassLoader());
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/share/classes/com/sun/cdc/io/j2me/file/ProtocolNative.java b/phoneme_advanced_mr2_b167/cdc/src/share/classes/com/sun/cdc/io/j2me/file/ProtocolNative.java
+index 6149f21..27dd202 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/share/classes/com/sun/cdc/io/j2me/file/ProtocolNative.java
++++ b/phoneme_advanced_mr2_b167/cdc/src/share/classes/com/sun/cdc/io/j2me/file/ProtocolNative.java
+@@ -1,4 +1,12 @@
+ /*
++ * NOTICE: Portions Copyright (c) 2007-2009 Davy Preuveneers.
++ * This file has last been modified by Davy Preuveneers on 2010-02-23. The
++ * changes are licensed under the terms of the GNU General Public
++ * License version 2. This notice was added to meet the conditions of
++ * Section 3.a of the GNU General Public License version 2.
++ */
++
++/*
+  * @(#)ProtocolNative.java	1.8 06/10/10
+  *
+  * Copyright  1990-2008 Sun Microsystems, Inc. All Rights Reserved.  
+@@ -72,6 +80,9 @@ public abstract class ProtocolNative extends ProtocolBase {
+ 
+         if(name.length() >= 2 && name.charAt(0) == '/' && name.charAt(1) == '/') {
+             if(name.length() >= 3) {
++                if(name.startsWith("//localhost/")) {
++                    name = "///" + name.substring(12);
++                }
+                 if(name.charAt(2) != '/') {
+                     throw new IllegalArgumentException("Network format not implemented "+name);
+                 } else {
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/globals.c b/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/globals.c
+index cef812e..c67eef4 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/globals.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/globals.c
+@@ -1182,9 +1182,11 @@ CVMBool CVMinitVMGlobalState(CVMGlobalState *gs, CVMOptions *options)
+     if (CVMglobals.cvmDynHandle == NULL) {
+         CVMglobals.cvmDynHandle = CVMdynlinkOpen(NULL);
+         if (CVMglobals.cvmDynHandle == NULL) {
++#if 0
+             CVMconsolePrintf("Cannot start VM "
+                              "(Could not open cvm as a shared library)\n");
+             return CVM_FALSE;
++#endif
+         }
+     }
+ 
+@@ -1318,7 +1320,7 @@ void CVMdestroyVMGlobalState(CVMExecEnv *ee, CVMGlobalState *gs)
+     /*
+      * Destroy zip_util related data structures
+      */
+-    CVMzutilDestroyZip();
++    //CVMzutilDestroyZip();
+ #endif
+ 
+ #ifndef CDC_10
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/interpreter.c b/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/interpreter.c
+index b7899b3..1e48ea7 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/interpreter.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/share/javavm/runtime/interpreter.c
+@@ -3089,7 +3089,9 @@ CVMthreadSuspendConsistentRelease(CVMExecEnv* ee)
+ static void*
+ CVMfindBuiltinEntry(const char* name)
+ {
++#if 0
+     CVMassert(CVMglobals.cvmDynHandle != NULL);
++#endif
+     return CVMdynlinkSym(CVMglobals.cvmDynHandle, name);
+ }
+ 
+diff --git a/phoneme_advanced_mr2_b167/midp/build/common/project.gmk b/phoneme_advanced_mr2_b167/midp/build/common/project.gmk
+index 2b56601..7a27f6e 100644
+--- a/phoneme_advanced_mr2_b167/midp/build/common/project.gmk
++++ b/phoneme_advanced_mr2_b167/midp/build/common/project.gmk
+@@ -29,7 +29,7 @@
+ #
+ ######################################################################
+ 
+-PROJECT_NAME = phoneME Feature project
+-PROJECT_NAME_SHORT = phoneME Feature
++PROJECT_NAME = phoneME_Feature_project
++PROJECT_NAME_SHORT = phoneME_Feature
+ 
+ PROJECT_VERSION = 2.0
+diff --git a/phoneme_advanced_mr2_b167/midp/build/linux_fb_gcc/Options.gmk b/phoneme_advanced_mr2_b167/midp/build/linux_fb_gcc/Options.gmk
+index 037a34b..5ac6309 100644
+--- a/phoneme_advanced_mr2_b167/midp/build/linux_fb_gcc/Options.gmk
++++ b/phoneme_advanced_mr2_b167/midp/build/linux_fb_gcc/Options.gmk
+@@ -94,9 +94,9 @@ USE_AMS_FOLDERS         = false
+ USE_AMS_EXECUTABLE      = true
+ USE_OCSP                = false
+ USE_DYNAMIC_COMPONENTS  = false
+-USE_JAVA_VIRTUAL_KEYBOARD   = false
++USE_JAVA_VIRTUAL_KEYBOARD   =  false
+ USE_NATIVE_VIRTUAL_KEYBOARD = false
+-USE_FINGER_TOUCH        = false
++USE_FINGER_TOUCH        = true
+ USE_PUBLIC_AMS_API	= false
+ 
+ # DIRECTFB 
+@@ -119,7 +119,7 @@ USE_GCOV                = false
+ USE_SERVER_SOCKET       = true
+ 
+ # JPEG decoding for putpixel
+-USE_JPEG=false
++USE_JPEG=true
+ 
+ # RESOURCE MANAGEMENT POLICY
+ USE_FIXED               = false
+diff --git a/phoneme_advanced_mr2_b167/midp/src/configuration/configuration_xml/linux_fb/constants_omap730.xml b/phoneme_advanced_mr2_b167/midp/src/configuration/configuration_xml/linux_fb/constants_omap730.xml
+index 59336c2..0df198c 100755
+--- a/phoneme_advanced_mr2_b167/midp/src/configuration/configuration_xml/linux_fb/constants_omap730.xml
++++ b/phoneme_advanced_mr2_b167/midp/src/configuration/configuration_xml/linux_fb/constants_omap730.xml
+@@ -28,11 +28,11 @@
+ <constant_class Package="com.sun.midp.configurator" Name="Constants" Scope="public">
+   <constant Type="boolean"
+             Name="POINTER_SUPPORTED"
+-            Value="false" 
++            Value="true" 
+             Comment="Whether both the platform and MIDP implementation provide support for a pointer (press and release). Set to true when pointer is supported; set to false when pointer is not supported."/>
+   <constant Type="boolean"
+             Name="MOTION_SUPPORTED"
+-            Value="false" 
++            Value="true" 
+             Comment="If your platform supports pointer motion and you want MIDP implementation provides support for pointer motions, set it to true; otherwise, set it to false so that MIDP runtime can provide this information to MIDlet."/>
+   <constant Type="boolean"
+             Name="REPEAT_SUPPORTED"
+diff --git a/phoneme_advanced_mr2_b167/midp/src/core/vm_services/cdc_vm/linux_fb/native/cdc_natives.c b/phoneme_advanced_mr2_b167/midp/src/core/vm_services/cdc_vm/linux_fb/native/cdc_natives.c
+index aa28222..21615b3 100644
+--- a/phoneme_advanced_mr2_b167/midp/src/core/vm_services/cdc_vm/linux_fb/native/cdc_natives.c
++++ b/phoneme_advanced_mr2_b167/midp/src/core/vm_services/cdc_vm/linux_fb/native/cdc_natives.c
+@@ -407,6 +407,7 @@ KNIDECL(com_sun_midp_events_NativeEventMonitor_waitForNativeEvent) {
+     int keyboard_has_event = 0;
+ #else
+     int keyboardFd = fbapp_get_keyboard_fd();
++    int mouseFd = fbapp_get_mouse_fd();
+ #endif /* defined(DIRECTFB) */
+     int done = 0;
+ 
+@@ -429,6 +430,14 @@ KNIDECL(com_sun_midp_events_NativeEventMonitor_waitForNativeEvent) {
+             }
+         }
+ 
++        mouseFd = fbapp_get_mouse_fd();
++        if (mouseFd >= 0) {
++            FD_SET(mouseFd, &read_fds);
++            if (num_fds <= mouseFd) {
++                num_fds = mouseFd + 1;
++            }
++        }
++
+         CVMD_gcSafeExec(_ee, {
+             num_ready= select(num_fds+1, &read_fds, &write_fds, &except_fds,
+                               NULL);
+@@ -498,6 +507,29 @@ KNIDECL(com_sun_midp_events_NativeEventMonitor_waitForNativeEvent) {
+ #endif
+                     done = 1;
+                 }
++            } else if (FD_ISSET(mouseFd, &read_fds)) {
++                newSignal.waitingFor = 0;
++                newSignal.pResult = NULL;
++                MIDP_EVENT_INITIALIZE(newMidpEvent);
++
++                handlePointer(&newSignal, &newMidpEvent);
++                /* Need to set the event DISPLAY (intParam4) to forground. See
++                   midpStoreEventAndSignalForeground() in midpEventUtil.c. */
++                newMidpEvent.DISPLAY = gForegroundDisplayId;
++                if (newSignal.waitingFor == UI_SIGNAL
++                    || newSignal.waitingFor == AMS_SIGNAL) {
++                    KNI_SetIntField(eventObj, typeFieldID, newMidpEvent.type);
++                    KNI_SetIntField(eventObj, intParam1FieldID,
++                                    newMidpEvent.intParam1);
++                    KNI_SetIntField(eventObj, intParam2FieldID,
++                                    newMidpEvent.intParam2);
++                    KNI_SetIntField(eventObj, intParam3FieldID,
++                                    newMidpEvent.intParam3);
++                    KNI_SetIntField(eventObj, intParam4FieldID,
++                                    newMidpEvent.intParam4);
++
++                    done = 1;
++                }
+             } else if (FD_ISSET(controlPipe[0], &read_fds)) {
+                 readControlIntField(eventObj, typeFieldID);
+                 readControlIntField(eventObj, intParam1FieldID);
+diff --git a/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_handle_input.c b/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_handle_input.c
+index a1e4637..ed4cf72 100644
+--- a/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_handle_input.c
++++ b/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_handle_input.c
+@@ -108,24 +108,10 @@ static void init_key_device() {
+     if (!done) {
+         done = KNI_TRUE;
+         memset(&keyState, 0, sizeof(keyState));
+-        switch (fbapp_get_fb_device_type()) {
+-        case LINUX_FB_OMAP730:
+-            mapping = omap_730_keys;
+-            bitscale_mode = KNI_TRUE;
+-            readKeyEvent = read_omap730_key_event;
+-            break;
+-        case LINUX_FB_ZAURUS:
+-            mapping = zaurus_sl5500_keys;
+-            bitscale_mode = KNI_FALSE;
+-            readKeyEvent = read_char_key_event;
+-            break;
+-        case LINUX_FB_VERSATILE_INTEGRATOR:
+-        default:
+-            mapping = versatile_integrator_keys;
+-            bitscale_mode = KNI_FALSE;
+-            readKeyEvent = read_char_key_event;
+-            break;
+-        }
++        mapping = smartphone_keys;
++        bitscale_mode = KNI_FALSE;
++        readKeyEvent = read_char_key_event;
++
+ #ifdef DIRECTFB
+         /* DirectFB provides generic function to read input key events */
+         readKeyEvent = read_directfb_key_event;
+@@ -171,6 +157,21 @@ static void find_raw_key_mapping() {
+             } else if (km->raw_keyup == key) {
+                 down = 0;
+                 break;
++            } else if (km->raw_keydown == key - 0x010000) { // Key up = Key down + 0x010000
++                down = 0;
++                break;
++            }
++        }
++        if (km->midp_keycode == KEYMAP_KEY_INVALID) {
++            km++;
++            if (key > 0x010000) {
++                down = 0;
++                km->raw_keydown == key - 0x010000;
++                km->raw_keyup == key - 0x010000;
++            } else {
++                down = 1;
++                km->raw_keydown == key;
++                km->raw_keyup == key;
+             }
+         }
+     }
+@@ -211,6 +212,10 @@ void handle_key_port(MidpReentryData* pNewSignal, MidpEvent* pNewMidpEvent) {
+    }
+ }
+ 
++int min(int a, int b) {
++    return (a < b ? a : b);
++}
++
+ /**
+  * ARM version to read mouse events.
+  * By default it's empty because currently it does not supported pointer events
+@@ -220,8 +225,87 @@ void handle_key_port(MidpReentryData* pNewSignal, MidpEvent* pNewMidpEvent) {
+  * @param pNewMidpEvent     a native MIDP event to be stored to Java event queue
+  */
+ void handle_pointer_port(MidpReentryData* pNewSignal, MidpEvent* pNewMidpEvent) {
+-    (void)pNewSignal;
+-    (void)pNewMidpEvent;
++    int maxX, maxY, screenX, screenY, d1, d2;
++    int n;
++    int id;
++    static const int mouseBufSize = 12;
++    unsigned char mouseBuf[mouseBufSize];
++    int mouseIdx = 0;
++    jboolean pressed = KNI_FALSE;
++
++    static struct {
++        int x;
++        int y;
++        int state;
++    } pointer;
++
++    do {
++        n = read(fbapp_get_mouse_fd(), mouseBuf + mouseIdx,
++                mouseBufSize - mouseIdx);
++        if ( n > 0 )
++            mouseIdx += n;
++    } while ( n > 0 );
++
++    /* unexpected data size.  Broken package, no handling - just return */
++    if (mouseIdx < mouseBufSize)
++        return;
++
++    pNewMidpEvent->type = MIDP_PEN_EVENT;
++    id = fbapp_get_current_hardwareId();
++    screenX = fbapp_get_screen_x(id);
++    screenY = fbapp_get_screen_y(id);
++    maxX = fbapp_get_screen_width(id);
++    maxY = fbapp_get_screen_height(id);
++
++    d1 = (((int)mouseBuf[3]) << 24) +
++        (((int)mouseBuf[2]) << 16) +
++        (((int)mouseBuf[1]) << 8) +
++        (int)mouseBuf[0];
++
++    d2 = (((int)mouseBuf[7]) << 24) +
++        (((int)mouseBuf[6]) << 16) +
++        (((int)mouseBuf[5]) << 8) +
++        (int)mouseBuf[4];
++
++    if (fbapp_get_reverse_orientation(id)) {
++        pNewMidpEvent->X_POS = min(maxX - d2, maxX) + screenX;
++        pNewMidpEvent->Y_POS = min(d1 - screenY, maxY);
++    } else {
++        pNewMidpEvent->X_POS = min(d1 - screenX, maxX);
++        pNewMidpEvent->Y_POS = min(d2 - screenY, maxY);
++    }
++
++    if (pNewMidpEvent->X_POS < 0) {
++        pNewMidpEvent->X_POS = 0;
++    }
++
++    if (pNewMidpEvent->Y_POS < 0) {
++        pNewMidpEvent->Y_POS = 0;
++    }
++
++    pressed = mouseBuf[8]  ||
++        mouseBuf[9]  ||
++        mouseBuf[10] ||
++        mouseBuf[11];
++
++    if (pressed) {
++        if ((pointer.state == KEYMAP_STATE_PRESSED) || (pointer.state == KEYMAP_STATE_DRAGGED)) {
++            pNewMidpEvent->ACTION = KEYMAP_STATE_DRAGGED;
++        } else {
++            pNewMidpEvent->ACTION = KEYMAP_STATE_PRESSED;
++        }
++    } else {
++        pNewMidpEvent->ACTION = KEYMAP_STATE_RELEASED;
++    }
++
++    if ( pNewMidpEvent->ACTION != -1 ) {
++        pNewSignal->waitingFor = UI_SIGNAL;
++    }
++
++    /* keep the previous coordinates to detect dragged event */
++    pointer.x = pNewMidpEvent->X_POS;
++    pointer.y = pNewMidpEvent->Y_POS;
++    pointer.state = pNewMidpEvent->ACTION;
+ }
+ 
+ /**
+diff --git a/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_keymapping.c b/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_keymapping.c
+index 4e444bf..83e1ade 100644
+--- a/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_keymapping.c
++++ b/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_keymapping.c
+@@ -39,6 +39,266 @@
+ KeyMapping *mapping = NULL;
+ jboolean bitscale_mode = KNI_FALSE;
+ 
++/** Keyboard info for the smartphone */
++
++KeyMapping smartphone_keys[] = {
++    {KEYMAP_KEY_0,               '0',     0},
++    {KEYMAP_KEY_1,               '1',     0},
++    {KEYMAP_KEY_2,               '2',     0},
++    {KEYMAP_KEY_3,               '3',     0},
++    {KEYMAP_KEY_4,               '4',     0},
++    {KEYMAP_KEY_5,               '5',     0},
++    {KEYMAP_KEY_6,               '6',     0},
++    {KEYMAP_KEY_7,               '7',     0},
++    {KEYMAP_KEY_8,               '8',     0},
++    {KEYMAP_KEY_9,               '9',     0},
++    {KEYMAP_KEY_SPACE,           ' ',     0},
++
++    {KEYMAP_KEY_SELECT,         '\r',     0},  // CR
++    {KEYMAP_KEY_BACKSPACE,      0x7f,     0},  // BS
++    {KEYMAP_KEY_CLEAR,          0x1b,     0},  // ESC
++
++    {KEYMAP_KEY_POUND,           '#',     0},
++    {KEYMAP_KEY_ASTERISK,        '*',     0},
++
++    {KEYMAP_KEY_GAMEA,           '7',     0},  // 7
++    {KEYMAP_KEY_GAMEB,           '9',     0},  // 9
++    {KEYMAP_KEY_GAMEC,           '#',     0},  // pound
++    {KEYMAP_KEY_GAMED,           '*',     0},  // asterisk
++
++    {KEYMAP_KEY_UP,             0x01,     0},
++    {KEYMAP_KEY_DOWN,           0x02,     0},
++    {KEYMAP_KEY_LEFT,           0x03,     0},
++    {KEYMAP_KEY_RIGHT,          0x04,     0},
++    {KEYMAP_KEY_SOFT1,          0x05,     0},
++    {KEYMAP_KEY_SOFT2,          0x06,     0},
++
++    {KEYMAP_KEY_POWER,          0x11,     0},
++    {KEYMAP_KEY_END,            0x12,     0},
++    {KEYMAP_KEY_SEND,           0x13,     0},
++    {KEYMAP_KEY_VIRT_KEYB,      0x14,     0},
++    {KEYMAP_KEY_SCREEN_ROT,     0x15,     0},
++
++    {KEYMAP_KEY_GAME_UP,        0x01,     0},
++    {KEYMAP_KEY_GAME_DOWN,      0x02,     0},
++    {KEYMAP_KEY_GAME_LEFT,      0x03,     0},
++    {KEYMAP_KEY_GAME_RIGHT,     0x04,     0},
++
++    {0x08,                      '\b',     0},
++    {0x09,                      '\t',     0},
++    {0x0a,                      '\n',     0},
++    {0x0d,                      '\r',     0},
++
++    {0x20,                      0x20,     0},
++    {0x21,                      0x21,     0},
++    {0x22,                      0x22,     0},
++    {0x23,                      0x23,     0},
++    {0x24,                      0x24,     0},
++    {0x25,                      0x25,     0},
++    {0x26,                      0x26,     0},
++    {0x27,                      0x27,     0},
++    {0x28,                      0x28,     0},
++    {0x29,                      0x29,     0},
++    {0x2a,                      0x2a,     0},
++    {0x2b,                      0x2b,     0},
++    {0x2c,                      0x2c,     0},
++    {0x2d,                      0x2d,     0},
++    {0x2e,                      0x2e,     0},
++    {0x2f,                      0x2f,     0},
++
++    {0x30,                      0x30,     0},
++    {0x31,                      0x31,     0},
++    {0x32,                      0x32,     0},
++    {0x33,                      0x33,     0},
++    {0x34,                      0x34,     0},
++    {0x35,                      0x35,     0},
++    {0x36,                      0x36,     0},
++    {0x37,                      0x37,     0},
++    {0x38,                      0x38,     0},
++    {0x39,                      0x39,     0},
++    {0x3a,                      0x3a,     0},
++    {0x3b,                      0x3b,     0},
++    {0x3c,                      0x3c,     0},
++    {0x3d,                      0x3d,     0},
++    {0x3e,                      0x3e,     0},
++    {0x3f,                      0x3f,     0},
++
++    {0x40,                      0x40,     0},
++    {0x41,                      0x41,     0},
++    {0x42,                      0x42,     0},
++    {0x43,                      0x43,     0},
++    {0x44,                      0x44,     0},
++    {0x45,                      0x45,     0},
++    {0x46,                      0x46,     0},
++    {0x47,                      0x47,     0},
++    {0x48,                      0x48,     0},
++    {0x49,                      0x49,     0},
++    {0x4a,                      0x4a,     0},
++    {0x4b,                      0x4b,     0},
++    {0x4c,                      0x4c,     0},
++    {0x4d,                      0x4d,     0},
++    {0x4e,                      0x4e,     0},
++    {0x4f,                      0x4f,     0},
++
++    {0x50,                      0x50,     0},
++    {0x51,                      0x51,     0},
++    {0x52,                      0x52,     0},
++    {0x53,                      0x53,     0},
++    {0x54,                      0x54,     0},
++    {0x55,                      0x55,     0},
++    {0x56,                      0x56,     0},
++    {0x57,                      0x57,     0},
++    {0x58,                      0x58,     0},
++    {0x59,                      0x59,     0},
++    {0x5a,                      0x5a,     0},
++    {0x5b,                      0x5b,     0},
++    {0x5c,                      0x5c,     0},
++    {0x5d,                      0x5d,     0},
++    {0x5e,                      0x5e,     0},
++    {0x5f,                      0x5f,     0},
++
++    {0x60,                      0x60,     0},
++    {0x61,                      0x61,     0},
++    {0x62,                      0x62,     0},
++    {0x63,                      0x63,     0},
++    {0x64,                      0x64,     0},
++    {0x65,                      0x65,     0},
++    {0x66,                      0x66,     0},
++    {0x67,                      0x67,     0},
++    {0x68,                      0x68,     0},
++    {0x69,                      0x69,     0},
++    {0x6a,                      0x6a,     0},
++    {0x6b,                      0x6b,     0},
++    {0x6c,                      0x6c,     0},
++    {0x6d,                      0x6d,     0},
++    {0x6e,                      0x6e,     0},
++    {0x6f,                      0x6f,     0},
++
++    {0x70,                      0x70,     0},
++    {0x71,                      0x71,     0},
++    {0x72,                      0x72,     0},
++    {0x73,                      0x73,     0},
++    {0x74,                      0x74,     0},
++    {0x75,                      0x75,     0},
++    {0x76,                      0x76,     0},
++    {0x77,                      0x77,     0},
++    {0x78,                      0x78,     0},
++    {0x79,                      0x79,     0},
++    {0x7a,                      0x7a,     0},
++    {0x7b,                      0x7b,     0},
++    {0x7c,                      0x7c,     0},
++    {0x7d,                      0x7d,     0},
++    {0x7e,                      0x7e,     0},
++    // {0x7f,                      0x7f,     0},
++
++    {0xa0,                      0xa0,     0},
++    {0xa1,                      0xa1,     0},
++    {0xa2,                      0xa2,     0},
++    {0xa3,                      0xa3,     0},
++    {0xa4,                      0xa4,     0},
++    {0xa5,                      0xa5,     0},
++    {0xa6,                      0xa6,     0},
++    {0xa7,                      0xa7,     0},
++    {0xa8,                      0xa8,     0},
++    {0xa9,                      0xa9,     0},
++    {0xaa,                      0xaa,     0},
++    {0xab,                      0xab,     0},
++    {0xac,                      0xac,     0},
++    {0xad,                      0xad,     0},
++    {0xae,                      0xae,     0},
++    {0xaf,                      0xaf,     0},
++
++    {0xb0,                      0xb0,     0},
++    {0xb1,                      0xb1,     0},
++    {0xb2,                      0xb2,     0},
++    {0xb3,                      0xb3,     0},
++    {0xb4,                      0xb4,     0},
++    {0xb5,                      0xb5,     0},
++    {0xb6,                      0xb6,     0},
++    {0xb7,                      0xb7,     0},
++    {0xb8,                      0xb8,     0},
++    {0xb9,                      0xb9,     0},
++    {0xba,                      0xba,     0},
++    {0xbb,                      0xbb,     0},
++    {0xbc,                      0xbc,     0},
++    {0xbd,                      0xbd,     0},
++    {0xbe,                      0xbe,     0},
++    {0xbf,                      0xbf,     0},
++
++    {0xc0,                      0xc0,     0},
++    {0xc1,                      0xc1,     0},
++    {0xc2,                      0xc2,     0},
++    {0xc3,                      0xc3,     0},
++    {0xc4,                      0xc4,     0},
++    {0xc5,                      0xc5,     0},
++    {0xc6,                      0xc6,     0},
++    {0xc7,                      0xc7,     0},
++    {0xc8,                      0xc8,     0},
++    {0xc9,                      0xc9,     0},
++    {0xca,                      0xca,     0},
++    {0xcb,                      0xcb,     0},
++    {0xcc,                      0xcc,     0},
++    {0xcd,                      0xcd,     0},
++    {0xce,                      0xce,     0},
++    {0xcf,                      0xcf,     0},
++
++    {0xd0,                      0xd0,     0},
++    {0xd1,                      0xd1,     0},
++    {0xd2,                      0xd2,     0},
++    {0xd3,                      0xd3,     0},
++    {0xd4,                      0xd4,     0},
++    {0xd5,                      0xd5,     0},
++    {0xd6,                      0xd6,     0},
++    {0xd7,                      0xd7,     0},
++    {0xd8,                      0xd8,     0},
++    {0xd9,                      0xd9,     0},
++    {0xda,                      0xda,     0},
++    {0xdb,                      0xdb,     0},
++    {0xdc,                      0xdc,     0},
++    {0xdd,                      0xdd,     0},
++    {0xde,                      0xde,     0},
++    {0xdf,                      0xdf,     0},
++
++    {0xe0,                      0xe0,     0},
++    {0xe1,                      0xe1,     0},
++    {0xe2,                      0xe2,     0},
++    {0xe3,                      0xe3,     0},
++    {0xe4,                      0xe4,     0},
++    {0xe5,                      0xe5,     0},
++    {0xe6,                      0xe6,     0},
++    {0xe7,                      0xe7,     0},
++    {0xe8,                      0xe8,     0},
++    {0xe9,                      0xe9,     0},
++    {0xea,                      0xea,     0},
++    {0xeb,                      0xeb,     0},
++    {0xec,                      0xec,     0},
++    {0xed,                      0xed,     0},
++    {0xee,                      0xee,     0},
++    {0xef,                      0xef,     0},
++
++    {0xf0,                      0xf0,     0},
++    {0xf1,                      0xf1,     0},
++    {0xf2,                      0xf2,     0},
++    {0xf3,                      0xf3,     0},
++    {0xf4,                      0xf4,     0},
++    {0xf5,                      0xf5,     0},
++    {0xf6,                      0xf6,     0},
++    {0xf7,                      0xf7,     0},
++    {0xf8,                      0xf8,     0},
++    {0xf9,                      0xf9,     0},
++    {0xfa,                      0xfa,     0},
++    {0xfb,                      0xfb,     0},
++    {0xfc,                      0xfc,     0},
++    {0xfd,                      0xfd,     0},
++    {0xfe,                      0xfe,     0},
++    {0xff,                      0xff,     0},
++
++    {KEYMAP_KEY_INVALID,           0,     0},
++
++    {0x00,                      0x00,     0},
++
++};
++
+ /** Keyboard info for the ARM Versatile and Integrator boards */
+ KeyMapping versatile_integrator_keys[] = {
+     {KEYMAP_KEY_0,                11,   139},
+diff --git a/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_keymapping.h b/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_keymapping.h
+index 59939f2..f420239 100644
+--- a/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_keymapping.h
++++ b/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_keymapping.h
+@@ -45,6 +45,9 @@ typedef struct _KeyMapping {
+     unsigned raw_keyup;
+ } KeyMapping;
+ 
++/** Keyboard info for the smartphone */
++extern KeyMapping smartphone_keys[];
++
+ /** Keyboard info for the ARM Versatile and Integrator boards */
+ extern KeyMapping versatile_integrator_keys[];
+ 
+diff --git a/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_read_key.c b/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_read_key.c
+index 5427aa7..efad864 100644
+--- a/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_read_key.c
++++ b/phoneme_advanced_mr2_b167/midp/src/events/input_port/fb/native/fb_read_key.c
+@@ -77,10 +77,16 @@ jboolean read_omap730_key_event() {
+ 
+ /** Update input keys state reading single char from keyboard device */
+ jboolean read_char_key_event() {
+-    unsigned char c;
++    unsigned short c;
+     int readBytes = read(fbapp_get_keyboard_fd(), &c, sizeof(c));
+     keyState.key = c;
+     keyState.down = -1;
++
++    if (c == 0x0080) {
++        readBytes = read(fbapp_get_keyboard_fd(), &c, sizeof(c));
++        keyState.key = 0x010000 + c;
++    }
++
+     return (readBytes > 0) ?
+         KNI_TRUE : KNI_FALSE;
+ }
+diff --git a/phoneme_advanced_mr2_b167/midp/src/highlevelui/fb_application/reference/native/fbapp_export.c b/phoneme_advanced_mr2_b167/midp/src/highlevelui/fb_application/reference/native/fbapp_export.c
+index 396a31f..2bf2ab6 100644
+--- a/phoneme_advanced_mr2_b167/midp/src/highlevelui/fb_application/reference/native/fbapp_export.c
++++ b/phoneme_advanced_mr2_b167/midp/src/highlevelui/fb_application/reference/native/fbapp_export.c
+@@ -151,15 +151,16 @@ void fbapp_set_fullscreen_mode(int hardwareId, int mode) {
+     }
+ }
+ 
++int get_surface_height();
++int get_surface_width();
++
+ /** Return screen width */
+ int fbapp_get_screen_width(int hardwareId) {
+     (void)hardwareId;
+     if (reverse_orientation) {
+-        return (isFullScreen == 1) ?
+-            CHAM_FULLHEIGHT : CHAM_HEIGHT;
++        return get_surface_height();
+     } else {
+-        return (isFullScreen == 1) ?
+-            CHAM_FULLWIDTH : CHAM_WIDTH;
++        return get_surface_width();
+     }
+ }
+ 
+@@ -167,11 +168,9 @@ int fbapp_get_screen_width(int hardwareId) {
+ int fbapp_get_screen_height(int hardwareId) {
+     (void)hardwareId;
+     if (reverse_orientation) {
+-        return (isFullScreen == 1) ?
+-            CHAM_FULLWIDTH : CHAM_WIDTH;
++        return get_surface_width();
+     } else {
+-        return (isFullScreen == 1) ?
+-            CHAM_FULLHEIGHT : CHAM_HEIGHT;
++        return get_surface_height();
+     }
+ }
+ 
+diff --git a/phoneme_advanced_mr2_b167/midp/src/highlevelui/fb_port/fb/lib.gmk b/phoneme_advanced_mr2_b167/midp/src/highlevelui/fb_port/fb/lib.gmk
+index c3e4873..890a3e9 100644
+--- a/phoneme_advanced_mr2_b167/midp/src/highlevelui/fb_port/fb/lib.gmk
++++ b/phoneme_advanced_mr2_b167/midp/src/highlevelui/fb_port/fb/lib.gmk
+@@ -38,4 +38,4 @@ vpath % $(FB_PORT_DIR)/native
+ # Additional native files for the platform
+ #
+ SUBSYSTEM_APP_NATIVE_FILES += \
+-    fb_port.c
++    fb_port_android.c
+diff --git a/phoneme_advanced_mr2_b167/midp/src/highlevelui/lcdlf/lfjava/classes/com/sun/midp/chameleon/skins/resources/SkinResourcesImpl.jpp b/phoneme_advanced_mr2_b167/midp/src/highlevelui/lcdlf/lfjava/classes/com/sun/midp/chameleon/skins/resources/SkinResourcesImpl.jpp
+index a7c27c5..6daa706 100644
+--- a/phoneme_advanced_mr2_b167/midp/src/highlevelui/lcdlf/lfjava/classes/com/sun/midp/chameleon/skins/resources/SkinResourcesImpl.jpp
++++ b/phoneme_advanced_mr2_b167/midp/src/highlevelui/lcdlf/lfjava/classes/com/sun/midp/chameleon/skins/resources/SkinResourcesImpl.jpp
+@@ -1,4 +1,12 @@
+ /*
++ * NOTICE: Portions Copyright (c) 2007-2009 Davy Preuveneers.
++ * This file has last been modified by Davy Preuveneers on 2010-02-23. The
++ * changes are licensed under the terms of the GNU General Public
++ * License version 2. This notice was added to meet the conditions of
++ * Section 3.a of the GNU General Public License version 2.
++ */
++
++/*
+  *   
+  *
+  * Copyright  1990-2007 Sun Microsystems, Inc. All Rights Reserved.
+@@ -652,7 +660,7 @@ final class LoadedSkinData {
+     /**
+      * Cleanups after reading data from skin file
+      */
+-    private native static int finishReadingSkinFile()
++    private native static void finishReadingSkinFile()
+         throws IOException;
+ 
+     /**
+diff --git a/phoneme_advanced_mr2_b167/midp/src/i18n/i18n_port/default/native/defaultLocale.c b/phoneme_advanced_mr2_b167/midp/src/i18n/i18n_port/default/native/defaultLocale.c
+index 0517d7c..3772a44 100644
+--- a/phoneme_advanced_mr2_b167/midp/src/i18n/i18n_port/default/native/defaultLocale.c
++++ b/phoneme_advanced_mr2_b167/midp/src/i18n/i18n_port/default/native/defaultLocale.c
+@@ -24,6 +24,8 @@
+  * information or have any questions.
+  */
+ 
++#include <stdio.h>
++#include <stdlib.h>
+ #include <locale.h>
+ 
+ void
+diff --git a/phoneme_advanced_mr2_b167/midp/src/rms/rms_base/reference/native/recordStoreUtil.c b/phoneme_advanced_mr2_b167/midp/src/rms/rms_base/reference/native/recordStoreUtil.c
+index 04239d1..1099aec 100644
+--- a/phoneme_advanced_mr2_b167/midp/src/rms/rms_base/reference/native/recordStoreUtil.c
++++ b/phoneme_advanced_mr2_b167/midp/src/rms/rms_base/reference/native/recordStoreUtil.c
+@@ -85,7 +85,7 @@ KNIDECL(com_sun_midp_rms_RecordStoreUtil_exists) {
+  *         internally.
+  */
+ 
+-KNIEXPORT KNI_RETURNTYPE_BOOLEAN
++KNIEXPORT KNI_RETURNTYPE_VOID
+ KNIDECL(com_sun_midp_rms_RecordStoreUtil_deleteFile) {
+     int extension = KNI_GetParameterAsInt(3);
+     jboolean existed = KNI_FALSE;
+@@ -118,6 +118,6 @@ KNIDECL(com_sun_midp_rms_RecordStoreUtil_deleteFile) {
+ 
+     KNI_EndHandles();
+ 
+-    KNI_ReturnBoolean(existed);
++    KNI_ReturnVoid();
+ }
+ 
+diff --git a/phoneme_advanced_mr2_b167/pcsl/file/posix/pcsl_dir_posix.c b/phoneme_advanced_mr2_b167/pcsl/file/posix/pcsl_dir_posix.c
+index 61f551c..28856f0 100644
+--- a/phoneme_advanced_mr2_b167/pcsl/file/posix/pcsl_dir_posix.c
++++ b/phoneme_advanced_mr2_b167/pcsl/file/posix/pcsl_dir_posix.c
+@@ -31,11 +31,13 @@
+ #include <sys/stat.h>
+ #include <errno.h>
+ #include <unistd.h>
+-#include <sys/statvfs.h>
++#include <sys/statfs.h>
+ 
+ #include <pcsl_directory.h>
+ #include <pcsl_memory.h>
+ 
++#define statvfs statfs
++
+ /**
+  * @def PCSL_DIR_MAX_NAME_LEN
+  * Maximum length of a file name
+-- 
+1.7.1
+

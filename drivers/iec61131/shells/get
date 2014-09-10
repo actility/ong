@@ -1,0 +1,8 @@
+USER="http%3a//nsc1.actility.com%3a8088/m2m/applications/SYSTEM:"
+App=$1
+RES="http://192.168.1.116:8080/m2m/applications/$App/containers/configuration/contentInstances/"
+echo $RES
+TYPE="Content-Type: application/xml"
+
+curl -v -X GET -u "$USER" $RES/latest/content
+

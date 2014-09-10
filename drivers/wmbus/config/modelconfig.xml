@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resourceModeling xmlns="http://uri.actility.com/m2m/ong">
+    
+  <!-- Energy -->
+  <interface filter="wmbus:/server/0x0003">
+    <descriptor>
+      <point name="m2mCurrentSummationDelivered" config="logging"/>
+      <point name="m2mInstantaneousDemand" config="logging"/>
+      <point name="extVoltageInstantaneousDemand" config="logging"/>
+      <point name="extCurrentInstantaneousDemand" config="logging"/>
+    </descriptor>
+    <covConfigurations>
+      <covConfiguration filter="wmbus:/attribute/0x0003" minInterval="PT5M"/>
+      <covConfiguration filter="wmbus:/attribute/0x002b" minInterval="PT5M"/>
+      <covConfiguration filter="wmbus:/attribute/0xfd49" minInterval="PT5M"/>
+      <covConfiguration filter="wmbus:/attribute/0xfd5c" minInterval="PT5M"/>
+    </covConfigurations>
+  </interface>  
+    
+</resourceModeling>

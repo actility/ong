@@ -1,0 +1,12 @@
+chmod 755 $ROOTACT/etc/init.d/modbus
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/init.d/modbus
+mkdir -p $ROOTACT/etc/rc.d
+cd $ROOTACT/etc/rc.d
+ln -fs ../init.d/modbus S07modbus
+chmod 755 $ROOTACT/bin/modbus.x
+mkdir -p $ROOTACT/usr/etc/modbus/
+[ -f $ROOTACT/usr/etc/modbus/modelconfig.xml ] || \
+cp $ROOTACT/etc/modbus/modelconfig.xml $ROOTACT/usr/etc/modbus/
+[ -f $ROOTACT/usr/etc/modbus/spvconfig.xml ] || \
+cp $ROOTACT/etc/modbus/spvconfig.xml $ROOTACT/usr/etc/modbus/
+

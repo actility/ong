@@ -1,0 +1,106 @@
+
+/*
+* Copyright (C) Actility, SA. All Rights Reserved.
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License version
+* 2 only, as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful, but
+* WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* General Public License version 2 for more details (a copy is
+* included at /legal/license.txt).
+*
+* You should have received a copy of the GNU General Public License
+* version 2 along with this work; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+* 02110-1301 USA
+*
+* Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+* or visit www.actility.com if you need additional
+* information or have any questions.
+*/
+
+#ifndef MODELING_REF
+#define MODELING_REF
+
+#include "misc.ref"
+
+ong:extParameter
+{
+    ong:name    	XoString		{ embattr }
+    ong:val    		XoString		{ embattr }
+}
+
+ong:covConfiguration
+{
+    ong:filter    	XoString		{ embattr }
+    ong:minInterval    	XoString		{ embattr }
+    ong:maxInterval    	XoString		{ embattr }
+    ong:minCOV    	XoString		{ embattr }
+
+    ong:extParameters	ong:extParameter	{ list }
+}
+
+ong:attr
+{
+    ong:name    		XoString	{ embattr }
+    ong:config    		XoString	{ embattr 
+    					default="descriptor" 
+					value="descriptor|retargeting" }
+    ong:accessRight    		XoString	{ embattr
+    					default="level1"
+					value="level1|level2|level3" }
+
+    ong:extParameters	ong:extParameter	{ list }
+}
+
+ong:cmd
+{
+    ong:name    		XoString	{ embattr }
+    ong:accessRight    		XoString	{ embattr
+    					default="level1"
+					value="level1|level2|level3" }
+}
+
+ong:point
+{
+    ong:name    		XoString	{ embattr }
+    ong:config    		XoString	{ embattr 
+    					default="logging" 
+    					value="logging" }
+    ong:accessRight    		XoString	{ embattr
+    					default="level1"
+					value="level1|level2|level3" }
+
+    ong:maxNrOfInstances	XoString	{ embattr }
+    ong:maxInstanceAge		XoString	{ embattr }
+    ong:maxByteSize		XoString	{ embattr }
+    ong:storageDriver		XoString	{ embattr }
+}
+
+ong:feed
+{
+    ong:name    		XoString	{ embattr }
+
+    ong:maxNrOfInstances	XoString	{ embattr }
+    ong:maxInstanceAge		XoString	{ embattr }
+    ong:maxByteSize		XoString	{ embattr }
+    ong:storageDriver		XoString	{ embattr }
+}
+
+ong:interface from ong:t_xml_obj
+{
+    ong:filter    		XoString		{ embattr }
+    ong:descriptor		XoVoidObj		{ list }
+    ong:covConfigurations	ong:covConfiguration	{ list }
+}
+
+ong:resourceModeling from ong:t_xml_obj
+{
+	ong:interfaces ong:interface { list wraphidden }
+}
+
+#endif // MODELING_REF

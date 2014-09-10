@@ -1,0 +1,66 @@
+HTTP/1.0 200 OK
+Server: Contiki/2.4 http://www.sics.se/contiki/
+Connection: close
+Content-type: text/html
+
+<html><head><title>ContikiRPL</title></head><body>
+<h2>Neighbors</h2>fe80::ff:ff00:2343<br>
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+ fe80::ff:ff00:2343
+
+<h2>Routes</h2>
+1000<br>
+2000<br>
+3000<br>
+</body></html>

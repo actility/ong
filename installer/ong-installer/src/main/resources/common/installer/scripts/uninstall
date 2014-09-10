@@ -1,0 +1,20 @@
+
+eval $( grep ROOTACT $PROFILE )
+
+if [ -d "$ROOTACT" ]; then
+ if [ "$PRESERVE_USR" = "1" ]; then
+  if [ "x$ROOTACT" != "x$NEW_ROOTACT" ]; then
+   mkdir -p $NEW_ROOTACT
+   mv $ROOTACT/usr $NEW_ROOTACT/
+   rm -rf $ROOTACT
+  else
+   dirs=`ls $ROOTACT | grep -v '^usr$' | tr -s '\n' ' '`
+   for dir in $dirs
+   do
+     rm -rf $ROOTACT/$dir
+   done
+  fi
+ else
+  rm -rf $ROOTACT
+ fi
+fi

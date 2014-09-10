@@ -1,0 +1,54 @@
+
+/*
+* Copyright (C) Actility, SA. All Rights Reserved.
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License version
+* 2 only, as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful, but
+* WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* General Public License version 2 for more details (a copy is
+* included at /legal/license.txt).
+*
+* You should have received a copy of the GNU General Public License
+* version 2 along with this work; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+* 02110-1301 USA
+*
+* Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+* or visit www.actility.com if you need additional
+* information or have any questions.
+*/
+
+#ifndef NOTIFICATIONCHANNEL_REF
+#define NOTIFICATIONCHANNEL_REF
+
+#include "misc.ref"
+
+
+m2m:ChannelData from ong:t_xml_obj
+{
+    xsi:type    XoString    { embattr } // (optional) (xmlType: xsd:QName)
+}
+alias m2m:ChannelData with m2m:channelData
+
+m2m:LongPollingChannelData from m2m:ChannelData
+{
+    m2m:longPollingURI    XoString    {  } // (xmlType: xsd:anyURI) 
+}
+
+m2m:NotificationChannel from ong:t_xml_obj
+{
+    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:channelType    XoString    {  } // (optional) (xmlType: m2m:ChannelType) (enum: LONG_POLLING ) 
+    m2m:contactURI    XoString    {  } // (optional) (xmlType: xsd:anyURI) 
+    m2m:channelData    XoVoidObj    { default=m2m:ChannelData  } // (optional) 
+    m2m:creationTime    XoString    {  } // (optional) (xmlType: xsd:dateTime) 
+    m2m:lastModifiedTime    XoString    {  } // (optional) (xmlType: xsd:dateTime) 
+}
+alias m2m:NotificationChannel with m2m:notificationChannel
+
+#endif // NOTIFICATIONCHANNEL_REF

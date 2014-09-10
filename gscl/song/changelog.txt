@@ -1,0 +1,317 @@
+-------------------------------------------------------------------------------
+SONG changelog
+-------------------------------------------------------------------------------
+Version: 4.0.3
+Date: 2014-05-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Changed BundleLogger to use a static method instead of a static variable
+ - Fixed NPE when accessing message content when content-type is null
+
+-------------------------------------------------------------------------------
+Version: 4.0.2
+Date: 2014-03-27
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed infinite loop when accept header contains several media-types with
+   parameter q
+
+-------------------------------------------------------------------------------
+Version: 4.0.1
+Date: 2014-03-26
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed request was rejected when Accept header equals */*
+
+-------------------------------------------------------------------------------
+Version: 4.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - Updated to song.api-4.0.0
+ - report patches for IS2T VM compatibility.
+ - Changed the groupId for com.actility.m2m (was com.actility).
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.12.0
+Date: 2013-10-07
+
+New Features:
+-------------
+ - Updated to song.api-3.6.0
+ - Added the possibility to declare a priority for a SONG request with the
+   request attribute "com.actility.servlet.song.Priority"
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.10.2
+Date: 2013-04-08
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Song URI query parameters are badly decoded
+ - Fixed. STATSUS_ACCEPTED responses were not considered as a final response
+ - Fixed #0000061 exception between createResponse and send prevents from
+   sending a response
+
+-------------------------------------------------------------------------------
+Version: 3.10.1
+Date: 2013-01-24
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Fill the "HostName" servlet attribute with the local machine name
+   without domain
+
+-------------------------------------------------------------------------------
+Version: 3.10.0
+Date: 2012-11-27
+
+New Features:
+-------------
+ - Added traces to track performances issues
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.8.0
+Date: 2012-11-13
+
+New Features:
+-------------
+ - Updated to backend.api-3.6.0
+
+Bug Fixes:
+----------
+ - Fixed. Respond "503 Service Unavailable" instead of "500 Internal Server
+   Error" when backend queue is full
+
+-------------------------------------------------------------------------------
+Version: 3.6.1
+Date: 2012-10-31
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Updated to song.binding.api-3.4.1
+
+-------------------------------------------------------------------------------
+Version: 3.6.0
+Date: 2012-10-23
+
+New Features:
+-------------
+ - Update song.binding.api dependency to version 3.4.0. Statistics are now
+   implemented
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.4.1
+Date: 2012-10-05
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Removed provided scopes in pom.xml to allow transitive dependencies
+
+-------------------------------------------------------------------------------
+Version: 3.4.0
+Date: 2012-08-30
+
+New Features:
+-------------
+ - Updated to new backend.api-2.4.0
+ - Updated, now backend exchange share the same id as the SONG request. This
+   is to simplify the correlation between objects in logs
+ - Updated, requesting entity could not be null anymore
+
+Bug Fixes:
+----------
+ - Fixed. Server header was always null for responses generated locally
+
+-------------------------------------------------------------------------------
+Version: 3.2.1
+Date: 2012-07-17
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed. Requests send to an URI different from the targetID (poc mechanism)
+   are badly routed in the SONG container
+ - Fixed. Use lowercase for local hostname generation as hostnames are
+   case-insensitive. This helps SONG applications if they are based on
+   strict string comparison
+
+-------------------------------------------------------------------------------
+Version: 3.2.0
+Date: 2012-07-12
+
+New Features:
+-------------
+ - Update song.binding.api dependency to version 3.2.0
+
+Bug Fixes:
+----------
+ - Updated logs messages for clarity
+ - Fixed. Now SongURI is using java.net.URI when serialized. This fixes an
+   issue when encoding special characters
+
+-------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2012-06-05
+
+New Features:
+-------------
+ - Re-alignment with new song.api 3.0
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2012-03-20
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Added priorities in exchange generated by SONG service on backend bus
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2012-03-13
+
+New Features:
+-------------
+ - Updated project artifactId to fit bundle-coding-rules + updated dependencies
+   accordingly
+ - Use new java.cdc.pom 2.0.0
+ - Added the authorizationKey configuration parameter which allows a simple
+   authorization mechanism. Its value is added to each SONG request in a Basic
+   Authorization header
+
+Bug Fixes:
+----------
+ - Improved timer management and better finalization of resources
+
+-------------------------------------------------------------------------------
+Version: 1.4.2
+Date: 2011-11-16
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed a SONG request never receives a response when the response is received
+   at the same time that the request expires and generates a 408 Request
+   Timeout
+
+-------------------------------------------------------------------------------
+Version: 1.4.1
+Date: 2011-11-10
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed management of parameters and headers in SONG URIs
+
+-------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2011-11-03
+
+New Features:
+-------------
+ - Added possibility to override some aspects of ServletContextImpl
+ - Updated to song-service-api 1.4.0
+ - Use new java-cdc-pom 1.4.0
+
+Bug Fixes:
+----------
+ - Removed song-obix-model-api from dependencies to remove the transitive
+   dependency on oBIX
+ - Fixed an expired local request now returns a 504 Server Timeout instead
+   of a 408 Request Timeout
+ - Fixed ClassCastException when creating an error response to a remote
+   wrapped request in a binding node
+ - Removed isWarnEnabled as it not part of the log4j API
+ - Fixed now a validation of the given timeout is done when sending a local
+   request. This value must be greater or equal to 0
+ - Fixed concurrent modification exception when unregistering a Servlet
+   application
+ - Fixed removed error when receiving a response in the SONG router as it is
+   a possible situation
+ - Fixed Use Bundle.getResource instead of ClassLoader.getResourceAsStream like
+   it is specified in the OSGi API
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2011-08-04
+
+New Features:
+-------------
+ - Use SONG service API 1.2.0
+
+Bug Fixes:
+----------
+ - Fixed an outgoing request which could not be sent now returns a 500
+   Internal Error instead of a 408 Request Timeout
+ - Fixed warning when closing song-service
+ - Fixed. Now relative URIs can be used to build a SONG URI. They use the
+   default binding which is SONG
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Initial version

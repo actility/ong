@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+
+	<!-- <capabilityInstance > resource type -->
+	<complexType name="CapabilityInstance">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:capabilityName" minOccurs="0"/>
+					<element ref="tns:attached" minOccurs="0"/>
+					<element ref="tns:capabilityActionStatus" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+		<!-- attribute name="id"></attribute -->
+	</complexType>
+
+	<element name="capabilityName" type="string"/>
+
+	<element name="attached" type="tns:TFboolean">
+		<annotation>
+			<documentation>
+			When the Device Capability is removable, it indicates whether the device is attached or not to the device.
+			</documentation>
+		</annotation>
+	</element>
+
+	<simpleType name="TFboolean" >
+		<restriction base="boolean">
+			<pattern value="true/false" />
+		</restriction>
+	</simpleType>
+
+	<element name="capabilityActionStatus" type="tns:ActionStatus"/>
+
+
+
+</schema>
+
+

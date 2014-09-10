@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2mMapping>
+  <map comment="Temp Sensor"    input="%IX1.1" targetID="/m2m/applications/APP_00137a0000005daa.10/containers/0x0402.0x0000.0.m2m/contentInstances" />
+  <map comment="Humidity Sensor" input="%IX1.2" targetID="/m2m/applications/APP_00137a0000005daa.10/containers/0x0405.0x0000.0.m2m/contentInstances" />
+  <map comment="Delta" input="%IX1.3" targetID="http://nsc1.actility.com:8088/m2m/applications/BAB-003018A07B8A_APP/containers/CONSIGNE/contentInstances" />
+
+  <map comment="Plug ON"        output="%OX2.1" value="TRUE" targetID="/m2m/applications/APP_00137a00000080d6.10/retargeting2/0x0006.0x01.ope">
+    <![CDATA[<bool      val="TRUE" />]]> 
+  </map>
+  <map comment="Plug OFF"       output="%OX2.1" value="FALSE" targetID="/m2m/applications/APP_00137a00000080d6.10/retargeting2/0x0006.0x00.ope">
+    <![CDATA[<bool      val="FALSE" />]]> 
+  </map>
+  <map comment="Plug Status"    input="%IX2.1" targetID="/m2m/applications/APP_00137a00000080d6.10/containers/0x0006.0x0000.0.m2m/contentInstances" />
+  <map comment="Plug Kw"        input="%IX2.2" targetID="/m2m/applications/APP_00137a00000080d6.10/containers/0x0702.0x0400.0.m2m/contentInstances" />
+  <map comment="Plug Kwh"       input="%IX2.3" targetID="/m2m/applications/APP_00137a00000080d6.10/containers/0x0702.0x0000.0.m2m/contentInstances" />
+</m2mMapping>

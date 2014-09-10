@@ -1,0 +1,10 @@
+
+USER="http%3a//nsc1.actility.com%3a8088/m2m/applications/SYSTEM:"
+Cmd=$1
+App=$2
+RES="http://192.168.1.116:8080/m2m/applications/$App/retargeting3/$Cmd"
+TYPE="Content-Type: application/xml"
+FILE=@"empty_file"
+
+cat /dev/null > ./empty_file
+curl -v -H "$TYPE" -X GET --data $FILE -u "$USER" $RES

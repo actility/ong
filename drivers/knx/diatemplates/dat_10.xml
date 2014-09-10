@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reltime val="${dpt_value}" xmlns="http://obix.org/ns/schema/1.1">
+    <int name="Day" val="${raw_Day}"/>
+    <int name="Hour" val="${raw_Hour}"/>
+    <int name="Minutes" val="${raw_Minutes}"/>
+    <int name="Seconds" val="${raw_Seconds}"/>
+    <str name="raw" val="0x${dpt_raw}"/>
+</reltime>

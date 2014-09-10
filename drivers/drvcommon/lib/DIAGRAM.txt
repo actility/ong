@@ -1,0 +1,45 @@
+
+DiaxxxStart()
+	Elem : <applications>
+	Cont : <containers>
+	Inst : <contentInstances>
+
+
+                               NOK | UPDATE_ELEM         +--------------------+
+                      +----------------------------------+ xxxElemRetrieve    +
+                      |                                  +--------------------+
+                      v                                                      |
+           +--------------------+                                            |
+       +---+ xxxElemCreate      +  <<< xxx_elem.xml                          |
+       |   +--------------------+                                          OK|
+       |              |                 OK                                   |
+       |              +-----------------------------------+                  |
+       |                                                  |                  |
+       |NOK                                               v                  v
+       |                       NOK | UPDATE_CONT         +--------------------+
+       |              +----------------------------------+ xxxContRetrieve    +
+       |              |                                  +--------------------+
+       |              v                                                      |
+       |   +--------------------+                                            |
+       |   + xxxContCreate      +  <<< xxx_cont.xml                          |
+       |   +--------------------+                                          OK|
+       |     |        |                 OK                    xxx_inst.xml   |
+       |     |        +-----------------------------------+        v         |
+       |     |                                            |        v         |
+       |     |NOK                                         v        v         v
+       |     |                 NOK                       +--------------------+
+       |     |        +----------------------------------+ xxxInstCreate (*)  +
+       |     |        |                                  +--------------------+
+       |     v        v                                         OK v
+       |   +--------------------+                        +--------------------+
+       +-->+ xxxError           +                        + xxxOK              + 
+           +--------------------+                        +--------------------+
+
+(*) xxxInstCreate()
+	Net => SetDeviceList
+	Dev => SetApplicationList
+	App => SetInterfaceList (app_inst.xml + N x itf_inst_nnnn.xml)
+
+(**) no Cont and Inst for Acc
+
+(***) Inst of Dat is a special case

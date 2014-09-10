@@ -1,0 +1,4 @@
+mkdir -p $ROOTACT/externals/usr/
+cd $ROOTACT/externals/usr/
+ln -s $ROOTACT/lib/
+sed -i "s,^prefix=.*,prefix=\"$ROOTACT\"," $ROOTACT/bin/pcap-config

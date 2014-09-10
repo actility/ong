@@ -1,0 +1,45 @@
+-------------------------------------------------------------------------------
+SONG over HTTP - C implementation - changelog
+-------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2014-07-23
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Memory overflow occurs while adding received content for incoming POST
+  requests to the response_t data structure. Fixed.
+ - HTTP query parameters for incoming POST request were not risen to the
+  issuer. Fixed: they are now risen as HTTP headers in optHeaders parameter.
+
+Limitations:
+------------
+ - HTTP server side: the library only support incoming POST requests.
+
+Dependencies:
+-------------
+ - rtbase-1.2.3-0
+ - curl-7.36.0-2
+ - libmicrohttpd-0.9.33-0
+ - makefile-common-1.0.0-0
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2014-07-18
+
+Initial version
+
+Limitations:
+------------
+ - HTTP server side: the library only support incoming POST requests.
+
+Dependencies:
+-------------
+ - rtbase-1.2.3-0
+ - curl-7.36.0-2
+ - libmicrohttpd-0.9.33-0
+ - makefile-common-1.0.0-0
+

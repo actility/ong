@@ -1,0 +1,4 @@
+
+if [ -f /etc/init.d/rcS -a -n "`grep 'hotplug.sh' /etc/init.d/rcS`" ]; then
+    sed -i -e "s|^echo .* > /proc/sys/kernel/hotplug$|echo /sbin/mdev > /proc/sys/kernel/hotplug|" /etc/init.d/rcS
+fi

@@ -1,0 +1,1 @@
+for i in tests/*; do echo $i >&2; ./parser.x -f $i -t9 ; done 2>ST.out

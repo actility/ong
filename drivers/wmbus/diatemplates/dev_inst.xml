@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <str name="nodeID" val="DEV_${d_ieee}"/>
+    
+    <bool name="wmAesEnable" val="false" />
+    <str name="wmAesKey" val="" />
+    
+    <str name="wmRfChannel" val="${w_rfch}"/>
+    
+    <str name="wmManufacturerID" val="${w_mid}"/>
+    <str name="wmIdentificationNumber" val="${w_id}"/>
+    <int name="wmVersion" val="${w_version}" />
+    <str name="wmType" val="${w_type}"/>
+    
+    <str name="wmRfPower" val="${w_rfpwr}"/>
+    
+    <list name="applications">
+    </list>
+</obj>

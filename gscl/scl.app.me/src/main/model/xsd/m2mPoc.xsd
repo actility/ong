@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="common.xsd" />
+
+	<element name="m2mPoc" type="tns:M2MPoc" />
+
+	<complexType name="M2MPoc">
+		<sequence>
+			<element ref="tns:contactInfo" minOccurs="0" />
+			<element ref="tns:expirationTime" minOccurs="0" />
+			<element ref="tns:onlineStatus" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0" />
+			<element ref="tns:lastModifiedTime" minOccurs="0" />
+			<!-- not defined yet element ref="tns:containerType" minOccurs="0" -->
+			<!-- subresources -->
+		</sequence>
+		<attribute ref="tns:id" />
+	</complexType>
+
+	<element name="contactInfo" type="tns:ContactInfo" />
+	<complexType name="ContactInfo">
+		<choice>
+			<element ref="tns:contactURI" />
+			<element ref="tns:other" />
+		</choice>
+	</complexType>
+
+
+	<element name="other" type="anyType" />
+
+
+</schema>

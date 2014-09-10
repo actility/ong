@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description xmlns="http://uri.actility.com/m2m/adaptor-modbus">
+    <ref>Labjack:ue9pro:0</ref>
+    <vendor>Labjack</vendor>
+    <product>UE9-Pro</product>
+    <version>0</version>
+
+	<interfaces>
+		<interface>
+			<id>AnalogInput.Srv</id>
+			<attributs>
+				<attr name="currentMesure" unit="obix:units/volts" type="float-le" display="Analog Input #0" reg="/holding/1/2" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+
+		<interface>
+			<id>AnalogInput2.Srv</id>
+			<attributs>
+				<attr name="currentMesure" unit="obix:units/volts" type="float-le" display="Analog Input #1" reg="/holding/3/2" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+
+		<interface>
+			<id>AnalogInput2.Srv</id>
+			<attributs>
+				<attr name="currentMesure" unit="obix:units/volts" type="float-le" display="Analog Input #1" reg="/holding/3/2" readable="false" writable="true"/>
+			</attributs>
+		</interface>
+		
+		<interface>
+			<id>AnalogInput2.Srv</id>
+			<attributs>
+				<attr name="currentMesure" unit="obix:units/volts" type="float-le" display="Analog Input #1" reg="/holding/3/2" readable="true" writable="true"/>
+			</attributs>
+		</interface>
+		
+		<interface>
+			<id>Basic.Srv</id>
+			<attributs>
+				<attr name="productId" type="int" display="Product ID" reg="/holding/65000/1" readable="true" writable="false"/>
+				<attr name="serialNumber" type="int" display="Serial Number" reg="/holding/65001/2" readable="true" writable="false"/>
+				<attr name="localId" type="int" display="Local ID" reg="/holding/65003/1" readable="true" writable="false"/>
+				<attr name="hardwareVersion" type="int" display="Hardware Version" reg="/holding/65004/1" readable="true" writable="false"/>
+			</attributs>
+		</interface>
+	</interfaces>
+</description>

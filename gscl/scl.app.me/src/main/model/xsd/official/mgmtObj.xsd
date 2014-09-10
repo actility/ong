@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:tns="http://uri.etsi.org/m2m" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m">
+	<include schemaLocation="common.xsd" />
+	<include schemaLocation="commonDM.xsd" />
+	<!-- generic mgmtObj type resource -->
+	<element name="mgmtObj" type="tns:MgmtObj" />
+	<complexType name="MgmtObj">
+		<sequence>
+			<!-- common attributes -->
+			<element ref="tns:expirationTime" minOccurs="0" />
+			<element ref="tns:accessRightID" minOccurs="0" />
+			<element ref="tns:searchStrings" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0" />
+			<element ref="tns:lastModifiedTime" minOccurs="0" />
+			<element ref="tns:moID" minOccurs="0" />
+			<element ref="tns:originalMO" minOccurs="0" />
+			<element ref="tns:contentType" minOccurs="0" />
+			<element ref="tns:description" minOccurs="0" />
+			<!-- sub resources -->
+			<element ref="tns:parametersCollection" />
+			<element ref="tns:subscriptionsReference" minOccurs="0" />
+			<!-- MO specific attributes; but for ETSI defined models these are specified explicitly by extension -->
+			<any minOccurs="0" maxOccurs="unbounded" namespace="##other" processContents="lax"/> <!-- so extension is done for extensions in the same namespace or local but ANY can be used for 'external'/non-ETSI -->
+		</sequence>
+		<attribute ref="tns:id"/>
+	</complexType>
+</schema>

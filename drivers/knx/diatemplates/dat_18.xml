@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <bool name="c" val="${raw_c}" />
+    <int name="SceneNumber" val="${raw_SceneNumber}"/>
+    <str name="raw" val="0x${dpt_raw}"/>
+</obj>

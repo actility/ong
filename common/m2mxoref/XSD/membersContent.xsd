@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m"
+	xmlns:xmlmime="http://www.w3.org/2005/05/xmlmime">
+
+	<include schemaLocation="common.xsd" />
+
+	<import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="http://www.w3.org/2005/05/xmlmime.xsd" />
+
+	<element name="membersContentResponses">
+		<complexType>
+			<sequence>
+				<element name="status" minOccurs="0" maxOccurs="unbounded">
+					<complexType>						
+							<sequence>
+								<element name="statusCode" type="string" />
+								<element name="eTag" type="string" minOccurs="0"/>
+								<element name="lastModifiedTime" type="dateTime" minOccurs="0"/>
+								<element name="resultBody" type="xmlmime:base64Binary" minOccurs="0"/>
+								<!-- element name="resultHeaders" type="string" ???? -->
+							</sequence>
+							<attribute name="id" type="anyURI" />
+					</complexType>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+</schema>

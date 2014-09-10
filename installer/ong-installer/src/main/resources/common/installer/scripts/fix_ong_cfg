@@ -1,0 +1,5 @@
+cp $ROOTACT/etc/ong.cfg $ROOTACT/etc/ong.cfg.back
+
+echo "export ROOTACT=$ROOTACT" > $ROOTACT/etc/ong.cfg
+cat $ROOTACT/etc/ong.cfg.back >> $ROOTACT/etc/ong.cfg
+rm -f $ROOTACT/etc/ong.cfg.back

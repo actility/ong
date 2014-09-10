@@ -1,0 +1,21 @@
+
+#
+#	iec61131 post installation script
+#
+
+NAME=iec61131
+
+# Install server ala Unix SV
+chmod 755 $ROOTACT/etc/init.d/$NAME
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/init.d/$NAME
+mkdir -p $ROOTACT/etc/rc.d
+cd $ROOTACT/etc/rc.d
+ln -s ../init.d/$NAME S08$NAME
+
+# Be sure it is executable
+chmod 755 $ROOTACT/bin/plc.x
+
+# Copy generic spvconfig.xml (/etc) into specific (/usr/etc)
+mkdir -p $ROOTACT/usr/etc/$NAME/
+[ -f $ROOTACT/usr/etc/$NAME/spvconfig.xml ] || cp $ROOTACT/etc/$NAME/spvconfig.xml $ROOTACT/usr/etc/$NAME/
+

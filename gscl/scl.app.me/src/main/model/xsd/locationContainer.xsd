@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="container.xsd" />
+
+	<element name="locationContainer" type="tns:LocationContainer" />
+
+	<complexType name="LocationContainer">
+		<complexContent>
+			<extension base="tns:Container">
+				<sequence>
+					<element ref="tns:locationContainerType" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="locationContainerType" type="tns:LocationContainerType" />
+
+
+	<simpleType name="LocationContainerType">
+		<restriction base="string">
+			<enumeration value="LOCATION_SERVER_BASED"></enumeration>
+			<enumeration value="APPLICATION_GENERATED"></enumeration>
+		</restriction>
+	</simpleType>
+
+
+
+
+</schema>

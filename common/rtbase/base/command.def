@@ -1,0 +1,9 @@
+#
+#	included by all makefile
+#
+
+MKWHAT=$(ROOTACT)/rtbase/shells/mkwhat.sh
+MKPKGSOURCE=$(ROOTACT)/rtbase/shells/mktar.sh
+MKPKGRUNTIME=$(ROOTACT)/rtbase/shells/mkruntime.sh
+MKXO=$(ROOTACT)/xo/com/mkxo.x
+MKSHLIB=$(ROOTACT)/rtbase/shells/mkshlib.sh

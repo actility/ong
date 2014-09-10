@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+x-template="${w_template}"
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="TicMetering.Srv" status="cfg-mandatory"/>
+    <str name="clusterID" val="0x0053" status="cfg-mandatory"/>
+    <enum name="clusterType" val="server" status="cfg-mandatory"/>
+
+    <op name="zbCovConfig"
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x0053.0xFF.ope"/>
+
+    <!-- ZigBee attributes -->
+    <!-- ZigBee commands -->
+    <!-- Watteco commands -->
+    <!-- M2M POINTS-->
+    <!-- M2M POINTS watteco -->
+    <str name="extTicIceData" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0053.0x0000.0.m2m/contentInstances/latest/content"/>
+    <str name="extTicIcePeriode0" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0053.0x0001.0.m2m/contentInstances/latest/content"/>
+    <str name="extTicIcePeriode1" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0053.0x0002.0.m2m/contentInstances/latest/content"/>
+
+    <int name="extTicIceType" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0053.0x0010.0.m2m/contentInstances/latest/content"/>
+</obj>

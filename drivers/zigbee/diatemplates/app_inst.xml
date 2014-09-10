@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="applicationID" val="APP_${d_ieee}.${a_num}"/>
+    <str name="zbApplicationProfileID" val="${a_appProfId}"/>
+    <str name="zbApplicationDeviceID" val="${a_appDevId}"/>
+    <int name="zbApplicationDeviceVersion" val="${a_appDevVers}"/>
+    <int name="zbEndpoint" val="${a_num}"/>
+    <list name="interfaces">
+<!--
+
+     See sensor.c:iSensorSetInterfaceListInObj() and itf_inst_%04x_server.xml
+
+-->
+    </list>
+</obj>

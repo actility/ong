@@ -1,0 +1,1 @@
+sudo tcpdump -iany -X -s0 -n port 5683 -w /tmp/dia.pcap

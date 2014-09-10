@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m2m="http://uri.etsi.org/m2m" appId="IPU_6LoWPAN">
+  <m2m:accessRightID>Locadmin_AR</m2m:accessRightID>
+  <m2m:searchStrings>
+    <m2m:searchString>ETSI.ObiectType/ETSI.IP</m2m:searchString>
+    <m2m:searchString>ETSI.ObjectTechnology/ZigBee.ZigBee_1_0</m2m:searchString>
+  </m2m:searchStrings>
+  <m2m:aPoC>coap://localhost:5684/6lowpan/IPU_6LoWPAN</m2m:aPoC>
+  <m2m:aPoCPaths>
+    <m2m:aPoCPath>
+      <m2m:path>/command1</m2m:path>
+      <m2m:accessRightID>Locadmin_AR</m2m:accessRightID>
+    </m2m:aPoCPath>
+    <m2m:aPoCPath>
+      <m2m:path>/command2</m2m:path>
+      <m2m:accessRightID>Locadmin2_AR</m2m:accessRightID>
+    </m2m:aPoCPath>
+  </m2m:aPoCPaths>
+</m2m:application>

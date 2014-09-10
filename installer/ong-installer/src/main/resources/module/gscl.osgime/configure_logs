@@ -1,0 +1,4 @@
+sed -i -e "s|^maxFileSize:int=.*$|maxFileSize:int=$LOG_OSGI_SIZE|" $ROOTACT/etc/gscl/cm/com.actility.m2m.log.config.cfg
+sed -i -e "s|^maxNbOfFiles:int=.*$|maxNbOfFiles:int=$LOG_OSGI_GENERATION|" $ROOTACT/etc/gscl/cm/com.actility.m2m.log.config.cfg
+sed -i -e "s|^dIaMaxLogFileSize:int=.*$|dIaMaxLogFileSize:int=$LOG_DIA_SIZE|" $ROOTACT/etc/gscl/cm/com.actility.m2m.song.binding.coap.sni.config.cfg
+sed -i -e "s|\(stdin-logger [^ ]* out\) [0-9]* [0-9]*|\1 $LOG_OUT_SIZE_KB $LOG_OUT_GENERATION|" $ROOTACT/etc/init.d/gscl

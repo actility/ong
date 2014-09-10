@@ -1,0 +1,61 @@
+#!(SHELL)
+#
+
+exec 2> /dev/null
+
+NAME=iec61131
+
+CURRENT_DIR=`dirname $0`
+. $CURRENT_DIR/../ong.cfg
+. $CURRENT_DIR/../functions
+
+OPTIONS=""
+IEC61131_DATA=$ROOTACT/usr/data/$NAME
+SERVICE=$NAME
+PIDFILE=$IEC61131_DATA/$NAME.pid
+STOPFILE=$IEC61131_DATA/stop
+
+usage() {
+    echo "Usage: iec61131 [<options>] {start|stop|status|restart}"
+    echo "  Where options are:"
+    echo "   -h|--help    Print this help message"
+}
+
+preStart() {
+  mkdir -p $ROOTACT/usr/data/$NAME
+}
+
+serviceCommand() {
+  echo "plc.x "$OPTIONS
+}
+
+stopService() {
+  IEC61131_PIDS=$(pidof plc.x)
+  [ -n "$IEC61131_PIDS" ] && kill -TERM $IEC61131_PIDS
+}
+
+abortService() {
+  IEC61131_PIDS=$(pidof plc.x)
+  [ -n "$IEC61131_PIDS" ] && kill -KILL $IEC61131_PIDS
+}
+
+GETOPTTEMP=`getopt -o hi --long help,init -- $@`
+if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments
+while [ -n "$1" ]
+do
+    case "$1" in
+        "-h"|"--help") usage; exit;;
+        "-i"|"--init") ;;
+        "--") shift; break ;;
+        * ) echo "Internal error ($*)!"; exit 1;;
+    esac
+    shift
+done
+
+handleParams $*
+
+exit $?
+

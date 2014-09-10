@@ -1,0 +1,662 @@
+-------------------------------------------------------------------------------
+ZigBee driver changelog
+-------------------------------------------------------------------------------
+Version: 1.8.4
+Date: 2014-02-17
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - When invoking M2M "leave" operation, M2M resources may be not deleted
+   whereas the GIP driver does not manage the "node" anymore. Fixed.
+
+dependencies:
+-------------
+ - libAZAP: 1.6.2
+ - rtbase: 1.2.3
+ - libxo: 4.2.10
+ - libdIa: 1.0.25
+ - drvcommon: 1.4.14
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.8.3
+Date: 2014-02-17
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Smooth the creation of data containers for device applications: because of
+   latency of the storage under rpi, these requests take much more time than on 
+   other targets. Now ithe HAN "publish" processing is delayed when there are 
+   still not respnded dIa requests.
+
+dependencies:
+-------------
+ - libAZAP: 1.6.2
+ - rtbase: 1.2.3
+ - libxo: 4.2.10
+ - libdIa: 1.0.25
+ - drvcommon: 1.4.14
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.8.2
+Date: 2014-02-06
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Data containers for device applications were created using "Locadmin_AR" as
+   "accessRightID" instead of using the one created for the device
+   application. Fixed.
+
+dependencies:
+-------------
+ - libAZAP: 1.6.2
+ - rtbase: 1.2.3
+ - libxo: 4.2.10
+ - libdIa: 1.0.25
+ - drvcommon: 1.4.14
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.8.1
+Date: 2014-02-05
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Few fixes for raspberry-pi compilation.
+
+dependencies:
+-------------
+ - libAZAP: 1.6.2
+ - rtbase: 1.2.3
+ - libxo: 4.2.10
+ - libdIa: 1.0.25
+ - drvcommon: 1.4.14
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.8.0
+Date: 2014-01-29
+
+New features:
+-------------
+ - Added M2M operations specified in TS 102.966 last edition:
+   * "open": on network application. Open association procedure, similar to
+	 MgmtPermitJoin
+	 * "leave": on device application. Instruct the IPU to remove the device
+	 from the HAN. WARNING: it also erases the M2M resources associated to the
+	 device, including measured values.
+
+Bug Fixes:
+----------
+ - N/A
+
+dependencies:
+-------------
+ - libAZAP: 1.6.1
+ - rtbase: 1.2.1
+ - libxo: 4.2.8
+ - libdIa: 1.0.24
+ - drvcommon: 1.4.13
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.6.1
+Date: 2014-01-23
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Upgrade dependencies: libAZAP-1.6.1, rtbase-1.2.1, drvcommon-1.4.13
+ - Changed normal clock function (time) by monotonic functions.
+
+dependencies:
+-------------
+ - libAZAP: 1.6.1
+ - rtbase: 1.2.1
+ - libxo: 4.2.8
+ - libdIa: 1.0.24
+ - drvcommon: 1.4.13
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.6.0
+Date: 2013-11-04
+
+New features:
+-------------
+ - Now use drvcommon as an apu, and no more as a static library
+   (drvcommon-1.4.12).
+ - Update access rights according to "ref-tpkinfra2.0-access-rights-rev16"
+   document.
+
+Bug Fixes:
+----------
+ - N/A
+
+dependencies:
+-------------
+ - libAZAP: 1.6.0
+ - rtbase: 1.2.0
+ - libxo: 4.2.8
+ - libdIa: 1.0.24
+ - drvcommon: 1.4.12
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.4.3
+Date: 2013-11-04
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed: nodes were deleted when a device audit starts (on DeviceAnnce
+   message received) if the device does not respond to a ZDO NodeDesc request
+   or ZDO PowerDesc request, even if the device has already been successfully
+   audited in the past. As a consequence, the driver ignores the reports sent
+   by the device and refuses to send requests to this device.
+ - upgrade libAZAP to 1.6.0, and add new CLI command "readReportCfg".
+ - upgrade libdIa to 1.0.22, which now allow relocating the driver and the
+   SCL on different hosts.
+
+dependencies:
+-------------
+ - libAZAP: 1.6.0
+ - rtbase: 1.0.38
+ - libxo: 4.2.8
+ - libdIa: 1.0.22
+ - drvcommon: 1.4.4
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.4.2
+Date: 2013-09-10
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed: crash down on device association when auditing custom cluster.
+
+dependencies:
+-------------
+ - libAZAP: 1.4.4
+ - rtbase: 1.0.38
+ - libxo: 4.2.8
+ - libdIa: 1.0.21
+ - drvcommon: 1.4.4
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.4.1
+Date: 2013-09-05
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed: potential unsafe statement while retrieving oBIX "<str>" tag value
+   from request content on re-targeting operations.
+ - upgrade to drvcommon 1.4.4
+
+dependencies:
+-------------
+ - libAZAP: 1.4.4
+ - rtbase: 1.0.38
+ - libxo: 4.2.8
+ - libdIa: 1.0.21
+ - drvcommon: 1.4.4
+ - m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2013-05-13
+
+New features:
+-------------
+- Added CLI command "reloadMdl": when invoked this command causes the GIP
+  driver to reload the "modelconfig.xml" file for M2M resources modeling.
+- Added CLI command "displaySrvMdl": when invoked this command causes the GIP
+  driver to display on the CLI console the active M2M resources modeling for a 
+  given cluster interface.
+- Added CLI command "configReport": when invoked this command causes the GIP
+  driver to send a ZDO Bind request and a ZCL Configure Reporting command,
+	considering the active M2M resources modeling values.
+
+Bug Fixes:
+----------
+- Fixed: M2M SearchString were not added in device applications and
+  device end point applications. Also added "ETSI.ModelID" search string into
+  device end point applications.
+
+dependencies:
+-------------
+- libAZAP: 1.4.3
+- rtbase: 1.0.33
+- libxo: 4.2.8
+- libdIa: 1.0.15
+- drvcommon: 1.2.1
+- m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.2.3
+Date: 2013-02-15
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Fixed: after a device audit, the ZigBee GIP driver didn't always start
+  sending dIa request to the SCL for creating associated M2M resources (lpv3
+  specific). Add CLI tools to get information on dIa requests/responses
+  processing, and to force synchronization between driver and SCL tree content.
+- Fixed: default NSCL listening port was 8086 in spvconfig.xml file. Changed
+  to up-to-date NSCL listening port 8088.
+
+dependencies:
+-------------
+- libAZAP: 1.4.2
+- rtbase: 1.0.27
+- libxo: 4.2.5
+- libdIa: 1.0.15
+- drvcommon: 1.0.61
+- m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.2.2
+Date: 2013-01-24
+
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Fixed: dIa template for OnOff cluster point was defining a "<real>" 
+  attribute instead of a "<bool>" attribute.
+- Fixed: "tracesize" parameter of spvconfig.xml file where not taken into 
+  account.
+- Fixed: a buffer overflow happens while reading spvconfig.xml file, while
+  building internal data structure for "<interfacesMapping>" section.
+
+dependencies:
+-------------
+- libAZAP: 1.4.2
+- rtbase: 1.0.27
+- libxo: 4.2.5
+- libdIa: 1.0.15
+- drvcommon: 1.0.61
+- m2mxoref: 1.1.12
+
+-------------------------------------------------------------------------------
+Version: 1.2.1
+Date: 2013-01-21
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- The init script failed to start the service because the folder 
+  $ROOTACT/usr/data/zigbee was missing. Fixed; now creation forced in
+	"preStart" command.
+
+dependencies:
+-------------
+- libAZAP: 1.4.1
+- rtbase: 1.0.27
+- libxo: 4.2.5
+- libdIa: 1.0.15
+- drvcommon: 1.0.61
+- m2mxoref: 1.1.11
+
+
+-------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2013-01-09
+
+New features:
+-------------
+- Automated run of the tool "astyle" (a C beautifier) on the source code.
+- New init script leveraging new "functions" script
+
+Bug Fixes:
+----------
+- N/A
+
+dependencies:
+-------------
+- libAZAP: 1.4.1
+- rtbase: 1.0.27
+- libxo: 4.2.5
+- libdIa: 1.0.15
+- drvcommon: 1.0.61
+- m2mxoref: 1.1.11
+
+
+-------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2012-12-10
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Requesting identity used for dIa authorization was wrong; it wrongly didn't 
+  include the port number. As a consequence the ZigBee driver was not able to
+  create any resource on the SCL. Fixed.
+- Fixed units of measure for SimpleMetering cluster. They were "watt" and 
+  "watt_hour" whereas they should be "kilowatt" and "kilowatt_hour" for
+  electric metering devices (i.e. when attribute UnitOfMeasure 0x0301 is set
+  to 0x00).
+- Added "version" command in CLI.
+
+dependencies:
+-------------
+- libAZAP: 1.2.2
+- rtbase: 1.0.27
+- libxo: 4.0.30
+- libdIa: 1.0.15
+- drvcommon: 1.0.59
+- m2mxoref: 1.1.9
+
+
+-------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2012-12-05
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Clean-up default spvconfig.xml file content.
+
+
+dependencies:
+-------------
+- libAZAP: 1.2.2
+- rtbase: 1.0.27
+- libxo: 4.0.30
+- libdIa: 1.0.15
+- drvcommon: 1.0.59
+- m2mxoref: 1.1.9
+
+
+-------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2012-12-03
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Update dependencies; now using libAZAP-1.2.2, libdIa-1.0.15, rtbase-1.0.27,
+  libxo-4.0.32, libdrvcommon-1.0.59. 
+- Change "reset HAN at reboot" option, that was previously enable with "-r" 
+  flag, to "-i" flag.
+
+
+dependencies:
+-------------
+- libAZAP: 1.2.2
+- rtbase: 1.0.27
+- libxo: 4.0.30
+- libdIa: 1.0.15
+- drvcommon: 1.0.59
+- m2mxoref: 1.1.9
+
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2012-11-26
+
+New features:
+-------------
+- Integrate access rights management according to specification
+  ref-tpkinfra2.0-access-rights-rev11.
+
+Bug Fixes:
+----------
+- "zbNetworkAddress" attribute in device DESCRIPTOR document was wrongly
+  formatted: it had an extra "0x" prefix. Fixed.
+- Add support for trace file size customization (<int name="tracesize" 
+  val="..."> as <parameter> child). By default, maximum file size for traces
+  is 200Ko.
+- Added Actility copyright cartridge in source files.
+
+
+dependencies:
+-------------
+- AZAP: 1.2.1
+- rtbase: 1.0.24
+- xo: 4.0.30
+- coap: 1.8.2
+- dIa: 1.0.6
+- drvcommon: 1.0.52
+
+
+-------------------------------------------------------------------------------
+Version: 0.0.7
+Date: 2012-10-26
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Added statistics on driver processing and AZAP layer processing. These
+  statistics are available through CLI.
+
+
+dependencies:
+-------------
+- AZAP: 1.2.1
+- rtbase: 1.0.24
+- xo: 4.0.30
+- coap: 1.8.2
+- dIa: 1.0.6
+- drvcommon: 1.0.52
+
+
+-------------------------------------------------------------------------------
+Version: 0.0.6
+Date: 2012-10-24
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Changed search string value ETSI.AN_DEV into ETSI.AN_NODE in M2M device 
+  applications.
+- Changed ZCL operation names in dIa templates for server cluster 0x0006
+  (OnOff.Srv) from "zclOn", "zclOff" and "zclToggle" to "zbOn", "zbOff" and
+  "zbToggle"
+- Added filters on reporting frequency in order to protect SCL against report
+  overload.
+- Integration of new AZAP api 1.2: requests for device audit have TTL mode set 
+  to "start time count when request is sent", and requests for all retargeting 
+  operations have TTL mode set to "start time count at API invoke".
+- Added <m2m:maxNrOfInstances> tag with value "1" in dIa templates for 
+  container creation of IPU, network, nodes, and applications.
+
+dependencies:
+-------------
+- AZAP: 1.2.0
+- rtbase: 1.0.24
+- xo: 4.0.30
+- coap: 1.8.2
+- dIa: 1.0.6
+- drvcommon: 1.0.52
+
+
+-------------------------------------------------------------------------------
+Version: 0.0.5
+Date: 2012-10-18
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Integrated AZAP API 1.0.5 changes.
+
+dependencies:
+-------------
+- AZAP: 1.0.5
+- rtbase: 1.0.24 
+- xo: 4.0.30
+- coap: 1.8.2
+- dIa: 1.0.6
+- drvcommon: 1.0.52
+
+-------------------------------------------------------------------------------
+Version: 0.0.4
+Date: 2012-10-18
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Fixed few compilation warnings for 64-bits architecture.
+- Added support for backing up and restoring known nodes.
+- Fixed memory overflows on retargeting functionality. 
+- dIa request for M2M resources creation are now spread over time, to prevent
+  sending the SCL too many requests at a time, and thus to prevent overloading
+  it.
+- Update "drvcommon" with the one embedded in watteco 1.0.52.
+
+dependencies:
+-------------
+- AZAP: 1.0.1
+- rtbase: 1.0.24 
+- xo: 4.0.30
+- coap: 1.8.2
+- dIa: 1.0.6
+- drvcommon: 1.0.52
+
+-------------------------------------------------------------------------------
+Version: 0.0.3
+Date: 2012-10-11
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Retargeting paths provided for ZDP operations at device instance resource
+  were wrong, using an erroneous IEEE address to build these paths instead of
+  using the real one. (diatemplates/dev_inst.xml)
+- Each time the driver audited a device, it added the discovered end points to
+  the list of end points representation, even if this end point is already
+  represented. Fixed.
+- In MgmtLeave input command oBIX contract, "zbDeviceAddress" parameter is no 
+  more used (indeed it was useless because it can be deduced from requested
+  URI).
+- Added support for retargeting attributes.
+- Changed default listening UDP port for dIa interface to 5685. 5684 is
+  reserved for Watteco driver.
+
+dependencies:
+-------------
+- AZAP: 1.0.1
+- rtbase: 1.0.24 
+- xo: 4.0.30
+- coap: 1.8.2
+- dIa: 1.0.6
+
+-------------------------------------------------------------------------------
+Version: 0.0.2
+Date: 2012-10-04
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+- Fix in dIa server side, requestURI should be provided to dIa layer for 
+  completion.
+- Wrong parse flag provided in ZCL IdentifyQuery response processing, that
+  leads to generate an erroneous document in dIa response. Fixed.
+- Change loading path for xo namespace loading, now looking in $ROOTACT/etc/xo
+  and $ROOTACT/etc/zigbee.
+- new xo namespace file named zigbee.xns installed in $ROOTACT/etc/zigbee.
+- Client interfaces were not added to the M2M node application descriptor. 
+  Fixed.
+- Added support for ZDO MgmtBind, MgmtLeave requests.
+- By default at start-up the HAN is now close for joining.
+- Add the cluster identifier in dIa templates for zbBind and zbUnbind
+  commands.
+
+dependencies:
+-------------
+- AZAP: 1.0.1
+- rtbase: 1.0.24 
+- xo: 4.0.30
+- coap: 1.8.2
+- dIa: 1.0.6
+
+-------------------------------------------------------------------------------
+Version: 0.0.1
+Date: 2012-10-01
+
+New features:
+-------------
+- N/A
+
+Bug Fixes:
+----------
+first alpha release for tests only.
+
+
+dependencies:
+-------------
+- AZAP: 1.0.0
+- rtbase: 1.0.24 
+- xo: 4.0.30
+- coap: 1.8.2
+- dIa: 1.0.6
+

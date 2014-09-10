@@ -1,0 +1,33 @@
+From fcd7196e8d92838b111390f63d1ab39662bb0cb8 Mon Sep 17 00:00:00 2001
+From: jreich_dev <jreich@CentOS-dev-jreich.actility.net>
+Date: Wed, 22 Aug 2012 16:52:59 +0200
+Subject: [PATCH] uclibc-sigignore.patch
+
+---
+ .../cdc/src/linux/javavm/runtime/globals_md.c      |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/globals_md.c b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/globals_md.c
+index 6de2859..47e3cde 100644
+--- a/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/globals_md.c
++++ b/phoneme_advanced_mr2_b167/cdc/src/linux/javavm/runtime/globals_md.c
+@@ -185,11 +185,14 @@ CVMBool CVMinitStaticState(CVMpathInfo *pathInfo)
+ 
+     linuxNetInit();
+ 
+-    sigignore(SIGPIPE);
++    struct sigaction ignore_action;
++    ignore_action.sa_handler = SIG_IGN;
++    ignore_action.sa_flags = SA_RESTART;
++    sigaction(SIGPIPE, &ignore_action, NULL);
+     
+ #ifdef __VFP_FP__    
+     /* TODO: Needed for armboard5. Should be moved to ARM specific code. */
+-    sigignore(SIGFPE);
++    sigaction(SIGFPE, &ignore_action, NULL);
+ #endif
+ 
+     {
+-- 
+1.7.3.4
+

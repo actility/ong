@@ -1,0 +1,52 @@
+
+/*
+* Copyright (C) Actility, SA. All Rights Reserved.
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License version
+* 2 only, as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful, but
+* WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* General Public License version 2 for more details (a copy is
+* included at /legal/license.txt).
+*
+* You should have received a copy of the GNU General Public License
+* version 2 along with this work; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+* 02110-1301 USA
+*
+* Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+* or visit www.actility.com if you need additional
+* information or have any questions.
+*/
+
+#ifndef CONTENTINSTANCE_REF
+#define CONTENTINSTANCE_REF
+
+#include "misc.ref"
+#include "extern.ref"
+
+
+m2m:ContentTypes from ong:t_xml_obj
+{
+    m2m:contentType    XoString    { list } // (xmlType: xsd:string) (list size: [1, infinity[) 
+}
+alias m2m:ContentTypes with m2m:contentTypes
+
+m2m:ContentInstance from ong:t_xml_obj
+{
+    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    href    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:creationTime    XoString    {  } // (optional) (xmlType: xsd:dateTime) 
+    m2m:lastModifiedTime    XoString    {  } // (optional) (xmlType: xsd:dateTime) 
+    m2m:delayTolerance    XoString    {  } // (optional) (xmlType: xsd:dateTime) 
+    m2m:contentTypes    m2m:ContentTypes    {  } // (optional) 
+    m2m:contentSize    XoString    {  } // (optional) (xmlType: xsd:long) 
+    m2m:content    xmime:base64Binary    {  } // (optional) 
+}
+alias m2m:ContentInstance with m2m:contentInstance
+
+#endif // CONTENTINSTANCE_REF

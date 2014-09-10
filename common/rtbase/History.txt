@@ -1,0 +1,551 @@
+
+###########################################################################
+1.2.3	2014/01/23
+############################################################################
+
++ port to "raspberry pi" tools chain "poky linux-gnueabi 1.4.1"
+ OS actility is "rpib"
++ new functions (dynamic sprintf)
+int rtl_vasnprintf(char **buf, size_t size, const char *format, va_list arg);
+int rtl_asnprintf(char **buf, size_t size, const char *format, ...);
+int rtl_vasprintf(char **buf, const char *format, va_list arg);
+int rtl_asprintf(char **buf, const char *format, ...);
+
++ new functions (dynamic sprintf) : include/vasprintf.h
+int rtl_vasnprintf(char **buf, size_t size, const char *format, va_list arg);
+int rtl_asnprintf(char **buf, size_t size, const char *format, ...);
+int rtl_vasprintf(char **buf, const char *format, va_list arg);
+int rtl_asprintf(char **buf, const char *format, ...);
+
+###########################################################################
+1.2.2	2014/01/09
+############################################################################
+
++ CLOCK_MONOTIC_RAW does not work on wirmav2
+
+###########################################################################
+1.2.1	2014/01/07
+############################################################################
+
++ rtl_timerAlloc() rtl_imsgAddDelayed() erroneous calculation of delta sec/nsec
+
++ cross compilation kerlink/wirmav2
+
+
+###########################################################################
+1.2.0	2013/12/26
+############################################################################
+
++ add attributs to t_imsg structure to manage more precise timers :
+/*P*/	time_t		im_startns;	// start at time (in nsec)
+/*P*/	time_t 		im_endns;	// end at time (in nsec)
+/*P*/	time_t 		im_diffms;	// diff (in msec)
+
++ im_start and im_end are now in seconds instead of 1/10 sec :
+/*P*/	time_t		im_start;	// start at time (now in sec)
+/*P*/	time_t 		im_end;		// end at time (now in sec)
+
++ rewrite queue timers with :
+	- clock monotonic 
+	- more precise timers (from 1/10 sec to 1/1000 sec)
+
+ obviously if we want to use the full 1/1000 precision the main loop must run at
+ 1/1000 sec ... in case of rtl_poll() with null trafic :
+ 	- rtl_poll(MainTbPoll,/*MSTIC*/100)	=> 0% CPU
+ 	- rtl_poll(MainTbPoll,/*MSTIC*/1)	=> [1-2]% CPU
+
++ add functions around clock_gettime(MONOTONIC) and struct timespec :
+	void	rtl_timespecmono(struct timespec *tv);
+	time_t	rtl_timemono(time_t *part);		// == time(2)
+	time_t	rtl_tmmsmono();
+	void	rtl_timebasemono(struct timespec *tv);
+	void	rtl_timebasemonoVal(time_t *sec,time_t *ns);
+
+and the same functions using gettimeofday() for non MONOTONIC usage :
+	void	rtl_timespec(struct timespec *tv);
+	time_t	rtl_time(time_t *part);			// == time(2)
+	time_t	rtl_tmms();
+	void	rtl_timebase(struct timespec *tv);
+	void	rtl_timebaseVal(time_t *sec,time_t *ns);
+
++ add package name before version when tagging :
+svn://10.10.12.201/repos/m2m/ong/drivers/common/rtbase/tags/rtbase-1.2.0
+
++ extract check dependencies feature of mkapu.sh to mkdep.sh
+
+example :
+./MAKE dep
+#####
+#watteco for linux-x86
+#package-deps        	  required            installed
+#drvcommon           	    1.4.12               1.4.12 =
+#libcoap             	     1.8.7                1.8.7 =
+#libdIa              	    1.0.24               1.0.24 =
+#libpcap             	     1.3.0                1.3.0 =
+#libxml2             	     2.7.8                    ? ?
+#m2mxoref            	    1.1.12                1.2.1 >
+#rtbase              	     1.2.0                1.2.0 =
+#xo                  	     4.2.8               4.4.11 >
+#
+
++ rename target systems :
+	linux_x86	-> linux-x86
+	linux_x86_64	-> linux-x86_64
+	macosx_x86	-> macosx-x86
+	macosx_x86_64	-> macosx-x86_64
+	centos6_x86	-> centos6-x86
+	centos6_x86_64	-> centos6-x86_64
+
+it is easier to separate OS and ARCH.
+
++ suppress target name vs num target conversion in MAKE and apu/package_runtime/apu.sh (buildProject function), so MAKE can be called with the real target name
+
+	echo "linux-x86" | ./MAKE
+
++ add -lrt to all LDFLAGS because of future use of clock_gettime()
+
++ MAKE apu* : shells/mkapu.sh based on
+	- apu-tools/apu-maker.sh -l SYSTEM -s
+	- apu-tools/apu-install-stdalone.sh
+
++ MAKE svntag : shells/mksvn.sh
+
+ do not repeat trunk in tags paths : ..../pack/tags/pack-a.b.c
+
++ add function void rtl_traceunlock(void) to unlock mutex on traces, usefull
+when rtl_trace() functions are called in a signal handler function.
+
++ if applications need to access to attributs of t_iqmsg structure, 
+add  #define	RTL_INTERNAL_IQMSG_STRUCT before #include "rtlimsg.h"
+
++ format of whatString has changed :
+@(#) Actility rtbase 1.2.0 16/12/13 target=linux-x86 host=pca-ESPRIMO-P5730
+
+
+###########################################################################
+1.0.38	2013/08/05
+############################################################################
+
++ add functions to parse .ini files :
+
+- int rtl_iniParse(const char* filename,
+              int (*handler)(void* user, const char* section,
+                             const char* name, const char* value),
+              void* user);
+Parse given INI-style file. May have [section]s, name=value pairs
+   (whitespace stripped), and comments starting with ';' (semicolon). Section
+   is "" if name=value pair parsed before any section heading. name:value
+   pairs are also supported as a concession to Python's ConfigParser.
+
+   For each name=value pair parsed, call handler function with given user
+   pointer as well as section, name, and value (data only valid for duration
+   of handler call). Handler should return nonzero on success, zero on error.
+
+   Returns 0 on success, line number of first error on parse error (doesn't
+   stop on first error), -1 on file open error, or -2 on memory allocation
+   error (only when INI_USE_STACK is zero).
+
+
+- int rtl_iniParseFile(FILE* file,
+                   int (*handler)(void* user, const char* section,
+                                  const char* name, const char* value),
+                   void* user);
+
+Same as rtl_iniParse(), but takes a FILE* instead of filename. This doesn't
+   close the file when it's finished -- the caller must do that :
+
+
++ add functions to parse .ini files and load [section:index].var in a hash
+table :
+
+- int rtl_iniLoadCB(void *user,const char *section,const char *name,const char *value)
+
+- char	*rtl_iniStr(void *ht,char *sec,int index,char *var,char *def)
+
+- int rtl_iniInt(void *ht,char *sec,int index,char *var,int def)
+
+example :
+
+static	void	LoadConfig(int hot)
+{
+	int	err;
+
+	if	((err=rtl_iniParse("config.ini",rtl_iniLoadCB,htable)) < 0)
+	{
+		RTL_TRDBG(0,"parse error=%d\n",err);
+		exit(1);
+	}
+
+	TraceLevel	= rtl_iniInt(htable,"trace",-1,"level",TraceLevel);
+	TraceDebug	= rtl_iniInt(htable,"trace",-1,"debug",TraceDebug);
+	TraceSize	= rtl_iniInt(htable,"trace",-1,"debug",TraceSize);
+}
+
++ correction in rtl_htblDestroy() save h->CS before freeing object.
+
++ add rtl_evalPath2() equivalent to rtl_evalPath() but callback functions to
+read variables are called with the new parameter 'user'.
+
+char	*rtl_evalPath2( char *in, char *out, int lgmax, char *(*fctvar)(void *user,char *v),void *user)
+
+To avoid problems with eval2() variables are mandatory placed between {} or ()
+
++ add :
+
+- char *rtl_binToStr(unsigned char *bin,int lg,char dst[],int max);
+- unsigned char	*rtl_strToBin(char *str,unsigned char bin[],int *lg);
+
+###########################################################################
+1.0.37	2013/06/27
+############################################################################
+
++ bugs in base64 functions mainly used by plciec engine
+
+###########################################################################
+1.0.36	2013/06/18
+############################################################################
+
++ wrong usage of $(THREADLD) for _htbl _imsgts compilation
+
+###########################################################################
+1.0.35	2013/06/03
+############################################################################
+
++ rtl_tracerotate() : when the file of the current day is full, it is
+unlinked and recreated instead of give up next traces. A counter indicates the
+number of times it happened in the day:
+	### rotate(6) : 20130603  10:51:48
+It always has one file per day of the week, and a link to the current day.
+
+###########################################################################
+1.0.34	2013/05/23
+############################################################################
+
++ add option --exclude-vcs to tar(1) in ~/shells/mktar.sh to execlude .svn
+files in tar archives.
+
++ ~/shells/mktar.sh used by "MAKE src" no longer does a cd $ROOTACT/$PRODUCT
+otherwise it is impossible to do a "MAKE src" from another directory
+
+###########################################################################
+1.0.33	2013/05/14
+############################################################################
+
++ add functions for base64 encoding decoding in new file lib/base64.c
+
+long rtl_base64_encode (char *to, const char *from, unsigned int len);
+long rtl_base64_decode (char *to, const char *from, unsigned int len);
+
++ add function to convert unix time to iso8601 time in new file lib/iso8601.c
+
+void rtl_gettimeofday_to_iso8601date(struct timeval *tv, struct timezone *tz, char *buf);
+void rtl_getCurrentIso8601date(char *buf);
+
+###########################################################################
+1.0.32	2013/03/26
+############################################################################
+
++ android NDK 7 port for watteco panrouter :
+	- android-ndk-r7-linux-x86.tar.bz2
+	- SYSTEM=android_panrouter
+	- add -DANDROID to base/makefile.def
+	- add -ldl -lz to LDFLAGS
+	- create $THREADLD=-lpthread for all target system empty "" for android
+	- use agcc.bash as wrapper for gcc to hide real options for gcc 
+	- add -ldl to Makefile for libxml2
+	- do not compile noinst_PROGRAMS for libxml2
+	- add -lgcc to agcc.bash for shared libs creation
+	- environment for agcc :
+		export CC=$ROOTACT/agcc.bash
+		export AGCC_NDK=$ROOTACT/android-ndk-r7
+		export AGCC_API=14
+		export ac_cv_func_malloc_0_nonnull=yes
+
+
+	compilation of libxml2 :
+
+	ROOTACT=/home/actility/androidpanrouter
+	CC=$ROOTACT/rtbase/shells/agcc.sh
+	AGCC_NDK=$ROOTACT/android-ndk-r7
+	AGCC_API=14
+	ac_cv_func_malloc_0_nonnull=yes
+	PATH=$PATH:$ROOTACT/rtbase/shells
+
+	- cd libxml2
+	./configure --host=arm-linux --prefix=$ROOTACT
+
+	- vi Makefile
+		-- subsitute
+	                   PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
+	                   by
+	                   PROGRAMS = $(bin_PROGRAMS)
+	
+        	-- add -ldl to
+                           libxml2_la_LIBADD =  -lz $(ICONV_LIBS) -lm
+        	-- add -ldl to
+                           LDADDS =  $(top_builddir)/libxml2.la  -lz $(ICONV_LIBS) -lm
+        - make
+        - make install
+
+
++ angstrom linux 3.2 for watteco panrouter :
+	- SYSTEM=angstrom_panrouter
+
+###########################################################################
+1.0.29	2013/01/25
+############################################################################
+
+
++ svn project
+
++ svn tools
+
+	MAKE svninfo
+	MAKE svnstatus
+	MAKE svndiff
+	MAKE svnls [dir]	(MAKE svnls tags)
+	MAKE svnimport
+	MAKE svnnew		(import + checkout in a new directory)
+	MAKE svntags		(copy trunk in tags/Version)
+	MAKE svnadd path [.. path]
+
+Main parameters are set in base/svn.h :
+	SVN_URL="svn://10.10.12.201"
+	SVN_REPOS="repos"
+	SVN_TRUNK="trunk"
+	SVN_TAGS="tags"
+	SVN_DEF_ROOT_PROJECT="m2m/ong/drivers/common"
+	SVN_ROOT_PROJECT=${SVN_URL}/${SVN_REPOS}/${SVN_DEF_ROOT_PROJECT}
+
+
+Each package can redefine these parameters with their own svn.sh file searched
+in ./svn/svn/sh
+
+Each package must add the folowing commands in MAKE :
+	svn*)
+		svncmd=$1
+		shift
+		sh ${MKSVN} -p $SELF -c $svncmd $*
+		exit 0
+	;;
+
+MAKE svnstatus and MAKE svndiff perform a MAKE clean ...
+
+
+###########################################################################
+1.0.28	2012/11/2929
+############################################################################
+
++ char *rtl_evalPath(char *in,char *out,int lgmax,char *(*fctvar)(char *v))
+no more modifies <in> but variables names are now limited to 128 car.
+
+###########################################################################
+1.0.27	2012/11/06
+############################################################################
+
++ add SYSTEM entries to base/makefile.def
+
++ add -DWORDS_BIGENDIAN=1 to CFLAGS & CCFLAGS for lpv3 & lpv3_debug target
+Actualy only libcoap needs this kind of define.
+
++ add a shell "docopyrights.sh" to add copyrights.txt file to all *.[ch] in
+a directory (reccursively). The main interest is to do not change the last time 
+modification of each file.
+
++ add copyrights.txt to all *.[ch]
+
+###########################################################################
+1.0.26	2012/10/12
+############################################################################
+
++ valgrind warnings : poll.c:rtl_pollRequest() and poll.c:rtl_pollScan()
+
+	if (table->handPoll[i].fctrequest && (table->tbPoll[i].fd >= 0))
+=>
+	if ((table->tbPoll[i].fd >= 0) && table->handPoll[i].fctrequest)
+
+
+###########################################################################
+1.0.25	2012/09/03
+############################################################################
+
++ gzip after tar
+
+############################################################################
+1.0.24	2012/09/03
+############################################################################
+
+
+- add LDFLAGS=-L$(ROOTACT)/lib -L$(ROOTACT)/shlib to makefile.def
+
+- add a user data parameter to htbl_walk function :
+
+int rtl_htblWalk(void *htbl, int (*fct)(void *h,char *key, void *data, void *udata), void *udata)
+
+- runtime.lst files are also searched in $ROOTACT/rtbase/package if the are
+not found in packages.
+
+############################################################################
+1.0.23	2012/07/31
+############################################################################
+
+- int	rtl_imsgRemove(void *piq,t_imsg *rmv) :
+	remove a given message/timer <rmv> (returned by rtl_imsgAlloc() or 
+	rtl_timerAlloc()). This is a safe (but slow) removal, because <rmv>
+	is really searched in messages/timers lists.
+
+- int	rtl_imsgFastRemove(void *piq,t_imsg *rmv) :
+	remove a given message/timer <rmv> (returned by rtl_imsgAlloc() or 
+	rtl_timerAlloc()). This is an unsecure (but fast) removal, because <rmv>
+	is not searched in messages/timers lists.
+
+- int	rtl_imsgRemoveToType(void *piq,void *to,int class,int type) :
+	remove all messages/timers of class <class> and type <type> for a given
+	destination <to>. <class> and <type> may be -1 to match any messages.
+
+- int	rtl_imsgRemoveTo(void *piq,void *to) :
+	remove all messages/timers for a given <to> destination.
+	<=> rtl_imsgRemoveToType(piq,to,-1,-1)
+
+############################################################################
+1.0.22	2012/07/26
+############################################################################
+
+- hash tables tests failure on centos5 because of errors (addition of signed 
+unsigned int) in _htbl/mh.c 
+
+
+############################################################################
+1.0.21	2012/07/10
+############################################################################
+
+- for htbl replace size_t with (unsigned int), because size_t is 8 bytes on x64
+
+############################################################################
+1.0.20	2012/07/09
+############################################################################
+
+- suppress local variable "file" in #define RTL_TRDBG()
+
+- add -fPIC to CFLAGS under "linux_x64"
+
+- search current libxml2 with pkg-config --variable=libdir under "linux_x??"
+
+- hash tables
+
+	+ lib/hashtbl.c
+	+ include/rtlhtbl.h
+
+	+ _htbl/*.c (3 examples)
+
+#define	HTBL_KEY_STRING		1 // key is (char *) type
+#define	HTBL_KEY_UINT		2 // key is (unsigned int) type
+
+#define	HTBL_KEY_INCLUDED	4 // key is stored in user data (not duplicate)
+#define	HTBL_FREE_DATA		8 // user data is freed with free(3) if removed
+
+#define	HTBL_USE_MUTEX		32// set a mutex on the htbl
+
+
+/* hashtbl.c */
+void *rtl_htblNew(unsigned int size);
+void *rtl_htblCreate(unsigned int size, unsigned int (*hashfunc)(void *));
+void *rtl_htblCreateSpec(unsigned int size, unsigned int (*hashfunc)(void *),unsigned int flags);
+int rtl_htblGetFlags(void *hashtbl);
+int rtl_htblGetCount(void *hashtbl);
+int rtl_htblSetRmovFunc(void *hashtbl, void (*rmovfunc)(void *h,char *k,void *data));
+int rtl_htblSetKeyOffset(void *hashtbl, int offset); // only if HTBL_KEY_INCLUDED
+
+
+// rtl_htblNew(sz) == rtl_htblCreate(sz,NULL)
+// rtl_htblCreate(sz,fct) == rtl_htblCreateSpec(sz,fct,0)
+// if hashfunc is NULL very basic hash functions are used :
+//	static size_t def_hashfunc(void *key)	// for HTBL_KEY_STRING
+//	{
+//		size_t hash=0;
+//		unsigned char *k = (unsigned char *)key;
+//		while(*k) hash+=*k++;
+//		return hash;
+//	}
+
+//	static 	size_t uint_hashfunc(void *key)	// HTBL_KEY_UINT
+//	{
+//		return (size_t)key;
+//	}
+//
+// rmovfunc is called each time a key is removed on user data
+// use offsetof(t_data,strkey) to set parameter offset of rtl_htblSetKeyOffset
+
+/* locked functions */
+void rtl_htblDestroy(void *hashtbl);
+int rtl_htblInsert(void *hashtbl, void *key, void *data);
+int rtl_htblAdd(void *hashtbl, void *data); // only if HTBL_KEY_INCLUDED
+int rtl_htblRemove(void *hashtbl, void *key);
+void *rtl_htblGet(void *hashtbl, void *key);
+int rtl_htblResize(void *hashtbl, unsigned int size);
+void rtl_htblDump(void *hashtbl, void (*fctdump)(char *key, void *data));
+int rtl_htblWalk(void *hashtbl, int (*fctwalk)(void *hashtbl,char *key, void *data));
+
+// rtl_htblAdd(h,d) == rtl_htblInsert(h,NULL,d)
+// if fctwalk returns a non 0 value, walk is stopped and rtl_htblWalk returns 
+// this value.
+// rtl_htblRemove() can be used in fctwalk, not in fctdump
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.0.18
+- t_imsg	*rtl_imsgWait(void *piq,int mode)	// do not use
+  // TODO cannot be used with timed/delayed messages
+  // TODO cannot be used in mono thread environment
+  wait until a message arrive or timeout
+
+- t_imsg	*rtl_imsgWaitTime(void *piq,int mode,int *ms)	// do not use
+  // TODO cannot be used with timed/delayed messages
+  // TODO cannot be used in mono thread environment
+  wait until a message arrive or timeout
+  ms in millisecondes, ellapsed time is returned in ms, or 0 if timeout.
+
+1.0.16
+- dead lock in rtl_trace() when max size file is reached.
+- missing fclose() in rtl_vsize()
+
+1.0.15
+- char	*rtl_evalPath(char *in,char *out,int lgmax,char *(*fctvar)(char *v));
+
+1.0.14
+- add rtl_readAbsDir() to rtl_openDir(dir)/rtl_readDir()/rtl_closeDir(), 
+  with rtl_readDir() the returned file name is relative to <dir>, 
+  with rtl_readAbsDir() the returned file name is an absolute file name.
+
+1.0.12
+- missing -Wl,soname=librtbase.so otherwise path is static. (TODO verify)
+ 	=> LD_LIBRARY_PATH=$ROOTACT/shlib
+
+
+1.0.11
+- add LDSOFLAGS in base/makefile.def
+- duplicate base/command to base/command.def for make and base/command.sh for sh
+- add shells/mkshlib.sh
+- add librtbase.so
+
+1.0.8
+- unsigned long rtl_vsize(int pid)	// if pid == 0 => self
+
+1.0.7
+- void	rtl_tracedbg(int t,char *file,int line,char *fmt,...)
+- define	RTL_TRDBG(lev,...)
+
+1.0.6
+- t_imsg	*rtl_imsgWait(void *iq,int mode);

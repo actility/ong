@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <!-- M2M -->
+    <str name="interworkingProxyID" val="${w_ipuid}"/>
+    <list name="supportedTechnologies">
+        <!-- 
+		<obj>
+			<str name="anStandard" val="ISO_14543_3"/>
+		</obj>
+		-->
+	</list>
+	<list name="networks"/>
+	
+	<!-- Modbus -->
+    <op name="modbusCreateNetwork" href="${s_rootapp}/${w_ipuid}/retargeting1/modbusCreateNetwork"/>
+    <op name="modbusLoadProduct" href="${s_rootapp}/${w_ipuid}/retargeting1/modbusLoadProduct"/>
+    <ref name="modbusProducts" href="/m2m/applications/${w_ipuid}/containers/products"/>
+</obj>

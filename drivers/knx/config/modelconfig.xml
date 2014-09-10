@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resourceModeling
+	xmlns="http://uri.actility.com/m2m/ong">
+ 
+    <interface filter="knx:/dpt/1">
+    	<covConfigurations>
+            <covConfiguration minInterval="PT5M" maxInterval="PT1H"/>
+    	</covConfigurations>
+    </interface>
+    
+    <interface filter="knx:/dpt/7">
+    	<covConfigurations>
+            <covConfiguration minInterval="PT5M" maxInterval="PT1H"/>
+    	</covConfigurations>
+    </interface>    
+
+    <interface filter="knx:/dpt/9">
+    	<covConfigurations>
+            <covConfiguration minInterval="PT5M" maxInterval="PT1H"/>
+    	</covConfigurations>
+    </interface>    
+
+    <interface filter="knx:/dpt/14">
+    	<covConfigurations>
+            <covConfiguration minInterval="PT5M" maxInterval="PT1H"/>
+    	</covConfigurations>
+    </interface>    
+
+    <interface filter="knx:/dpt/229">
+    	<covConfigurations>
+            <covConfiguration minInterval="PT5M" maxInterval="PT1H"/>
+    	</covConfigurations>
+    </interface>    
+    
+</resourceModeling>

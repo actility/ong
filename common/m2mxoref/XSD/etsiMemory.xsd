@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:tns="http://uri.etsi.org/m2m" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- etsiMemory resource type -->
+	<complexType name="EtsiMemory">
+		<complexContent>
+			<extension base="tns:MgmtObj">
+				<sequence>
+					<element ref="tns:ramAvailable" minOccurs="0"/>
+					<element ref="tns:ramTotal" minOccurs="0"/>
+				</sequence>
+				<!-- attribute ref="tns:id" use="required" fixed="etsiMemory"/ -->
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="ramAvailable" type="long">
+		<annotation>
+			<documentation>
+			Expressed in kilobytes.
+			</documentation>
+		</annotation>
+	</element>
+
+	<element name="ramTotal" type="long">
+		<annotation>
+			<documentation>
+			Expressed in kilobytes.
+			</documentation>
+		</annotation>
+	</element>
+</schema>

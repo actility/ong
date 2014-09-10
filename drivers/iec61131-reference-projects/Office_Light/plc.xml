@@ -1,0 +1,1601 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6.xsd"
+         xsi:schemaLocation="http://www.plcopen.org/xml/tc6.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="Actility"
+              productName="iec61131"
+              productVersion="1.0.28"
+              creationDateTime="2013-03-20T17:09:43"/>
+  <contentHeader name="Office_Lighting"
+                 version="1.0.0"
+                 modificationDateTime="2013-09-17T17:31:58"
+                 author="Laurent Nicq">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="10" y="10"/>
+      </fbd>
+      <ld>
+        <scaling x="0" y="0"/>
+      </ld>
+      <sfc>
+        <scaling x="10" y="10"/>
+      </sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes/>
+    <pous>
+      <pou name="POU_Astro_Using" pouType="program">
+        <interface>
+          <externalVars>
+            <variable name="GL_Astro_Status">
+              <type>
+                <DINT/>
+              </type>
+              <documentation>
+<![CDATA[0 if Astro started]]>
+              </documentation>
+            </variable>
+            <variable name="GL_Current_DateTime">
+              <type>
+                <DT/>
+              </type>
+            </variable>
+            <variable name="GL_SunSet_Time">
+              <type>
+                <DT/>
+              </type>
+            </variable>
+            <variable name="GL_SunRise_Time">
+              <type>
+                <DT/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="Information">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="astro_status">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="delay_before">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="t#30s"/>
+              </initialValue>
+            </variable>
+            <variable name="time_remaining">
+              <type>
+                <TIME/>
+              </type>
+              <documentation>
+<![CDATA[Helper for debug]]>
+              </documentation>
+            </variable>
+            <variable name="delay_after">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="t#45s"/>
+              </initialValue>
+            </variable>
+          </localVars>
+          <externalVars>
+            <variable name="GL_Automatic_Light">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="current_day">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <actions>
+          <action name="store_current_day">
+            <body>
+              <ST>
+<![CDATA[current_day:= yday(GL_Current_DateTime);]]>
+              </ST>
+            </body>
+          </action>
+          <action name="remaining">
+            <body>
+              <ST>
+<![CDATA[time_remaining:= SUB_DT_DT(GL_SunSet_Time , GL_Current_DateTime);]]>
+              </ST>
+            </body>
+          </action>
+        </actions>
+        <transitions>
+          <transition name="new_day">
+            <body>
+              <ST>
+<![CDATA[yday(GL_Current_DateTime)<> current_day;
+/* check for a different day. Avoid dealing with 365-366 days case */]]>
+              </ST>
+            </body>
+          </transition>
+        </transitions>
+        <body>
+          <SFC>
+            <step localId="1" height="60" width="120" name="Get_status" initialStep="true">
+              <position x="260" y="10"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="60" y="60"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="120" y="30"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="2" width="250" height="40">
+              <position x="420" y="20"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1">
+                  <position x="420" y="40"/>
+                  <position x="380" y="40"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[astro_status:= GL_Astro_Status;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <step localId="10" height="60" width="120" name="Display_Status">
+              <position x="30" y="180"/>
+              <connectionPointIn>
+                <relPosition x="60" y="0"/>
+                <connection refLocalId="20">
+                  <position x="90" y="180"/>
+                  <position x="90" y="140"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="60" y="60"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="120" y="30"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="14" width="290" height="40">
+              <position x="190" y="190"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="10">
+                  <position x="190" y="210"/>
+                  <position x="150" y="210"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Information:='Astro is NOT RUNNING';]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <transition localId="16" height="2" width="20">
+              <position x="80" y="290"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="10">
+                  <position x="90" y="290"/>
+                  <position x="90" y="240"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[TRUE;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <jumpStep localId="18" height="40" width="40" targetName="Get_status">
+              <position x="70" y="320"/>
+              <connectionPointIn>
+                <relPosition x="20" y="0"/>
+                <connection refLocalId="16">
+                  <position x="90" y="320"/>
+                  <position x="90" y="292"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <selectionDivergence localId="19" height="1" width="460">
+              <position x="90" y="100"/>
+              <connectionPointIn>
+                <relPosition x="230" y="0"/>
+                <connection refLocalId="1">
+                  <position x="320" y="100"/>
+                  <position x="320" y="70"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="0" y="1"/>
+              </connectionPointOut>
+              <connectionPointOut formalParameter="">
+                <relPosition x="460" y="1"/>
+              </connectionPointOut>
+            </selectionDivergence>
+            <transition localId="20" height="10" width="20">
+              <position x="80" y="130"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="19">
+                  <position x="90" y="130"/>
+                  <position x="90" y="101"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[astro_status <>0;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <transition localId="21" height="10" width="20">
+              <position x="540" y="140"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="19">
+                  <position x="550" y="140"/>
+                  <position x="550" y="101"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[astro_status = 0;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <actionBlock localId="3" width="260" height="70">
+              <position x="650" y="190"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="22">
+                  <position x="650" y="210"/>
+                  <position x="590" y="210"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Information:='Astro is RUNNING';]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="store_current_day"/>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="remaining"/>
+              </action>
+            </actionBlock>
+            <step localId="22" height="40" width="80" name="Astro_OK">
+              <position x="510" y="190"/>
+              <connectionPointIn>
+                <relPosition x="40" y="0"/>
+                <connection refLocalId="21">
+                  <position x="550" y="190"/>
+                  <position x="550" y="150"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="40" y="40"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="80" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="23" height="10" width="20">
+              <position x="540" y="300"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="22">
+                  <position x="550" y="300"/>
+                  <position x="550" y="230"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[GL_Current_DateTime > GL_SunSet_Time - delay_before;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <step localId="24" height="30" width="100" name="Start_SunSet">
+              <position x="500" y="330"/>
+              <connectionPointIn>
+                <relPosition x="50" y="0"/>
+                <connection refLocalId="23">
+                  <position x="550" y="330"/>
+                  <position x="550" y="318"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="50" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="100" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="25" height="10" width="20">
+              <position x="540" y="380"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="24">
+                  <position x="550" y="380"/>
+                  <position x="550" y="360"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[GL_Current_DateTime  > (( GL_SunSet_Time - delay_before) + delay_after);]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <step localId="26" height="30" width="100" name="Stop_SunSet">
+              <position x="500" y="410"/>
+              <connectionPointIn>
+                <relPosition x="50" y="0"/>
+                <connection refLocalId="25">
+                  <position x="550" y="410"/>
+                  <position x="550" y="390"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="50" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="100" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="27" width="240" height="30">
+              <position x="650" y="330"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="24">
+                  <position x="650" y="350"/>
+                  <position x="600" y="350"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[GL_Automatic_Light:=TRUE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <actionBlock localId="4" width="240" height="30">
+              <position x="650" y="410"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="26">
+                  <position x="650" y="430"/>
+                  <position x="600" y="430"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[GL_Automatic_Light:=FALSE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <comment localId="28" height="90" width="270">
+              <position x="220" y="470"/>
+              <content>
+<![CDATA[Need to wait for a new day before using a
+SunSet value calculated by the Astro script
+]]>
+              </content>
+            </comment>
+            <jumpStep localId="29" height="20" width="20" targetName="Get_status">
+              <position x="540" y="530"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="30">
+                  <position x="550" y="530"/>
+                  <position x="550" y="480"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <transition localId="30" height="10" width="20">
+              <position x="540" y="470"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="26">
+                  <position x="550" y="470"/>
+                  <position x="550" y="440"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <reference name="new_day"/>
+              </condition>
+            </transition>
+          </SFC>
+        </body>
+        <documentation>
+<![CDATA[Example for using the Sunset]]>
+        </documentation>
+      </pou>
+      <pou name="POU_Astro_Sun_Time" pouType="program">
+        <interface>
+          <externalVars>
+            <variable name="GL_SunSet_Time">
+              <type>
+                <DT/>
+              </type>
+            </variable>
+            <variable name="GL_SunRise_Time">
+              <type>
+                <DT/>
+              </type>
+            </variable>
+            <variable name="GL_Current_DateTime">
+              <type>
+                <DT/>
+              </type>
+            </variable>
+            <variable name="GL_Astro_Status">
+              <type>
+                <INT/>
+              </type>
+            </variable>
+            <variable name="GL_Lat">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="GL_Lon">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="Astro_Version">
+              <type>
+                <string/>
+              </type>
+              <initialValue>
+                <simpleValue value="'1.1.2'"/>
+              </initialValue>
+            </variable>
+            <variable name="current_day">
+              <type>
+                <DINT/>
+              </type>
+            </variable>
+            <variable name="Lat">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+            <variable name="Lon">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="0"/>
+              </initialValue>
+            </variable>
+          </localVars>
+        </interface>
+        <actions>
+          <action name="init_location">
+            <body>
+              <ST>
+<![CDATA[/* Lyon, France */
+GL_Lat:=45.76404;
+GL_Lon:=4.835659;
+/* Narvik, Norway */
+/* (no sunset in june and no sunrise in december) */
+/* GL_Lat:=68.433; */
+/* GL_Lon:=17.4167; */]]>
+              </ST>
+            </body>
+          </action>
+        </actions>
+        <transitions/>
+        <body>
+          <SFC>
+            <step localId="1" height="40" width="130" name="Init_Variables" initialStep="true">
+              <position x="130" y="10"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="70" y="40"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="130" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="2" width="166" height="100">
+              <position x="330" y="10"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1">
+                  <position x="330" y="30"/>
+                  <position x="260" y="30"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <reference name="init_location"/>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[GL_Astro_Status:=2;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Lon:=GL_Lon;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Lat:=GL_Lat;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <step localId="3" height="40" width="90" name="Astro_Started">
+              <position x="150" y="340"/>
+              <connectionPointIn>
+                <relPosition x="50" y="0"/>
+                <connection refLocalId="12">
+                  <position x="200" y="340"/>
+                  <position x="200" y="308"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="50" y="40"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="90" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="5" width="263" height="50">
+              <position x="330" y="340"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="3">
+                  <position x="330" y="360"/>
+                  <position x="220" y="360"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[GL_Astro_Status:=0;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[GL_Current_DateTime:= LocalDT();]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <transition localId="6" height="2" width="20">
+              <position x="80" y="450"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="18">
+                  <position x="90" y="450"/>
+                  <position x="90" y="421"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[(GL_Lat = 99.0) OR (GL_Lon = 99.0);]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <step localId="7" height="40" width="110" name="LatLon_changing">
+              <position x="30" y="480"/>
+              <connectionPointIn>
+                <relPosition x="60" y="0"/>
+                <connection refLocalId="6">
+                  <position x="90" y="480"/>
+                  <position x="90" y="452"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="60" y="40"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="110" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <actionBlock localId="8" width="170" height="40">
+              <position x="210" y="480"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="7">
+                  <position x="210" y="500"/>
+                  <position x="140" y="500"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[GL_Astro_Status:=-1;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <step localId="10" height="40" width="110" name="Get_Lat_Lon">
+              <position x="140" y="150"/>
+              <connectionPointIn>
+                <relPosition x="60" y="0"/>
+                <connection refLocalId="11">
+                  <position x="200" y="150"/>
+                  <position x="200" y="140"/>
+                  <position x="200" y="140"/>
+                  <position x="200" y="132"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="60" y="40"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="110" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="11" height="2" width="20">
+              <position x="190" y="130"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="200" y="130"/>
+                  <position x="200" y="50"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[(Lat <> 99.0) AND (Lon <> 99.0);]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <transition localId="12" height="3" width="20">
+              <position x="187" y="305"/>
+              <connectionPointIn>
+                <relPosition x="13" y="0"/>
+                <connection refLocalId="10">
+                  <position x="200" y="305"/>
+                  <position x="200" y="190"/>
+                </connection>
+                <connection refLocalId="12">
+                  <position x="200" y="305"/>
+                  <position x="200" y="189"/>
+                  <position x="200" y="189"/>
+                  <position x="200" y="318"/>
+                  <position x="200" y="318"/>
+                  <position x="200" y="308"/>
+                </connection>
+                <connection refLocalId="12">
+                  <position x="200" y="305"/>
+                  <position x="200" y="189"/>
+                  <position x="200" y="189"/>
+                  <position x="200" y="318"/>
+                  <position x="200" y="318"/>
+                  <position x="200" y="308"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="13" y="3"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[(GL_SunSet_Time <> T#0) AND (GL_SunRise_Time <> T#0);]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <actionBlock localId="14" width="270" height="140">
+              <position x="330" y="150"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="10">
+                  <position x="330" y="170"/>
+                  <position x="250" y="170"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[setLatLon (Lat,Lon);]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[GL_SunSet_Time := sunsetTime();]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[GL_SunRise_Time := sunriseTime();]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[GL_Current_DateTime:= LocalDT();]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[GL_Astro_Status :=3;]]>
+                  </ST>
+                </inline>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[current_day:=yday(GL_Current_DateTime);]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <comment localId="15" height="80" width="200">
+              <position x="520" y="470"/>
+              <content>
+<![CDATA[check with the DAY_Of_Year to force new Sun calculation on day change]]>
+              </content>
+            </comment>
+            <transition localId="16" height="2" width="20">
+              <position x="80" y="550"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="7">
+                  <position x="90" y="550"/>
+                  <position x="90" y="520"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="2"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[TRUE;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <jumpStep localId="17" height="20" width="20" targetName="Init_Variables">
+              <position x="80" y="580"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="16">
+                  <position x="90" y="580"/>
+                  <position x="90" y="552"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <selectionDivergence localId="18" height="1" width="350">
+              <position x="90" y="420"/>
+              <connectionPointIn>
+                <relPosition x="175" y="0"/>
+                <connection refLocalId="3">
+                  <position x="265" y="420"/>
+                  <position x="265" y="400"/>
+                  <position x="200" y="400"/>
+                  <position x="200" y="380"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="0" y="1"/>
+              </connectionPointOut>
+              <connectionPointOut formalParameter="">
+                <relPosition x="350" y="1"/>
+              </connectionPointOut>
+            </selectionDivergence>
+            <transition localId="19" height="10" width="20">
+              <position x="430" y="450"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="18">
+                  <position x="440" y="450"/>
+                  <position x="440" y="421"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[yday(GL_Current_DateTime)<>current_day;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <jumpStep localId="9" height="20" width="20" targetName="Get_Lat_Lon">
+              <position x="430" y="576"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="19">
+                  <position x="440" y="576"/>
+                  <position x="440" y="460"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+          </SFC>
+        </body>
+        <documentation>
+<![CDATA[Distributes the Sunset Sunrise times]]>
+        </documentation>
+      </pou>
+      <pou name="Presence_detection" pouType="program">
+        <interface>
+          <externalVars>
+            <variable name="Move_Detected">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Move_Sensor">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Light_State1">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Light_State2">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </externalVars>
+          <localVars>
+            <variable name="Time_Stay_ON">
+              <type>
+                <TIME/>
+              </type>
+              <initialValue>
+                <simpleValue value="t#20s"/>
+              </initialValue>
+            </variable>
+            <variable name="Running_time1">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+            <variable name="Running_time2">
+              <type>
+                <TIME/>
+              </type>
+            </variable>
+            <variable name="Pulse_Timer1">
+              <type>
+                <derived name="TP"/>
+              </type>
+            </variable>
+            <variable name="Pulse_Timer2">
+              <type>
+                <derived name="TP"/>
+              </type>
+            </variable>
+            <variable name="Rising_Edge">
+              <type>
+                <derived name="R_TRIG"/>
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <SFC>
+            <step localId="1" height="30" width="80" name="Start" initialStep="true">
+              <position x="70" y="10"/>
+              <connectionPointOut formalParameter="">
+                <relPosition x="40" y="30"/>
+              </connectionPointOut>
+            </step>
+            <transition localId="2" height="10" width="20">
+              <position x="100" y="50"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="1">
+                  <position x="110" y="42"/>
+                  <position x="110" y="50"/>
+                  <position x="110" y="40"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[TRUE;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <step localId="3" height="30" width="80" name="Pulse1">
+              <position x="70" y="90"/>
+              <connectionPointIn>
+                <relPosition x="40" y="0"/>
+                <connection refLocalId="2">
+                  <position x="110" y="90"/>
+                  <position x="110" y="60"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="40" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="80" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <step localId="4" height="30" width="80" name="Pulse2">
+              <position x="70" y="250"/>
+              <connectionPointIn>
+                <relPosition x="40" y="0"/>
+                <connection refLocalId="5">
+                  <position x="110" y="250"/>
+                  <position x="110" y="200"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut formalParameter="">
+                <relPosition x="40" y="30"/>
+              </connectionPointOut>
+              <connectionPointOutAction formalParameter="">
+                <relPosition x="80" y="20"/>
+              </connectionPointOutAction>
+            </step>
+            <transition localId="5" height="10" width="20">
+              <position x="100" y="190"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="3">
+                  <position x="110" y="190"/>
+                  <position x="110" y="120"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[Move_Detected = TRUE;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <transition localId="6" height="10" width="20">
+              <position x="100" y="320"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="4">
+                  <position x="110" y="320"/>
+                  <position x="110" y="280"/>
+                </connection>
+              </connectionPointIn>
+              <connectionPointOut>
+                <relPosition x="10" y="10"/>
+              </connectionPointOut>
+              <condition>
+                <inline name="">
+                  <ST>
+<![CDATA[Move_Detected = TRUE;]]>
+                  </ST>
+                </inline>
+              </condition>
+            </transition>
+            <jumpStep localId="7" height="20" width="20" targetName="Pulse1">
+              <position x="100" y="350"/>
+              <connectionPointIn>
+                <relPosition x="10" y="0"/>
+                <connection refLocalId="6">
+                  <position x="110" y="350"/>
+                  <position x="110" y="330"/>
+                </connection>
+              </connectionPointIn>
+            </jumpStep>
+            <actionBlock localId="8" width="170" height="60">
+              <position x="190" y="90"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="3">
+                  <position x="190" y="110"/>
+                  <position x="150" y="110"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="Pulse_Timer1"/>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="Rising_Edge"/>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Move_Detected:=FALSE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <block localId="9" width="80" height="110" typeName="TP" instanceName="Pulse_Timer1" executionOrderId="1">
+              <position x="540" y="70"/>
+              <inputVariables>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="11">
+                      <position x="540" y="110"/>
+                      <position x="470" y="110"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PT">
+                  <connectionPointIn>
+                    <relPosition x="0" y="90"/>
+                    <connection refLocalId="10">
+                      <position x="540" y="160"/>
+                      <position x="470" y="160"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="Q">
+                  <connectionPointOut>
+                    <relPosition x="80" y="40"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="ET">
+                  <connectionPointOut>
+                    <relPosition x="80" y="90"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="10" height="30" width="90">
+              <position x="380" y="140"/>
+              <connectionPointOut>
+                <relPosition x="90" y="20"/>
+              </connectionPointOut>
+              <expression>Time_Stay_ON</expression>
+            </inVariable>
+            <inVariable localId="11" height="30" width="90">
+              <position x="380" y="90"/>
+              <connectionPointOut>
+                <relPosition x="90" y="20"/>
+              </connectionPointOut>
+              <expression>Move_Sensor</expression>
+            </inVariable>
+            <outVariable localId="12" height="30" width="80">
+              <position x="660" y="90"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="9" formalParameter="Q">
+                  <position x="660" y="110"/>
+                  <position x="620" y="110"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Light_State1</expression>
+            </outVariable>
+            <block localId="13" width="80" height="110" typeName="TP" instanceName="Pulse_Timer2" executionOrderId="1">
+              <position x="540" y="230"/>
+              <inputVariables>
+                <variable formalParameter="IN">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="15">
+                      <position x="540" y="270"/>
+                      <position x="470" y="270"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PT">
+                  <connectionPointIn>
+                    <relPosition x="0" y="90"/>
+                    <connection refLocalId="14">
+                      <position x="540" y="320"/>
+                      <position x="470" y="320"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="Q">
+                  <connectionPointOut>
+                    <relPosition x="80" y="40"/>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="ET">
+                  <connectionPointOut>
+                    <relPosition x="80" y="90"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="14" height="30" width="90">
+              <position x="380" y="300"/>
+              <connectionPointOut>
+                <relPosition x="90" y="20"/>
+              </connectionPointOut>
+              <expression>Time_Stay_ON</expression>
+            </inVariable>
+            <inVariable localId="15" height="30" width="90">
+              <position x="380" y="250"/>
+              <connectionPointOut>
+                <relPosition x="90" y="20"/>
+              </connectionPointOut>
+              <expression>Move_Sensor</expression>
+            </inVariable>
+            <outVariable localId="16" height="30" width="80">
+              <position x="660" y="250"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="13" formalParameter="Q">
+                  <position x="660" y="270"/>
+                  <position x="620" y="270"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Light_State2</expression>
+            </outVariable>
+            <outVariable localId="17" height="30" width="100">
+              <position x="660" y="140"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="9" formalParameter="ET">
+                  <position x="660" y="160"/>
+                  <position x="620" y="160"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Running_time1</expression>
+            </outVariable>
+            <outVariable localId="18" height="30" width="100">
+              <position x="660" y="300"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="13" formalParameter="ET">
+                  <position x="660" y="320"/>
+                  <position x="620" y="320"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Running_time2</expression>
+            </outVariable>
+            <actionBlock localId="19" width="170" height="60">
+              <position x="190" y="250"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="4">
+                  <position x="190" y="270"/>
+                  <position x="150" y="270"/>
+                </connection>
+              </connectionPointIn>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="Pulse_Timer2"/>
+              </action>
+              <action localId="0">
+                <relPosition x="0" y="0"/>
+                <reference name="Rising_Edge"/>
+              </action>
+              <action localId="0" qualifier="P">
+                <relPosition x="0" y="0"/>
+                <inline>
+                  <ST>
+<![CDATA[Move_Detected:=FALSE;]]>
+                  </ST>
+                </inline>
+              </action>
+            </actionBlock>
+            <block localId="20" width="50" height="50" typeName="R_TRIG" instanceName="Rising_Edge" executionOrderId="1">
+              <position x="410" y="380"/>
+              <inputVariables>
+                <variable formalParameter="CLK">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="21">
+                      <position x="410" y="420"/>
+                      <position x="330" y="420"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="Q">
+                  <connectionPointOut>
+                    <relPosition x="50" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="21" height="30" width="90">
+              <position x="240" y="400"/>
+              <connectionPointOut>
+                <relPosition x="90" y="20"/>
+              </connectionPointOut>
+              <expression>Move_Sensor</expression>
+            </inVariable>
+            <outVariable localId="22" height="30" width="100">
+              <position x="620" y="400"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="20" formalParameter="Q">
+                  <position x="620" y="420"/>
+                  <position x="460" y="420"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Move_Detected</expression>
+            </outVariable>
+          </SFC>
+        </body>
+        <documentation>
+<![CDATA[Use Movemtent sensor as Presence sensor]]>
+        </documentation>
+      </pou>
+      <pou name="Light_control" pouType="program">
+        <interface>
+          <externalVars>
+            <variable name="Light_State1">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Light_State2">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Light_Actuator">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Move_Sensor">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Move_Detected">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="GL_Automatic_Light">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </externalVars>
+        </interface>
+        <body>
+          <FBD>
+            <block localId="1" width="60" height="70" typeName="AND" executionOrderId="2">
+              <position x="440" y="20"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="30"/>
+                    <connection refLocalId="6">
+                      <position x="440" y="50"/>
+                      <position x="190" y="50"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="60"/>
+                    <connection refLocalId="2" formalParameter="OUT">
+                      <position x="440" y="80"/>
+                      <position x="355" y="80"/>
+                      <position x="355" y="140"/>
+                      <position x="310" y="140"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="60" y="30"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <block localId="2" width="60" height="100" typeName="OR" executionOrderId="1">
+              <position x="250" y="100"/>
+              <inputVariables>
+                <variable formalParameter="IN1">
+                  <connectionPointIn>
+                    <relPosition x="0" y="40"/>
+                    <connection refLocalId="3">
+                      <position x="250" y="140"/>
+                      <position x="150" y="140"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="IN2">
+                  <connectionPointIn>
+                    <relPosition x="0" y="80"/>
+                    <connection refLocalId="4">
+                      <position x="250" y="180"/>
+                      <position x="150" y="180"/>
+                    </connection>
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables/>
+              <outputVariables>
+                <variable formalParameter="OUT">
+                  <connectionPointOut>
+                    <relPosition x="60" y="40"/>
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+            </block>
+            <inVariable localId="3" height="30" width="90">
+              <position x="60" y="120"/>
+              <connectionPointOut>
+                <relPosition x="90" y="20"/>
+              </connectionPointOut>
+              <expression>Light_State1</expression>
+            </inVariable>
+            <inVariable localId="4" height="30" width="90">
+              <position x="60" y="160"/>
+              <connectionPointOut>
+                <relPosition x="90" y="20"/>
+              </connectionPointOut>
+              <expression>Light_State2</expression>
+            </inVariable>
+            <outVariable localId="5" height="30" width="100">
+              <position x="540" y="30"/>
+              <connectionPointIn>
+                <relPosition x="0" y="20"/>
+                <connection refLocalId="1" formalParameter="OUT">
+                  <position x="540" y="50"/>
+                  <position x="500" y="50"/>
+                </connection>
+              </connectionPointIn>
+              <expression>Light_Actuator</expression>
+            </outVariable>
+            <inVariable localId="6" height="30" width="130">
+              <position x="60" y="30"/>
+              <connectionPointOut>
+                <relPosition x="130" y="20"/>
+              </connectionPointOut>
+              <expression>GL_Automatic_Light</expression>
+            </inVariable>
+          </FBD>
+        </body>
+        <documentation>
+<![CDATA[Light Actuator Control]]>
+        </documentation>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations>
+      <configuration name="Astro_test">
+        <resource name="Resource_main">
+          <task name="task_slow" interval="T#5s0ms" priority="0">
+            <pouInstance name="Instance_Astro_calc" typeName="POU_Astro_Sun_Time"/>
+          </task>
+          <task name="task_fast" interval="T#1s0ms" priority="0">
+            <pouInstance name="Instance_Astro_use" typeName="POU_Astro_Using"/>
+            <pouInstance name="Presence" typeName="Presence_detection"/>
+            <pouInstance name="Lighting" typeName="Light_control"/>
+          </task>
+          <globalVars>
+            <variable name="GL_Automatic_Light">
+              <type>
+                <BOOL/>
+              </type>
+              <documentation>
+<![CDATA[TRUE: automatic lighting at Night]]>
+              </documentation>
+            </variable>
+            <variable name="Light_Actuator">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Light_State1">
+              <type>
+                <BOOL/>
+              </type>
+              <documentation>
+<![CDATA[For first TP block]]>
+              </documentation>
+            </variable>
+            <variable name="Light_State2">
+              <type>
+                <BOOL/>
+              </type>
+              <documentation>
+<![CDATA[For second TP block]]>
+              </documentation>
+            </variable>
+            <variable name="Move_Sensor">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Movement detector]]>
+              </documentation>
+            </variable>
+            <variable name="Move_Detected">
+              <type>
+                <BOOL/>
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE"/>
+              </initialValue>
+              <documentation>
+<![CDATA[Movement detected]]>
+              </documentation>
+            </variable>
+            <variable name="GL_SunSet_Time">
+              <type>
+                <DT/>
+              </type>
+              <initialValue>
+                <simpleValue value="T#0"/>
+              </initialValue>
+            </variable>
+            <variable name="GL_SunRise_Time">
+              <type>
+                <DT/>
+              </type>
+              <initialValue>
+                <simpleValue value="T#0"/>
+              </initialValue>
+            </variable>
+            <variable name="GL_Current_DateTime">
+              <type>
+                <DT/>
+              </type>
+            </variable>
+            <variable name="GL_Astro_Status">
+              <type>
+                <DINT/>
+              </type>
+              <initialValue>
+                <simpleValue value="-1"/>
+              </initialValue>
+              <documentation>
+<![CDATA[-1 means Stopped]]>
+              </documentation>
+            </variable>
+            <variable name="GL_Lat">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="-99.0"/>
+              </initialValue>
+              <documentation>
+<![CDATA[-99.0 means not initialized]]>
+              </documentation>
+            </variable>
+            <variable name="GL_Lon">
+              <type>
+                <REAL/>
+              </type>
+              <initialValue>
+                <simpleValue value="-99.0"/>
+              </initialValue>
+              <documentation>
+<![CDATA[-99.0 means not initialized]]>
+              </documentation>
+            </variable>
+          </globalVars>
+        </resource>
+      </configuration>
+    </configurations>
+  </instances>
+</project>

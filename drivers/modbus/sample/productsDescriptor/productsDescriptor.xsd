@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!-- Product interface -->
+    <xs:element name="attr">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="cnt" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="xs:string" use="required"/>
+            <xs:attribute name="display" type="xs:string" use="required"/>
+            <xs:attribute name="reg" type="xs:string" use="required"/>
+            <xs:attribute name="readable" type="xs:string" use="required"/>
+            <xs:attribute name="writable" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="attributs">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="attr" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="interface">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="attributs" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="interfaces">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="interface" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    
+    <!-- Product description -->
+    <xs:element name="vendor" type="xs:string"/>
+    <xs:element name="product" type="xs:string"/>
+    <xs:element name="version" type="xs:string"/>
+    
+    <!-- Primary key -->
+    <xs:element name="ref" type="xs:string"/>
+
+    <!-- Root node -->
+    <xs:element name="description">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ref" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="vendor" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="product" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="version" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="interfaces" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
+

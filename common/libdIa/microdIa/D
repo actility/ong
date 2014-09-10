@@ -1,0 +1,1 @@
+./client.x -m delete -v9 $* /test

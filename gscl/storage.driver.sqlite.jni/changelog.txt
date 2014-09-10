@@ -1,0 +1,26 @@
+-------------------------------------------------------------------------------
+SQLite driver native Service JNI implementation changelog
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2014-04-03
+
+New Features:
+-------------
+ - Implementation of the new storage.driver.sqlite.ni.api-2.0.0
+ - Now the bundle performs a vacuum command on the following events (whichever
+   come first):
+   * There are more than 500 updates and deletes since the last vacuum
+   * The last vacuum occurred one day before
+   * Database space usage is at 90%
+   Moreover there is a protection rule which forces to wait at least 60s
+   between two vacuums
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2014-03-21
+
+Initial version

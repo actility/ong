@@ -1,0 +1,85 @@
+#
+# Copyright   Actility, SA. All Rights Reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version
+# 2 only, as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License version 2 for more details (a copy is
+# included at /legal/license.txt).
+#
+# You should have received a copy of the GNU General Public License
+# version 2 along with this work; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+#
+# Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+# or visit www.actility.com if you need additional
+# information or have any questions.
+#
+# id $Id: Makefile.common.sharedlib 3563 2012-11-22 10:38:33Z JReich $  
+# author $Author: JReich $
+# version $Revision: 3563 $
+# lastrevision $Date: 2012-11-22 11:38:33 +0100 (Thu, 22 Nov 2012) $
+# modifiedby $LastChangedBy: JReich $
+# lastmodified $LastChangedDate: 2012-11-22 11:38:33 +0100 (Thu, 22 Nov 2012) $
+
+###############################################################################
+# Common makefile for all shared library building makefiles
+# Author: mlouiset
+# Date: 2010-09-23
+###############################################################################
+
+# define phony targets
+.PHONY: noaction clean all build_o_target build_so_target build_dependencies clean_dependencies
+.PHONY: preliminaryAction lastAction
+.PHONY: $(foreach subdirdep,$(SUBDIRS_DEP),_depbuild_$(subdirdep) _depclean_$(subdirdep))
+
+all: preliminaryAction build_so_target build_o_target $(SONAME) lastAction
+
+noaction:
+
+preliminaryAction:
+	@echo "Preliminary actions"
+	@$(PRELIMINARY)
+
+build_o_target:
+	@echo "Building .o target"
+	@ ( [ -n "$(OBJS_TARGET)" ] && [ ! -e $(OBJS_TARGET) ] && mkdir -vp $(OBJS_TARGET) ) || [ true ]
+
+build_so_target:
+	@echo "Building .so target"
+	@ ( [ -n "$(SO_TARGET)" ] && [ ! -e $(SO_TARGET) ] && mkdir -vp $(SO_TARGET) ) || [ true ]
+
+lastAction:
+	@echo "Last actions"
+	@$(LASTACTIONS)
+
+build_dependencies: noaction $(foreach subdirdep,$(SUBDIRS_DEP),_depbuild_$(subdirdep))
+
+$(foreach subdirdep,$(SUBDIRS_DEP),_depbuild_$(subdirdep)):
+	@$(MAKE) -C $(subst _depbuild_,,$@)
+
+# Program compilation and linking steps
+clean: clean_dependencies
+	@ rm -vrf $(OBJS_TARGET) $(SO_TARGET) 
+
+clean_dependencies: noaction $(foreach subdirdep,$(SUBDIRS_DEP),_depclean_$(subdirdep))
+
+$(foreach subdirdep,$(SUBDIRS_DEP),_depclean_$(subdirdep)):
+	@$(MAKE) -C $(subst _depclean_,,$@) clean
+
+$(SONAME): build_dependencies $(OBJS)
+	$(CC) $(LDFLAGS) --shared -o $@ $(OBJS) $(STATIC_LIBS) $(DYNAMIC_LIBS)
+
+$(OBJS_TARGET)/%.o: %.c
+	$(CC) $(CFLAGS) $(DEF_OPTIONS) $(INC_OPTIONS) -c -o $@ $<
+
+$(OBJS_TARGET)/%.o: %.cxx
+	$(GCC) $(CFLAGS) $(DEF_OPTIONS) $(INC_OPTIONS) -c -o $@ $<
+
+

@@ -1,0 +1,35 @@
+
+USER="http%3a//nsc1.actility.com%3a8088/m2m/applications/SYSTEM:"
+RES="http://192.168.1.116:8080/m2m/applications/IEC_61131_VM/retargeting1/$1"
+TYPE="Content-Type: application/xml"
+TMP=./tmp_file
+
+[ "$2" == "" ] && {
+	FILE=@"empty_file"
+	cat /dev/null > ./empty_file
+} || {
+	(
+	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+	echo "<obix:obj xmlns:obix=\"http://obix.org/ns/schema/1.1\">"
+	echo "  <obix:str name=\"iecApplicationID\" val=\"$2\"/>"
+	echo "  <obix:uri name=\"iecRequestingEntity\" val=\"coap://plciecong.actility.com:5683/m2m/applications/GIP\"/>"
+	echo "  <obix:int name=\"iecMaxConf\" val=\"5\"/>"
+	echo "  <obix:int name=\"iecMaxConfSize\" val=\"100000\"/>"
+	echo "  <obix:int name=\"iecMaxVarMappings\" val=\"10\"/>"
+	echo "  <obix:int name=\"iecMaxVarMappingsSize\" val=\"1000\"/>"
+	echo "  <obix:int name=\"iecMaxINvariables\" val=\"20\"/>"
+	echo "  <obix:int name=\"iecMaxOUTvariables\" val=\"20\"/>"
+	echo "  <obix:int name=\"iecMaxTasks\" val=\"20\"/>"
+	echo "  <obix:reltime name=\"iecMinCyclicInterval\" val=\"PT1S\"/>"
+	echo "  <obix:reltime name=\"iecOutTokenBucketRate\" val=\"PT0.1S\"/>"
+	echo "  <obix:int name=\"iecOutTokenBucketSize\" val=\"100\"/>"
+	echo "</obix:obj>"
+	) > $TMP
+	FILE=@"$TMP"
+	cat $TMP
+}
+
+curl -v -H "$TYPE" -X POST --data $FILE -u "$USER" $RES
+
+rm $TMP 2>/dev/null
+

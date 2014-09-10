@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m2m:applications xmlns:m2m="http://uri.etsi.org/m2m">
+  <m2m:accessRightID>../accessRights/Locadmin_AR</m2m:accessRightID>
+</m2m:applications>

@@ -1,0 +1,93 @@
+if [ -z "$ROOTACT" ]
+then
+	Error "ROOTACT not specified"
+	exit 1
+fi
+source $ROOTACT/rtbase/base/system
+
+SELF=iec61131
+echo "#####"
+echo	"$SELF for $SYSTEM"
+
+Compile()
+{
+	for i in unitTest xpath interv2 astro cal waveGen addtime bin mxml beremiz.addons timerFB validation
+	do
+		pushd $i >/dev/null
+		#echo "[$i] Compiling ..."
+		make $*
+		[ $? != 0 ] && echo "[31;7m[$i] Error ![0m" || echo "[32;7m[$i] OK[0m"
+		popd >/dev/null
+	done
+}
+
+Install()
+{
+	(
+	cd files
+	mkdir -p $ROOTACT/etc/iec61131/files
+	cp -r *  $ROOTACT/etc/iec61131/files
+	mkdir -p $ROOTACT/usr/etc/iec61131
+	cd ../config
+	cp spvconfig.std.xml $ROOTACT/etc/iec61131/spvconfig.xml
+	cp spvconfig.xml $ROOTACT/usr/etc/iec61131/spvconfig.xml
+	) 2>/dev/null
+	[ $? != 0 ] && echo "[31;7m[install] Error ![0m" || echo "[32;7m[install] OK[0m"
+}
+
+# frequemment oublié dans les makefile
+CleanPlus()
+{	
+	rm */core.* > /dev/null 2>&1
+	rm */core > /dev/null 2>&1
+	rm */TRACE_* > /dev/null 2>&1
+	rm */*.log > /dev/null 2>&1
+}
+
+
+case  $# in
+	0)
+		Compile
+		exit 0
+		;;
+	*)	case $1 in
+			src|source)
+				shift
+				./MAKE clean
+				sh ${MKPKGSOURCE} -p $SELF $*
+				exit 0
+			;;
+			runtime)
+				shift
+				./MAKE
+				sh ${MKPKGRUNTIME} -p $SELF
+				exit 0
+			;;
+			clean)
+				shift
+				CleanPlus
+				Compile clean
+				exit 0
+				;;
+			install)
+				shift
+				Install
+				exit 0
+				;;
+			svn*)
+				svncmd=$1
+				shift
+				sh ${MKSVN} -p $SELF -c $svncmd $*
+				exit 0
+			;;
+			*)
+				Compile $*
+				exit 0
+				;;
+		esac
+	;;
+esac
+
+echo "Usage: MAKE [clean|runtime|src|source]"
+exit 1
+

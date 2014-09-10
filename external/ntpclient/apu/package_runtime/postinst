@@ -1,0 +1,8 @@
+chmod 755 $ROOTACT/etc/init.d/ntp
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/init.d/ntp
+mkdir -p $ROOTACT/etc/rc.d
+cd $ROOTACT/etc/rc.d
+ln -s ../init.d/ntp S01ntp
+chmod 755 $ROOTACT/bin/ntpclient
+mkdir -p $ROOTACT/usr/data/ntp
+

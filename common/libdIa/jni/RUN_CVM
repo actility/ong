@@ -1,0 +1,1 @@
+$PHONEME_HOME/bin/cvm -Djava.library.path=/home/actility/libdIa/jni diajni

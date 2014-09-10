@@ -1,0 +1,3 @@
+./exipe -schema=exipe-test-xsd.exi,exipe-test-nested-xsd.exi,exipe-test-types-xsd.exi demoS.exi
+
+./exipe demo.exi

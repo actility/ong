@@ -1,0 +1,1 @@
+./server.x -v9 -R root $*

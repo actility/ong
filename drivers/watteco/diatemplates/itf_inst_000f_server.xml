@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj 
+x-template="${w_template}"
+xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="BinaryInputServerCluster.Srv" status="cfg-mandatory"/>
+    <str name="clusterID" val="0x000f" status="cfg-mandatory"/>
+    <enum name="clusterType" val="server" status="cfg-mandatory"/>
+
+    <!-- M2M attributs -->
+    <bool name="extPolarity" 
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting1/0x000f.0x0054.0.attr"/>
+    <int name="extEdgeSelect" 
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting1/0x000f.0x0400.0.attr"/>
+    <int name="extDebounce" 
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting1/0x000f.0x0401.0.attr"/>
+
+    <!-- M2M commands -->
+    <op name="zbCovConfig"
+    href="${s_rootapp}/APP_${d_ieee}.${a_num}/retargeting2/0x000f.0xFF.ope"/>
+
+    <!-- M2M POINTS-->
+    <bool name="m2mMeasuredValue" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x000f.0x0055.0.m2m/contentInstances/latest/content"/>
+    <int name="extCounter" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x000f.0x0402.0.m2m/contentInstances/latest/content"/>
+
+</obj>

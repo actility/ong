@@ -1,0 +1,51 @@
+
+#include "misc.ref"
+
+/*
+ *    definition for $AW_DATA_DIR/knownsensors/*.xml
+ */
+wmbus:sensor    from ong:t_xml_obj
+{
+    wmbus:nicename        XoString    { }
+}
+
+
+
+/*
+ *    definition for loading appropriate .so
+ */
+wmbus:preprocessor from ong:t_xml_obj
+{
+    wmbus:min       XoString    { embattr }
+    wmbus:max       XoString    { embattr }
+    wmbus:module    XoString    { embattr }
+    wmbus:fcnt      XoString    { embattr }
+    wmbus:fcntCmd   XoString    { embattr }
+}
+
+wmbus:resourceManufacturer from ong:t_xml_obj
+{
+    wmbus:preprocessors wmbus:preprocessor { list wraphidden }
+}
+
+
+/*
+ *    definition for knowledge database
+ */
+wmbus:profile from ong:t_xml_obj
+{
+     wmbus:id       XoString { embattr }
+}
+
+wmbus:device from ong:t_xml_obj
+{
+        wmbus:min               XoString        { embattr }
+        wmbus:max               XoString        { embattr }
+        wmbus:profiles          wmbus:profile   { list wraphidden }
+}
+
+wmbus:resourceDevice from ong:t_xml_obj
+{
+        wmbus:devices wmbus:device { list wraphidden }
+}
+

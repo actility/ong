@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m"
+	xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="common.xsd" />
+
+	<element name="errorInfo" type="tns:ErrorInfo" />
+
+	<complexType name="ErrorInfo">
+		<sequence>
+			<element ref="tns:statusCode" minOccurs="0" />
+			<element ref="tns:additionalInfo" minOccurs="0" />
+		</sequence>
+	</complexType>
+
+	<element name="additionalInfo" type="string" />
+
+</schema>

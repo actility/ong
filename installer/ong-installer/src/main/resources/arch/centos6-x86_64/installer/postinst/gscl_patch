@@ -1,0 +1,3 @@
+
+sed -i -e "s|^\([ \t]*\)JAVA[ \t]*=[ \t]*cvm$|\1JAVA=java\n\1ARGS=\$ARGS\" -Dos.arch=x86_64\"|" $ROOTACT/etc/init.d/gscl
+sed -i -e "s|^-Dorg.knopflerfish.gosg.jars=.*$|-Dorg.knopflerfish.gosg.jars=file:$ROOTACT/lib/osgi/|" $ROOTACT/etc/gscl/knopflerfish/init.xargs

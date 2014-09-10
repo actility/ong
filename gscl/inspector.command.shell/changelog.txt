@@ -1,0 +1,20 @@
+-------------------------------------------------------------------------------
+Inspector command shell changelog
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2014-03-21
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Updated Activator to new format
+ - Updated all dependencies to new versions with updated package names
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2013-10-08
+
+Initial version

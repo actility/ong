@@ -1,0 +1,93 @@
+if [ -z "$ROOTACT" ]
+then
+	Error "ROOTACT not specified"
+	exit 1
+fi
+source $ROOTACT/rtbase/base/system
+
+SELF=watteco
+echo "#####"
+echo	"$SELF for $SYSTEM"
+
+Compile()
+{
+#for i in base include drvcommon lib tictools discover zcllike tunslip supervisor simulsensors pseudoong xoref snif
+for i in base include lib tictools discover zcllike tunslip supervisor simulsensors pseudoong xoref snif
+do
+	(
+	cd $i
+	if [ -f MAKE ]
+	then
+		echo "#####"
+		echo "#####	$i"
+		echo "#####"
+		sh ./MAKE $*
+	fi
+	)
+done
+}
+
+# frequemment oublié dans les makefile
+CleanPlus()
+{	
+	rm -f */core.* > /dev/null 2>&1
+	rm -f */core > /dev/null 2>&1
+	rm -f */TRACE_* > /dev/null 2>&1
+	rm -f */*.log > /dev/null 2>&1
+	rm -f */nohup.out > /dev/null 2>&1
+}
+
+
+case  $# in
+	0)
+		Compile
+		exit 0
+		;;
+	*)	case $1 in
+			src|source)
+				shift
+				MAKE clean
+				sh ${MKPKGSOURCE} -p $SELF $*
+				exit 0
+			;;
+			runtime)
+				shift
+				MAKE
+				sh ${MKPKGRUNTIME} -p $SELF
+				exit 0
+			;;
+			clean)
+				shift
+				CleanPlus
+				Compile clean
+				exit 0
+				;;
+			svn*)
+				svncmd=$1
+				shift
+				sh ${MKSVN} -p $SELF -c $svncmd $*
+				exit 0
+			;;
+			apu*)
+				apucmd=$1
+				shift
+				sh ${MKAPU} -p $SELF
+				exit 0
+			;;
+			dep*)
+				depcmd=$1
+				shift
+				sh ${MKDEP} -p $SELF
+				exit 0
+			;;
+			*)
+				Compile $*
+				exit 0
+				;;
+		esac
+	;;
+esac
+
+echo "Usage: MAKE [clean|runtime|src|source]"
+exit 1
+

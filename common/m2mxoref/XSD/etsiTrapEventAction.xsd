@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd"/>
+	<include schemaLocation="parameters.xsd"/>
+
+	<!-- trapEventAction resource type -->
+	<complexType name="TrapEventAction">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:trapEventEnable" minOccurs="0"/>
+					<element ref="tns:trapEventDisable" minOccurs="0"/>
+				</sequence>
+				<!-- attribute ref="tns:id" use="required" fixed="trapEventAction"/ -->
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="trapEventEnable" type="anyURI"/>
+
+	<element name="trapEventDisable" type="anyURI"/>
+
+</schema>

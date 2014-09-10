@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" is="zigBee:InterworkingDescriptor">
+  <str name="interworkingProxyID" val="IPU_6LoWPAN"/>
+  <list name="supportedTechnologies">
+    <obj>
+      <enum name="anPhysical" val="IEEE_802_15_4_2003_2_4GHz"/>
+      <enum name="anStandard" val="ZigBee_1_0"/>
+      <enum name="anProfile" val="ZigBee_HA"/>
+    </obj>
+  </list>
+  <list name="networks" of="obix:ref m2m:NetworkDescriptor">
+    <ref href="/m2m/applications/NW_0b435eff56a2af14/containers/DESCRIPTOR/contentInstances/latest/content/"/>
+  </list>
+</obj>

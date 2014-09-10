@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m"
+	xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="commonSecurity.xsd" />
+	<include schemaLocation="common.xsd" />
+		
+	<element name="connectionParamSet" type="tns:ConnectionParamSet" />
+
+	<complexType name="ConnectionParamSet">
+		<sequence>
+			<element ref="tns:securityConnectionId" />
+			<element ref="tns:securityKmcIndex" />
+			<element ref="tns:securityLifetime" />
+			<element ref="tns:securityM2MKey" />
+			<element ref="tns:sclId" />
+			<element ref="tns:securitymIdFlags" />
+		</sequence>
+	</complexType>
+</schema>

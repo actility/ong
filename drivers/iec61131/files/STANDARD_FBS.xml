@@ -1,0 +1,918 @@
+<pous>
+<pou name="SR" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="S1"> <type> <BOOL/> </type> </variable>
+      <variable name="R"> <type> <BOOL/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q1"> <type> <BOOL/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="Q1"> <type> <BOOL/> </type> </variable>
+    </localVars>
+  </interface>
+  <body>
+    <FBD>
+
+      <block localId="7" typeName="SR_function">
+        <inputVariables>
+          <variable formalParameter="S1">
+            <connectionPointIn>
+              <connection refLocalId="3">
+              </connection>
+            </connectionPointIn>
+          </variable>
+          <variable formalParameter="R">
+            <connectionPointIn>
+              <connection refLocalId="4">
+              </connection>
+            </connectionPointIn>
+          </variable>
+          <variable formalParameter="Q1">
+            <connectionPointIn>
+              <connection refLocalId="5">
+              </connection>
+            </connectionPointIn>
+          </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q1" />
+        </outputVariables>
+      </block>
+
+      <inVariable localId="3"> <expression>S1</expression> </inVariable>
+      <inVariable localId="4"> <expression>R</expression> </inVariable>
+      <inVariable localId="5"> <expression>Q1</expression> </inVariable>
+
+      <outVariable localId="21">
+        <connectionPointIn>
+          <connection refLocalId="7" formalParameter="Q1">
+          </connection>
+        </connectionPointIn>
+        <expression>Q1</expression>
+      </outVariable>
+
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="RS" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="S"> <type> <BOOL/> </type> </variable>
+      <variable name="R1"> <type> <BOOL/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q1"> <type> <BOOL/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="Q1"> <type> <BOOL/> </type> </variable>
+    </localVars>
+  </interface>
+  <body>
+    <FBD>
+
+      <block localId="7" typeName="RS_function">
+        <inputVariables>
+          <variable formalParameter="S">
+		  <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="R1">
+            <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="Q1">
+            <connectionPointIn> <connection refLocalId="5"> </connection> </connectionPointIn>
+          </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q1" />
+        </outputVariables>
+      </block>
+
+      <inVariable localId="3"> <expression>S</expression> </inVariable>
+      <inVariable localId="4"> <expression>R1</expression> </inVariable>
+      <inVariable localId="5"> <expression>Q1</expression> </inVariable>
+
+      <outVariable localId="21">
+        <connectionPointIn>
+          <connection refLocalId="7" formalParameter="Q1">
+          </connection>
+        </connectionPointIn>
+        <expression>Q1</expression>
+      </outVariable>
+
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="CTU" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="CU"> <type> <BOOL/> </type> </variable>
+      <variable name="R"> <type> <BOOL/> </type> </variable>
+      <variable name="PV"> <type> <INT/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q"> <type> <BOOL/> </type> </variable>
+      <variable name="CV"> <type> <INT/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="CV"> <type> <INT/> </type> </variable>
+      <variable name="TRIG_M"> <type> <BOOL/> </type> </variable>
+    </localVars>
+  </interface>
+  <body>
+    <FBD>
+
+      <block localId="7" typeName="CTU_function">
+        <inputVariables>
+          <variable formalParameter="CU">
+            <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="R">
+            <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="PV">
+            <connectionPointIn> <connection refLocalId="5"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="CV">
+            <connectionPointIn> <connection refLocalId="6"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="TRIG_M">
+            <connectionPointIn> <connection refLocalId="7"> </connection> </connectionPointIn>
+          </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q" />
+          <variable formalParameter="CV" />
+          <variable formalParameter="TRIG_M" />
+        </outputVariables>
+      </block>
+
+      <inVariable localId="3"> <expression>CU</expression> </inVariable>
+      <inVariable localId="4"> <expression>R</expression> </inVariable>
+      <inVariable localId="5"> <expression>PV</expression> </inVariable>
+      <inVariable localId="6"> <expression>CV</expression> </inVariable>
+      <inVariable localId="7"> <expression>TRIG_M</expression> </inVariable>
+
+      <outVariable localId="21">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="Q"> </connection> </connectionPointIn>
+        <expression>Q</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="CV"> </connection> </connectionPointIn>
+        <expression>CV</expression>
+      </outVariable>
+      <outVariable localId="23">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="TRIG_M"> </connection> </connectionPointIn>
+        <expression>TRIG_M</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+
+<pou name="CTD" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="CD"> <type> <BOOL/> </type> </variable>
+      <variable name="LD"> <type> <BOOL/> </type> </variable>
+      <variable name="PV"> <type> <INT/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q"> <type> <BOOL/> </type> </variable>
+      <variable name="CV"> <type> <INT/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="CV"> <type> <INT/> </type> </variable>
+      <variable name="TRIG_M"> <type> <BOOL/> </type> </variable>
+    </localVars>
+  </interface>
+  <body>
+    <FBD>
+
+      <block localId="7" typeName="CTD_function">
+        <inputVariables>
+          <variable formalParameter="CD">
+            <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="LD">
+            <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="PV">
+            <connectionPointIn> <connection refLocalId="5"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="CV">
+            <connectionPointIn> <connection refLocalId="6"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="TRIG_M">
+            <connectionPointIn> <connection refLocalId="7"> </connection> </connectionPointIn>
+          </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q" />
+          <variable formalParameter="CV" />
+        </outputVariables>
+      </block>
+
+      <inVariable localId="3"> <expression>CD</expression> </inVariable>
+      <inVariable localId="4"> <expression>LD</expression> </inVariable>
+      <inVariable localId="5"> <expression>PV</expression> </inVariable>
+      <inVariable localId="6"> <expression>CV</expression> </inVariable>
+      <inVariable localId="7"> <expression>TRIG_M</expression> </inVariable>
+
+      <outVariable localId="21">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="Q"> </connection> </connectionPointIn>
+        <expression>Q</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="CV"> </connection> </connectionPointIn>
+        <expression>CV</expression>
+      </outVariable>
+      <outVariable localId="23">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="TRIG_M"> </connection> </connectionPointIn>
+        <expression>TRIG_M</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="CTUD" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="CU"> <type> <BOOL/> </type> </variable>
+      <variable name="CD"> <type> <BOOL/> </type> </variable>
+      <variable name="R"> <type> <BOOL/> </type> </variable>
+      <variable name="LD"> <type> <BOOL/> </type> </variable>
+      <variable name="PV"> <type> <INT/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="QU"> <type> <BOOL/> </type> </variable>
+      <variable name="QD"> <type> <BOOL/> </type> </variable>
+      <variable name="CV"> <type> <INT/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="CV"> <type> <INT/> </type> </variable>
+      <variable name="TRIG_MU"> <type> <BOOL/> </type> </variable>
+      <variable name="TRIG_MD"> <type> <BOOL/> </type> </variable>
+    </localVars>
+  </interface>
+  <body>
+    <FBD>
+
+      <block localId="7" typeName="CTUD_function">
+        <inputVariables>
+          <variable formalParameter="CU">
+            <connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="CD">
+            <connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="R">
+            <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="LD">
+            <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="PV">
+            <connectionPointIn> <connection refLocalId="5"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="CV">
+            <connectionPointIn> <connection refLocalId="6"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="TRIG_MU">
+            <connectionPointIn> <connection refLocalId="7"> </connection> </connectionPointIn>
+          </variable>
+          <variable formalParameter="TRIG_MD">
+            <connectionPointIn> <connection refLocalId="8"> </connection> </connectionPointIn>
+          </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="QU" />
+          <variable formalParameter="QD" />
+          <variable formalParameter="CV" />
+        </outputVariables>
+      </block>
+
+      <inVariable localId="1"> <expression>CU</expression> </inVariable>
+      <inVariable localId="2"> <expression>CD</expression> </inVariable>
+      <inVariable localId="3"> <expression>R</expression> </inVariable>
+      <inVariable localId="4"> <expression>LD</expression> </inVariable>
+      <inVariable localId="5"> <expression>PV</expression> </inVariable>
+      <inVariable localId="6"> <expression>CV</expression> </inVariable>
+      <inVariable localId="7"> <expression>TRIG_MU</expression> </inVariable>
+      <inVariable localId="8"> <expression>TRIG_MD</expression> </inVariable>
+
+      <outVariable localId="21">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="QU"> </connection> </connectionPointIn>
+        <expression>QU</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="QD"> </connection> </connectionPointIn>
+        <expression>QD</expression>
+      </outVariable>
+      <outVariable localId="23">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="CV"> </connection> </connectionPointIn>
+        <expression>CV</expression>
+      </outVariable>
+      <outVariable localId="24">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="TRIG_MU"> </connection> </connectionPointIn>
+        <expression>TRIG_MU</expression>
+      </outVariable>
+      <outVariable localId="25">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="TRIG_MD"> </connection> </connectionPointIn>
+        <expression>TRIG_MD</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+
+<pou name="R_TRIG" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="CLK"> <type> <BOOL/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q"> <type> <BOOL/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="M"> <type> <BOOL/> </type> </variable>
+    </localVars>
+  </interface>
+
+  <body>
+    <FBD>
+      <block localId="7" typeName="R_TRIG_function">
+        <inputVariables>
+          <variable formalParameter="CLK">
+            <connectionPointIn>
+              <connection refLocalId="3">
+              </connection>
+            </connectionPointIn>
+          </variable>
+          <variable formalParameter="M">
+            <connectionPointIn>
+              <connection refLocalId="4">
+              </connection>
+            </connectionPointIn>
+          </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q" />
+          <variable formalParameter="M" />
+        </outputVariables>
+      </block>
+
+      <inVariable localId="3">
+        <expression>CLK</expression>
+      </inVariable>
+      <inVariable localId="4">
+        <expression>M</expression>
+      </inVariable>
+
+      <outVariable localId="21">
+        <connectionPointIn>
+          <connection refLocalId="7" formalParameter="Q">
+          </connection>
+        </connectionPointIn>
+        <expression>Q</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn>
+          <connection refLocalId="7" formalParameter="M">
+          </connection>
+        </connectionPointIn>
+        <expression>M</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="F_TRIG" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="CLK"> <type> <BOOL/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q"> <type> <BOOL/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="M"> <type> <BOOL/> </type> </variable>
+    </localVars>
+  </interface>
+
+  <body>
+    <FBD>
+      <block localId="7" typeName="F_TRIG_function">
+        <inputVariables>
+          <variable formalParameter="CLK">
+            <connectionPointIn>
+              <connection refLocalId="3">
+              </connection>
+            </connectionPointIn>
+          </variable>
+          <variable formalParameter="M">
+            <connectionPointIn>
+              <connection refLocalId="4">
+              </connection>
+            </connectionPointIn>
+          </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q" />
+          <variable formalParameter="M" />
+        </outputVariables>
+      </block>
+
+      <inVariable localId="3">
+        <expression>CLK</expression>
+      </inVariable>
+      <inVariable localId="4">
+        <expression>M</expression>
+      </inVariable>
+
+      <outVariable localId="21">
+        <connectionPointIn>
+          <connection refLocalId="7" formalParameter="Q">
+          </connection>
+        </connectionPointIn>
+        <expression>Q</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn>
+          <connection refLocalId="7" formalParameter="M">
+          </connection>
+        </connectionPointIn>
+        <expression>M</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="RTC" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="IN"> <type> <BOOL/> </type> </variable>
+      <variable name="PDT"> <type> <DT/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q"> <type> <BOOL/> </type> </variable>
+      <variable name="CDT"> <type> <DT/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="PREV_IN"> <type> <BOOL/> </type> </variable>
+      <variable name="OFFSET"> <type> <TIME/> </type> </variable>
+    </localVars>
+  </interface>
+
+  <body>
+    <FBD>
+
+      <inVariable localId="1"> <expression>IN</expression> </inVariable>
+      <inVariable localId="2"> <expression>PDT</expression> </inVariable>
+      <inVariable localId="3"> <expression>PREV_IN</expression> </inVariable>
+      <inVariable localId="4"> <expression>OFFSET</expression> </inVariable>
+
+      <block localId="7" typeName="RTC_function">
+        <inputVariables>
+          <variable formalParameter="IN"> <connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="PDT"> <connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="PREV_IN"> <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="OFFSET"> <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn> </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q" />
+          <variable formalParameter="CDT" />
+          <variable formalParameter="PREV_IN" />
+          <variable formalParameter="OFFSET" />
+        </outputVariables>
+      </block>
+
+      <outVariable localId="21">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="Q"> </connection> </connectionPointIn> <expression>Q</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="CDT"> </connection> </connectionPointIn> <expression>CDT</expression>
+      </outVariable>
+      <outVariable localId="23">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="PREV_IN"> </connection> </connectionPointIn> <expression>PREV_IN</expression>
+      </outVariable>
+      <outVariable localId="24">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="OFFSET"> </connection> </connectionPointIn> <expression>OFFSET</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="TP" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="IN"> 			<type> <BOOL/> </type> </variable>
+      <variable name="PT"> 			<type> <TIME/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q"> 			<type> <BOOL/> </type> </variable>
+      <variable name="ET">			<type> <TIME/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="STATE">			<type> <SINT/> </type> </variable>
+      <variable name="PREV_IN">		<type> <BOOL/> </type> </variable>
+      <variable name="START_TIME">	<type> <TIME/> </type> </variable>
+      <variable name="Q"> 			<type> <BOOL/> </type> </variable>
+      <variable name="ET">			<type> <TIME/> </type> </variable>
+    </localVars>
+  </interface>
+
+  <body>
+    <FBD>
+
+      <inVariable localId="1"> <expression>IN</expression> </inVariable>
+      <inVariable localId="2"> <expression>PT</expression> </inVariable>
+      <inVariable localId="3"> <expression>STATE</expression> </inVariable>
+      <inVariable localId="4"> <expression>PREV_IN</expression> </inVariable>
+      <inVariable localId="5"> <expression>START_TIME</expression> </inVariable>
+      <inVariable localId="6"> <expression>Q</expression> </inVariable>
+      <inVariable localId="7"> <expression>ET</expression> </inVariable>
+
+      <block localId="7" typeName="TP_function">
+        <inputVariables>
+          <variable formalParameter="IN"> 			<connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="PT"> 			<connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="STATE"> 			<connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="PREV_IN"> 		<connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="START_TIME"> 	<connectionPointIn> <connection refLocalId="5"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="Q">				<connectionPointIn> <connection refLocalId="6"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="ET">				<connectionPointIn> <connection refLocalId="7"> </connection> </connectionPointIn> </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q" />
+          <variable formalParameter="ET" />
+          <variable formalParameter="STATE" />
+          <variable formalParameter="PREV_IN" />
+          <variable formalParameter="START_TIME" />
+        </outputVariables>
+      </block>
+
+      <outVariable localId="21">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="Q"> </connection> </connectionPointIn> <expression>Q</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="ET"> </connection> </connectionPointIn> <expression>ET</expression>
+      </outVariable>
+      <outVariable localId="23">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="STATE"> </connection> </connectionPointIn> <expression>STATE</expression>
+      </outVariable>
+      <outVariable localId="24">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="PREV_IN"> </connection> </connectionPointIn> <expression>PREV_IN</expression>
+      </outVariable>
+      <outVariable localId="25">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="START_TIME"> </connection> </connectionPointIn> <expression>START_TIME</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="TON" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="IN"> <type> <BOOL/> </type> </variable>
+      <variable name="PT"> <type> <TIME/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q"> <type> <BOOL/> </type> </variable>
+      <variable name="ET"> <type> <TIME/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="STATE"> <type> <SINT/> </type> </variable>
+      <variable name="PREV_IN"> <type> <BOOL/> </type> </variable>
+      <variable name="START_TIME"> <type> <TIME/> </type> </variable>
+      <variable name="Q"> <type> <BOOL/> </type> </variable>
+      <variable name="ET"> <type> <TIME/> </type> </variable>
+    </localVars>
+  </interface>
+
+  <body>
+    <FBD>
+
+      <inVariable localId="1"> <expression>IN</expression> </inVariable>
+      <inVariable localId="2"> <expression>PT</expression> </inVariable>
+      <inVariable localId="3"> <expression>STATE</expression> </inVariable>
+      <inVariable localId="4"> <expression>PREV_IN</expression> </inVariable>
+      <inVariable localId="5"> <expression>START_TIME</expression> </inVariable>
+      <inVariable localId="6"> <expression>Q</expression> </inVariable>
+      <inVariable localId="7"> <expression>ET</expression> </inVariable>
+
+      <block localId="7" typeName="TON_function">
+        <inputVariables>
+          <variable formalParameter="IN"> 			<connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="PT"> 			<connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="STATE"> 			<connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="PREV_IN"> 		<connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="START_TIME"> 	<connectionPointIn> <connection refLocalId="5"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="Q">				<connectionPointIn> <connection refLocalId="6"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="ET">				<connectionPointIn> <connection refLocalId="7"> </connection> </connectionPointIn> </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q" />
+          <variable formalParameter="ET" />
+          <variable formalParameter="STATE" />
+          <variable formalParameter="PREV_IN" />
+          <variable formalParameter="START_TIME" />
+        </outputVariables>
+      </block>
+
+      <outVariable localId="21">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="Q"> </connection> </connectionPointIn> <expression>Q</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="ET"> </connection> </connectionPointIn> <expression>ET</expression>
+      </outVariable>
+      <outVariable localId="23">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="STATE"> </connection> </connectionPointIn> <expression>STATE</expression>
+      </outVariable>
+      <outVariable localId="24">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="PREV_IN"> </connection> </connectionPointIn> <expression>PREV_IN</expression>
+      </outVariable>
+      <outVariable localId="25">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="START_TIME"> </connection> </connectionPointIn> <expression>START_TIME</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="TOF" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="IN"> <type> <BOOL/> </type> </variable>
+      <variable name="PT"> <type> <TIME/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q"> <type> <BOOL/> </type> </variable>
+      <variable name="ET"> <type> <TIME/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="STATE"> <type> <SINT/> </type> </variable>
+      <variable name="PREV_IN"> <type> <BOOL/> </type> </variable>
+      <variable name="START_TIME"> <type> <TIME/> </type> </variable>
+    </localVars>
+  </interface>
+
+  <body>
+    <FBD>
+
+      <inVariable localId="1"> <expression>IN</expression> </inVariable>
+      <inVariable localId="2"> <expression>PT</expression> </inVariable>
+      <inVariable localId="3"> <expression>STATE</expression> </inVariable>
+      <inVariable localId="4"> <expression>PREV_IN</expression> </inVariable>
+      <inVariable localId="5"> <expression>START_TIME</expression> </inVariable>
+
+      <block localId="7" typeName="TOF_function">
+        <inputVariables>
+          <variable formalParameter="IN"> <connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="PT"> <connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="STATE"> <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="PREV_IN"> <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="START_TIME"> <connectionPointIn> <connection refLocalId="5"> </connection> </connectionPointIn> </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q" />
+          <variable formalParameter="ET" />
+          <variable formalParameter="STATE" />
+          <variable formalParameter="PREV_IN" />
+          <variable formalParameter="START_TIME" />
+        </outputVariables>
+      </block>
+
+      <outVariable localId="21">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="Q"> </connection> </connectionPointIn> <expression>Q</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="ET"> </connection> </connectionPointIn> <expression>ET</expression>
+      </outVariable>
+      <outVariable localId="23">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="STATE"> </connection> </connectionPointIn> <expression>STATE</expression>
+      </outVariable>
+      <outVariable localId="24">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="PREV_IN"> </connection> </connectionPointIn> <expression>PREV_IN</expression>
+      </outVariable>
+      <outVariable localId="25">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="START_TIME"> </connection> </connectionPointIn> <expression>START_TIME</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="HYSTERESIS" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="XIN1"> <type> <REAL/> </type> </variable>
+      <variable name="XIN2"> <type> <REAL/> </type> </variable>
+      <variable name="EPS"> <type> <REAL/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="Q"> <type> <BOOL/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="Q"> <type> <BOOL/> </type> </variable>
+    </localVars>
+  </interface>
+
+  <body>
+    <FBD>
+
+      <inVariable localId="1"> <expression>XIN1</expression> </inVariable>
+      <inVariable localId="2"> <expression>XIN2</expression> </inVariable>
+      <inVariable localId="3"> <expression>EPS</expression> </inVariable>
+      <inVariable localId="4"> <expression>Q</expression> </inVariable>
+
+      <block localId="7" typeName="HYSTERESIS_function">
+        <inputVariables>
+          <variable formalParameter="XIN1"> <connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="XIN2"> <connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="EPS"> <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="Q"> <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn> </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="Q" />
+        </outputVariables>
+      </block>
+
+      <outVariable localId="21">
+        <connectionPointIn> <connection refLocalId="7" formalParameter="Q"> </connection> </connectionPointIn> <expression>Q</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="DERIVATIVE" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="RUN"> <type> <BOOL/> </type> </variable>
+      <variable name="XIN"> <type> <REAL/> </type> </variable>
+      <variable name="CYCLE"> <type> <TIME/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="XOUT"> <type> <REAL/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="X1"> <type> <DINT/> </type> </variable>
+      <variable name="X2"> <type> <DINT/> </type> </variable>
+      <variable name="X3"> <type> <DINT/> </type> </variable>
+    </localVars>
+  </interface>
+
+  <body>
+    <FBD>
+
+      <inVariable localId="1"> <expression>RUN</expression> </inVariable>
+      <inVariable localId="2"> <expression>XIN</expression> </inVariable>
+      <inVariable localId="3"> <expression>CYCLE</expression> </inVariable>
+      <inVariable localId="4"> <expression>X1</expression> </inVariable>
+      <inVariable localId="5"> <expression>X2</expression> </inVariable>
+      <inVariable localId="6"> <expression>X3</expression> </inVariable>
+
+      <block localId="100" typeName="DERIVATIVE_function">
+        <inputVariables>
+          <variable formalParameter="RUN"> <connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="XIN"> <connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="CYCLE"> <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="X1"> <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="X2"> <connectionPointIn> <connection refLocalId="5"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="X3"> <connectionPointIn> <connection refLocalId="6"> </connection> </connectionPointIn> </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="XOUT" />
+          <variable formalParameter="X1" />
+          <variable formalParameter="X2" />
+          <variable formalParameter="X3" />
+        </outputVariables>
+      </block>
+
+      <outVariable localId="21">
+        <connectionPointIn> <connection refLocalId="100" formalParameter="XOUT"> </connection> </connectionPointIn> <expression>XOUT</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn> <connection refLocalId="100" formalParameter="X1"> </connection> </connectionPointIn> <expression>X1</expression>
+      </outVariable>
+      <outVariable localId="23">
+        <connectionPointIn> <connection refLocalId="100" formalParameter="X2"> </connection> </connectionPointIn> <expression>X2</expression>
+      </outVariable>
+      <outVariable localId="24">
+        <connectionPointIn> <connection refLocalId="100" formalParameter="X3"> </connection> </connectionPointIn> <expression>X3</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+
+<pou name="PID" pouType="functionBlock">
+  <interface>
+    <inputVars>
+      <variable name="AUTO"> <type> <BOOL/> </type> </variable>
+      <variable name="PV"> <type> <REAL/> </type> </variable>
+      <variable name="SP"> <type> <REAL/> </type> </variable>
+      <variable name="X0"> <type> <REAL/> </type> </variable>
+      <variable name="KP"> <type> <REAL/> </type> </variable>
+      <variable name="TR"> <type> <REAL/> </type> </variable>
+      <variable name="TD"> <type> <REAL/> </type> </variable>
+      <variable name="CYCLE"> <type> <TIME/> </type> </variable>
+    </inputVars>
+    <outputVars>
+      <variable name="XOUT"> <type> <REAL/> </type> </variable>
+    </outputVars>
+    <localVars>
+      <variable name="X1"> <type> <REAL/> </type> </variable>
+      <variable name="X2"> <type> <REAL/> </type> </variable>
+      <variable name="X3"> <type> <REAL/> </type> </variable>
+      <variable name="ITERM_XOUT"> <type> <REAL/> </type> </variable>
+    </localVars>
+  </interface>
+
+  <body>
+    <FBD>
+
+      <inVariable localId="1"> <expression>AUTO</expression> </inVariable>
+      <inVariable localId="2"> <expression>PV</expression> </inVariable>
+      <inVariable localId="3"> <expression>SP</expression> </inVariable>
+      <inVariable localId="4"> <expression>X0</expression> </inVariable>
+      <inVariable localId="5"> <expression>KP</expression> </inVariable>
+      <inVariable localId="6"> <expression>TR</expression> </inVariable>
+      <inVariable localId="7"> <expression>TD</expression> </inVariable>
+      <inVariable localId="8"> <expression>CYCLE</expression> </inVariable>
+      <inVariable localId="9"> <expression>X1</expression> </inVariable>
+      <inVariable localId="10"> <expression>X2</expression> </inVariable>
+      <inVariable localId="11"> <expression>X3</expression> </inVariable>
+      <inVariable localId="12"> <expression>ITERM_XOUT</expression> </inVariable>
+
+      <block localId="100" typeName="PID_function">
+        <inputVariables>
+          <variable formalParameter="AUTO"> <connectionPointIn> <connection refLocalId="1"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="PV"> <connectionPointIn> <connection refLocalId="2"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="SP"> <connectionPointIn> <connection refLocalId="3"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="X0"> <connectionPointIn> <connection refLocalId="4"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="KP"> <connectionPointIn> <connection refLocalId="5"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="TR"> <connectionPointIn> <connection refLocalId="6"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="TD"> <connectionPointIn> <connection refLocalId="7"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="CYCLE"> <connectionPointIn> <connection refLocalId="8"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="X1"> <connectionPointIn> <connection refLocalId="9"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="X2"> <connectionPointIn> <connection refLocalId="10"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="X3"> <connectionPointIn> <connection refLocalId="11"> </connection> </connectionPointIn> </variable>
+          <variable formalParameter="ITERM_XOUT"> <connectionPointIn> <connection refLocalId="12"> </connection> </connectionPointIn> </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+          <variable formalParameter="XOUT" />
+          <variable formalParameter="X1" />
+          <variable formalParameter="X2" />
+          <variable formalParameter="X3" />
+          <variable formalParameter="ITERM_XOUT" />
+        </outputVariables>
+      </block>
+
+      <outVariable localId="21">
+        <connectionPointIn> <connection refLocalId="100" formalParameter="XOUT"> </connection> </connectionPointIn> <expression>XOUT</expression>
+      </outVariable>
+      <outVariable localId="22">
+        <connectionPointIn> <connection refLocalId="100" formalParameter="X1"> </connection> </connectionPointIn> <expression>X1</expression>
+      </outVariable>
+      <outVariable localId="23">
+        <connectionPointIn> <connection refLocalId="100" formalParameter="X2"> </connection> </connectionPointIn> <expression>X2</expression>
+      </outVariable>
+      <outVariable localId="24">
+        <connectionPointIn> <connection refLocalId="100" formalParameter="X3"> </connection> </connectionPointIn> <expression>X3</expression>
+      </outVariable>
+      <outVariable localId="25">
+        <connectionPointIn> <connection refLocalId="100" formalParameter="ITERM_XOUT"> </connection> </connectionPointIn> <expression>ITERM_XOUT</expression>
+      </outVariable>
+
+    </FBD>
+  </body>
+</pou>
+</pous>

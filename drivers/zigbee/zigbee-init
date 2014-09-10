@@ -1,0 +1,61 @@
+#!(SHELL)
+#
+# zigbee:       Starts the ZigBee driver
+
+exec 2> /dev/null
+
+CURRENT_DIR=$(dirname $0)
+. $CURRENT_DIR/../ong.cfg
+. $CURRENT_DIR/../functions
+
+ZIGBEE_DATA=$ROOTACT/usr/data/zigbee
+OPTIONS=""
+SERVICE="zigbee"
+PIDFILE=$ZIGBEE_DATA/zigbee.pid
+STOPFILE=$ZIGBEE_DATA/stop
+
+usage() {
+    echo "Usage: zigbee [<options>] {start|stop|status|restart}"
+    echo "  Where options are:"
+    echo "   -h|--help    Print this help message"
+    echo "   -i|--init    Re-initialize ONG"
+}
+
+preStart() {
+  mkdir -p $ROOTACT/usr/data/zigbee
+}
+
+serviceCommand() {
+  echo "azbspv.x "$OPTIONS
+}
+
+stopService() {
+  AZBSPV_PIDS=$(pidof azbspv.x)
+  [ -n "$AZBSPV_PIDS" ] && kill -TERM $AZBSPV_PIDS
+}
+
+abortService() {
+  AZBSPV_PIDS=$(pidof azbspv.x)
+  [ -n "$AZBSPV_PIDS" ] && kill -KILL $AZBSPV_PIDS
+}
+
+GETOPTTEMP=`getopt -o hi --long help,init -- $@`
+if [ $? != 0 ] ; then usage ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments
+while [ -n "$1" ]
+do
+    case "$1" in
+        "-h"|"--help") usage; exit;;
+        "-i"|"--init") OPTIONS=$OPTIONS" -i";;
+        "--") shift; break ;;
+        * ) echo "Internal error ($*)!"; exit 1;;
+    esac
+    shift
+done
+
+handleParams $*
+
+exit $?
+

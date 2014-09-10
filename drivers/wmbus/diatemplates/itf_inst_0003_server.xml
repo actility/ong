@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obj xmlns="http://obix.org/ns/schema/1.1">
+    <str name="interfaceID" val="SimpleMetering.Srv" status="cfg-mandatory" />
+    <real name="m2mCurrentSummationDelivered" unit="obix:units/watt_hour" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x0003.0x0000.0.m2m/contentInstances/latest/content"/>
+    <real name="m2mInstantaneousDemand" unit="obix:units/watt" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0x002b.0x0000.0.m2m/contentInstances/latest/content"/>
+    <real name="extVoltageInstantaneousDemand" unit="obix:units/volt" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0xfd49.0x0000.0.m2m/contentInstances/latest/content"/>
+    <real name="extCurrentInstantaneousDemand" unit="obix:units/ampere" href="${s_rootapp}/APP_${d_ieee}.${a_num}/containers/0xfd5c.0x0000.0.m2m/contentInstances/latest/content"/>
+
+</obj>

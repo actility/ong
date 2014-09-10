@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="common.xsd" />
+
+	<element name="container" type="tns:Container" />
+
+	<complexType name="Container">
+		<sequence>
+			<element ref="tns:expirationTime" minOccurs="0" />
+			<element ref="tns:accessRightID" minOccurs="0" />
+			<element ref="tns:searchStrings" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0" />
+			<element ref="tns:lastModifiedTime" minOccurs="0" />
+			<element ref="tns:announceTo" minOccurs="0" />
+			<element ref="tns:maxNrOfInstances" minOccurs="0" />
+			<element ref="tns:maxByteSize" minOccurs="0" />
+			<element ref="tns:maxInstanceAge" minOccurs="0" />
+			<!--  not defined yet element ref="tns:containerType" minOccurs="0"  -->
+			<!-- subresources -->
+			<element ref="tns:contentInstancesReference" minOccurs="0" />
+			<element ref="tns:subscriptionsReference" minOccurs="0" />
+		</sequence>
+		<attribute ref="tns:id"/>
+	</complexType>
+
+	<element name="maxNrOfInstances" type="long"/>
+	<element name="maxByteSize" type="long"/>
+	<element name="maxInstanceAge" type="long"/>
+</schema>
