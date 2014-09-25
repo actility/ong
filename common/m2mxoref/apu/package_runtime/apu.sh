@@ -2,7 +2,7 @@
 buildProject()
 {
   cd m2mxoref
-  if [[ $1 == centos6-x86 ]]
+  if [[ $1 == $HOST_TARGET ]]
   then
     ./MAKE clean
     ./MAKE
