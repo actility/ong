@@ -64,13 +64,13 @@ REPOSITORY=-Dmaven.repo.local=$REPO_DIR
   "util" "m2m/ong/scl/" "4.0.1" \
   "org.apache.felix.shell.acy" "m2m/ong/scl/" "2.0.0" \
   "org.apache.felix.shell.tui.acy" "m2m/ong/scl/" "1.0.0" \
-  "felix.shell.telnet" "m2m/ong/scl/" "2.0.1" \
+  "felix.shell.telnet" "m2m/ong/scl/" "2.2.0" \
   "framework.resources.osgi" "m2m/ong/scl/" "1.0.0" \
   "cm" "m2m/ong/scl/" "1.0.3" \
   "cm.command.shell" "m2m/ong/scl/" "2.0.0" \
   "framework.command.shell.me" "m2m/ong/scl/" "2.0.0" \
   "framework.command.shell.se" "m2m/ong/scl/" "1.0.0" \
-  "log" "m2m/ong/scl/" "1.0.0" \
+  "log" "m2m/ong/scl/" "1.0.1" \
   "log.command.shell" "m2m/ong/scl/" "2.0.1" \
   "inspector.command.shell" "m2m/ong/scl/" "1.2.0" \
   "backend" "m2m/ong/scl/" "3.0.1" \
@@ -83,7 +83,7 @@ REPOSITORY=-Dmaven.repo.local=$REPO_DIR
   "song.trace.command.shell" "m2m/ong/scl/" "3.0.0" \
   "phoneme.command.shell" "m2m/ong/scl/" "2.0.0" \
   "m2m" "m2m/ong/scl/" "3.0.3" \
-  "scl.app.me" "m2m/ong/scl/" "2.0.4" \
+  "scl.app.me" "m2m/ong/scl/" "2.0.5" \
   "system.version" "m2m/ong/scl/" "4.4.1" \
   "transport.logger.log" "m2m/ong/scl/" "1.0.1" \
   "jxo" "m2m/ong/scl/" "3.0.1" \
