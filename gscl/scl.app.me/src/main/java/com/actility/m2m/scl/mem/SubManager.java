@@ -229,6 +229,45 @@ public final class SubManager implements Serializable {
             timerId = manager.getM2MContext().startTimer(RETRY_TIMER, this);
         } else {
             LOG.error(path + ": Too much retries attempted to replay event on <subscription>. Giving up");
+            // Omit this notification
+            switch (state) {
+            case ST_WAITING_NOTIFICATION:
+                LOG.error(path + ": Received a subscription retry in state " + ST_NAMES[state]);
+                break;
+            case ST_PENDING_NOTIFY:
+                nbRetry = 0;
+                state = ST_WAITING_NOTIFICATION;
+                break;
+            case ST_PENDING_NOTIFY_AND_NOTIFICATION:
+                nbRetry = 0;
+                state = ST_PENDING_NOTIFY;
+                retrieveAndSendNotify();
+                break;
+            case ST_WAITING_MINT:
+            case ST_WAITING_RETRY:
+            case ST_EXPIRING_PENDING_NOTIFY_WAITING_RETRY:
+            case ST_DELETING_PENDING_NOTIFY_WAITING_RETRY:
+            case ST_EXPIRING_WAITING_RETRY:
+            case ST_DELETING_WAITING_RETRY:
+                LOG.error(path + ": Received a subscription retry in state " + ST_NAMES[state]);
+                break;
+            case ST_EXPIRING_PENDING_NOTIFY:
+                nbRetry = 0;
+                state = ST_EXPIRING;
+                break;
+            case ST_DELETING_PENDING_NOTIFY:
+                nbRetry = 0;
+                state = ST_DELETING;
+                break;
+            case ST_EXPIRING:
+            case ST_DELETING:
+                nbRetry = 0;
+                state = ST_DELETED;
+                break;
+            case ST_DELETED:
+                LOG.error(path + ": Received a subscription retry in state " + ST_NAMES[state]);
+                break;
+            }
         }
     }
 
@@ -840,7 +879,7 @@ public final class SubManager implements Serializable {
     }
 
     public void print(StringBuffer buffer) {
-        buffer.append("    sub: ").append(id).append(" state: ").append(ST_NAMES[state])
+        buffer.append("    sub: ").append(id).append(" state: ").append(ST_NAMES[state]).append(" nbRetry: ").append(nbRetry)
                 .append(" pendingLastSuccessRequestTime: ").append(pendingLastSuccessRequestTime)
                 .append(" lastSuccessConfirmTime: ").append(lastSuccessConfirmTime).append(" mediaType: ").append(mediaType)
                 .append('\n');
