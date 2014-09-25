@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: TelnetServer.java 8750 2014-05-21 15:18:02Z JReich $
+ * id $Id: TelnetServer.java 9060 2014-07-09 15:43:26Z JReich $
  * author $Author: JReich $
- * version $Revision: 8750 $
- * lastrevision $Date: 2014-05-21 17:18:02 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9060 $
+ * lastrevision $Date: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:18:02 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
  */
 
 package com.actility.m2m.felix.shell.telnet;
@@ -225,7 +225,6 @@ public class TelnetServer implements BundleActivator, Runnable, ManagedService {
                     serverSocket.setSoTimeout(telnetConfig.getSocketTimeout());
                     Socket socket = serverSocket.accept();
 
-                    // System.out.println("accepting on " + socket);
                     TelnetSession telnetSession = new TelnetSession(socket, telnetConfig, context, this);
                     Thread telnetSessionThread = new Thread(telnetSession, "TelnetConsoleSession");
                     telnetSessions.put(telnetSession, telnetSessionThread);

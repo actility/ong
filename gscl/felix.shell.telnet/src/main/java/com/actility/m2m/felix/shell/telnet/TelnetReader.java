@@ -21,52 +21,36 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: TelnetReader.java 6382 2013-11-07 08:50:55Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6382 $
- * lastrevision $Date: 2013-11-07 09:50:55 +0100 (Thu, 07 Nov 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-11-07 09:50:55 +0100 (Thu, 07 Nov 2013) $
+ * id $Id: TelnetReader.java 9060 2014-07-09 15:43:26Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9060 $
+ * lastrevision $Date: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
  */
 
 package com.actility.m2m.felix.shell.telnet;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
-import java.util.Vector;
+import java.util.LinkedList;
 
 /**
  * Reads an input stream and extracts telnet TVM character.
  *
  * This class provides a very limited line editing capability.
  */
-public class TelnetReader extends Reader {
+public class TelnetReader {
     // private InputStreamReader ir;
-    private TelnetSession tels;
-
-    private Vector lineBuf; // buffer while a line is being edited
-
-    private char[] readyLine; // buffer for a that has been terminated by CR
-                              // or LF
-
-    private int rp; // pointer in read buffer line
-
+    private TelnetSession telnetSession;
     private InputStream is;
-
     private boolean busyWait;
-
     private boolean skipLF = false; // Skip next char if LF
 
-    public TelnetReader(InputStream is, TelnetSession tels, boolean busyWait) {
-        this.tels = tels;
+    public TelnetReader(InputStream is, TelnetSession telnetSession, boolean busyWait) {
+        this.telnetSession = telnetSession;
         this.is = is;
         this.busyWait = busyWait;
-
-        // ir = new InputStreamReader(is);
-        lineBuf = new Vector();
-        readyLine = new char[0];
-        rp = 0;
     }
 
     public void close() throws IOException {
@@ -74,90 +58,10 @@ public class TelnetReader extends Reader {
     }
 
     public boolean ready() throws IOException {
-        // TODO, we should check skipLF
         return is.available() > 0;
     }
 
-    /**
-     * Block here until end of line (CR) and then return
-     *
-     * This method provides very limited line editing functionality
-     *
-     * CR -&lt; return from read BS -&lt; back one step in buffer
-     *
-     */
-    public int read(char[] buf, int off, int len) throws IOException {
-        int count = 0;
-        int character;
-        Integer tmp;
-
-        // System.out.println("TelnetReader.read buf=" + buf + ", off=" + off +
-        // ", len=" + len);
-
-        // 1. Check if there still are characters in readyLine ?
-
-        count = chkRdyLine(buf, off, len);
-
-        if (count > 0) {
-            return count;
-        }
-        boolean w1 = true;
-        while (w1) {
-            character = readChar();
-
-            if (character != -1) {
-
-                // System.out.println("Char " + String.valueOf(character));
-
-                switch (character) {
-
-                case TelnetCommandCodes.BS:
-                    // System.out.println("BS");
-                    if (lineBuf.size() > 0) {
-                        lineBuf.removeElementAt(lineBuf.size() - 1);
-                        // tels.echoChar(character);
-                        tels.echoChar(' ');
-                        tels.echoChar(character);
-                    }
-                    break;
-
-                case TelnetCommandCodes.CR:
-                case TelnetCommandCodes.LF:
-                    // System.out.println("CR");
-                    lineBuf.addElement(new Integer(character));
-                    // tels.echoChar(character);
-
-                    // transfer from lineBuf to readyLine
-
-                    readyLine = new char[lineBuf.size()];
-                    for (int i = 0; i < lineBuf.size(); i++) {
-                        tmp = (Integer) lineBuf.elementAt(i);
-                        character = tmp.intValue();
-                        readyLine[i] = (char) character;
-                    }
-                    rp = 0;
-
-                    lineBuf.removeAllElements();
-                    count = chkRdyLine(buf, off, len);
-                    return count;
-
-                default:
-                    // System.out.println("char=" + character);
-                    lineBuf.addElement(new Integer(character));
-                    //tels.echoChar(character);
-                }
-            } else {
-                // The input stream is closed; ignore the buffered data
-                // and return -1 to to tell next layer that the reader
-                // is closed.
-                return -1;
-            }
-        }
-        return count;
-    }
-
     private int readChar() throws IOException {
-        // System.out.println("TelnetReader.readChar()");
         int c;
         while (true) {
             if (busyWait) {
@@ -180,7 +84,10 @@ public class TelnetReader extends Reader {
             }
         }
 
-        tels.echoChar(c);
+        if (c != TelnetCommandCodes.ESC && c != TelnetCommandCodes.DEL && c != TelnetCommandCodes.BS) {
+            telnetSession.echoChar(c);
+            telnetSession.echoFlush();
+        }
 
         if (c == TelnetCommandCodes.CR) {
             skipLF = true;
@@ -188,57 +95,76 @@ public class TelnetReader extends Reader {
         return c;
     }
 
-    private int chkRdyLine(char[] buf, int off, int len) {
-        int count = 0;
-        if (rp < readyLine.length) {
-            while (count < (len - off)) {
-                buf[off + count] = readyLine[rp++];
-                count++;
-            }
-        }
-        return count;
-    }
-
     /**
      * * Read input data until CR or LF found;
      */
-
     public String readLine() throws IOException {
-        Vector buf = new Vector();
-        int character = -2;
+        LinkedList buffer = telnetSession.getCurrentLine();
+        buffer.clear();
+        int character = 0;
+        telnetSession.resetLinePosition();
 
-        // System.out.println("TelnetReader.readLine()");
-
-        try {
-            while (true) {
-                character = readChar();
-                if (character == TelnetCommandCodes.CR) {
-                    break;
+        while ((character = readChar()) != -1) {
+            switch (character) {
+            case TelnetCommandCodes.ESC:
+                // Read VT100
+                StringBuffer tmp = new StringBuffer();
+                tmp.append((char) character);
+                while ((character = is.read()) != 1) {
+                    tmp.append((char) character);
+                    int command = VT100CommandCodes.readVT100CommandCode(tmp.toString());
+                    if (command == -1) {
+                        // Unknown VT100 character code. Echo all characters
+                        for (int i = 0; i < tmp.length(); ++i) {
+                            telnetSession.echoChar(tmp.charAt(i));
+                        }
+                        telnetSession.echoFlush();
+                        break;
+                    } else if (command > 0) {
+                        // Execute command code
+                        VT100CommandCodes.executeCommandCode(tmp.toString(), command, telnetSession);
+                        break;
+                    }
                 }
-
-                if (-1 == character) {
-                    // The input stream is closed; ignore the buffered
-                    // data and return null to to tell next layer that
-                    // the reader is closed.
+                if (character == -1) {
                     return null;
                 }
-                // System.out.println("TelnetReader.readLine() add char " +
-                // character);
-                buf.addElement(new Character((char) character));
+                break;
+            case TelnetCommandCodes.BS:
+            case TelnetCommandCodes.DEL:
+                if (buffer.size() > 0 && telnetSession.getLinePosition() > 0) {
+                    buffer.remove(telnetSession.getLinePosition() - 1);
+                    telnetSession.decLinePosition();
+                    telnetSession.echoChar(TelnetCommandCodes.BS);
+                    for (int i = telnetSession.getLinePosition(); i < buffer.size(); ++i) {
+                        telnetSession.echoChar(((Character) buffer.get(i)).charValue());
+                    }
+                    telnetSession.echoChar(' ');
+                    telnetSession.echoChar(TelnetCommandCodes.BS);
+                    for (int i = telnetSession.getLinePosition(); i < buffer.size(); ++i) {
+                        telnetSession.echoChar(TelnetCommandCodes.BS);
+                    }
+                }
+                break;
+            case TelnetCommandCodes.CR:
+            case TelnetCommandCodes.LF:
+                StringBuffer realLine = new StringBuffer();
+                for (int i = 0; i < buffer.size(); i++) {
+                    realLine.append(buffer.get(i));
+                }
+                return realLine.toString();
+            default:
+                buffer.add(telnetSession.getLinePosition(), new Character((char) character));
+                telnetSession.incLinePosition();
+                for (int i = telnetSession.getLinePosition(); i < buffer.size(); ++i) {
+                    telnetSession.echoChar(((Character) buffer.get(i)).charValue());
+                }
+                for (int i = telnetSession.getLinePosition(); i < buffer.size(); ++i) {
+                    telnetSession.echoChar(TelnetCommandCodes.BS);
+                }
             }
-
-            // Convert to string
-
-            char[] cbuf = new char[buf.size()];
-            for (int i = 0; i < buf.size(); i++) {
-                Character c1 = (Character) buf.elementAt(i);
-                cbuf[i] = c1.charValue();
-            }
-            String s1 = new String(cbuf);
-            return s1;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
+            telnetSession.echoFlush();
         }
+        return null;
     }
 }

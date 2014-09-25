@@ -1,32 +1,32 @@
 /*
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version
  * 2 only, as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License version 2 for more details (a copy is
  * included at /legal/license.txt).
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * version 2 along with this work; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
- * 
+ *
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- * 
- * id $Id: TelnetStateMachine.java 6116 2013-10-16 12:27:48Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6116 $
- * lastrevision $Date: 2013-10-16 14:27:48 +0200 (Wed, 16 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-16 14:27:48 +0200 (Wed, 16 Oct 2013) $
+ *
+ * id $Id: TelnetStateMachine.java 9060 2014-07-09 15:43:26Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9060 $
+ * lastrevision $Date: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
  */
 
 package com.actility.m2m.felix.shell.telnet;
@@ -66,8 +66,6 @@ public class TelnetStateMachine {
 
     public int nextState(int state, int code) {
         int newState = 0;
-        // System.out.println("State = " + String.valueOf(state) + " Code = " +
-        // String.valueOf(code));
 
         switch (state) {
         case 0: // data mode, look for IAC only

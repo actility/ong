@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: TelnetInputStream.java 6382 2013-11-07 08:50:55Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6382 $
- * lastrevision $Date: 2013-11-07 09:50:55 +0100 (Thu, 07 Nov 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-11-07 09:50:55 +0100 (Thu, 07 Nov 2013) $
+ * id $Id: TelnetInputStream.java 9060 2014-07-09 15:43:26Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9060 $
+ * lastrevision $Date: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
  */
 
 package com.actility.m2m.felix.shell.telnet;
@@ -105,8 +105,6 @@ public class TelnetInputStream extends FilterInputStream {
         scanStream: while (true) {
             prevChar = thisChar;
             thisChar = in.read();
-
-            //System.out.println("TelnetIS char=" + thisChar);
 
             if (thisChar == -1) {
                 break scanStream;

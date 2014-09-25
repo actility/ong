@@ -21,21 +21,24 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: TelnetSession.java 8750 2014-05-21 15:18:02Z JReich $
+ * id $Id: TelnetSession.java 9060 2014-07-09 15:43:26Z JReich $
  * author $Author: JReich $
- * version $Revision: 8750 $
- * lastrevision $Date: 2014-05-21 17:18:02 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9060 $
+ * lastrevision $Date: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:18:02 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
  */
 
 package com.actility.m2m.felix.shell.telnet;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.LinkedList;
 
 import org.apache.felix.shell.Session;
 import org.apache.felix.shell.ShellService;
@@ -91,6 +94,16 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
 
     private boolean end = false;
 
+    private int linePosition;
+
+    private LinkedList lastEditingLine;
+    private LinkedList[] editingHistory;
+    private int editingHistoryIndex;
+    private String[] history;
+    private int historyIndex;
+
+    private LinkedList currentLine;
+
     public TelnetSession(Socket socket, TelnetConfig telnetConfig, BundleContext bc, TelnetServer telnetServer) {
         this.telnetConfig = telnetConfig;
         this.socket = socket;
@@ -112,8 +125,8 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
             LOG.error("Session socket opening exception " + iox.toString(), iox);
         }
 
-        telnetInputStream = new TelnetInputStream(is, this);
-        telnetOutputStream = new TelnetOutputStream(os, this);
+        telnetInputStream = new TelnetInputStream(new BufferedInputStream(is), this);
+        telnetOutputStream = new TelnetOutputStream(new BufferedOutputStream(os), this);
 
         printStream = new PrintStream(telnetOutputStream);
         reader = new TelnetReader(telnetInputStream, this, telnetConfig.getBusyWait());
@@ -126,6 +139,12 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
 
         telnetCommands[TelnetCommandCodes.STATUS] = new TelnetCommandStatus(this, TelnetCommandCodes.STATUS, false, true);
 
+        currentLine = new LinkedList();
+        history = new String[32];
+        historyIndex = 0;
+        lastEditingLine = null;
+        editingHistory = new LinkedList[32];
+        editingHistoryIndex = 0;
     }
 
     public void run() {
@@ -145,40 +164,34 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
                     printStream.println("'quit' to end session");
                     LOG.info("Telnet session logged in");
                     session = shellService.createSession();
-                    StringBuffer cmdline = new StringBuffer();
-                    boolean eol = false;
-                    int current = 0;
+                    String cmdline = null;
+                    // boolean eol = false;
+                    // int current = 0;
                     while (!end) {
-                        cmdline.setLength(0);
                         printStream.print("-> ");
 
                         end = printStream.checkError();
-                        eol = end;
-                        while (!eol) {
-                            current = reader.read();
-                            if (current == -1) {
-                                throw new IOException("Socket is closed");
-                            }
-                            switch (current) {
-                            case 0x7f:
-                                if (cmdline.length() > 0) {
-                                    cmdline.setLength(cmdline.length() - 1);
-                                }
-                                break;
-                            case '\r':
-                            case '\n':
-                            case '\0':
-                                eol = true;
-                                break;
-                            default:
-                                cmdline.append((char) current);
-                                break;
-                            }
+                        // eol = end;
+
+                        editingHistoryIndex = historyIndex;
+                        for (int i = 0; i < editingHistory.length; ++i) {
+                            editingHistory[i] = null;
+                        }
+                        cmdline = reader.readLine();
+                        if (cmdline == null) {
+                            throw new IOException("Socket is closed");
                         }
 
                         if (!end && cmdline.length() > 0) {
                             try {
-                                String command = cmdline.toString().trim();
+                                String command = cmdline.trim();
+                                // Add command to history
+                                int previousIndex = (historyIndex - 1 + history.length) % history.length;
+                                if (command.length() > 0
+                                        && (history[previousIndex] == null || !history[previousIndex].equals(command))) {
+                                    history[historyIndex] = command;
+                                    historyIndex = (historyIndex + 1) % history.length;
+                                }
                                 if ("quit".equalsIgnoreCase(command)) {
                                     end = true;
                                 } else {
@@ -269,10 +282,18 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
     public void echoChar(int character) {
         TelnetCommand tc = telnetCommands[TelnetCommandCodes.ECHO];
 
-        // System.out.println("echo=" + character + ", enable=" + enableEcho);
         if (tc != null) {
             if (tc.getDoStatus() && enableEcho) {
                 printStream.print((char) character);
+            }
+        }
+    }
+
+    public void echoFlush() {
+        TelnetCommand tc = telnetCommands[TelnetCommandCodes.ECHO];
+
+        if (tc != null) {
+            if (tc.getDoStatus() && enableEcho) {
                 printStream.flush();
             }
         }
@@ -499,6 +520,88 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
                 }
             }
         }
+    }
+
+    public int getLinePosition() {
+        return linePosition;
+    }
+
+    public boolean incLinePosition() {
+        if (linePosition < currentLine.size()) {
+            this.linePosition++;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean decLinePosition() {
+        if (linePosition > 0) {
+            linePosition--;
+            return true;
+        }
+        return false;
+    }
+
+    public void endLinePosition() {
+        linePosition = currentLine.size();
+    }
+
+    public void resetLinePosition() {
+        linePosition = 0;
+    }
+
+    public void setLinePosition(int linePosition) {
+        this.linePosition = linePosition;
+    }
+
+    public LinkedList getCurrentLine() {
+        return currentLine;
+    }
+
+    public LinkedList getPreviousCommand() {
+        if (editingHistoryIndex == historyIndex) {
+            lastEditingLine = new LinkedList(currentLine);
+        } else {
+            editingHistory[editingHistoryIndex] = new LinkedList(currentLine);
+        }
+        int previousEditingHistoryIndex = (editingHistoryIndex - 1 + editingHistory.length) % editingHistory.length;
+        if (previousEditingHistoryIndex != historyIndex && history[previousEditingHistoryIndex] != null) {
+            editingHistoryIndex = previousEditingHistoryIndex;
+            LinkedList previousCommandList = editingHistory[editingHistoryIndex];
+            if (previousCommandList == null) {
+                String previousCommand = history[editingHistoryIndex];
+                previousCommandList = new LinkedList();
+                for (int i = 0; i < previousCommand.length(); ++i) {
+                    previousCommandList.add(new Character(previousCommand.charAt(i)));
+                }
+            }
+            return previousCommandList;
+        }
+        return new LinkedList(currentLine);
+    }
+
+    public LinkedList getNextCommand() {
+        if (editingHistoryIndex != historyIndex) {
+            editingHistory[editingHistoryIndex] = new LinkedList(currentLine);
+
+            editingHistoryIndex = (editingHistoryIndex + 1) % editingHistory.length;
+
+            LinkedList nextCommandList = null;
+            if (editingHistoryIndex == historyIndex) {
+                nextCommandList = lastEditingLine;
+            } else {
+                nextCommandList = editingHistory[editingHistoryIndex];
+                if (nextCommandList == null) {
+                    String nextCommand = history[editingHistoryIndex];
+                    nextCommandList = new LinkedList();
+                    for (int i = 0; i < nextCommand.length(); ++i) {
+                        nextCommandList.add(new Character(nextCommand.charAt(i)));
+                    }
+                }
+            }
+            return nextCommandList;
+        }
+        return new LinkedList(currentLine);
     }
 
     public Object addingService(ServiceReference reference) {
