@@ -1,6 +1,124 @@
 -------------------------------------------------------------------------------
 M2M subscription over HTTP - C implementation - changelog
 -------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2014-09-22
+
+Initial version
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - "last notify" information that is display when invoking "httpSubsDisplayAll"
+   function was wrong when no "notify" request was received yet. Fixed.
+
+Limitations:
+------------
+ - N/A
+
+Dependencies:
+-------------
+ - rtbase-1.2.3-0
+ - m2mxoref-1.1.12-1
+ - xo-4.2.10-0
+ - libSongOverHttp-2.0.0-0
+ - makefile-common-1.0.1-0
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2014-09-09
+
+Initial version
+
+New features:
+-------------
+ - Add callback method for errors notification.
+ - Add support for 'fullInitialReport' parameter: when disable, <subscription> 
+   resource is generated with a <createdSince> filter criteria set at the date
+   and time of the xml document creation. As a consequence the initial report
+   does not contains all the <contentInstance> representations.
+ - Add the ability to proxy requests through a NSCL.
+   "httpSubsCreate" prototype changed: "nsclBaseUri" has been renamed 
+   "nsclProxyHostPort" and has now format "host:port". Can be NULL if the
+   request is to be routed directly.
+
+Bug Fixes:
+----------
+ - N/A
+
+Limitations:
+------------
+ - N/A
+
+Dependencies:
+-------------
+ - rtbase-1.2.3-0
+ - m2mxoref-1.1.12-1
+ - xo-4.2.10-0
+ - libSongOverHttp-2.0.0-0
+ - makefile-common-1.0.1-0
+
+-------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2014-09-01
+
+Initial version
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Server FQDN (that is provided as parameter of "httpSubsInit" primitive) was
+   not managed correctly; as a consequence the <m2m:contact> set in built
+   subscription resources may be wrong. Fixed.
+
+Limitations:
+------------
+ - 'fullInitialReport' parameter of httpSubsCreate API function is 
+   inefficient.
+
+Dependencies:
+-------------
+ - rtbase-1.2.3-0
+ - m2mxoref-1.1.12-1
+ - xo-4.2.10-0
+ - libSongOverHttp-1.0.3-0
+ - makefile-common-1.0.1-0
+
+-------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2014-07-25
+
+Initial version
+
+New features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Added static library in "devel" apu.
+ - Fixed few compilation warnings regarding printf functions usage.
+
+Limitations:
+------------
+ - 'fullInitialReport' parameter of httpSubsCreate API function is 
+   inefficient.
+
+Dependencies:
+-------------
+ - rtbase-1.2.3-0
+ - m2mxoref-1.1.12-1
+ - xo-4.2.10-0
+ - libSongOverHttp-1.0.1-0
+ - makefile-common-1.0.1-0
+
+-------------------------------------------------------------------------------
 Version: 1.0.0
 Date: 2014-07-24
 

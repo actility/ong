@@ -693,7 +693,7 @@ static int s_curl_debugCb(CURL *eh, curl_infotype type, char *msg, size_t msgLen
     max = MAX_BUF_SIZE_VL-1;
   }
 
-  snprintf(message, max, msg);
+  snprintf(message, max, "%s", msg);
   RTL_TRDBG(TRACE_DEBUG, "%s%s\n", head, message);
 
   return 0;

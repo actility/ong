@@ -18,7 +18,8 @@ char *xoSerializeAndFree(void *xo)
   void *xoWriter;
   char *subsXml;
 
-  xoWriter = XoWritXmlMem(xo, 0, &subsXml, "m2m");
+  //xoWriter = XoWritXmlMem(xo, 0, &subsXml, "m2m");
+  xoWriter = XoWritXmlMem(xo, 0, &subsXml, NULL);
   if  (!xoWriter)
   {
     RTL_TRDBG(TRACE_ERROR, "ERROR cannot serialize (XML) xo '%s'\n",

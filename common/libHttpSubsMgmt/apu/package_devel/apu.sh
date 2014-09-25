@@ -23,6 +23,7 @@ buildApuImage()
   cp libHttpSubsMgmt/include/* apu/data/include/ && \
   cp libHttpSubsMgmt/lib/lib/libHttpSubsMgmt.so \
      apu/data/lib/libHttpSubsMgmt-$HSM_VERSION.so && \
+  cp libHttpSubsMgmt/lib/lib/libHttpSubsMgmt.a apu/data/lib/ && \
   echo "cd \$ROOTACT/lib" > apu/control/postinst && \
   echo "ln -f -s libHttpSubsMgmt-$HSM_VERSION.so libHttpSubsMgmt.so" >> apu/control/postinst 
 }

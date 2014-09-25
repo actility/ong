@@ -137,6 +137,9 @@ void sohClockMs()
 
 /**
  * Send a request.
+ * @param method the request method to use for that request.
+ * @param nsclProxyHostPort the host and port (':'-seprated) of the NSCL that will proxy 
+ * the request. May be NULL. In this case the request is directly sent using 'targetID'.
  * @param reqEntity the requesting entity
  * @param targetID the targetID query parameter ; should be a full URI, and when 
  * targeting an ONG, must start with the link URI provided by the ONG when it registered
@@ -150,9 +153,9 @@ void sohClockMs()
  * @param respCb pointer on the issuer callback function.
  * @return SOH_RC_OK if the request can be sent successfully, any other SOH_RCODE otherwise.
  */
-static SOH_RCODE sohRequest(SOH_METHOD method, char *reqEntity, char *targetID, 
-  unsigned char *content, size_t len, char *contentType, sohHeader_t **optHeaders, 
-  char **tid, void *issuerData, void *respCb)
+static SOH_RCODE sohRequest(SOH_METHOD method, char *nsclProxyHostPort, char *reqEntity, 
+  char *targetID, unsigned char *content, size_t len, char *contentType, 
+  sohHeader_t **optHeaders, char **tid, void *issuerData, void *respCb)
 {
   cltTransaction_t *trans;
   int i = 0;
@@ -165,7 +168,12 @@ static SOH_RCODE sohRequest(SOH_METHOD method, char *reqEntity, char *targetID,
   trans->setCompletionParam(trans, respCb, issuerData);
   trans->setReqMethod(trans, method);
   trans->setReqUrl(trans, targetID);
-  
+
+  if (nsclProxyHostPort)
+  {
+    trans->setReqProxy(trans, nsclProxyHostPort);
+  } 
+ 
   trans->setReqRequestingEntity(trans, reqEntity);
   if (optHeaders)
   {
@@ -191,6 +199,8 @@ static SOH_RCODE sohRequest(SOH_METHOD method, char *reqEntity, char *targetID,
 
 /**
  * Send a CREATE request.
+ * @param nsclProxyHostPort the host and port (':'-seprated) of the NSCL that will proxy 
+ * the request. May be NULL. In this case the request is directly sent using 'targetID'.
  * @param reqEntity the requesting entity
  * @param targetID the targetID query parameter ; should be a full URI, and when 
  * targeting an ONG, must start with the link URI provided by the ONG when it registered
@@ -203,43 +213,45 @@ static SOH_RCODE sohRequest(SOH_METHOD method, char *reqEntity, char *targetID,
  * @param issuerData a pointer on issuer data structure, passed transparently over the library.
  * @return SOH_RC_OK if the request can be sent successfully, any other SOH_RCODE otherwise.
  */
-SOH_RCODE sohCreateRequest(char *reqEntity, char *targetID, unsigned char *content, size_t len,
-  char *contentType, sohHeader_t **optHeaders, char **tid, void *issuerData, 
-  PF_SOH_CREATE_RESPONSE_CB createRespCb)
+SOH_RCODE sohCreateRequest(char *nsclProxyHostPort, char *reqEntity, char *targetID, 
+  unsigned char *content, size_t len, char *contentType, sohHeader_t **optHeaders, 
+  char **tid, void *issuerData, PF_SOH_CREATE_RESPONSE_CB createRespCb)
 {
-  return sohRequest(SOH_CREATE, reqEntity, targetID, content, len, contentType, optHeaders, 
-    tid, issuerData, createRespCb);
+  return sohRequest(SOH_CREATE, nsclProxyHostPort, reqEntity, targetID, content, len, 
+    contentType, optHeaders, tid, issuerData, createRespCb);
 }
 
 /**
  * Send a RETRIEVE request.
  */
-SOH_RCODE sohRetrieveRequest(char *reqEntity, char *targetID, sohHeader_t **optHeaders, 
-  char **tid, void *issuerData, PF_SOH_RETRIEVE_RESPONSE_CB retrieveRespCb)
+SOH_RCODE sohRetrieveRequest(char *nsclProxyHostPort, char *reqEntity, char *targetID, 
+  sohHeader_t **optHeaders, char **tid, void *issuerData, 
+  PF_SOH_RETRIEVE_RESPONSE_CB retrieveRespCb)
 {
-  return sohRequest(SOH_RETRIEVE, reqEntity, targetID, NULL, 0, NULL, optHeaders, 
-    tid, issuerData, retrieveRespCb);
+  return sohRequest(SOH_RETRIEVE, nsclProxyHostPort, reqEntity, targetID, NULL, 0, NULL, 
+    optHeaders, tid, issuerData, retrieveRespCb);
 }
 
 /**
  * Send an UPDATE request.
  */
-SOH_RCODE sohUpdateRequest(char *reqEntity, char *targetID, unsigned char *content, size_t len,
-  char *contentType, sohHeader_t **optHeaders, char **tid, void *issuerData,
-  PF_SOH_UPDATE_RESPONSE_CB updateRespCb)
+SOH_RCODE sohUpdateRequest(char *nsclProxyHostPort, char *reqEntity, char *targetID,
+  unsigned char *content, size_t len, char *contentType, sohHeader_t **optHeaders, 
+  char **tid, void *issuerData, PF_SOH_UPDATE_RESPONSE_CB updateRespCb)
 {
-  return sohRequest(SOH_UPDATE, reqEntity, targetID, content, len, contentType, optHeaders, 
-    tid, issuerData, updateRespCb);
+  return sohRequest(SOH_UPDATE, nsclProxyHostPort, reqEntity, targetID, content, len, 
+    contentType, optHeaders, tid, issuerData, updateRespCb);
 }
 
 /**
  * Send a DELETE request.
  */
-SOH_RCODE sohDeleteRequest(char *reqEntity, char *targetID, sohHeader_t **optHeaders, 
-  char **tid, void *issuerData, PF_SOH_DELETE_RESPONSE_CB deleteRespCb)
+SOH_RCODE sohDeleteRequest(char *nsclProxyHostPort, char *reqEntity, char *targetID,
+  sohHeader_t **optHeaders, char **tid, void *issuerData, 
+  PF_SOH_DELETE_RESPONSE_CB deleteRespCb)
 {
-  return sohRequest(SOH_DELETE, reqEntity, targetID, NULL, 0, NULL, optHeaders, 
-    tid, issuerData, deleteRespCb);
+  return sohRequest(SOH_DELETE, nsclProxyHostPort, reqEntity, targetID, NULL, 0, NULL, 
+    optHeaders, tid, issuerData, deleteRespCb);
 }
 
 

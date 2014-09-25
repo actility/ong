@@ -40,7 +40,7 @@ static  int FdListen = -1;
 static  int TcpKeepAlive  = 1;
 
 static char g_reqEntity[255];
-static char g_nsclBaseUri[255];
+static char g_nsclProxy[255];
 
 static t_cli *g_testerClRef = NULL;
 
@@ -52,7 +52,7 @@ static void AdmHelp(t_cli *cl)
   AdmPrint(cl, "\n");
   AdmPrint(cl, "getInfo                  : get value of global variables\n");
   AdmPrint(cl, "setReqEntity <reqEntity> : set globally the reqEntity\n");
-  AdmPrint(cl, "setNsclBaseUri <baseUri> : set globally the nsclBaseUri\n");
+  AdmPrint(cl, "setNsclProxy <host:port> : set globally the nsclProxy host and port\n");
   AdmPrint(cl, "subsCis <targetID>       : subscribe to content instances\n");
   AdmPrint(cl, "subs <targetID>          : subscribe to content instances\n");
   AdmPrint(cl, "displaySubs              : display information for all active subscriptions\n"); 
@@ -62,7 +62,7 @@ static void AdmHelp(t_cli *cl)
 void doGetInfo(t_cli *cl)
 {
   AdmPrint(cl, "reqEntity: %s\n", g_reqEntity);
-  AdmPrint(cl, "nsclBaseUri: %s\n", g_nsclBaseUri);
+  AdmPrint(cl, "nsclProxy: %s\n", g_nsclProxy);
   AdmPrint(cl, "\n");
 }
 
@@ -82,11 +82,11 @@ void doSetReqEntity(t_cli *cl, char *buf)
   }
 
   memset(g_reqEntity, 0, sizeof(g_reqEntity));
-  sprintf(g_reqEntity, arg);
+  sprintf(g_reqEntity, "%s", arg);
 }
 
-// setNsclBaseUri <baseUri>
-void doSetNsclBaseUri(t_cli *cl, char *buf)
+// setNsclProxy <host:port>
+void doSetNsclProxy(t_cli *cl, char *buf)
 {
   char arg[255];
   memset(arg, 0, sizeof(arg));
@@ -96,12 +96,12 @@ void doSetNsclBaseUri(t_cli *cl, char *buf)
 
   if (! *arg)
   {
-    AdmPrint(cl, "<baseUri> is missing\n");
+    AdmPrint(cl, "<host:port> is missing\n");
     return;  
   }
 
-  memset(g_nsclBaseUri, 0, sizeof(g_nsclBaseUri));
-  sprintf(g_nsclBaseUri, arg);
+  memset(g_nsclProxy, 0, sizeof(g_nsclProxy));
+  sprintf(g_nsclProxy, "%s", arg);
  
 }
 
@@ -117,7 +117,27 @@ void testerNotifCb(unsigned long subscriptionId, void *issuerData, char *content
   {
     printf("=======================================================================\n");
     printf("Received notification for subscription %lu:\n", subscriptionId);
-    printf(content);
+    printf("%s", content);
+    printf("\n");
+  }
+}
+
+void testerErrorCb(unsigned long subscriptionId, void *issuerData, SUBS_ERR_CODE errorCode, 
+  char *errorMsg)
+{
+  if (g_testerClRef)
+  {
+    AdmPrint(g_testerClRef, "Received error msg for subscription %lu (error:%d):\n", 
+      subscriptionId, errorCode);
+    AdmPrint(g_testerClRef, errorMsg);
+    AdmPrint(g_testerClRef, "\n");
+  }
+  else
+  {
+    printf("=======================================================================\n");
+    printf("Received error msg for subscription %lu (error:%d):\n", subscriptionId, 
+      errorCode);
+    printf("%s", errorMsg);
     printf("\n");
   }
 }
@@ -138,8 +158,8 @@ void doSubsCis(t_cli *cl, char *buf)
     return;  
   }
 
-  if (httpSubsCreate(&subsId, testerNotifCb, cl, g_reqEntity, g_nsclBaseUri, arg, 
-        SUBS_TYPE_CONTENT_INSTANCES, true, 10000))
+  if (httpSubsCreate(&subsId, testerNotifCb, testerErrorCb, g_testerClRef, g_reqEntity, 
+      g_nsclProxy, arg, SUBS_TYPE_CONTENT_INSTANCES, true, 10000))
   {
     AdmPrint(cl, "Subscription %ld created\n", subsId);
   }
@@ -165,8 +185,8 @@ void doSubs(t_cli *cl, char *buf)
     return;  
   }
 
-  if (httpSubsCreate(&subsId, testerNotifCb, g_testerClRef, g_reqEntity, g_nsclBaseUri, arg, 
-        SUBS_TYPE_COMMON, true, 10000))
+  if (httpSubsCreate(&subsId, testerNotifCb, testerErrorCb, g_testerClRef, g_reqEntity, 
+        g_nsclProxy, arg, SUBS_TYPE_COMMON, false, 10000))
   {
     AdmPrint(cl, "Subscription %ld created\n", subsId);
   }
@@ -220,9 +240,9 @@ static  int AdmCommand(t_cli *cl, char *buf)
     return CLI_PROMPT;
   }
 
-  if (0 == strncmp(buf, "setNsclBaseUri", strlen("setNsclBaseUri")))
+  if (0 == strncmp(buf, "setNsclProxy", strlen("setNsclProxy")))
   {
-    doSetNsclBaseUri(cl, buf);
+    doSetNsclProxy(cl, buf);
     return CLI_PROMPT;
   }
 
@@ -856,7 +876,7 @@ int CB_AdmTcpListen(void *tb, int fd, void *r1, void *r2, int revents)
 
   SetCB(fdnew);
 
-  AdmPrint(cl, "Welcome to AZAP tester CLI\n");
+  AdmPrint(cl, "Welcome to libHttpSubsMgmt tester CLI\n");
   if  (strlen(GetTelnetKey()))
   {
     AdmPrint(cl, "key:");
@@ -933,9 +953,9 @@ void  AdmTcpInit()
 {
   AdmTcpBind();
   memset(g_reqEntity, 0, sizeof(g_reqEntity));
-  memset(g_nsclBaseUri, 0, sizeof(g_nsclBaseUri));
-  sprintf(g_reqEntity, "http://rms.poc1.actility.com:8080/m2m/applications/SUPPORT");
-  sprintf(g_nsclBaseUri, "http://rms.poc1.actility.com:8080/m2m");
+  memset(g_nsclProxy, 0, sizeof(g_nsclProxy));
+  sprintf(g_reqEntity, "http://nsc1.actility.com:8088/m2m/applications/SUPPORT");
+  sprintf(g_nsclProxy, "nsc1.actility.com:8088");
 }
 
 void  AdmClockSc(time_t now)

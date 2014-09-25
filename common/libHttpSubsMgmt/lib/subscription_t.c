@@ -13,7 +13,7 @@
 #include "subscription_t.h"
 
 
-extern char g_httpSrvFQDN[];
+extern char *g_httpSrvFQDN;
 extern int g_httpSrvPort;
 extern int g_subsDuration;
 
@@ -34,19 +34,22 @@ static void subscription_t_init(subscription_t *This)
   This->subscribe = subscription_t_subscribe;
   This->reSubscribe = subscription_t_reSubscribe;
   This->unsubscribe = subscription_t_unsubscribe;
+  This->notify = subscription_t_notify;
   This->display = subscription_t_display;
   /* Initialize the members */
   This->id = 0;
-  memset(This->targetID, 0, BUF_SIZE_L); 
-  memset(This->reqEntity, 0, BUF_SIZE_M); 
-  memset(This->nsclBaseUri, 0, BUF_SIZE_M);
+  This->targetID = NULL;
+  This->reqEntity = NULL;
+  This->nsclProxy = NULL;
   This->type = SUBS_TYPE_UNKNOWN;
   This->fullInitialReport = false;
   This->minTimeBtwnNotif = 0;
   This->lastSubsDate = 0;
+  This->lastNotifyDate = 0;
   This->pendingTid = NULL;
   This->state = SUBS_ST_INIT;
   This->notifyCb = NULL;
+  This->errorCb = NULL;
   This->issuerData = NULL;
 }
 
@@ -55,9 +58,9 @@ static void subscription_t_init(subscription_t *This)
  * @param name the name of the header.
  * @return the created object-like instance.
  */
-subscription_t *new_subscription_t(char *targetID, char *reqEntity, char *nsclBaseUri,
-  SUBS_TYPE type, unsigned long minTimeBtwnNotif, bool fullInitialReport, 
-  PF_HTTP_SUBS_NOTIFY_CB notifyCb, void *issuerData)
+subscription_t *new_subscription_t(char *nsclProxy, char *targetID, char *reqEntity, 
+  SUBS_TYPE type, unsigned long minTimeBtwnNotif, bool fullInitialReport,
+  PF_HTTP_SUBS_NOTIFY_CB notifyCb, PF_HTTP_SUBS_ERROR_CB errorCb, void *issuerData)
 {
   subscription_t *This = malloc(sizeof(subscription_t));
   if (!This)
@@ -67,13 +70,14 @@ subscription_t *new_subscription_t(char *targetID, char *reqEntity, char *nsclBa
   subscription_t_init(This);
   This->free = subscription_t_newFree;
   This->id = ++g_subscriptionId;
-  snprintf(This->targetID, BUF_SIZE_L, targetID); 
-  snprintf(This->reqEntity, BUF_SIZE_M, reqEntity); 
-  snprintf(This->nsclBaseUri, BUF_SIZE_M, nsclBaseUri);
+  This->nsclProxy = strdup(nsclProxy); 
+  This->targetID = strdup(targetID); 
+  This->reqEntity = strdup(reqEntity); 
   This->type = type;
   This->minTimeBtwnNotif = minTimeBtwnNotif;
   This->fullInitialReport = fullInitialReport; 
   This->notifyCb = notifyCb;
+  This->errorCb = errorCb;
   This->issuerData = issuerData;
 
   sprintf(This->idStr, SUBS_STR_FORMAT, This->id, g_httpSrvFQDN, g_httpSrvPort); 
@@ -89,6 +93,9 @@ subscription_t *new_subscription_t(char *targetID, char *reqEntity, char *nsclBa
 void subscription_t_newFree(subscription_t *This)
 {
   RTL_TRDBG(TRACE_DEBUG, "subscription_t::newFree (id:%lu)\n", This->id);
+  free(This->nsclProxy);
+  free(This->targetID);
+  free(This->reqEntity);
   free(This);
 }
 
@@ -105,6 +112,7 @@ int subscription_t_subscribe(subscription_t *This,
   void *issuerData, PF_SOH_CREATE_RESPONSE_CB createRespCb)
 {
   void *subs;
+  void *filterCriteria;
   char *subsXml;
   char szTemp[BUF_SIZE_M];
   struct timeval tv;
@@ -122,7 +130,8 @@ int subscription_t_subscribe(subscription_t *This,
 
   subs = XoNmNew("m2m:subscription");
   // Fix here all that need to be fixed in m2mxoref...
-  XoNmSetAttr(subs, "name$", "subscription", 0, 0);
+  XoNmSetAttr(subs, "name$", "m2m:subscription", 0, 0);
+  XoSetNameSpace(subs, "m2m");
   XoNmSetAttr(subs, "m2m:id", This->idStr, 0, 0);
  
   // minimalTimeBetweenNotifications
@@ -137,9 +146,24 @@ int subscription_t_subscribe(subscription_t *This,
     g_httpSrvPort, SUBS_QPARAM_ID, This->id);
   XoNmSetAttr(subs, "m2m:contact", szTemp, 0, 0);
 
+  gettimeofday(&tv, &tz);
+
+  // filter criteria - createdSince
+  if (! This->fullInitialReport)
+  {
+    filterCriteria = XoNmNew("m2m:ContentInstanceFilterCriteriaType");
+    XoNmSetAttr(filterCriteria, "name$", "m2m:filterCriteria", 0, 0);
+    XoSetNameSpace(filterCriteria, "m2m");
+    XoSetNameSpace(filterCriteria, "xsi");
+    XoNmSetAttr(filterCriteria, "xsi:type", "m2m:ContentInstanceFilterCriteriaType", 0, 0);
+    rtl_gettimeofday_to_iso8601date(&tv, &tz, szTemp);
+    XoNmSetAttr(filterCriteria, "createdSince", szTemp, 0, 0);
+    XoNmSetAttr(subs, "m2m:filterCriteria", filterCriteria, 0, 0);
+  }
+
+
   rtl_timemono(&This->lastSubsDate); 
   // expirationTime
-  gettimeofday(&tv, &tz);
   tv.tv_sec += g_subsDuration;
   rtl_gettimeofday_to_iso8601date(&tv, &tz, szTemp);
   XoNmSetAttr(subs, "m2m:expirationTime", szTemp, 0, 0);
@@ -148,7 +172,7 @@ int subscription_t_subscribe(subscription_t *This,
 
   sprintf(szTemp, "%s/subscriptions/", This->targetID);
   // sends the create request
-  if (SOH_RC_OK != sohCreateRequest(This->reqEntity, szTemp,
+  if (SOH_RC_OK != sohCreateRequest(This->nsclProxy, This->reqEntity, szTemp,
         (unsigned char *)subsXml, strlen(subsXml), CONTENT_TYPE_VALUE, 
         NULL, &This->pendingTid, issuerData, createRespCb))
   {
@@ -195,8 +219,9 @@ int subscription_t_reSubscribe(subscription_t *This,
   }
  
   subs = XoNmNew("m2m:subscription");
+  XoSetNameSpace(subs, "m2m");
   // Fix here all that need to be fixed in m2mxoref...
-  XoNmSetAttr(subs, "name$", "subscription", 0, 0);
+  XoNmSetAttr(subs, "name$", "m2m:subscription", 0, 0);
  
   // minimalTimeBetweenNotifications
   if (This->minTimeBtwnNotif)
@@ -216,7 +241,7 @@ int subscription_t_reSubscribe(subscription_t *This,
 
   sprintf(szTemp, "%s/subscriptions/%s", This->targetID, This->idStr);
   // sends the create request
-  if (SOH_RC_OK != sohUpdateRequest(This->reqEntity, szTemp,
+  if (SOH_RC_OK != sohUpdateRequest(This->nsclProxy, This->reqEntity, szTemp,
         (unsigned char *)subsXml, strlen(subsXml), CONTENT_TYPE_VALUE, 
         NULL, &This->pendingTid, issuerData, updateRespCb))
   {
@@ -262,7 +287,7 @@ int subscription_t_unsubscribe(subscription_t *This,
 
   sprintf(szTemp, "%s/subscriptions/%s", This->targetID, This->idStr);
   // sends the create request
-  if (SOH_RC_OK != sohDeleteRequest(This->reqEntity, szTemp,
+  if (SOH_RC_OK != sohDeleteRequest(This->nsclProxy, This->reqEntity, szTemp,
         NULL, &This->pendingTid, issuerData, deleteRespCb))
   {
     RTL_TRDBG(TRACE_ERROR, "subscription_t::unsubscribe: "
@@ -278,6 +303,16 @@ int subscription_t_unsubscribe(subscription_t *This,
   return rc; 
 }
 
+/**
+ * Do inform the issuer of a NOTIFY request receipt for the subscription.
+ * @param This the object-like instance.
+ * @param content the content of the NOTIFY
+ */
+void subscription_t_notify(subscription_t *This, char *content)
+{
+  rtl_timemono(&This->lastNotifyDate); 
+  This->notifyCb(This->id, This->issuerData, content);
+}
 
 /**
  * Format the subscription and use the provided function to display it.
@@ -289,16 +324,38 @@ void subscription_t_display(subscription_t *This, PF_HTTP_SUBS_PRINT_CB dispFunc
   void *handle)
 {
   time_t now;
+  char lastSubs[BUF_SIZE_S];
+  char lastNotif[BUF_SIZE_S];
+
   rtl_timemono(&now);
+  if (This->lastSubsDate)
+  {
+    sprintf(lastSubs, "%lu seconds ago", now - This->lastSubsDate);
+  }
+  else
+  {
+    sprintf(lastSubs, "never");
+  }
+
+  if (This->lastNotifyDate)
+  {
+    sprintf(lastNotif, "%lu seconds ago", now - This->lastNotifyDate);
+  }
+  else
+  {
+    sprintf(lastNotif, "never");
+  }
+
   dispFunc(handle, 
-    "*\tid:       %lu\n"
-    "\tm2m:id:    %s\n"
-    "\ttargetID:  %s\n"
-    "\treqEntity: %s\n"
-    "\tstate:     %s\n" 
-    "\tlast subs: %lu seconds ago\n", 
-    This->id, This->idStr, This->targetID, This->reqEntity, stateStr(This->state), 
-    now - This->lastSubsDate);
+    "* id:          %lu\n"
+    "  m2m:id:      %s\n"
+    "  targetID:    %s\n"
+    "  reqEntity:   %s\n"
+    "  state:       %s\n" 
+    "  last subs:   %s\n" 
+    "  last notify: %s\n", 
+    This->id, This->idStr, This->targetID, This->reqEntity, 
+    stateStr(This->state), lastSubs, lastNotif);
 }
 
 

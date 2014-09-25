@@ -291,11 +291,14 @@ int response_t_parseStatusLine(response_t *This, char *statusLine, size_t status
  */
 void response_t_addToContent(response_t *This, unsigned char *content, size_t contentLen)
 {
-  size_t newContentLen = This->contentLength + contentLen + 1; 
+  size_t newContentLen;
 
   RTL_TRDBG(TRACE_DEBUG, "response_t::addToContent (This:0x%.8x) (contentLen:%d)\n", 
     This, contentLen);
 
+  if (This->contentLength) This->contentLength--; // remove the trailing space
+  newContentLen = This->contentLength + contentLen + 1;
+ 
   if (content && contentLen)
   {
     This->content = realloc(This->content, newContentLen);

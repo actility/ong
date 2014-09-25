@@ -21,6 +21,8 @@ buildApuImage()
   mkdir -p apu/control && \
   SOH_VERSION=`cat libSongOverHttp/Version` && \
   cp libSongOverHttp/include/* apu/data/include/ && \
+  cp libSongOverHttp/lib/lib/libSongOverHttp.a \
+     apu/data/lib/ && \
   cp libSongOverHttp/lib/lib/libSongOverHttp.so \
      apu/data/lib/libSongOverHttp-$SOH_VERSION.so && \
   echo "cd \$ROOTACT/lib" > apu/control/postinst && \
