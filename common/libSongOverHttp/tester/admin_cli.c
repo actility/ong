@@ -50,22 +50,28 @@ static void AdmHelp(t_cli *cl)
   AdmPrint(cl, "sendUpdate <targetID> <reqEnt> <file> : do send a UPDATE request to <uri>\n");
   AdmPrint(cl, "                                        request content is read from <file>\n");
   AdmPrint(cl, "sendDelete <targetID> <reqEnt>        : do send a DELETE request to <uri>\n");
+  AdmPrint(cl, "sendCreate, sendRetrieve, sendUpdate and sendDelete may also have a last\n"
+               "parameter <proxy>. If present, it specifies the NSCL host and port that\n"
+               "will proxy the request toward the targetted GSCL.");
 }
 
-// "sendCreate <targetID> <reqEnt> <file>"
+// "sendCreate <targetID> <reqEnt> <file> [<proxy>]"
 void doSendCreate(t_cli *cl, char *buf)
 {
   FILE *contentFile = NULL;
   char uri[255];
   char reqEntity[255];
   char file[255];
+  char proxy[255];
   char *transId = NULL;
+  char *proxyPtr = NULL;
   unsigned char content[4096];
   size_t readLen = 0;
 
   memset(uri, 0, sizeof(uri));
   memset(reqEntity, 0, sizeof(reqEntity));
   memset(file, 0, sizeof(file));
+  memset(proxy, 0, sizeof(proxy));
   memset(content, 0, sizeof(content));
 
   buf = AdmAccept(buf);
@@ -91,6 +97,13 @@ void doSendCreate(t_cli *cl, char *buf)
     return;  
   }
 
+  buf = AdmAdvance(buf);
+  buf = AdmAcceptKeep(buf, proxy);
+  if (*proxy)
+  {
+    proxyPtr = proxy;
+  } 
+
   contentFile = fopen(file, "r");
   if (! contentFile)
   {
@@ -100,10 +113,10 @@ void doSendCreate(t_cli *cl, char *buf)
   readLen = fread(content, 1, sizeof(content), contentFile); 
   fclose(contentFile);
 
-  if (SOH_RC_OK == sohCreateRequest(reqEntity, uri, content, readLen, "application/xml", 
-        NULL, &transId, cl, testerCreateResponseCb))
+  if (SOH_RC_OK == sohCreateRequest(proxyPtr, reqEntity, uri, content, readLen, 
+        "application/xml", NULL, &transId, cl, testerCreateResponseCb))
   {
-    AdmPrint(cl, "[-->] [transId:%s] CREATE sent\n", transId);
+    AdmPrint(cl, "[-->] [transId:%s] [proxy:%s] CREATE sent\n", transId, proxyPtr);
   }
   else
   { 
@@ -117,10 +130,13 @@ void doSendRetrieve(t_cli *cl, char *buf)
 {
   char uri[255];
   char reqEntity[255];
+  char proxy[255];
+  char *proxyPtr = NULL;
   char *transId = NULL;
 
   memset(uri, 0, sizeof(uri));
   memset(reqEntity, 0, sizeof(reqEntity));
+  memset(proxy, 0, sizeof(proxy));
 
   buf = AdmAccept(buf);
   buf = AdmAdvance(buf);
@@ -138,10 +154,18 @@ void doSendRetrieve(t_cli *cl, char *buf)
     return;  
   }
 
-  if (SOH_RC_OK == sohRetrieveRequest(reqEntity, uri,
+  buf = AdmAdvance(buf);
+  buf = AdmAcceptKeep(buf, proxy);
+  if (*proxy)
+  {
+    proxyPtr = proxy;
+  } 
+
+
+  if (SOH_RC_OK == sohRetrieveRequest(proxyPtr, reqEntity, uri,
         NULL, &transId, cl, testerRetrieveResponseCb))
   {
-    AdmPrint(cl, "[-->] [transId:%s] RETRIEVE sent\n", transId);
+    AdmPrint(cl, "[-->] [transId:%s] [proxy:%s] RETRIEVE sent\n", transId, proxyPtr);
   }
   else
   { 
@@ -157,6 +181,8 @@ void doSendUpdate(t_cli *cl, char *buf)
   char uri[255];
   char reqEntity[255];
   char file[255];
+  char proxy[255];
+  char *proxyPtr = NULL;
   char *transId = NULL;
   unsigned char content[4096];
   size_t readLen = 0;
@@ -165,6 +191,7 @@ void doSendUpdate(t_cli *cl, char *buf)
   memset(reqEntity, 0, sizeof(reqEntity));
   memset(file, 0, sizeof(file));
   memset(content, 0, sizeof(content));
+  memset(proxy, 0, sizeof(proxy));
 
   buf = AdmAccept(buf);
   buf = AdmAdvance(buf);
@@ -189,6 +216,13 @@ void doSendUpdate(t_cli *cl, char *buf)
     return;  
   }
 
+  buf = AdmAdvance(buf);
+  buf = AdmAcceptKeep(buf, proxy);
+  if (*proxy)
+  {
+    proxyPtr = proxy;
+  } 
+
   contentFile = fopen(file, "r");
   if (! contentFile)
   {
@@ -198,10 +232,10 @@ void doSendUpdate(t_cli *cl, char *buf)
   readLen = fread(content, 1, sizeof(content), contentFile); 
   fclose(contentFile);
 
-  if (SOH_RC_OK == sohUpdateRequest(reqEntity, uri, content, readLen, "application/xml", 
-        NULL, &transId, cl, testerUpdateResponseCb))
+  if (SOH_RC_OK == sohUpdateRequest(proxyPtr, reqEntity, uri, content, readLen, 
+        "application/xml", NULL, &transId, cl, testerUpdateResponseCb))
   {
-    AdmPrint(cl, "[-->] [transId:%s] UPDATE sent\n", transId);
+    AdmPrint(cl, "[-->] [transId:%s] [proxy:%s] UPDATE sent\n", transId, proxyPtr);
   }
   else
   { 
@@ -215,10 +249,13 @@ void doSendDelete(t_cli *cl, char *buf)
 {
   char uri[255];
   char reqEntity[255];
+  char proxy[255];
+  char *proxyPtr = NULL;
   char *transId = NULL;
 
   memset(uri, 0, sizeof(uri));
   memset(reqEntity, 0, sizeof(reqEntity));
+  memset(proxy, 0, sizeof(proxy));
 
   buf = AdmAccept(buf);
   buf = AdmAdvance(buf);
@@ -236,10 +273,17 @@ void doSendDelete(t_cli *cl, char *buf)
     return;  
   }
 
-  if (SOH_RC_OK == sohDeleteRequest(reqEntity, uri,
+  buf = AdmAdvance(buf);
+  buf = AdmAcceptKeep(buf, proxy);
+  if (*proxy)
+  {
+    proxyPtr = proxy;
+  } 
+
+  if (SOH_RC_OK == sohDeleteRequest(proxyPtr, reqEntity, uri,
         NULL, &transId, cl, testerDeleteResponseCb))
   {
-    AdmPrint(cl, "[-->] [transId:%s] DELETE sent\n", transId);
+    AdmPrint(cl, "[-->] [transId:%s] [proxy:%s] DELETE sent\n", transId, proxyPtr);
   }
   else
   { 
@@ -907,7 +951,7 @@ int CB_AdmTcpListen(void *tb, int fd, void *r1, void *r2, int revents)
 
   SetCB(fdnew);
 
-  AdmPrint(cl, "Welcome to AZAP tester CLI\n");
+  AdmPrint(cl, "Welcome to libSongOverHttp tester CLI\n");
   if  (strlen(GetTelnetKey()))
   {
     AdmPrint(cl, "key:");

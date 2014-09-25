@@ -5,6 +5,7 @@
 #define BUF_SIZE_S 128
 #define BUF_SIZE_M 256
 #define BUF_SIZE_L 1024
+#define BUF_SIZE_VL 4096
 
 #define CONTENT_TYPE_VALUE "application/xml"
 #define SUBS_STR_FORMAT "%lu-%s-%d"

@@ -140,6 +140,8 @@ void sohClockMs();
 
 /**
  * Send a CREATE request.
+ * @param nsclProxyHostPort the host and port (':'-seprated) of the NSCL that will proxy 
+ * the request. May be NULL. In this case the request is directly sent using 'targetID'.
  * @param reqEntity the requesting entity
  * @param targetID the targetID query parameter ; should be a full URI, and when 
  * targeting an ONG, must start with the link URI provided by the ONG when it registered
@@ -153,28 +155,30 @@ void sohClockMs();
  * @param createRespCb the callback that is to be invoked when receiving the response.
  * @return SOH_RC_OK if the request can be sent successfully, any other SOH_RCODE otherwise.
  */
-SOH_RCODE sohCreateRequest(char *reqEntity, char *targetID, unsigned char *content, size_t len,
-  char *contentType, sohHeader_t **optHeaders, char **tid, void *issuerData,
-  PF_SOH_CREATE_RESPONSE_CB createRespCb);
+SOH_RCODE sohCreateRequest(char *nsclProxyHostPort, char *reqEntity, char *targetID, 
+  unsigned char *content, size_t len, char *contentType, sohHeader_t **optHeaders, 
+  char **tid, void *issuerData, PF_SOH_CREATE_RESPONSE_CB createRespCb);
 
 /**
  * Send a RETRIEVE request.
  */
-SOH_RCODE sohRetrieveRequest(char *reqEntity, char *targetID, sohHeader_t **optHeaders, 
-  char **tid, void *issuerData, PF_SOH_RETRIEVE_RESPONSE_CB retrieveRespCb);
+SOH_RCODE sohRetrieveRequest(char *nsclProxyHostPort, char *reqEntity, char *targetID, 
+  sohHeader_t **optHeaders, char **tid, void *issuerData, 
+  PF_SOH_RETRIEVE_RESPONSE_CB retrieveRespCb);
 
 /**
  * Send an UPDATE request.
  */
-SOH_RCODE sohUpdateRequest(char *reqEntity, char *targetID, unsigned char *content, size_t len,
-  char *contentType, sohHeader_t **optHeaders, char **tid, void *issuerData,
-  PF_SOH_UPDATE_RESPONSE_CB updateRespCb);
+SOH_RCODE sohUpdateRequest(char *nsclProxyHostPort, char *reqEntity, char *targetID, 
+  unsigned char *content, size_t len, char *contentType, sohHeader_t **optHeaders, 
+  char **tid, void *issuerData, PF_SOH_UPDATE_RESPONSE_CB updateRespCb);
 
 /**
  * Send a DELETE request.
  */
-SOH_RCODE sohDeleteRequest(char *reqEntity, char *targetID, sohHeader_t **optHeaders, 
-  char **tid, void *issuerData, PF_SOH_DELETE_RESPONSE_CB deleteRespCb);
+SOH_RCODE sohDeleteRequest(char *nsclProxyHostPort, char *reqEntity, char *targetID, 
+  sohHeader_t **optHeaders, char **tid, void *issuerData,
+  PF_SOH_DELETE_RESPONSE_CB deleteRespCb);
 
 /**
  * Send response to a received SONG CREATE request.

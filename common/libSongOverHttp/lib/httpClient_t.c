@@ -371,6 +371,7 @@ void httpClient_t_invokeRespCompletion(httpClient_t *This, CURLcode result, CURL
       t->response->reasonPhrase = strdup(curl_easy_strerror(result));
     }
     t->invokeRespCompletion(t);
+    This->removeReq(This, t->transId);
 
 //    RTL_TRDBG(TRACE_INFO, "<<< httpClient_t::invokeRespCompletion (This:0x%.8x) (transId:%s) "
 //      "(statusCode:%d) (reasonPhrase:%s)\n", This, t->transId, t->response->statusCode, 

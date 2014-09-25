@@ -236,20 +236,21 @@ void srvTransaction_t_setReqBody(srvTransaction_t *This, const char *body, size_
 {
   RTL_TRDBG(TRACE_DEBUG, "srvTransaction_t::setReqBody (This:0x%.8x) (transId:%s) "
     "(len:%d)\n", This, This->transId, len);
-  if (This->reqBody)
-  {
-    free(This->reqBody);
-    This->reqBody = NULL;
-  }
+
+  size_t newContentLen;
+
+  if (This->reqBodyLen) This->reqBodyLen--; // remove the trailing '0'
+  newContentLen = This->reqBodyLen + len + 1;
+
   if (len && body && *body)
   {
-    This->reqBody = malloc(len * sizeof(unsigned char) + 1);
-    memcpy(This->reqBody, body, len * sizeof(unsigned char));
-    This->reqBodyLen = len;
+    This->reqBody = realloc(This->reqBody, newContentLen * sizeof(unsigned char));
+    memcpy(This->reqBody + This->reqBodyLen, body, len * sizeof(unsigned char));
+    This->reqBodyLen = newContentLen;
     // theorically useless for unsigned char buffer, but can be usefull 
     // and prevent from copying the buffer if one known that content is 
     // printable... so, just in case...
-    This->reqBody[len] = 0;
+    This->reqBody[newContentLen - 1] = 0;
   }
 }
 

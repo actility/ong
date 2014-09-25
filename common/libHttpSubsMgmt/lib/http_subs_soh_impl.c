@@ -58,12 +58,12 @@ SOH_RCODE httpSubsSohCreateCb(char *reqEntity, char *targetID, unsigned char *co
     }
     else
     {
-      RTL_TRDBG(TRACE_INFO, "httpSubsSohCreateCb - received notify (id:%lu)\n",
-        subs->id);
+      RTL_TRDBG(TRACE_INFO, "httpSubsSohCreateCb - received notify (id:%lu) (len:%zu)\n",
+        subs->id, len);
       // should we look at the status code before ??
   
       // trigger the issuer
-      subs->notifyCb(subs->id, subs->issuerData, (char *)content);
+      subs->notify(subs, (char *)content);
       // send a 200 OK response back to the client
       sohCreateResponse(SOH_SC_OK, NULL, NULL, 0, NULL, NULL, tid);
     }
