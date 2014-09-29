@@ -3,7 +3,7 @@ sed -i -e "s|<str name=\"w_coapaddr_r\" val=\"[^\"]*\"/>|<str name=\"w_coapaddr_
 sed -i -e "s|<str name=\"w_coapport_r\" val=\"[^\"]*\"/>|<str name=\"w_coapport_r\" val=\"$GSCL_COAP_PORT\"/>|" $ROOTACT/usr/etc/wmbus/spvconfig.xml
 sed -i -e "s|<str name=\"w_tpkdev\" val=\"[^\"]*\"/>|<str name=\"w_tpkdev\" val=\"$TPK_DEV_URI\"/>|" $ROOTACT/usr/etc/wmbus/spvconfig.xml
 sed -i -e "s|<str name=\"w_nsclbaseuri\" val=\"[^\"]*\"/>|<str name=\"w_nsclbaseuri\" val=\"$NSCL_URI\"/>|" $ROOTACT/usr/etc/wmbus/spvconfig.xml
-if [ -n "$ONG_NAME" ]; thenl
+if [ -n "$ONG_NAME" ]; then
   if [[ $(cat $ROOTACT/usr/etc/wmbus/spvconfig.xml) =~ w_boxname ]]; then
     sed -i -e "s|<str name=\"w_boxname\" val=\"[^\"]*\"/>|<str name=\"w_boxname\" val=\"$ONG_NAME\"/>\n|" $ROOTACT/usr/etc/wmbus/spvconfig.xml
   else
