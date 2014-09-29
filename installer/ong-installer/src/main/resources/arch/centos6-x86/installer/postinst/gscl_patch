@@ -1,0 +1,3 @@
+
+sed -i -e "s|^\([ \t]*ARGS=.*com\.actility\.m2m\.framework\.config\.rootact.*\)$|\1\n    ARGS=\$ARGS\" -Dos.arch=x86\"|" $ROOTACT/etc/init.d/gscl
+sed -i -e "s|^-Dorg.knopflerfish.gosg.jars=.*$|-Dorg.knopflerfish.gosg.jars=file:$ROOTACT/lib/osgi/|" $ROOTACT/etc/gscl/knopflerfish/init.xargs
