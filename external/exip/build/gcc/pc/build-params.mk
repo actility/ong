@@ -1,5 +1,5 @@
 # Specify compiler to be used
-COMPILER = gcc -m32
+COMPILER = gcc
 
 # Specify ar tool to be used
 ARCHIVER = ar
