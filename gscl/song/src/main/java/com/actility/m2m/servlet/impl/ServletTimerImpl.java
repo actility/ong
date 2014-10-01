@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: ServletTimerImpl.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: ServletTimerImpl.java 9688 2014-10-01 13:08:16Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9688 $
+ * lastrevision $Date: 2014-10-01 15:08:16 +0200 (Wed, 01 Oct 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-10-01 15:08:16 +0200 (Wed, 01 Oct 2014) $
  */
 
 package com.actility.m2m.servlet.impl;
@@ -173,7 +173,7 @@ public final class ServletTimerImpl implements ServletTimer, Runnable {
             // Thread.currentThread().setContextClassLoader(cl);
             LOG.debug("Call timeout");
             listener.timeout(this);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOG.error("An unexpected exception happened in the timer callback", e);
         } finally {
             // Thread.currentThread().setContextClassLoader(oldClassLoader);
