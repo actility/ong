@@ -154,7 +154,7 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                 Condition ciCondition = manager.getConditionBuilder().createStringCondition(Constants.ATTR_TYPE,
                         ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
 
-                Date limitDate = new Date(now.getTime() + (maxInstanceAge * 1000L) + 1000L);
+                Date limitDate = new Date(now.getTime() - (maxInstanceAge * 1000L));
                 Condition lastCiToDeleteCondition = manager.getConditionBuilder().createDateCondition(
                         M2MConstants.ATTR_CREATION_TIME, ConditionBuilder.OPERATOR_LOWER, limitDate);
                 Condition condition = manager.getConditionBuilder().createConjunction(ciCondition, lastCiToDeleteCondition);
