@@ -211,7 +211,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>song</artifactId>
-      <version>4.0.3</version>
+      <version>4.0.4</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>

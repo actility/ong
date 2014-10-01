@@ -76,7 +76,7 @@ REPOSITORY=-Dmaven.repo.local=$REPO_DIR
   "backend" "m2m/ong/scl/" "3.0.1" \
   "backend.command.shell" "m2m/ong/scl/" "2.0.0" \
   "storage" "m2m/rms/scl/" "0.2.1" \
-  "song" "m2m/ong/scl/" "4.0.3" \
+  "song" "m2m/ong/scl/" "4.0.4" \
   "song.binding.http" "m2m/ong/scl/" "4.0.0" \
   "song.binding.http.command.shell" "m2m/ong/scl/" "1.0.0" \
   "song.command.shell" "m2m/ong/scl/" "3.0.0" \
