@@ -83,7 +83,7 @@ REPOSITORY=-Dmaven.repo.local=$REPO_DIR
   "song.trace.command.shell" "m2m/ong/scl/" "3.0.0" \
   "phoneme.command.shell" "m2m/ong/scl/" "2.0.0" \
   "m2m" "m2m/ong/scl/" "3.0.3" \
-  "scl.app.me" "m2m/ong/scl/" "2.0.5" \
+  "scl.app.me" "m2m/ong/scl/" "2.0.6" \
   "system.version" "m2m/ong/scl/" "4.4.1" \
   "transport.logger.log" "m2m/ong/scl/" "1.0.1" \
   "jxo" "m2m/ong/scl/" "3.0.1" \

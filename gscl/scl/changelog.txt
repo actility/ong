@@ -12,7 +12,7 @@ Bug Fixes:
 ----------
  - Up-graded packages:
   * felix.shell.telnet-2.2.0
-  * scl.app.me-2.0.5
+  * scl.app.me-2.0.6
   * log-1.0.1
   * song-4.0.4
 
