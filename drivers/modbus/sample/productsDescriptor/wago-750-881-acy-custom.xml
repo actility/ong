@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modbus:description xmlns:modbus="http://uri.actility.com/m2m/adaptor-modbus">
+    <modbus:ref>wago-acy-custom</modbus:ref>
+    <modbus:vendor>Wago-Actility</modbus:vendor>
+    <modbus:product>Wago-750-881</modbus:product>
+    <modbus:version>0</modbus:version>
+
+	<modbus:interfaces>
+		<modbus:interface>
+			<modbus:id>AcyCustom.Srv</modbus:id>
+			<modbus:attributes>
+				<modbus:attr modbus:name="m2mCustomPowerMeasure" modbus:cnt="0x9999.0x9999.0.m2m" modbus:type="array" modbus:display="Actility power measurement" modbus:reg="/holding/0/bytes/42/" modbus:readable="true" modbus:writable="false">
+				  <modbus:subattributes>
+				    <modbus:subattr modbus:name="DATE_TEMP" modbus:type="datetime" modbus:display="" modbus:offset="/beginbyte/0/endbyte/3/"/>
+				    <modbus:subattr modbus:name="FREQ" modbus:type="float" modbus:display="" modbus:offset="/beginbyte/4/endbyte/7/"/>
+				    <modbus:subattr modbus:name="Pw_1" modbus:type="float" modbus:display="" modbus:offset="/beginbyte/8/endbyte/11/"/>
+				    <modbus:subattr modbus:name="Pw_2" modbus:type="float" modbus:display="" modbus:offset="/beginbyte/12/endbyte/15/"/>
+				    <modbus:subattr modbus:name="Pw_3" modbus:type="float" modbus:display="" modbus:offset="/beginbyte/16/endbyte/19/"/>
+				    <modbus:subattr modbus:name="Pw_4" modbus:type="float" modbus:display="" modbus:offset="/beginbyte/20/endbyte/23/"/>
+				    <modbus:subattr modbus:name="Pw_5" modbus:type="float" modbus:display="" modbus:offset="/beginbyte/24/endbyte/27/"/>
+				    <modbus:subattr modbus:name="P_soutirage" modbus:type="float" modbus:display="" modbus:offset="/beginbyte/28/endbyte/31/"/>
+				    <modbus:subattr modbus:name="CD1" modbus:type="bool" modbus:display="" modbus:offset="/beginbyte/32/endbyte/32/"/>
+				    <modbus:subattr modbus:name="CD2" modbus:type="bool" modbus:display="" modbus:offset="/beginbyte/33/endbyte/33/"/>
+				    <modbus:subattr modbus:name="CD3" modbus:type="bool" modbus:display="" modbus:offset="/beginbyte/34/endbyte/34/"/>
+				    <modbus:subattr modbus:name="CD4" modbus:type="bool" modbus:display="" modbus:offset="/beginbyte/35/endbyte/35/"/>
+				    <modbus:subattr modbus:name="CD5" modbus:type="bool" modbus:display="" modbus:offset="/beginbyte/36/endbyte/36/"/>
+				    <modbus:subattr modbus:name="Status1" modbus:type="bool" modbus:display="" modbus:offset="/beginbyte/37/endbyte/37/"/>
+				    <modbus:subattr modbus:name="Status2" modbus:type="bool" modbus:display="" modbus:offset="/beginbyte/38/endbyte/38/"/>
+				    <modbus:subattr modbus:name="Status3" modbus:type="bool" modbus:display="" modbus:offset="/beginbyte/39/endbyte/39/"/>
+				    <modbus:subattr modbus:name="Status4" modbus:type="bool" modbus:display="" modbus:offset="/beginbyte/40/endbyte/40/"/>
+				    <modbus:subattr modbus:name="Status5" modbus:type="bool" modbus:display="" modbus:offset="/beginbyte/41/endbyte/41/"/>
+				  </modbus:subattributes>
+				</modbus:attr>
+			</modbus:attributes>
+		</modbus:interface>
+	</modbus:interfaces>
+</modbus:description>
+
