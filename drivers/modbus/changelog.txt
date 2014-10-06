@@ -1,6 +1,38 @@
 -------------------------------------------------------------------------------
 Modbus GIP driver changelog
 -------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2014-09-25
+
+New features:
+-------------
+ - Add support for <subattributes> in product description files (see
+   wago-750-881-acy-custom.xml as example).
+ 
+Bug Fixes:
+----------
+ - When loosing connection with the device, the driver did not try to
+   reconnect. Fixed.
+ - Version string (./modbus.x --version) was not using the same format as all
+   other GIP drivers. Fixed.
+ - The driver used to start a separated thread to access the ModBus devices 
+   (read and write). But access the program data were not safely protected.
+   Fixed: now the program does not start any other thread, and only run in a
+   single-thread process.
+	
+Dependencies:
+-------------
+ - cproto-4.6-0
+ - drvcommon-1.4.14-0
+ - libcoap-1.8.8-0
+ - libdIa-1.0.25-0
+ - libmodbus-3.0.5-0
+ - libxml2-2.7.8-0
+ - m2mxoref-1.1.12-1
+ - rtbase-1.2.3-0
+ - libxo-4.2.10-0
+			 
+-------------------------------------------------------------------------------
 Version: 1.0.0
 Date: 2014-06-17
 Initial version

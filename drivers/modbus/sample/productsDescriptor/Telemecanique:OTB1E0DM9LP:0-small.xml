@@ -9,23 +9,23 @@
 	    <!-- 1 Binary inputs -->
 		<interface>
 			<id>OnOff.Srv</id>
-			<attributs>
+			<attributes>
 				<attr name="m2mOnOff" cnt="0x0001.0x0001.0.m2m" type="bool" display="Binary Input #0" reg="/holding/0/mask/1/" readable="true" writable="false"/>
-			</attributs>
+			</attributes>
 		</interface>
 				
 		<!-- 2 Binary outputs -->
 		<interface>
 			<id>OnOff.Srv</id>
-			<attributs>
+			<attributes>
 				<attr name="m2mOnOff" cnt="0x0002.0x0001.0.m2m" type="bool" display="Binary Output #0" reg="/holding/100/mask/1/" readable="true" writable="true"/>
-			</attributs>
+			</attributes>
 		</interface>
 		<interface>
 			<id>OnOff.Srv</id>
-			<attributs>
+			<attributes>
 				<attr name="m2mOnOff" cnt="0x0002.0x0002.0.m2m" type="bool" display="Binary Output #1" reg="/holding/100/mask/2/" readable="true" writable="true"/>
-			</attributs>
+			</attributes>
 		</interface>
 	</interfaces>
 </description>

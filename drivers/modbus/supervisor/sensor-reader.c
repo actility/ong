@@ -1,17 +1,9 @@
-#include "modbus.h"
+#include "modbus-acy.h"
 #include <pthread.h>
 
-static pthread_t threadReader;
-static bool isThreadRunning = false;
 
 void
-modbusReaderNotifyExit(void *pdata)
-{
-  isThreadRunning = false;
-}
-
-void *
-modbusReaderThread(void *pdata)
+modbusReaderClockMs()
 {
   struct list_head *indexNetwork, *indexDevice, *indexPoint;
   Network_t *network;
@@ -20,11 +12,6 @@ modbusReaderThread(void *pdata)
   time_t now = 0;
   t_dia_req req[1];
   
-  pthread_cleanup_push(modbusReaderNotifyExit, NULL);
-  
-  do {
-    pthread_testcancel();
-    //now = time(NULL);
     rtl_timemono(&now);
   
  
@@ -42,6 +29,10 @@ modbusReaderThread(void *pdata)
           continue;
         }
       
+      if (NULL == device->modbusCtx) {
+        DeviceCheckModbusConnection(device);
+      }
+    
         list_for_each(indexPoint, &(device->cnts)) {
           pt = list_entry(indexPoint, Point_t, list);   
 
@@ -51,18 +42,18 @@ modbusReaderThread(void *pdata)
         
           if(pt->nextRead < now) {
             void *xo = NULL;
-            Value_t *val = &(pt->lastVal);
+          Value_t *val = pt->lastVal;
             if (pt->nextMaxInterval < now)
             {
               val = NULL; // need a report even if the value has changed
             }
-            bool valueChanged = _modbusAccessRead(device, &(pt->attr), NULL, 
+          bool valueChanged = _modbusAccessRead(device, pt->attr, NULL, 
               &xo, val);
             if (valueChanged)
             {              
               if (xo != NULL) {
-                RTL_TRDBG(0, "[READER OK] %s_%s %s\n", network->name, device->name, 
-                  pt->attr.modbusAccess);
+              RTL_TRDBG(TRACE_IMPL, "[READER OK] %s_%s %s\n", network->name, device->name, 
+                pt->attr->modbusAccess);
                 pt->xo = xo;
                 pt->nextMaxInterval = now + pt->maxInterval;
                 
@@ -80,8 +71,8 @@ modbusReaderThread(void *pdata)
                 DiaRepInstCreate(req, NULL);
 
               } else {
-                RTL_TRDBG(0, "[READER ERROR] %s_%s %s\n", network->name, device->name, 
-                  pt->attr.modbusAccess);
+              RTL_TRDBG(TRACE_ERROR, "[READER ERROR] %s_%s %s\n", network->name, device->name, 
+                pt->attr->modbusAccess);
               }
             }
             
@@ -91,65 +82,5 @@ modbusReaderThread(void *pdata)
         }
       }
     }
-    
-    usleep(100000);
-  } while(true);
-  
-  pthread_cleanup_pop(1);
-  return NULL;
 }
 
-
-int
-modbusReaderStart(void)
-{
-  int ret;
-  
-  if (isThreadRunning == true) {
-    return -1;
-  }
-  
-  ret = pthread_create(&threadReader, NULL, modbusReaderThread, NULL);
-  if (ret != 0) {
-    RTL_TRDBG(0, "Error on pthread_create\n");
-    return -2;
-  }
-  isThreadRunning = true;
-
-  return 0;
-}
-
-int
-modbusReaderStop(void)
-{
-  int ret;
-  
-  if (isThreadRunning == false) {
-    return -1;
-  }
-  
-  ret = pthread_cancel (threadReader);
-  if (ret < 0) {
-    RTL_TRDBG(0, "Error on pthread_cancel, can't stop reader thread !!!\n");
-  } else {
-    ret = pthread_join (threadReader, NULL);
-    if (ret == 0 || ret == -ESRCH) {
-      RTL_TRDBG(0, "Reader thread stopped (ret code = %d)\n", ret);
-    } else {
-      RTL_TRDBG(0, "Can't join the reader thread ! (ret code = %d)\n", ret);
-    }
-  }
-  
-  isThreadRunning = false;
-  return 0;
-}
-
-void
-modbusReaderStatus(void *cl)
-{
-  if (isThreadRunning == true) {
-    AdmPrint(cl, "Reader is running.\n");
-  } else {
-    AdmPrint(cl, "Reader is NOT running.\n");
-  }
-}

@@ -12,14 +12,11 @@
 #include "modbus/modbus-rtu.h"
 #include "modbus/modbus-tcp.h"
 
+
 typedef struct _sensor_t t_sensor;
 typedef struct _sensor_t Sensor_t;
 typedef struct _network_t Network_t;
 typedef struct _product_t Product_t;
-typedef struct _Point_t Point_t;
-typedef struct _Attr_t Attr_t;
-typedef struct _Value_t Value_t;
-
 
 /*
  * From Sensor header
@@ -36,6 +33,7 @@ typedef struct _Value_t Value_t;
 #define cp_dia_repok  cp_cmn.cmn_dia_repok
 #define cp_dia_reperr cp_cmn.cmn_dia_reperr
 
+#define MAX_NAME 256
 #define CP_NUM_NETWORK  1
 #define CP_NUM_DEVICE   2
 
@@ -112,22 +110,16 @@ struct _network_t {
 #define ACCESS_BOOL       1
 #define ACCESS_UINT8      2
 #define ACCESS_INT8       3
-#define ACCESS_UINT16_LE  4
-#define ACCESS_UINT16_BE  5
-#define ACCESS_INT16_LE   6
-#define ACCESS_INT16_BE   7
-#define ACCESS_INT        8
-#define ACCESS_UINT       9
-#define ACCESS_UINT32_LE  10
-#define ACCESS_UINT32_BE  11
-#define ACCESS_INT32_LE   12
-#define ACCESS_INT32_BE   13
-#define ACCESS_FLOAT      14
-#define ACCESS_FLOAT_LE   15
-#define ACCESS_FLOAT_BE   16
-#define ACCESS_DOUBLE     17
-#define ACCESS_DOUBLE_LE  18
-#define ACCESS_DOUBLE_BE  19
+#define ACCESS_UINT16     4
+#define ACCESS_INT16      5
+#define ACCESS_UINT32     6
+#define ACCESS_INT32      7
+#define ACCESS_FLOAT      8
+#define ACCESS_DOUBLE     9
+#define ACCESS_DATE_TIME  10
+#define ACCESS_ARRAY      11
+
+#define MAX_MODBUS_ACCESS_SIZE 1024
 
 /*
 Discretes Input
@@ -156,48 +148,5 @@ This type of data
 #define MAP_INPUT      3
 #define MAP_HOLDING    4
 
-/*
- * Describe Attr in retargeting config
- */
-struct _Attr_t {
-  struct list_head list;
-
-  char *modbusType;
-  int modbusTypeID;
-  char *modbusAccess;
-  bool isReadable;
-  bool isWritable;
-  
-  // Decoded version of modbusAccess
-  uint16_t mask;
-  int reg, map;
-};
-
-struct _Value_t {
-  union {
-    bool boolValue;
-  } u;
-};
-
-/*
- * Describe Point in logging config
- */
-struct _Point_t {
-  struct list_head list;
-  bool isInit;
-  bool toDelete;
-
-  time_t nextMaxInterval;
-  time_t nextRead;
-  int minInterval;
-  int maxInterval;
-  char *containerID;
-  Value_t lastVal;
- 
-  uint16_t rq_cluster, rq_attribut, rq_member;
-  void *xo;
-  
-  Attr_t attr;
-};
 
 #endif /* __MODBUS_TYPE__ */

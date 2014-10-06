@@ -11,6 +11,8 @@ SRC=\
 	sensor-events.c \
 	sensor-reader.c \
 	var.c \
+  version.c \
+	spv_util.c \
 	main.c \
 
 	
@@ -20,15 +22,18 @@ CCFLAGS += -O0 -g
 
 all: $(EXE).x
 
-$(EXE).x: $(OBJ) $(MODBUSLIB)
+$(EXE).x: _whatstr.h $(OBJ) $(MODBUSLIB)
 	$(CC) $(STATIC) $(LDPATH) $(LDFLAGS) -o $@ $^ $(SHLIB) $(XML2LD) $(LIBXML2)
+
+_whatstr.h : ../Version
+	$(MKWHAT) -p modbus -vf ../Version > _whatstr.h   
 
 %.o: cproto.h
 %.o: %.c
 	$(CC) $(CCFLAGS) $(INC) $(DEFINC) -c $<
 
 clean:
-	@(rm _cproto.h *.x *.o *.a core *.log 2>/dev/null || exit 0)
+	@(rm _cproto.h *.x *.o *.a core *.log _whatstr.h 2>/dev/null || exit 0)
 
 cproto.h: $(SRC)
 	rm -f cproto.h

@@ -18,138 +18,11 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#include "modbus.h"
+#include "modbus-acy.h"
 
-int TraceLevel = 3; //2;
-int TraceDebug = 3; //1;
-int TraceProto = 3; //0;
 int TraceSize = 200 * 1024 * 1024; // for each file
-int PseudoOng = 0;
-int WithDia = 1;
-int Operating = 1;  // 1 for ong deploy, 0 for dev
-int running = 1;
 bool resetHanAtReboot = false;
-
-int DiaTraceRequest = 0;
-
-int ActiveSniffer = 0;
-void *MainTbPoll;
-void *MainIQ;
-void *MdlCfg;
-
-unsigned int  DiaIpuOk;
-unsigned int  DiaNetOk;
-unsigned int  DiaIpuTmt;
-unsigned int  DiaNetTmt;
-unsigned int  DiaIpuErr;
-unsigned int  DiaNetErr;
-unsigned int  DiaRepDrp;
-
-char *rootactPath = NULL;
-
-LIST_HEAD(NetworkInternalList);
-
-/*
- *  Use only by drvcommon when Operating == 0
- */
-char *
-GetEnvVarName(void)
-{
-  if (!Operating) {
-    return "ROOTACT";
-  }
-  
-  return NULL;
-}
-
-/*!
-  *
-  * @brief calculate the next serial number which can be used to identity any 
-  * object/structure/messsage. 0 is not a valid serial number. Mainly used for
-  * t_sensor structure to identity sensors in conjonction with a sensor number.
-  * @return [1..INT_MAX]
-  * 
-  */
-int DoSerial()
-{
-  static int Serial = INT_MAX;
-
-  if (Serial == INT_MAX) {
-    Serial = 1;
-  } else {
-    Serial++;
-  }
-
-  return Serial;
-}
-
-/*!
-  *
-  * @brief called by main loop every 100 ms.
-  * @return void
-  * 
-  */
-void DoClockMs()
-{
-
-}
-
-/*!
-  *
-  * @brief called by main loop every 1 second.
-  * @return void
-  * 
-  */
-void DoClockSc()
-{
-   static unsigned int nbclock = 0;
-   time_t now = 0;
-
-   nbclock++;
-   //time(&now);
-   rtl_timemono(&now);
-
-   AdmClockSc(now);
-   DiaClockSc(now);
-   ModbusSensorClockSc(now);
-}
-
-/*!
-  *
-  * @brief called by main loop to dispatch an internal message
-  * @return void
-  * 
-  */
-void
-DoInternalEvent(t_imsg *imsg)
-{
-  RTL_TRDBG(1, "receive event cl=%d ty=%d\n", imsg->im_class, imsg->im_type);
-}
-
-/*!
-  *
-  * @brief called by main loop to dispatch an internal timer
-  * @return void
-  * 
-  */
-void
-DoInternalTimer(t_imsg *imsg)
-{
-  RTL_TRDBG(1, "receive timer cl=%d ty=%d vsize=%ld\n", imsg->im_class, imsg->im_type, rtl_vsize(getpid()));
-
-  switch(imsg->im_class) {
-    case IM_DEF :
-      switch(imsg->im_type) {
-        case IM_TIMER_GEN:
-          rtl_imsgAdd(
-          MainIQ,
-          rtl_timerAlloc(IM_DEF, IM_TIMER_GEN, IM_TIMER_GEN_V, NULL, 0)
-          );
-          break;
-      }
-      break;
-  }
-}
+int running = 1;
 
 /*!
   *
@@ -231,7 +104,6 @@ DoArg(int initial,int argc,char *argv[])
   extern char *optarg;
   extern int optind;
   int c;
-  char *pt;
 
   char *fmtgetopt = "hXDOt:d:p:i";
 
@@ -242,7 +114,7 @@ DoArg(int initial,int argc,char *argv[])
       printf ("%s\n",rtl_version());
       printf ("%s\n",XoVersion());
       printf ("%s\n",dia_getVersion());
-      printf ("%s\n", modbus_whatStr);
+      printf ("%s\n", GetAdaptorVersion());
       exit(0);
     }
     if (strcmp(argv[i],"--help") == 0) {
@@ -336,7 +208,7 @@ void SetOption(char *name,char *value)
     return;
   }
 
-  RTL_TRDBG(0,"ERROR parameter/option '%s' not found\n",name);
+  RTL_TRDBG(TRACE_ERROR,"ERROR parameter/option '%s' not found\n",name);
 }
 
 /*!
@@ -360,18 +232,18 @@ void DoConfig(int hot,int custom,char *fcfg)
 
   o = XoReadXmlEx(fcfg,NULL,parseflags,&parseerr);
   if (parseerr > 0) {
-    RTL_TRDBG(0,"ERROR config file '%s' parsing error=%d \n",
+    RTL_TRDBG(TRACE_ERROR,"ERROR config file '%s' parsing error=%d \n",
     fcfg,parseerr);
     return;
   }
   if (parseerr < 0) {
-    RTL_TRDBG(0,"ERROR config file '%s' loading error=%d \n",
+    RTL_TRDBG(TRACE_ERROR,"ERROR config file '%s' loading error=%d \n",
     fcfg,parseerr);
     return;
   }
 
   if (!o) {
-    RTL_TRDBG(0,"ERROR config file '%s' not found\n",fcfg);
+    RTL_TRDBG(TRACE_ERROR,"ERROR config file '%s' not found\n",fcfg);
     return;
   }
   
@@ -386,7 +258,7 @@ void DoConfig(int hot,int custom,char *fcfg)
     name = XoNmGetAttr(var,"name",0);
     value = XoNmGetAttr(var,"val",0);
 
-    RTL_TRDBG(0,"hot=%d cust=%d parameter='%s' value='%s'\n",
+    RTL_TRDBG(TRACE_INFO,"hot=%d cust=%d parameter='%s' value='%s'\n",
     hot,custom,name,value);
     if (name && *name && value && *value) {
       SetOption(name,value);
@@ -404,7 +276,7 @@ void DoConfig(int hot,int custom,char *fcfg)
     name = XoNmGetAttr(var,"name",0);
     value = XoNmGetAttr(var,"val",0);
 
-    RTL_TRDBG(0,"hot=%d cust=%d variable='%s' value='%s'\n",
+    RTL_TRDBG(TRACE_INFO,"hot=%d cust=%d variable='%s' value='%s'\n",
     hot,custom,name,value);
     if (name && *name && value && *value) {
       SetVar(name,value);
@@ -424,7 +296,7 @@ void DoConfig(int hot,int custom,char *fcfg)
     name  = XoNmGetAttr(var,"name",0);
     value  = XoNmGetAttr(var,"val",0);
 
-    RTL_TRDBG(0,"hot=%d cust=%d mapping='%s' value='%s'\n",
+    RTL_TRDBG(TRACE_INFO,"hot=%d cust=%d mapping='%s' value='%s'\n",
       hot,custom,name,value);
     if  (name && *name && value && *value)
     {
@@ -471,7 +343,7 @@ stopService(int sig)
   */
 int main(int argc,char *argv[])
 {
-  int i, ret, custom;
+  int i, custom;
   char cfgroot[512];
   char cfgcust[512];
   char tmp[512];
@@ -490,39 +362,22 @@ int main(int argc,char *argv[])
     exit(1);
   }
 
-  if (!Operating) {
-    sprintf(cfgroot, "%s/%s/config/spvconfig.xml", rootactPath, GetAdaptorName());
-    cfgcust[0] = '\0';
-  } else {
     sprintf(cfgroot, "%s/etc/%s/spvconfig.xml", rootactPath, GetAdaptorName());
     sprintf(cfgcust, "%s/usr/etc/%s/spvconfig.xml", rootactPath, GetAdaptorName());
-  }
   DoArg(initial = 1, argc, argv);
 
   // Ensure driver's data folder is created
-  if (!Operating) {
-    sprintf(tmp, "%s", getenv("AW_DATA_DIR"));
-  } else {
     sprintf(tmp, "%s/usr/data/%s", rootactPath, GetAdaptorName());
-  }
   rtl_mkdirp(tmp);
 
-  if (!Operating) {
-    sprintf(tmp, "%s/products", getenv("AW_DATA_DIR"));
-  } else {
     sprintf(tmp, "%s/usr/data/%s/products", rootactPath, GetAdaptorName());
-  }
   rtl_mkdirp(tmp);
   
   // Init rotate log
   rtl_tracemutex();
   rtl_tracelevel(TraceLevel);
   rtl_tracesizemax(TraceSize);
-  if (!Operating) {
-    sprintf(tmp, "%s/%s/supervisor", rootactPath, GetAdaptorName());
-  } else {
     sprintf(tmp, "%s/var/log/%s", rootactPath, GetAdaptorName());
-  }
   rtl_mkdirp(tmp);
   strcat(tmp, "/");
   strcat(tmp, "TRACE.log");
@@ -534,23 +389,17 @@ int main(int argc,char *argv[])
   RTL_TRDBG(TRACE_ERROR, "%s\n", rtl_version());
   RTL_TRDBG(TRACE_ERROR, "%s\n", XoVersion());
   RTL_TRDBG(TRACE_ERROR, "%s\n", dia_getVersion());
-  RTL_TRDBG(TRACE_ERROR, "%s\n", modbus_whatStr);
+  RTL_TRDBG(TRACE_ERROR, "%s\n", GetAdaptorVersion());
   
   MainTbPoll = rtl_pollInit();
   MainIQ = rtl_imsgInitIq();
 
   // Xo 
   XoInit(0);
-  if (!Operating) {
-    sprintf(tmp, "%s/%s/xo/.", rootactPath, GetAdaptorName());
-    XoLoadNameSpaceDir(tmp);
-    XoLoadNameSpaceDir(".");
-  } else {
     sprintf(tmp, "%s/etc/xo/.", rootactPath);
     XoLoadNameSpaceDir(tmp);
     sprintf(tmp, "%s/etc/%s/.", rootactPath, GetAdaptorName());
     XoLoadNameSpaceDir(tmp);
-  }
   
   // XoRef
   if (LoadM2MXoRef() < 0)
@@ -570,9 +419,7 @@ int main(int argc,char *argv[])
   }
   
   DoConfig(hot=0,custom=0,cfgroot);
-  if (Operating) {
     DoConfig(hot=0,custom=1,cfgcust);
-  }
 
   // convert boxname and domainname to lowercase
   sprintf(tmp, "%s", GetVar("w_boxname"));
@@ -605,7 +452,7 @@ int main(int argc,char *argv[])
   }
 
   // Init m2m modeling
-  RTL_TRDBG(0,"Loading config modeling file\n");
+  RTL_TRDBG(TRACE_INFO,"Loading config modeling file\n");
   MdlCfg = MdlLoad(hot=0);
   if (!MdlCfg)
     exit(1);
@@ -622,8 +469,6 @@ int main(int argc,char *argv[])
     rtl_timerAlloc(IM_DEF, IM_TIMER_GEN, IM_TIMER_GEN_V, NULL, 0)
   );
 
-  // Create a thread to perform logging read
-  modbusReaderStart();
 
   // Load products cache
   ProductsLoadCache();
@@ -633,7 +478,7 @@ int main(int argc,char *argv[])
   DiaIpuStart();
   
   MainLoop();
-  RTL_TRDBG(0,"end !!! %s/main th=%lx\n", argv[0], (long)pthread_self());
+  RTL_TRDBG(TRACE_ERROR,"end !!! %s/main th=%lx\n", argv[0], (long)pthread_self());
   
   exit(1);
 }

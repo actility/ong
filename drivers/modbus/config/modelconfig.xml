@@ -34,4 +34,15 @@
         </covConfigurations>
     </interface>
 
+  <interface filter="modbus:/int/AcyCustom.Srv">
+    <descriptor>
+            
+      <!-- logging -->
+      <point name="m2mCustomPowerMeasure" config="logging"/>
+    </descriptor>
+    <covConfigurations>
+      <covConfiguration filter="modbus:/attribute/m2mCustomPowerMeasure" minInterval="PT5S" maxInterval="PT2H"/>
+    </covConfigurations>
+  </interface>
+
 </resourceModeling>

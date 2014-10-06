@@ -2,9 +2,14 @@
 buildProject()
 {
   export PATH=$PATH:$(pwd)/bin
-  cd modbus
-  make clean
-  make
+  cd modbus && \
+  make clean && \
+  make && \
+  if [[ $1 == centos6-x86 ]] 
+  then
+    cd tests && \
+    make run
+  fi
 
   return $?
 }

@@ -1,4 +1,4 @@
-#include "modbus.h"
+#include "modbus-acy.h"
 
 /*
  *  Generate the Xo object to add into the list 'interface' of M2M APP_* DESCRIPTOR
@@ -29,7 +29,7 @@ ApplicationITF(void *appInterfaces, void *xoProduct, void *xoModeling, Sensor_t 
   nbModel = XoNmNbInAttr(xoModeling, "ong:interfaces", 0);
   
   // Iterate over each interface
-  RTL_TRDBG(1, "nbItf = %d\n", nbItf);
+  RTL_TRDBG(TRACE_IMPL, "nbItf = %d\n", nbItf);
   for (iItf=0; iItf<nbItf; iItf++) {
     //printf("===============\n");
     itfModel = NULL;
@@ -37,7 +37,7 @@ ApplicationITF(void *appInterfaces, void *xoProduct, void *xoModeling, Sensor_t 
     CONTINUE_IF_NULL(interface);
       
     char *interfaceName = (char *) XoNmGetAttr(interface, "modbus:id.value$", 0);
-    //RTL_TRDBG(1, "interfaceName = %s\n", interfaceName);
+    //RTL_TRDBG(TRACE_DETAIL, "interfaceName = %s\n", interfaceName);
     
     snprintf(itfFilter, sizeof(itfFilter), "modbus:/int/%s", interfaceName);
     
@@ -78,42 +78,42 @@ ApplicationITF(void *appInterfaces, void *xoProduct, void *xoModeling, Sensor_t 
     XoNmSetAttr(interfaceID, "val", interfaceName, 0);
     XoNmAddInAttr(itf, "[]", interfaceID, 0, 0);
     
-    // Iterate over each attributs
-    nbAttr = XoNmNbInAttr(interface, "modbus:attributs", 0);
-    //RTL_TRDBG(1, "nbAttr = %d\n", nbAttr);
+    // Iterate over each attributes
+    nbAttr = XoNmNbInAttr(interface, "modbus:attributes", 0);
+    //RTL_TRDBG(TRACE_DETAIL, "nbAttr = %d\n", nbAttr);
     for (iAttr=0; iAttr<nbAttr; iAttr++) {
-      //RTL_TRDBG(1, "--------------------\n");
-      void *name;
+      //RTL_TRDBG(TRACE_DETAIL, "--------------------\n");
+      char *name;
       void *accessRight;
-      void *attr = XoNmGetAttr(interface, "modbus:attributs[%d]", 0, iAttr);
+      void *xoAttr = XoNmGetAttr(interface, "modbus:attributes[%d]", 0, iAttr);
 
-      char *attrName = (char *) XoNmGetAttr(attr, "modbus:name", 0);
-      //RTL_TRDBG(1, "attrName = %s\n", attrName);
+      char *attrName = (char *) XoNmGetAttr(xoAttr, "modbus:name", 0);
+      //RTL_TRDBG(TRACE_DETAIL, "attrName = %s\n", attrName);
 
       // Test if the attribut is in modeling, if not ignore this attribut
       // Then find the type of attribut : descriptor / logging / retargeting
       attrType = ATTR_NOT_USED;
       nbDescriptor = XoNmNbInAttr(itfModel, "ong:descriptor", 0);
-      //RTL_TRDBG(1, "nbDescriptor = %d\n", nbDescriptor);
+      //RTL_TRDBG(TRACE_DETAIL, "nbDescriptor = %d\n", nbDescriptor);
       for (iDescriptor=0; iDescriptor<nbDescriptor; iDescriptor++) {
         void *o = XoNmGetAttr(itfModel, "ong:descriptor[%d]", NULL, iDescriptor);
         CONTINUE_IF_NULL(o);
 
-        name = XoNmGetAttr(o, "ong:name", NULL, 0);
+        name = (char *)XoNmGetAttr(o, "ong:name", NULL, 0);
         CONTINUE_IF_NULL(name);
         
         accessRight = XoNmGetAttr(o, "ong:accessRight", NULL, 0);
         // May be NULL
         
-        //RTL_TRDBG(1, "ong:name = %s\n", (char *)name);
-        //RTL_TRDBG(1, "node = %s\n", XoNmType(o));
+        //RTL_TRDBG(TRACE_DETAIL, "ong:name = %s\n", (char *)name);
+        //RTL_TRDBG(TRACE_DETAIL, "node = %s\n", XoNmType(o));
         
         if (strcmp(name, attrName) == 0) {
 
           void *config = XoNmGetAttr(o, "ong:config", NULL, 0);
           CONTINUE_IF_NULL(config);     // Ensure for attr/point mixing in modeling
     
-          RTL_TRDBG(1, "config = %p (%s)\n", config, config);
+          RTL_TRDBG(TRACE_IMPL, "config = %p (%s)\n", config, config);
           if (config == NULL) {
             attrType = ATTR_NOT_USED;
           } else {
@@ -138,19 +138,19 @@ ApplicationITF(void *appInterfaces, void *xoProduct, void *xoModeling, Sensor_t 
         continue;
       }
     
-      char *attrModbusType = (char *) XoNmGetAttr(attr, "modbus:type", 0);
+      char *attrModbusType = (char *) XoNmGetAttr(xoAttr, "modbus:type", 0);
       CONTINUE_IF_NULL(attrModbusType);
-      //RTL_TRDBG(1, "attrType = %s\n", attrModbusType);
+      //RTL_TRDBG(TRACE_DETAIL, "attrType = %s\n", attrModbusType);
       
-      char *attrDisplay = (char *) XoNmGetAttr(attr, "modbus:display", 0);
+      char *attrDisplay = (char *) XoNmGetAttr(xoAttr, "modbus:display", 0);
       CONTINUE_IF_NULL(attrDisplay);
-      //RTL_TRDBG(1, "attrDisplay = %s\n", attrDisplay);
+      //RTL_TRDBG(TRACE_DETAIL, "attrDisplay = %s\n", attrDisplay);
       
-      char *attrReg = (char *) XoNmGetAttr(attr, "modbus:reg", 0);
+      char *attrReg = (char *) XoNmGetAttr(xoAttr, "modbus:reg", 0);
       CONTINUE_IF_NULL(attrReg);
-      //RTL_TRDBG(1, "attrReg = %s\n", attrReg);
+      //RTL_TRDBG(TRACE_DETAIL, "attrReg = %s\n", attrReg);
 
-      char *containerID = (char *) XoNmGetAttr(attr, "modbus:cnt", 0);
+      char *containerID = (char *) XoNmGetAttr(xoAttr, "modbus:cnt", 0);
       CONTINUE_IF_NULL(containerID);
 
 //      uint16_t rq_cluster, rq_attribut, rq_member;
@@ -163,25 +163,30 @@ ApplicationITF(void *appInterfaces, void *xoProduct, void *xoModeling, Sensor_t 
         continue;
       }
       
-      char *attrReadable = (char *) XoNmGetAttr(attr, "modbus:readable", 0);
+      char *attrReadable = (char *) XoNmGetAttr(xoAttr, "modbus:readable", 0);
       if (attrReadable == NULL) {
         attrReadable = "false";
       }
-      //RTL_TRDBG(1, "attrReadable = %s\n", attrReadable);
+      //RTL_TRDBG(TRACE_DETAIL, "attrReadable = %s\n", attrReadable);
 
-      char *attrWritable = (char *) XoNmGetAttr(attr, "modbus:writable", 0);
+      char *attrWritable = (char *) XoNmGetAttr(xoAttr, "modbus:writable", 0);
       if (attrWritable == NULL) {
         attrWritable = "false";
       }
-      //RTL_TRDBG(1, "attrWritable = %s\n", attrWritable);         
+      //RTL_TRDBG(TRACE_DETAIL, "attrWritable = %s\n", attrWritable);         
 
-      char *attrUnit = (char *) XoNmGetAttr(attr, "modbus:unit", 0);
-      //RTL_TRDBG(1, "attrUnit = %s\n", attrUnit);
+      char *attrUnit = (char *) XoNmGetAttr(xoAttr, "modbus:unit", 0);
+      //RTL_TRDBG(TRACE_DETAIL, "attrUnit = %s\n", attrUnit);
+
+      if (!strcmp(attrModbusType, "array")) {
+        void *subattrs = (void *) XoNmGetAttr(xoAttr, "modbus:subattributes", 0);
+        CONTINUE_IF_NULL(subattrs);
+      }
 
       bool isReadable = *attrReadable == 't' || *attrReadable == 'T';
       bool isWritable = *attrWritable == 't' || *attrWritable == 'T';
       char *obixType;
-      void *m2mPoint, *m2mDesc, *m2mOp;
+      void *m2mPoint, *m2mDesc;
       int ModbusTypeID;
       
       switch(attrType) {
@@ -202,15 +207,16 @@ ApplicationITF(void *appInterfaces, void *xoProduct, void *xoModeling, Sensor_t 
             }
             
             char *val = NULL;
-            Attr_t attr;
-            decodeModbusAccess(&attr, attrReg);
+            Attr_t *attr = new_Attr_t();
+            decodeModbusAccess(attr, attrReg);
             obixType = obixTypeFromModbus(attrModbusType, &ModbusTypeID);
             if (obixType == NULL) break;
-            attr.modbusTypeID = ModbusTypeID;
+            attr->modbusTypeID = ModbusTypeID;
             
-            _modbusAccessRead(device, &attr, &val, NULL);
+            _modbusAccessRead(device, attr, &val, NULL, NULL);
             XoNmSetAttr(m2mDesc, "val", val, 0);
             free(val);
+            attr->free(attr);
             
             XoNmAddInAttr(itf, "[]", m2mDesc, 0, 0);
           }
@@ -218,7 +224,7 @@ ApplicationITF(void *appInterfaces, void *xoProduct, void *xoModeling, Sensor_t 
           
         case ATTR_RETARGETING:
           if (isReadable || isWritable) {
-            Attr_t *attr = (Attr_t *) malloc(sizeof(Attr_t));
+            Attr_t *attr = new_Attr_t();
             if (attr == NULL) {
               break;
             }
@@ -294,18 +300,20 @@ ApplicationITF(void *appInterfaces, void *xoProduct, void *xoModeling, Sensor_t 
             pt->rq_member = rq_member;
             pt->minInterval = 5;
             pt->maxInterval = 30;
-            pt->attr.modbusType = ACCESS_VOID;
-            pt->attr.modbusAccess = attrReg;
+            pt->attr->modbusTypeID = ACCESS_VOID;
+            pt->attr->modbusType = attrModbusType;
+            pt->attr->modbusAccess = attrReg;
             pt->xo = NULL;
+            pt->attr->xoModelAttr = xoAttr;
             
-            decodeModbusAccess(&(pt->attr), attrReg);
+            decodeModbusAccess(pt->attr, attrReg);
             if(isNew) { 
               list_add(&(pt->list), &(device->cnts));
             }
             
             obixType = obixTypeFromModbus(attrModbusType, &ModbusTypeID);
             if (obixType == NULL) break;
-            pt->attr.modbusTypeID = ModbusTypeID;
+            pt->setModbusType(pt, ModbusTypeID);
             
             m2mPoint = XoNmNew(obixType);
             if (m2mPoint == NULL) break;

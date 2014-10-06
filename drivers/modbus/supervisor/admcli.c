@@ -1,4 +1,4 @@
-#include "modbus.h"
+#include "modbus-acy.h"
 
 /**
  * @brief Display on CLI a help message about the supported commands.
@@ -46,11 +46,6 @@ AdmUsage(t_cli *cl)
   AdmPrint(cl,"device interfaces <network> <device>\tList retargeting URI and logging containers for a device\n");
   AdmPrint(cl,"\n");
 
-  AdmPrint(cl,"reader start\t\t\t\tStart the modbus reader thread\n");
-  AdmPrint(cl,"reader stop\t\t\t\tStop the modbus reader thread\n");
-  AdmPrint(cl,"reader status\t\t\t\tShow the modbus reader thread status\n");
-  AdmPrint(cl,"\n");
-  
 }
 
 /**
@@ -267,30 +262,5 @@ AdmCmd(t_cli *cl, char *buf)
     return CLI_PROMPT;
   }
   
-  if (startby("reader start")) {
-    int rc = modbusReaderStart();
-    if (rc == 0) {
-      AdmPrint(cl, "Reader started\n");
-    } else {
-      AdmPrint(cl, "error (%d)\n", rc);
-    }
-    return CLI_PROMPT;
-  }
-
-  if (startby("reader stop")) {
-    int rc = modbusReaderStop();
-    if (rc == 0) {
-      AdmPrint(cl, "Reader stopped\n");
-    } else {
-      AdmPrint(cl, "error (%d)\n", rc);
-    }
-    return CLI_PROMPT;
-  }
-  
-  if (startby("reader status")) {
-    modbusReaderStatus(cl);
-    return CLI_PROMPT;
-  }
-
   return CLI_NFOUND;
 }

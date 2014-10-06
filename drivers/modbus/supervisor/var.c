@@ -1,13 +1,7 @@
-#include "modbus.h"
+#include "modbus-acy.h"
 
 int NbVar;
 int InternalVar;
-
-char *
-GetAdaptorVersion(void)
-{
-  return modbus_whatStr;
-}
 
 char *
 GetDate(void)
@@ -138,8 +132,9 @@ t_var TbVar[MAX_VAR] = {
   VAR_INIT(w_scl_httpport, "8080"),
   VAR_INIT_EMPTY(w_tpkdev),
   
-  // Modebus config
-  VAR_INIT(loggingDefaultCov, "PT1H"),
+  // Modbus config
+  VAR_INIT(loggingDefaultCovMinInterval, "PT5S"),
+  VAR_INIT(loggingDefaultCovMaxInterval, "PT1H"),
   
   // Modbus template
   VAR_INIT(w_driverpath, "modbus"),

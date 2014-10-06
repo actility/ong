@@ -33,6 +33,13 @@ modbus:context from ong:t_xml_obj {
  *  Product interface descriptor
  *  This file describe some product metadata and the list of interface to install in the M2M device application
  */
+modbus:subattr from ong:t_xml_obj {
+    modbus:name                 XoString                { embattr }
+    modbus:type                 XoString                { embattr }
+    modbus:display              XoString                { embattr }
+    modbus:offset               XoString                { embattr }
+}
+
 modbus:attr from ong:t_xml_obj {
     modbus:name                 XoString                { embattr }
     modbus:cnt                  XoString                { embattr }
@@ -42,6 +49,7 @@ modbus:attr from ong:t_xml_obj {
     modbus:reg                  XoString                { embattr }
     modbus:readable             XoString                { embattr }
     modbus:writable             XoString                { embattr }
+    modbus:subattributes        modbus:subattr          { list }
 }
 
 stext modbus:id from ong:t_xml_obj {
@@ -50,7 +58,7 @@ stext modbus:id from ong:t_xml_obj {
 
 modbus:interface from ong:t_xml_obj {
     modbus:id                   modbus:id               { }
-    modbus:attributs            modbus:attr             { list }
+    modbus:attributes           modbus:attr             { list }
 }
 
 stext modbus:version from ong:t_xml_obj {

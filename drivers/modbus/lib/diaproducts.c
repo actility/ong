@@ -23,7 +23,7 @@
 * information or have any questions.
 */
 
-/*! @file diadat.c
+/*! @file diaproducts.c
  *
  */
 #if 0
@@ -42,7 +42,7 @@
 #include <sys/time.h>
 #endif
 
-#include "modbus.h"
+#include "modbus-acy.h"
 #include "diadef.h"
 
 extern  dia_context_t  *DiaCtxt;
@@ -66,7 +66,7 @@ static  void DiaProductsDatContRetrieve(t_dia_req *preq, t_dia_rspparam *par, ..
 
 static  void  DiaProductsDatOk(t_dia_req *preq,t_dia_rspparam *par)
 {
-  RTL_TRDBG(2,"OK DIA DAT 'IPU' num=%04x attr=%04x member=%d\n",
+  RTL_TRDBG(TRACE_IMPL,"OK DIA DAT 'IPU' num=%04x attr=%04x member=%d\n",
     preq->rq_cluster,preq->rq_attribut,preq->rq_member);
 
   WDiaUCBRequestOk(DIA_FUNC,preq,NULL);
@@ -75,7 +75,7 @@ static  void  DiaProductsDatOk(t_dia_req *preq,t_dia_rspparam *par)
 
 static  void  DiaProductsDatError(t_dia_req *preq,t_dia_rspparam *par)
 {
-  RTL_TRDBG(0,"ERROR DIA DAT FAILURE 'IPU' req='%s' tid=%d code='%s' num=%04x\n",
+  RTL_TRDBG(TRACE_ERROR,"ERROR DIA DAT FAILURE 'IPU' req='%s' tid=%d code='%s' num=%04x\n",
   preq->rq_name,preq->rq_tid,preq->rq_scode,preq->rq_cluster);
 
   if  (par && par->pr_timeout)  // TIMEOUT => RETRY NO
@@ -83,7 +83,7 @@ static  void  DiaProductsDatError(t_dia_req *preq,t_dia_rspparam *par)
     WDiaUCBRequestTimeout(DIA_FUNC,preq,NULL);
     return;
   }
-  RTL_TRDBG(0,"ERROR DIA DAT DEFINTIVE FAILURE\n");
+  RTL_TRDBG(TRACE_ERROR,"ERROR DIA DAT DEFINTIVE FAILURE\n");
 
   WDiaUCBRequestError(DIA_FUNC,preq,NULL);
 }
@@ -137,6 +137,11 @@ DiaProductsDatContRetrieve(t_dia_req *preq, t_dia_rspparam *par, ...)
 {
   DIA_LOCAL_VAR();
 
+  (void)updatecont;
+  (void)updateelem;
+  (void)tmp;
+  (void)parseflags;
+
   sprintf(target,"%s%s/%s/containers/products", GetHostTarget(), SCL_ROOT_APP, GetVar("w_ipuid"));
 
   if  (par == NULL)
@@ -187,7 +192,7 @@ DiaProductsError(t_dia_req *preq,t_dia_rspparam *par)
   if (par && par->pr_timeout) {
     return;
   }
-  RTL_TRDBG(0,"ERROR DIA DAT DEFINTIVE FAILURE\n");
+  RTL_TRDBG(TRACE_ERROR,"ERROR DIA DAT DEFINTIVE FAILURE\n");
   ProductsSetDescription(preq->rq_dev, NULL);
 }
 
@@ -197,6 +202,11 @@ DiaProductsRetrieve(t_dia_req *preq, t_dia_rspparam *par, ...)
 {
   DIA_LOCAL_VAR();
   
+  (void)updatecont;
+  (void)updateelem;
+  (void)tmp;
+  (void)parseflags;
+
   sprintf(target,"%s%s/%s/containers/products/contentInstances/%s/content", 
       GetHostTarget(),
       SCL_ROOT_APP,

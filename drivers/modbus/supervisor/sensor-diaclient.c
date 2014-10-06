@@ -1,4 +1,4 @@
-#include "modbus.h"
+#include "modbus-acy.h"
 
 /*
  *  DIA Client Callbacks
@@ -133,7 +133,6 @@ WDiaUCBPostLoadTemplate_DiaAppElemCreate(t_dia_req *preq, char *target, t_cmn_se
   void *o;
   void *filter;
   int iSrchStr, nbSrchStr;
-  void *srchStr;
   void *srchStrElem;
   int found;
 

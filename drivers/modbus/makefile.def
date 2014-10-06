@@ -3,6 +3,7 @@ include $(ROOTACT)/rtbase/base/makefile.def
 MODBUSLIB= $(ROOTACT)/modbus/lib/libmodbus-acy.a \
            $(ROOTACT)/lib/libmodbus.a
 
+
 INC = -I$(ROOTACT)/ \
       -I$(ROOTACT)/xo/include \
       -I$(ROOTACT)/drvcommon/lib \

@@ -1,32 +1,11 @@
-#include "modbus.h"
+#include "modbus-acy.h"
 
-/**
- * @brief Call back from retargeted operations on the M2M IPU application.
- * @param ident the IPU identifier (i.e. MODBUS)
- * @param targetlevel The access right level (i.e. 1, 2 or 3)
- * @param obix the request content decoded as oBIX buffer.
- * @param targetid the request URI of the dIa incoming request.
- * @param reqId the dIa request identifier to provide on completion.
- */
-int
-IpuExecuteMethod(char *ident, int targetlevel, void *obix, char *targetid, int tid)
-{
-  int ret;
-  char *name;
+
+static int
+retargetingModbusCreateNetwork(void *obix) {
+  
   Network_t *network;
-
-  RTL_TRDBG(0, "%s\n", __FUNCTION__);
-  NOT_USED(ident);
-  NOT_USED(targetlevel);
-  NOT_USED(tid);
   
-  char *ope = rindex(targetid, '/') + 1;
-  if (ope == NULL || *ope == '\0') {
-    RTL_TRDBG(0, "Can't read operation\n");
-    return -404;
-  }
-  
-  if (strcmp(ope, "modbusCreateNetwork") == 0) {
   /*
     <?xml version="1.0" encoding="UTF-8"?>
     <obix:obj xmlns:obix="http://obix.org/ns/schema/1.1" href="modbusCreateNetwork">
@@ -46,15 +25,17 @@ IpuExecuteMethod(char *ident, int targetlevel, void *obix, char *targetid, int t
     </obix:obj>
   */
 
-    char *modbusNetworkName = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusNetworkName].val", NULL);
+  char *modbusNetworkName = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusNetworkName].val", 
+    NULL);
     if (modbusNetworkName == NULL) {
-      RTL_TRDBG(0, "Argument 'modbusNetworkName' not found\n");
+    RTL_TRDBG(TRACE_API, "Argument 'modbusNetworkName' not found\n");
       return -400;
     }
     
-    char *modbusNetworkType = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusNetworkType].val", NULL);
+  char *modbusNetworkType = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusNetworkType].val",
+    NULL);
     if (modbusNetworkName == NULL) {
-      RTL_TRDBG(0, "Argument 'modbusNetworkType' not found\n");
+    RTL_TRDBG(TRACE_API, "Argument 'modbusNetworkType' not found\n");
       return -400;
     } else
     if (!strcmp(modbusNetworkType, "ethernet")) {
@@ -63,44 +44,54 @@ IpuExecuteMethod(char *ident, int targetlevel, void *obix, char *targetid, int t
     if (!strcmp(modbusNetworkType, "serial")) {
       char *modbusUART = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusUART].val", NULL);
       if (modbusUART == NULL) {
-        RTL_TRDBG(0, "Argument 'modbusUART' not found\n");
+      RTL_TRDBG(TRACE_API, "Argument 'modbusUART' not found\n");
         return -400;
       }
       
-      char *modbusBaudrate = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusBaudrate].val", NULL);
+    char *modbusBaudrate = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusBaudrate].val", 
+      NULL);
       if (modbusBaudrate == NULL) {
         modbusBaudrate = "19200";
-        RTL_TRDBG(0, "Argument 'modbusBaudrate' use default value '%s'\n", modbusBaudrate);
+      RTL_TRDBG(TRACE_INFO, "Argument 'modbusBaudrate' use default value '%s'\n", 
+        modbusBaudrate);
       }
 
-      char *modbusParity = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusParity].val", NULL);
+    char *modbusParity = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusParity].val", 
+      NULL);
       if (modbusParity == NULL) {
         modbusParity = "N";
-        RTL_TRDBG(0, "Argument 'modbusParity' use default value '%s'\n", modbusParity);
+      RTL_TRDBG(TRACE_INFO, "Argument 'modbusParity' use default value '%s'\n", 
+        modbusParity);
       }
       
-      char *modbusDataSize = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusDataSize].val", NULL);
+    char *modbusDataSize = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusDataSize].val",
+      NULL);
       if (modbusDataSize == NULL) {
         modbusDataSize = "8";
-        RTL_TRDBG(0, "Argument 'modbusDataSize' use default value '%s'\n", modbusDataSize);
+      RTL_TRDBG(TRACE_INFO, "Argument 'modbusDataSize' use default value '%s'\n",
+        modbusDataSize);
       }
 
-      char *modbusStopSize = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusStopSize].val", NULL);
+    char *modbusStopSize = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusStopSize].val",
+      NULL);
       if (modbusStopSize == NULL) {
         modbusStopSize = "1";
-        RTL_TRDBG(0, "Argument 'modbusStopSize' use default value '%s'\n", modbusStopSize);
+      RTL_TRDBG(TRACE_INFO, "Argument 'modbusStopSize' use default value '%s'\n",
+        modbusStopSize);
       }
       
-      network = NetworkCreateSerial(modbusNetworkName, modbusUART, modbusBaudrate, modbusParity, modbusDataSize, modbusStopSize);
+    network = NetworkCreateSerial(modbusNetworkName, modbusUART, modbusBaudrate,
+      modbusParity, modbusDataSize, modbusStopSize);
     } else {
       // Bad type
-      RTL_TRDBG(0, "Argument 'modbusNetworkType', value not supported '%s'\n", modbusNetworkType);
+    RTL_TRDBG(TRACE_API, "Argument 'modbusNetworkType', value not supported '%s'\n",
+      modbusNetworkType);
       return -400;
     }
     
     // Check the network is really created
     if (network == NULL) {
-      RTL_TRDBG(0, "modbusCreateNetwork failed\n");
+    RTL_TRDBG(TRACE_API, "modbusCreateNetwork failed\n");
       return -500;
     }
     
@@ -110,24 +101,59 @@ IpuExecuteMethod(char *ident, int targetlevel, void *obix, char *targetid, int t
     DiaIpuStart();
     
     return 0;
-  } else
-  if (strcmp(ope, "modbusLoadProduct") == 0) {
+}
+
+
+static int
+retargetingModbusLoadProduct(void *obix) {
   /*
     <?xml version="1.0" encoding="UTF-8"?>
     <obix:obj xmlns:obix="http://obix.org/ns/schema/1.1">
       <obix:str name="modbusProductRef" val="Telemecanique:OTB1E0DM9LP:0" />
     </obix:obj>
   */
-    char *modbusProductRef = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusProductRef].val", NULL);
+  char *modbusProductRef = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusProductRef].val",
+    NULL);
     if (modbusProductRef == NULL) {
-      RTL_TRDBG(0, "Argument 'modbusProductRef' not found\n");
+    RTL_TRDBG(TRACE_API, "Argument 'modbusProductRef' not found\n");
       return -400;
     }
     
     ProductsSync(modbusProductRef);
     return 0;
+}
+
+
+/**
+ * @brief Call back from retargeted operations on the M2M IPU application.
+ * @param ident the IPU identifier (i.e. MODBUS)
+ * @param targetlevel The access right level (i.e. 1, 2 or 3)
+ * @param obix the request content decoded as oBIX buffer.
+ * @param targetid the request URI of the dIa incoming request.
+ * @param reqId the dIa request identifier to provide on completion.
+ */
+int
+IpuExecuteMethod(char *ident, int targetlevel, void *obix, char *targetid, int tid)
+{
+
+  RTL_TRDBG(TRACE_API, "%s\n", __FUNCTION__);
+  NOT_USED(ident);
+  NOT_USED(targetlevel);
+  NOT_USED(tid);
+  
+  char *ope = rindex(targetid, '/') + 1;
+  if (ope == NULL || *ope == '\0') {
+    RTL_TRDBG(TRACE_ERROR, "Can't read operation\n");
+    return -404;
+  }
+  
+  if (strcmp(ope, "modbusCreateNetwork") == 0) {
+    return retargetingModbusCreateNetwork(obix);
+  } else
+  if (strcmp(ope, "modbusLoadProduct") == 0) {
+    return retargetingModbusLoadProduct(obix);
   } else {
-    RTL_TRDBG(0, "Unknown operation '%s' on IPU\n", ope);
+    RTL_TRDBG(TRACE_API, "Unknown operation '%s' on IPU\n", ope);
     return -404;
   }
   
@@ -145,20 +171,20 @@ IpuExecuteMethod(char *ident, int targetlevel, void *obix, char *targetid, int t
 int
 CmnNetworkExecuteMethod(char *ident, int targetlevel, void *obix, char *targetid, int tid)
 {
-  RTL_TRDBG(0, "%s\n", __FUNCTION__);
+  RTL_TRDBG(TRACE_API, "%s\n", __FUNCTION__);
   NOT_USED(targetlevel);
   NOT_USED(tid);
 
   // Ensure the ident exists 
   Network_t *network = NetworkFindFromName(ident);
   if (network == NULL) {
-    RTL_TRDBG(0, "Network doesn't exist (ident:%s)\n", ident);
+    RTL_TRDBG(TRACE_API, "Network doesn't exist (ident:%s)\n", ident);
     return -404;
   }
   
   char *ope = rindex(targetid, '/') + 1;
   if (ope == NULL || *ope == '\0') {
-    RTL_TRDBG(0, "Can't read operation\n");
+    RTL_TRDBG(TRACE_API, "Can't read operation\n");
     return -404;
   }
   
@@ -186,25 +212,29 @@ CmnNetworkExecuteMethod(char *ident, int targetlevel, void *obix, char *targetid
       <obix:str name="modbusDeviceDefinition" val="labjack:u9:1" />
     </obix:obj>
   */
-    char *modbusDeviceName = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusDeviceName].val", NULL);
+    char *modbusDeviceName = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusDeviceName].val",
+      NULL);
     if (modbusDeviceName == NULL) {
-      RTL_TRDBG(0, "Argument 'modbusDeviceName' not found\n");
+      RTL_TRDBG(TRACE_API, "Argument 'modbusDeviceName' not found\n");
       return -400;
     }
 
-    char *modbusDeviceAddress = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusDeviceAddress].val", NULL);
+    char *modbusDeviceAddress = (char *) XoNmGetAttr(obix, 
+      "wrapper$[name=modbusDeviceAddress].val", NULL);
     if (modbusDeviceAddress == NULL) {
-      RTL_TRDBG(0, "Argument 'modbusDeviceAddress' not found\n");
+      RTL_TRDBG(TRACE_API, "Argument 'modbusDeviceAddress' not found\n");
       return -400;
     }
     
-    char *modbusDeviceDefinition = (char *) XoNmGetAttr(obix, "wrapper$[name=modbusDeviceDefinition].val", NULL);
+    char *modbusDeviceDefinition = (char *) XoNmGetAttr(obix,
+      "wrapper$[name=modbusDeviceDefinition].val", NULL);
     if (modbusDeviceDefinition == NULL) {
-      RTL_TRDBG(0, "Argument 'modbusDeviceDefinition' not found\n");
+      RTL_TRDBG(TRACE_API, "Argument 'modbusDeviceDefinition' not found\n");
       return -400;
     }
     
-    Sensor_t *device = DeviceCreate(network, modbusDeviceName, modbusDeviceAddress, modbusDeviceDefinition);
+    Sensor_t *device = DeviceCreate(network, modbusDeviceName, 
+      modbusDeviceAddress, modbusDeviceDefinition);
     if (device == NULL) {
       return -500;
     }
@@ -217,7 +247,7 @@ CmnNetworkExecuteMethod(char *ident, int targetlevel, void *obix, char *targetid
     // FFS modbusScanNetwork
     return -501;
   } else {
-    RTL_TRDBG(0, "Unknown operation '%s' on network\n", ope);
+    RTL_TRDBG(TRACE_API, "Unknown operation '%s' on network\n", ope);
     return -404;
   }
 
@@ -241,30 +271,30 @@ CmnNetworkExecuteMethod(char *ident, int targetlevel, void *obix, char *targetid
  * return 0 in case of success, a negative number indicating the error code otherwise.
  */
 int
-iCmnSensorExecuteMethod(t_cmn_sensor *cmn, int app, int cluster, int numm, int targetlevel, void *obix, char *targetid, int tid)
+iCmnSensorExecuteMethod(t_cmn_sensor *cmn, int app, int cluster, int numm, 
+  int targetlevel, void *obix, char *targetid, int tid)
 {
   NOT_USED(tid);
   Sensor_t *device = container_of(cmn, Sensor_t, cp_cmn);
   
-  RTL_TRDBG(0, "%s\n", __FUNCTION__);
-  RTL_TRDBG(0, "\tapp = %d\n", app);
-  RTL_TRDBG(0, "\tcluster = %d\n", cluster);
-  RTL_TRDBG(0, "\tnumm = %d\n", numm);
-  RTL_TRDBG(0, "\ttargetlevel = %d\n", targetlevel);
-  RTL_TRDBG(0, "\tobix = %p\n", obix);
+  RTL_TRDBG(TRACE_API, "%s\n", __FUNCTION__);
+  RTL_TRDBG(TRACE_API, "\tapp = %d\n", app);
+  RTL_TRDBG(TRACE_API, "\tcluster = %d\n", cluster);
+  RTL_TRDBG(TRACE_API, "\tnumm = %d\n", numm);
+  RTL_TRDBG(TRACE_API, "\ttargetlevel = %d\n", targetlevel);
+  RTL_TRDBG(TRACE_API, "\tobix = %p\n", obix);
 
   char *ope = rindex(targetid, '/') + 1;
   if (ope == NULL || *ope == '\0') {
-    RTL_TRDBG(0, "Can't read operation\n");
+    RTL_TRDBG(TRACE_API, "Can't read operation\n");
     return -404;
   }
 
   if (strcmp(ope, "modbusDeleteDevice") == 0) {
-    Network_t *network = device->network;
     DeviceDelete(device);
     return 0;
   } else {
-    RTL_TRDBG(0, "Unknown operation '%s' on device\n", ope);
+    RTL_TRDBG(TRACE_API, "Unknown operation '%s' on device\n", ope);
     return -404;
   }
   
@@ -287,18 +317,19 @@ iCmnSensorExecuteMethod(t_cmn_sensor *cmn, int app, int cluster, int numm, int t
  * the error code otherwise.
  */
 int
-iCmnSensorRetrieveAttrValue(t_cmn_sensor *cmn, int app, int cluster, int numm, int targetlevel, char *targetid, int tid)
+iCmnSensorRetrieveAttrValue(t_cmn_sensor *cmn, int app, int cluster, int numm, 
+  int targetlevel, char *targetid, int tid)
 {
   Sensor_t *device = container_of(cmn, Sensor_t, cp_cmn);
   
-  RTL_TRDBG(0, "%s\n", __FUNCTION__);
-  RTL_TRDBG(0, "\tcmn = %p\n", cmn);
-  RTL_TRDBG(0, "\tapp = %d\n", app);
-  RTL_TRDBG(0, "\tcluster = %d\n", cluster);
-  RTL_TRDBG(0, "\tnumm = %d\n", numm);
-  RTL_TRDBG(0, "\ttargetlevel = %d\n", targetlevel);
-  RTL_TRDBG(0, "\ttargetid = %s\n", targetid);
-  RTL_TRDBG(0, "\ttid = %d\n", tid);
+  RTL_TRDBG(TRACE_API, "%s\n", __FUNCTION__);
+  RTL_TRDBG(TRACE_API, "\tcmn = %p\n", cmn);
+  RTL_TRDBG(TRACE_API, "\tapp = %d\n", app);
+  RTL_TRDBG(TRACE_API, "\tcluster = %d\n", cluster);
+  RTL_TRDBG(TRACE_API, "\tnumm = %d\n", numm);
+  RTL_TRDBG(TRACE_API, "\ttargetlevel = %d\n", targetlevel);
+  RTL_TRDBG(TRACE_API, "\ttargetid = %s\n", targetid);
+  RTL_TRDBG(TRACE_API, "\ttid = %d\n", tid);
   
   char *uuid = strstr(targetid, "/retargeting");
   if (uuid == NULL) {
@@ -315,7 +346,7 @@ iCmnSensorRetrieveAttrValue(t_cmn_sensor *cmn, int app, int cluster, int numm, i
     return -404;
   }
 
-  RTL_TRDBG(1, "modbusType=%s(%d), isReadable=%d, reg=%s\n",
+  RTL_TRDBG(TRACE_INFO, "modbusType=%s(%d), isReadable=%d, reg=%s\n",
     attr->modbusType, attr->modbusTypeID, attr->isReadable, attr->modbusAccess);
 
   if (attr->isReadable == false) {
@@ -343,19 +374,20 @@ iCmnSensorRetrieveAttrValue(t_cmn_sensor *cmn, int app, int cluster, int numm, i
  * the error code otherwise.
  */
 int
-iCmnSensorUpdateAttrValue(t_cmn_sensor *cmn, int app, int cluster, int numm, int targetlevel, void *obix, char *targetid, int tid)
+iCmnSensorUpdateAttrValue(t_cmn_sensor *cmn, int app, int cluster, int numm, 
+  int targetlevel, void *obix, char *targetid, int tid)
 {
   Sensor_t *device = container_of(cmn, Sensor_t, cp_cmn);
 
-  RTL_TRDBG(0, "%s\n", __FUNCTION__);
-  RTL_TRDBG(0, "\tcmn = %p\n", cmn);
-  RTL_TRDBG(0, "\tapp = %d\n", app);
-  RTL_TRDBG(0, "\tcluster = %d\n", cluster);
-  RTL_TRDBG(0, "\tnumm = %d\n", numm);
-  RTL_TRDBG(0, "\ttargetlevel = %d\n", targetlevel);
-  RTL_TRDBG(0, "\tobix = %p\n", obix);
-  RTL_TRDBG(0, "\ttargetid = %s\n", targetid);
-  RTL_TRDBG(0, "\ttid = %d\n", tid);
+  RTL_TRDBG(TRACE_API, "%s\n", __FUNCTION__);
+  RTL_TRDBG(TRACE_API, "\tcmn = %p\n", cmn);
+  RTL_TRDBG(TRACE_API, "\tapp = %d\n", app);
+  RTL_TRDBG(TRACE_API, "\tcluster = %d\n", cluster);
+  RTL_TRDBG(TRACE_API, "\tnumm = %d\n", numm);
+  RTL_TRDBG(TRACE_API, "\ttargetlevel = %d\n", targetlevel);
+  RTL_TRDBG(TRACE_API, "\tobix = %p\n", obix);
+  RTL_TRDBG(TRACE_API, "\ttargetid = %s\n", targetid);
+  RTL_TRDBG(TRACE_API, "\ttid = %d\n", tid);
 
   char *uuid = strstr(targetid, "/retargeting");
   if (uuid == NULL) {
@@ -372,7 +404,7 @@ iCmnSensorUpdateAttrValue(t_cmn_sensor *cmn, int app, int cluster, int numm, int
     return -404;
   }
 
-  RTL_TRDBG(1, "modbusType=%s(%d), isWritable=%d, reg=%s\n",
+  RTL_TRDBG(TRACE_INFO, "modbusType=%s(%d), isWritable=%d, reg=%s\n",
     attr->modbusType, attr->modbusTypeID, attr->isWritable, attr->modbusAccess);
 
   if (attr->isWritable == false) {

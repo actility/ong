@@ -1,11 +1,10 @@
-#include "modbus.h"
+#include "modbus-acy.h"
 
 /**********************************************************************************************************************
  *  Utils
  */
  
  
-static
 t_sensor *
 SensorNumSerial(int num, int serial)
 {
@@ -32,7 +31,7 @@ CmnSensorNumSerial(int num, int serial)
 t_cmn_sensor *
 CmnSensorFindByIeee(char *ieee)
 {
-  RTL_TRDBG(1, "Search cmn with ident='%s'\n", ieee);
+  RTL_TRDBG(TRACE_DETAIL, "Search cmn with ident='%s'\n", ieee);
 
   char *sep = index(ieee, '_');
   if (sep == NULL) {
@@ -118,7 +117,7 @@ NetworkCreate(char *name)
   }
   
   network = (Network_t *) malloc (sizeof(Network_t));
-  RTL_TRDBG(1, "create network %p name=%s\n", network, name);
+  RTL_TRDBG(TRACE_INFO, "create network %p name=%s\n", network, name);
   
   network->isInit = false;
   network->toDelete = false;
@@ -162,24 +161,28 @@ NetworkCreateSerial(char *name, char *modbusUART, char *modbusBaudrate, char *mo
   // Check inputs
   int baudrate = strtol (modbusBaudrate, &endptr, 10);
   if (*endptr != '\0') {
-    RTL_TRDBG(1, "Baudrate must be numeric and not look like. modbusBaudrate=%s\n", modbusBaudrate);
+    RTL_TRDBG(TRACE_ERROR, "Baudrate parameter has wrong format. Must be numeric. "
+      "(modbusBaudrate=%s)\n", modbusBaudrate);
     return NULL;
   }
   
   int datasize = strtol (modbusDataSize, &endptr, 10);
   if (*endptr != '\0') {
-    RTL_TRDBG(1, "Data size must be numeric and not look like. modbusDataSize=%s\n", modbusDataSize);
+    RTL_TRDBG(TRACE_ERROR, "Data size parameter has wrong format. Must be numeric. "
+      "(modbusDataSize=%s)\n", modbusDataSize);
     return NULL;
   }
 
   int stopsize = strtol (modbusStopSize, &endptr, 10);
   if (*endptr != '\0') {
-    RTL_TRDBG(1, "Data stop size must be numeric and not look like. modbusStopSize=%s\n", modbusStopSize);
+    RTL_TRDBG(TRACE_ERROR, "Data stop size has wrong format. Must be numeric. "
+      "(modbusStopSize=%s)\n", modbusStopSize);
     return NULL;
   }
   
   if (*modbusParity != 'N' && *modbusParity != 'O' && *modbusParity != 'E') {
-    RTL_TRDBG(1, "Parity must be 'N', 'E', or 'O'. modbusParity=%s\n", modbusParity);
+    RTL_TRDBG(TRACE_ERROR, "Parity must be 'N', 'E', or 'O'. (modbusParity=%s)\n", 
+      modbusParity);
     return NULL;
   }
   
@@ -200,7 +203,8 @@ NetworkCreateSerial(char *name, char *modbusUART, char *modbusBaudrate, char *mo
   network->stopsize = stopsize;
   network->parity = modbusParity[0];
   
-  network->modbusCtx = modbus_new_rtu(network->uart, network->baudrate, network->parity, network->datasize, network->stopsize);
+  network->modbusCtx = modbus_new_rtu(network->uart, network->baudrate, 
+    network->parity, network->datasize, network->stopsize);
   
   return network;
 }
@@ -228,7 +232,7 @@ NetworkDelete(Network_t *network)
 {
   network->toDelete = true;
   
-  RTL_TRDBG(2, "Starting network '%s' delete state-machine\n", network->name);
+  RTL_TRDBG(TRACE_INFO, "Starting network '%s' delete state-machine\n", network->name);
   NetworkDeleteNext(network);
 }
 
@@ -362,7 +366,8 @@ DeviceCreate(Network_t *network, char *name, char *addr, char *product)
   if (network->type == NETWORK_SERIAL) {
     serial_addr = strtol (addr, &endptr, 10);
     if (*endptr != '\0') {
-      RTL_TRDBG(1, "Adress of device on a serial line must be numeric and not look like. addr=%s\n", addr);
+      RTL_TRDBG(TRACE_ERROR, "Adress of device on a serial line has wrong format. "
+        "Must be numeric. (addr=%s)\n", addr);
       return NULL;
     }
   } else {
@@ -372,7 +377,8 @@ DeviceCreate(Network_t *network, char *name, char *addr, char *product)
     } else {
       tcp_port = strtol (port + 1, &endptr, 10);
       if (*endptr != '\0') {
-        RTL_TRDBG(1, "TCP port of device must be numeric and not look like. port=%s\n", port);
+        RTL_TRDBG(TRACE_ERROR, "TCP port of device has wrong format. Must be numeric. "
+          "(port=%s)\n", port);
         return NULL;
       }
     }
@@ -380,10 +386,11 @@ DeviceCreate(Network_t *network, char *name, char *addr, char *product)
 
   device = (Sensor_t *) malloc (sizeof(Sensor_t));
   if (device == NULL) {
-    RTL_TRDBG(0, "malloc failure\n");
+    RTL_TRDBG(TRACE_ERROR, "malloc failure\n");
     return NULL;
   }
-  RTL_TRDBG(1, "create device %p name=%s addr=%s product=%s network=%s\n", device, name, addr, product, network->name);
+  RTL_TRDBG(TRACE_API, "create device %p name=%s addr=%s product=%s network=%s\n", 
+    device, name, addr, product, network->name);
   
   INIT_LIST_HEAD(&(device->ops));
   INIT_LIST_HEAD(&(device->cnts));
@@ -426,7 +433,8 @@ DeviceCheckModbusConnection(Sensor_t *device)
   
   if (network->type == NETWORK_SERIAL) {
     if (network->modbusCtx == NULL) {
-      modbusCtx = network->modbusCtx = modbus_new_rtu(network->uart, network->baudrate, network->parity, network->datasize, network->stopsize);
+      modbusCtx = network->modbusCtx = modbus_new_rtu(network->uart, 
+        network->baudrate, network->parity, network->datasize, network->stopsize);
     }
   } else {
     if (device->modbusCtx == NULL) {
@@ -447,15 +455,38 @@ DeviceCheckModbusConnection(Sensor_t *device)
 
   // For ethernet device, open the TCP/IP connection
   if (network->type == NETWORK_ETHERNET) {
-    RTL_TRDBG(1, "device %s try to connect. ip=%s port=%d\n", device->name, device->tcp_ip, device->tcp_port);
+    RTL_TRDBG(TRACE_INFO, "device %s try to connect. ip=%s port=%d\n", 
+      device->name, device->tcp_ip, device->tcp_port);
     if (modbus_connect(modbusCtx) == -1) {
-      RTL_TRDBG(1, "Modbus connection failed: %s\n", modbus_strerror(errno));
-      modbus_free(modbusCtx);
       device->modbusCtx = NULL;
+      RTL_TRDBG(TRACE_ERROR, "Modbus connection failed: %s\n", 
+        modbus_strerror(errno));
+      modbus_free(modbusCtx);
       return 0;
     }
     
-    RTL_TRDBG(1, "device %s connected. ip=%s port=%d\n", device->name, device->tcp_ip, device->tcp_port);
+    RTL_TRDBG(TRACE_API, "device %s connected. ip=%s port=%d\n", 
+      device->name, device->tcp_ip, device->tcp_port);
+  }
+  
+  return 1;
+}
+
+int
+DeviceModbusDisconnection(Sensor_t *device)
+{
+  if (device->network->type == NETWORK_SERIAL) {
+    if (NULL != device->network->modbusCtx) {
+      modbus_close(device->network->modbusCtx);
+      modbus_free(device->network->modbusCtx);
+      device->network->modbusCtx = NULL;
+    }
+  } else {
+    if (NULL != device->modbusCtx) {
+      modbus_close(device->modbusCtx);
+      modbus_free(device->modbusCtx);
+      device->modbusCtx = NULL;
+    }
   }
   
   return 1;
@@ -466,7 +497,7 @@ DeviceDelete(Sensor_t *device)
 {
   device->toDelete = true;
   
-  RTL_TRDBG(2, "Starting device '%s' delete state-machine\n", device->name);
+  RTL_TRDBG(TRACE_INFO, "Starting device '%s' delete state-machine\n", device->name);
   DeviceDiaDeleteNext(device);
 }
 
@@ -490,10 +521,7 @@ DeviceDestroy(Sensor_t *device)
   list_for_each_safe(index, next, &(device->ops)) {
     Point_t *pt = list_entry(index, Point_t, list);
     list_del(index);
-    if (pt->xo != NULL) {
-      XoFree(pt->xo, 1);
-    }
-    free(pt);
+    pt->free(pt);
   }
 
   free(device->name);
@@ -551,7 +579,7 @@ DeviceDiaDeleteNext(Sensor_t *device)
     Point_t *pt = list_entry(index, Point_t, list);   
 
     if (pt->isInit == true && pt->toDelete == true) {
-      RTL_TRDBG(2, "\n\ndevice=%s\t\t0x%04hX.0x%04hX.%hu.m2m DELETE\n",
+      RTL_TRDBG(TRACE_INFO, "\n\ndevice=%s\t\t0x%04hX.0x%04hX.%hu.m2m DELETE\n",
         device->name, pt->rq_cluster, pt->rq_attribut, pt->rq_member);
       req->rq_app = 0;
       req->rq_cluster = pt->rq_cluster;
@@ -679,7 +707,7 @@ DeviceDiaCreateNext(Sensor_t *device)
     Point_t *pt = list_entry(index, Point_t, list);   
 
     if (pt->isInit == false) {
-      RTL_TRDBG(2, "\n\ndevice=%s\t\t0x%04hX.0x%04hX.%hu.m2m CREATE\n",
+      RTL_TRDBG(TRACE_INFO, "\n\ndevice=%s\t\t0x%04hX.0x%04hX.%hu.m2m CREATE\n",
         device->name, pt->rq_cluster, pt->rq_attribut, pt->rq_member);
       req->rq_app = 0;
       req->rq_cluster = pt->rq_cluster;
@@ -705,18 +733,18 @@ DeviceNotifyProductUpdate(char *ref)
 
   list_for_each(index, &NetworkInternalList) {
     network = list_entry(index, Network_t, list);
-    RTL_TRDBG(2, "network = %p\n", network);
-    RTL_TRDBG(2, "network = %s\n", network->name);
+    RTL_TRDBG(TRACE_INFO, "network = %p\n", network);
+    RTL_TRDBG(TRACE_INFO, "network = %s\n", network->name);
     
     list_for_each(index2, &(network->device)) {
       device = list_entry(index2, Sensor_t, list);
-      RTL_TRDBG(2, "device = %p\n", device);
-      RTL_TRDBG(2, "device = %s\n", device->name);
+      RTL_TRDBG(TRACE_INFO, "device = %p\n", device);
+      RTL_TRDBG(TRACE_INFO, "device = %s\n", device->name);
     
       if (strcmp(device->product, ref) == 0) {
         // Xo is already received and in cache
         // device->xo is already the new product descriptor
-        RTL_TRDBG(2, "Device '%s' must be update !\n", device->name);
+        RTL_TRDBG(TRACE_INFO, "Device '%s' must be update !\n", device->name);
 
         // Drop all retargeting URI
         // May generate some 404 error just before the DESCRIPTOR update
@@ -732,7 +760,7 @@ DeviceNotifyProductUpdate(char *ref)
           Point_t *pt = list_entry(index3, Point_t, list);
           pt->toDelete = true;
           // direct delete for not init
-          RTL_TRDBG(2, "pt = %p, tag as toDelete\n", pt);
+          RTL_TRDBG(TRACE_INFO, "pt = %p, tag as toDelete\n", pt);
         }
   
         // Rewrite the application descriptor
@@ -787,7 +815,7 @@ DeviceListInterfaces(void *cl, Sensor_t *device)
         pt->minInterval,
         (pt->nextRead - now) < 0 ? 0 : (pt->nextRead - now),
         (pt->nextMaxInterval - now) < 0 ? 0 : (pt->nextMaxInterval - now),
-        pt->attr.modbusAccess);
+        pt->attr->modbusAccess);
     }
   }
 }
@@ -809,27 +837,26 @@ DeviceGetPointOrCreate(Sensor_t *device, char *containerID, bool *isNew)
   // Previouly used cntId
   list_for_each(index, &(device->cnts)) {
     pt = list_entry(index, Point_t, list);
-    // ! \\ pt->containerID is a pointer into a memory already free ! // ! \\
+    // --WARNING-- pt->containerID is a pointer into a memory already free ! --WARNING--
     
     if (pt->rq_cluster == rq_cluster &&
       pt->rq_attribut == rq_attribut &&
       pt->rq_member == rq_member) {
       
       // pt->isInit stay in previous state
-      RTL_TRDBG(0, "device=%s Point from cache(%s)=%p\n", device->name, containerID, pt);
+      RTL_TRDBG(TRACE_INFO, "device=%s Point from cache(%s)=%p\n", device->name, containerID, pt);
       *isNew = false;
       return pt;
     }
   }
   
   // New cntId
-  pt = (Point_t *) malloc(sizeof(Point_t));
+  pt = new_Point_t();
   if (pt == NULL) {
     return NULL;
   }
-  pt->isInit = false;
   *isNew = true;
-  RTL_TRDBG(0, "device=%s new Point(%s)=%p\n", device->name, containerID, pt);
+  RTL_TRDBG(TRACE_INFO, "device=%s new Point(%s)=%p\n", device->name, containerID, pt);
   return pt;
 }
  

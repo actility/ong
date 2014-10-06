@@ -11,7 +11,7 @@
 #define MAX_SSR_PER_RTR 10240
 
 #define CHECK_IS_OBIX(dst) \
-    	if	(!dst) return; if (XoIsObix(dst) <= 0) {RTL_TRDBG(0,"ERROR not an obix object\n");return;}
+    	if	(!dst) return 1; if (XoIsObix(dst) <= 0) {RTL_TRDBG(0,"ERROR not an obix object\n");return 1;}
 
 #define	DIA_KO()	(DiaIpuOk == 0 || DiaNetOk == 0)
 
@@ -32,6 +32,8 @@
 
 // Max of t_cov struct
 #define	CZ_MAX  100
+
+#define VAL_IN_ERROR "##"
 
 /*
  *  Easy Var init for t_var struct

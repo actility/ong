@@ -2,8 +2,26 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <!-- Product interface -->
+     <xs:element name="subattr">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="xs:string" use="required"/>
+            <xs:attribute name="display" type="xs:string" use="required"/>
+            <xs:attribute name="offset" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="subattributes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="subattr" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="attr">
         <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="subattributes" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"/>
             <xs:attribute name="cnt" type="xs:string" use="required"/>
             <xs:attribute name="type" type="xs:string" use="required"/>
@@ -13,7 +31,7 @@
             <xs:attribute name="writable" type="xs:string" use="required"/>
         </xs:complexType>
     </xs:element>
-    <xs:element name="attributs">
+    <xs:element name="attributes">
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="attr" minOccurs="1" maxOccurs="unbounded"/>
@@ -25,7 +43,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="id" type="xs:string" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="attributs" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="attributes" minOccurs="1" maxOccurs="1"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

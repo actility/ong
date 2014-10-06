@@ -1,4 +1,4 @@
-#include "modbus.h"
+#include "modbus-acy.h"
 
 LIST_HEAD(ProductList);
 unsigned int productID = 0;
@@ -20,7 +20,7 @@ ProductsGetDescription(char *ref)
   // Not found
   product = (Product_t *) malloc(sizeof(Product_t));
   if (product == NULL) {
-    RTL_TRDBG(0, "malloc failure\n");
+    RTL_TRDBG(TRACE_ERROR, "malloc failure\n");
     return NULL;
   }
   
@@ -29,7 +29,7 @@ ProductsGetDescription(char *ref)
   product->ref = strdup(ref);
   product->xo = NULL;
   list_add(&(product->list), &ProductList);
-  RTL_TRDBG(0, "Product description unknown for '%s'\n", product->ref);
+  RTL_TRDBG(TRACE_ERROR, "Product description unknown for '%s'\n", product->ref);
 
   // Fetch
   product->fetching = true;
@@ -95,7 +95,8 @@ ProductsList(void *cl)
   
   list_for_each(index, &ProductList) {
     product = list_entry(index, Product_t, list);
-    AdmPrint(cl, "\tref=%s xo=%p fetch=%s\n", product->ref, product->xo, product->fetching ? "yes" : "no");
+    AdmPrint(cl, "\tref=%s xo=%p fetch=%s\n", product->ref, product->xo, 
+      product->fetching ? "yes" : "no");
   }
 }
 
@@ -126,7 +127,7 @@ ProductsSetDescription(int id, void *xo)
     product = list_entry(index, Product_t, list);
 
     if (id == product->id) {
-      RTL_TRDBG(0, "Product description received for '%s'\n", product->ref);
+      RTL_TRDBG(TRACE_API, "Product description received for '%s'\n", product->ref);
       
       product->fetching = false;
 
@@ -137,8 +138,9 @@ ProductsSetDescription(int id, void *xo)
       // Swap descriptor and Free 
       void *xoxo = product->xo;
       product->xo = xo;
+      if (xoxo) {
       XoFree(xoxo, 1);
-      
+      }    
       break;
     }
   }
@@ -146,16 +148,12 @@ ProductsSetDescription(int id, void *xo)
   // Create or update cache
   void *dir;
   char *name;
-  char *point;
+  //char *point;
   char fullPath[NAME_MAX];
   char path[NAME_MAX];
   int reflen = strlen(product->ref);
 
-  if (!Operating) {
-    snprintf(path, NAME_MAX, "%s/products/", getenv("AW_DATA_DIR"));
-  } else {
     snprintf(path, NAME_MAX, "%s/usr/data/%s/products", rootactPath, GetAdaptorName());
-  }
   
   dir = rtl_openDir(path);
   if (!dir) {
@@ -172,14 +170,14 @@ ProductsSetDescription(int id, void *xo)
     if (strncmp(name, product->ref, reflen) == 0) {
       sprintf(fullPath, "%s/%s.xml", path, name);
       
-      RTL_TRDBG(0, "Drop cache for product description: '%s'\n", product->ref);
+      RTL_TRDBG(TRACE_API, "Drop cache for product description: '%s'\n", product->ref);
       remove(fullPath);
       break;
     }
   }
   
   sprintf(fullPath, "%s/%s.xml", path, product->ref);
-  RTL_TRDBG(0, "Create cache for product description: '%s'\n", product->ref);
+  RTL_TRDBG(TRACE_API, "Create cache for product description: '%s'\n", product->ref);
   XoWritXmlEx(fullPath, xo, 0, 0);
   
   // Update all device based on this product !
@@ -196,11 +194,7 @@ ProductsClearCache(void)
   char path[NAME_MAX];
 
 
-  if (!Operating) {
-    snprintf(path, NAME_MAX, "%s/products", getenv("AW_DATA_DIR"));
-  } else {
     snprintf(path, NAME_MAX, "%s/usr/data/%s/products", rootactPath, GetAdaptorName());
-  }
   
   dir = rtl_openDir(path);
   if (!dir) {
@@ -234,13 +228,9 @@ ProductsLoadCache(void)
   Product_t *product;
 
   
-  if (!Operating) {
-    snprintf(path, NAME_MAX, "%s/products", getenv("AW_DATA_DIR"));
-  } else {
     snprintf(path, NAME_MAX, "%s/usr/data/%s/products", rootactPath, GetAdaptorName());
-  }
   
-  RTL_TRDBG(0, "Loading product description form cache : '%s'\n", path);
+  RTL_TRDBG(TRACE_API, "Loading product description form cache : '%s'\n", path);
   dir = rtl_openDir(path);
   if (!dir) {
     return;
@@ -266,7 +256,7 @@ ProductsLoadCache(void)
 
       product = (Product_t *) malloc(sizeof(Product_t));
       if (product == NULL) {
-        RTL_TRDBG(0, "malloc failure\n");
+        RTL_TRDBG(TRACE_ERROR, "malloc failure\n");
         XoFree(xo, 1);
         continue;
       }
@@ -278,7 +268,8 @@ ProductsLoadCache(void)
       product->xo = xo;
       product->fetching = false;
       list_add(&(product->list), &ProductList);
-      RTL_TRDBG(0, "\t-> ref='%s', xo=%p, itfCount=%d\n", product->ref, xo, XoNmNbInAttr(xo, "modbus:interfaces", 0));
+      RTL_TRDBG(TRACE_INFO, "\t-> ref='%s', xo=%p, itfCount=%d\n", product->ref, 
+        xo, XoNmNbInAttr(xo, "modbus:interfaces", 0));
     }
   }
 }

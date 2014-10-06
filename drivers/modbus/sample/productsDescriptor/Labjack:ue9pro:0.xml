@@ -8,40 +8,40 @@
 	<interfaces>
 		<interface>
 			<id>AnalogInput.Srv</id>
-			<attributs>
+			<attributes>
 				<attr name="currentMesure" unit="obix:units/volts" type="float-le" display="Analog Input #0" reg="/holding/1/2" readable="true" writable="false"/>
-			</attributs>
+			</attributes>
 		</interface>
 
 		<interface>
 			<id>AnalogInput2.Srv</id>
-			<attributs>
+			<attributes>
 				<attr name="currentMesure" unit="obix:units/volts" type="float-le" display="Analog Input #1" reg="/holding/3/2" readable="true" writable="false"/>
-			</attributs>
+			</attributes>
 		</interface>
 
 		<interface>
 			<id>AnalogInput2.Srv</id>
-			<attributs>
+			<attributes>
 				<attr name="currentMesure" unit="obix:units/volts" type="float-le" display="Analog Input #1" reg="/holding/3/2" readable="false" writable="true"/>
-			</attributs>
+			</attributes>
 		</interface>
 		
 		<interface>
 			<id>AnalogInput2.Srv</id>
-			<attributs>
+			<attributes>
 				<attr name="currentMesure" unit="obix:units/volts" type="float-le" display="Analog Input #1" reg="/holding/3/2" readable="true" writable="true"/>
-			</attributs>
+			</attributes>
 		</interface>
 		
 		<interface>
 			<id>Basic.Srv</id>
-			<attributs>
+			<attributes>
 				<attr name="productId" type="int" display="Product ID" reg="/holding/65000/1" readable="true" writable="false"/>
 				<attr name="serialNumber" type="int" display="Serial Number" reg="/holding/65001/2" readable="true" writable="false"/>
 				<attr name="localId" type="int" display="Local ID" reg="/holding/65003/1" readable="true" writable="false"/>
 				<attr name="hardwareVersion" type="int" display="Hardware Version" reg="/holding/65004/1" readable="true" writable="false"/>
-			</attributs>
+			</attributes>
 		</interface>
 	</interfaces>
 </description>

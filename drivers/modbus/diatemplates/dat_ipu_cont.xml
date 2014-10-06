@@ -5,5 +5,4 @@
         <m2m:searchString>ETSI.ObjectSemantic/OASIS.OBIX_1_1</m2m:searchString>
     </m2m:searchStrings>
     <m2m:maxNrOfInstances>100</m2m:maxNrOfInstances>
-    <m2m:maxInstanceAge>2592000</m2m:maxInstanceAge>
 </m2m:container>
