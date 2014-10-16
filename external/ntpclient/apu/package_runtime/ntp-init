@@ -3,7 +3,7 @@
 # ntp:       Starts the NTP
 
 CURRENT_DIR=$(dirname $0)
-. $CURRENT_DIR/../ong.cfg
+. $CURRENT_DIR/../acy.cfg
 . $CURRENT_DIR/../functions
 [ -r $CURRENT_DIR/../ntp/ntp.cfg ] && . $CURRENT_DIR/../ntp/ntp.cfg
 

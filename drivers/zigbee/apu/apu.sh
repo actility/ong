@@ -1,7 +1,7 @@
 
 projectGroupId()
 {
-  echo "com.actilityi.m2m"
+  echo "com.actility.m2m"
 }
 
 projectVersion()

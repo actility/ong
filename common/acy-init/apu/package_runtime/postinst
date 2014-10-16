@@ -1,0 +1,4 @@
+chmod 755 $ROOTACT/etc/acy
+chmod 755 $ROOTACT/etc/pids
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/acy
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/pids

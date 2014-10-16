@@ -1,7 +1,7 @@
 #!(SHELL)
 
 CURRENT_DIR=$(dirname $0)
-. $CURRENT_DIR/ong.cfg
+. $CURRENT_DIR/acy.cfg
 
 OPTIONS=""
 RETVAL=0

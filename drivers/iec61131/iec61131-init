@@ -6,7 +6,7 @@ exec 2> /dev/null
 NAME=iec61131
 
 CURRENT_DIR=`dirname $0`
-. $CURRENT_DIR/../ong.cfg
+. $CURRENT_DIR/../acy.cfg
 . $CURRENT_DIR/../functions
 
 OPTIONS=""

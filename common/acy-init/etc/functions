@@ -192,6 +192,18 @@ healthAndCheck() {
     fi
 }
 
+downStrategyAndCheck() {
+    if [ "$1" = "test" ]; then
+      return 0
+    fi
+    if serviceStarted; then
+        downStrategy
+    else
+        echo "$SERVICE service is stopped"
+        return 1
+    fi
+}
+
 restart() {
     stop $*
     start $*
@@ -230,6 +242,10 @@ handleParams() {
         health)
             shift
             healthAndCheck $1
+            ;;
+        downStrategy)
+            shift
+            downStrategyAndCheck $1
             ;;
         *)
             usage
@@ -315,3 +331,8 @@ dumpState() {
 health() {
     :
 }
+
+downStrategy() {
+    echo "restart"
+}
+

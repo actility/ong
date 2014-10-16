@@ -3,7 +3,7 @@
 # tunslip:       Starts the tunslip driver
 
 CURRENT_DIR=`dirname $0`
-. $CURRENT_DIR/../ong.cfg
+. $CURRENT_DIR/../acy.cfg
 
 usage() {
     echo "Usage: tunslip [<options>] {start|stop|status|restart}"
