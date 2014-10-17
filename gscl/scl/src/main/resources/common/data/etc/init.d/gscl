@@ -20,6 +20,13 @@ PIDFILE=$GSCL_DATA/gscl.pid
 STOPFILE=$GSCL_DATA/stop
 FORCE="0"
 
+GSCL_WGET_TIMEOUT=5
+GSCL_URL=http://localhost:8080/m2m
+NSCL_BASE_URI=$(grep "^\-Fcom.actility.m2m.scl.app.me.config.nsclUri" $ROOTACT/etc/gscl/knopflerfish/props.xargs | cut -d= -f2 | tr -d '[:space:]')
+GSCL_ESC_REQ_ENTITY=$(echo -n "$NSCL_BASE_URI/applications/SUPPORT" | sed -e "s/:/%3a/g")
+GSCL_HEADER="Authorization: Basic $(echo $GSCL_ESC_REQ_ENTITY: | base64 | tr -d '[:space:]')"
+OK_STATUSES="200"
+
 usage() {
     echo "Usage: gscl [<options>] {start|stop|status|restart}"
     echo "  Where options are:"
@@ -213,8 +220,26 @@ dumpState() {
 }
 
 health() {
-    # TODO
-    :
+  RESULT=0
+  WGET_TEMP_FILE=$GSCL_DATA/wget-$(date "+%Y%m%d-%Hh%M%S").log
+  wget -q -S --tries=1 --timeout=$GSCL_WGET_TIMEOUT -O - --header "$GSCL_HEADER"  "$GSCL_URL" > $WGET_TEMP_FILE 2>&1
+  WGET_RESULT=$?
+  RESPONSE=$(awk '/^  HTTP/{print $2}' $WGET_TEMP_FILE)
+  if [ -z "$RESPONSE" ]; then
+    echo "RESPONSE is empty"
+    RESPONSE="000"
+  fi
+  if [ -n "$(echo $OK_STATUSES | grep $RESPONSE)" ]; then
+    echo "$SERVICE_NAME is UP"
+    RESULT=0
+  else
+    echo "$SERVICE_NAME is down"
+    cat $WGET_TEMP_FILE
+    echo "wget result: $WGET_RESULT"
+    RESULT=1
+  fi
+  rm $WGET_TEMP_FILE
+  return $RESULT
 }
 
 
