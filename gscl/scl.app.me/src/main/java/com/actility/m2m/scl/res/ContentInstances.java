@@ -335,8 +335,9 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         transaction.updateResource(path, resource, searchAttributes);
     }
 
-    public void prepareResourceForResponse(SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria,
-            Set supported) throws StorageException, XoException, M2MException {
+    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
+            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws StorageException, XoException,
+            M2MException {
         XoService xoService = manager.getXoService();
         String appPath = manager.getM2MContext().getApplicationPath();
         resource.setStringAttribute(Constants.ATTR_LATEST, null);
@@ -367,8 +368,8 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             while (it.hasNext()) {
                 contentInstance = xoService.readBinaryXmlXoObject((byte[]) it.next());
                 if (ContentInstance.getInstance().filterMatches(contentInstance, filterCriteria)) {
-                    ContentInstance.getInstance().prepareResourceForResponse(manager, null, contentInstance, filterCriteria,
-                            supported);
+                    ContentInstance.getInstance().prepareResourceForResponse(logId, manager, null, contentInstance,
+                            requestingEntity, filterCriteria, supported);
                     contentInstance.clearNameSpaces();
                     contentInstanceCollectionList.add(contentInstance);
                 } else {
@@ -444,12 +445,13 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         // TODO filter content instance according to filter criteria
     }
 
-    public byte[] getResponseRepresentation(SclManager manager, String path, FilterCriteria filterCriteria, Set supported,
-            String mediaType) throws UnsupportedEncodingException, StorageException, XoException, M2MException {
+    public byte[] getResponseRepresentation(String logId, SclManager manager, String path, URI requestingEntity,
+            FilterCriteria filterCriteria, Set supported, String mediaType) throws UnsupportedEncodingException,
+            StorageException, XoException, M2MException {
         XoObject resource = null;
         try {
             resource = manager.getXoResource(path);
-            prepareResourceForResponse(manager, path, resource, filterCriteria, supported);
+            prepareResourceForResponse(logId, manager, path, resource, requestingEntity, filterCriteria, supported);
             // Partial addressing
             String attributeAccessor = ((filterCriteria != null) ? filterCriteria.getAttributeAccessor() : null);
             if (attributeAccessor != null
@@ -1099,5 +1101,21 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                 childResource.free(true);
             }
         }
+    }
+
+    public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs) throws IOException,
+            StorageException, XoException {
+        int urisCount = remainingURIs;
+        try {
+            checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);
+            if (urisCount > 0) {
+                discoveryURIs.add(appPath + URIUtils.encodePath(path));
+            }
+            --urisCount;
+        } catch (M2MException e) {
+            // Right is not granted
+        }
+        return urisCount;
     }
 }

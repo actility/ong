@@ -31,11 +31,13 @@
 
 package com.actility.m2m.scl.res;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -51,6 +53,7 @@ import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.VolatileResource;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.Pair;
+import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -176,5 +179,21 @@ public final class NotificationChannel extends SclResource implements VolatileRe
     public void deleteChildResource(String logId, SclManager manager, String path, XoObject resource, XoObject childResource,
             Date now, SclTransaction transaction) {
         throw new UnsupportedOperationException();
+    }
+
+    public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs)
+            throws IOException, StorageException, XoException {
+        int urisCount = remainingURIs;
+        try {
+            checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);
+            if (urisCount > 0) {
+                discoveryURIs.add(appPath + URIUtils.encodePath(path));
+            }
+            --urisCount;
+        } catch (M2MException e) {
+            // Right is not granted
+        }
+        return urisCount;
     }
 }

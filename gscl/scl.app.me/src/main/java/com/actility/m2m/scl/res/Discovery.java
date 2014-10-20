@@ -33,11 +33,13 @@ package com.actility.m2m.scl.res;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.actility.m2m.m2m.FilterCriteria;
 import com.actility.m2m.m2m.Indication;
@@ -58,12 +60,23 @@ import com.actility.m2m.storage.StorageRequestExecutor;
 import com.actility.m2m.util.EmptyUtils;
 import com.actility.m2m.util.FormatUtils;
 import com.actility.m2m.util.Profiler;
-import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
 
+/**
+ * Discovery resource.
+ *
+ * <pre>
+ * m2m:Discovery from ong:t_xml_obj
+ * {
+ *     m2m:matchSize    XoString    { } // (optional) (xmlType: xsd:long)
+ *     m2m:truncated    XoString    { } // (optional) (xmlType: xsd:boolean)
+ *     m2m:discoveryURI    m2m:AnyURIList    { } // (optional)
+ * }
+ * alias m2m:Discovery with m2m:discovery
+ * </pre>
+ */
 public final class Discovery implements ResourceController {
-
     private static final Discovery INSTANCE = new Discovery();
 
     public static Discovery getInstance() {
@@ -206,7 +219,7 @@ public final class Discovery implements ResourceController {
             }
 
             searchResult = manager.getStorageContext().search(searchPrefix, scope, condition, StorageRequestExecutor.ORDER_ASC,
-                    limit);
+                    -1);
             result = searchResult.getResults();
         }
 
@@ -214,18 +227,44 @@ public final class Discovery implements ResourceController {
         try {
             representation = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_DISCOVERY);
             representation.setNameSpace(M2MConstants.PREFIX_M2M);
-            representation.setStringAttribute(M2MConstants.TAG_M2M_MATCH_SIZE, String.valueOf(result.size()));
-            if (searchResult != null && searchResult.isHasMore()) {
-                representation.setStringAttribute(M2MConstants.TAG_M2M_TRUNCATED, "true");
-            }
             XoObject discoveryURI = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_DISCOVERY_U_R_I);
             representation.setXoObjectAttribute(M2MConstants.TAG_M2M_DISCOVERY_U_R_I, discoveryURI);
             List discoveryUriList = discoveryURI.getStringListAttribute(M2MConstants.TAG_REFERENCE);
-            Iterator it = result.keySet().iterator();
+            Iterator it = result.entrySet().iterator();
+            Entry entry = null;
             String refPath = null;
+            byte[] rawXoObject = null;
+            XoObject xoObject = null;
+            ResourceController controller = null;
+            int urisCount = limit;
+            if (limit == -1) {
+                urisCount = Integer.MAX_VALUE;
+            }
             while (it.hasNext()) {
-                refPath = (String) it.next();
-                discoveryUriList.add(appPath + URIUtils.encodePath(refPath));
+                entry = (Entry) it.next();
+                refPath = (String) entry.getKey();
+                rawXoObject = (byte[]) entry.getValue();
+                xoObject = manager.getXoService().readBinaryXmlXoObject(rawXoObject);
+                try {
+                    controller = manager.getControllerFromTag(xoObject.getName());
+
+                    urisCount = controller.appendDiscoveryURIs(indication.getTransactionId(), manager, refPath, xoObject,
+                            indication.getRequestingEntity(), indication.getTargetID(), appPath,
+                            filterCriteria.getSearchString(), discoveryUriList, urisCount);
+                } finally {
+                    xoObject.free(true);
+                }
+            }
+            if (limit == -1) {
+                urisCount = Integer.MAX_VALUE - urisCount;
+            } else {
+                urisCount = limit - urisCount;
+            }
+            representation.setStringAttribute(M2MConstants.TAG_M2M_MATCH_SIZE, Integer.toString(urisCount));
+            if (limit != -1 && urisCount > limit) {
+                representation.setStringAttribute(M2MConstants.TAG_M2M_TRUNCATED, "true");
+            } else {
+                representation.setStringAttribute(M2MConstants.TAG_M2M_TRUNCATED, "false");
             }
 
             Response response = indication.createSuccessResponse(StatusCode.STATUS_OK);
@@ -276,6 +315,12 @@ public final class Discovery implements ResourceController {
 
     public void sessionExpired(SclManager manager, String path, M2MSession session) throws ParseException, IOException,
             StorageException, XoException, M2MException {
+        throw new UnsupportedOperationException();
+    }
+
+    public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs) throws IOException,
+            StorageException, XoException {
         throw new UnsupportedOperationException();
     }
 

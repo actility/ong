@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -64,6 +65,7 @@ import com.actility.m2m.storage.StorageRequestExecutor;
 import com.actility.m2m.util.FormatUtils;
 import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.Profiler;
+import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.UUID;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
@@ -170,13 +172,15 @@ public final class M2MPocs extends SclResource {
         transaction.updateResource(path, resource, searchAttributes);
     }
 
-    public void prepareResourceForResponse(SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria,
-            Set supported) throws UnsupportedEncodingException, XoException, StorageException {
+    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
+            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException,
+            XoException, StorageException {
         Condition condition = manager.getConditionBuilder().createStringCondition(Constants.ATTR_TYPE,
                 ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_M2M_POC);
         SearchResult searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, condition);
         Map children = searchResult.getResults();
-        generateNamedReferenceCollection(manager, path, resource, children, M2MConstants.TAG_M2M_M2M_POC_COLLECTION);
+        generateNamedReferenceCollection(logId, manager, M2MPoc.getInstance(), requestingEntity, path, resource, children,
+                M2MConstants.TAG_M2M_M2M_POC_COLLECTION);
     }
 
     public void doCreateIndication(SclManager manager, String path, XoObject resource, Indication indication)
@@ -251,5 +255,21 @@ public final class M2MPocs extends SclResource {
                 childResource.free(true);
             }
         }
+    }
+
+    public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs) throws IOException,
+            StorageException, XoException {
+        int urisCount = remainingURIs;
+        try {
+            checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);
+            if (urisCount > 0) {
+                discoveryURIs.add(appPath + URIUtils.encodePath(path));
+            }
+            --urisCount;
+        } catch (M2MException e) {
+            // Right is not granted
+        }
+        return urisCount;
     }
 }

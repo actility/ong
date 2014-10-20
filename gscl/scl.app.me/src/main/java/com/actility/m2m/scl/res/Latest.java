@@ -31,6 +31,7 @@
 
 package com.actility.m2m.scl.res;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -81,9 +82,10 @@ public final class Latest implements SubscribedResource {
         return ContentInstances.getInstance().mergeFilterCriteria(mergedFilterCriteria, filterCriteria);
     }
 
-    public void prepareResourceForResponse(SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria,
-            Set supported) throws XoException {
-        ContentInstance.getInstance().prepareResourceForResponse(manager, path, resource, filterCriteria, supported);
+    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
+            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws XoException {
+        ContentInstance.getInstance().prepareResourceForResponse(logId, manager, path, resource, requestingEntity,
+                filterCriteria, supported);
     }
 
     public void prepareResponse(Map context, SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria) {
@@ -94,8 +96,8 @@ public final class Latest implements SubscribedResource {
         // TODO
     }
 
-    public byte[] getResponseRepresentation(SclManager manager, String path, FilterCriteria filterCriteria, Set supported,
-            String mediaType) throws StorageException, XoException {
+    public byte[] getResponseRepresentation(String logId, SclManager manager, String path, URI requestingEntity,
+            FilterCriteria filterCriteria, Set supported, String mediaType) throws StorageException, XoException {
         ConditionBuilder conditionBuilder = manager.getConditionBuilder();
         Condition condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
                 Constants.TYPE_CONTENT_INSTANCE);
@@ -110,8 +112,8 @@ public final class Latest implements SubscribedResource {
             try {
                 latest = manager.getXoService().readBinaryXmlXoObject(contentInstance);
                 if (ContentInstance.getInstance().filterMatches(latest, filterCriteria)) {
-                    ContentInstance.getInstance().prepareResourceForResponse(manager, subPath, latest, filterCriteria,
-                            supported);
+                    ContentInstance.getInstance().prepareResourceForResponse(logId, manager, subPath, latest, requestingEntity,
+                            filterCriteria, supported);
                     if (M2MConstants.MT_APPLICATION_EXI.equals(mediaType)) {
                         return latest.saveExi();
                     }

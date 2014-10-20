@@ -61,6 +61,8 @@ public interface SclManager {
 
     StatsManager getStatsManager();
 
+    ResourceController getControllerFromTag(String tag);
+
     Object[] getControllerAndResource(String path) throws StorageException, XoException, M2MException;
 
     XoObject getXoResource(String path) throws StorageException, XoException;

@@ -31,12 +31,14 @@
 
 package com.actility.m2m.scl.res;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -60,6 +62,7 @@ import com.actility.m2m.scl.model.VolatileResource;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.FormatUtils;
 import com.actility.m2m.util.Pair;
+import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -149,10 +152,11 @@ public final class Subscription extends SclResource implements VolatileResource 
                 subsManager = new SubsManager(manager, subscribedController, subsPath, subscribedPath);
                 manager.getM2MContext().setAttribute(subsPath, subsManager);
             }
+            URI requestingEntity = URI.create(resource.getStringAttribute(Constants.ATTR_OWNER));
             String subId = resource.getStringAttribute(M2MConstants.ATTR_M2M_ID);
             // TODO cannot restore mediaType
             SubManager subManager = new SubManager(subsManager, manager, path, subId, subscribedController, subscribedPath,
-                    resource, filterCriteria, M2MConstants.MT_APPLICATION_XML);
+                    resource, requestingEntity, filterCriteria, M2MConstants.MT_APPLICATION_XML);
             if (subsManager.addSubscription(subId, subManager)) {
                 subManager.startExpirationTimer();
             } else {
@@ -258,7 +262,7 @@ public final class Subscription extends SclResource implements VolatileResource 
         searchAttributes.add(new Pair(Constants.ATTR_MEDIA_TYPE, mediaType));
         transaction.createResource(path, resource, searchAttributes);
         transaction.addTransientOp(new SubCreateOp(manager, subsPath, path, id, resource, subscribedPath, subscribedResource,
-                filterCriteria, mediaType));
+                requestingEntity, filterCriteria, mediaType));
 
         return modified;
     }
@@ -341,8 +345,24 @@ public final class Subscription extends SclResource implements VolatileResource 
         throw new UnsupportedOperationException();
     }
 
-    public void prepareResourceForResponse(SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria,
-            Set supported) {
+    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
+            URI requestingEntity, FilterCriteria filterCriteria, Set supported) {
         resource.setStringAttribute(Constants.ATTR_OWNER, null);
+    }
+
+    public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs) throws IOException,
+            StorageException, XoException {
+        int urisCount = remainingURIs;
+        try {
+            checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);
+            if (urisCount > 0) {
+                discoveryURIs.add(appPath + URIUtils.encodePath(path));
+            }
+            --urisCount;
+        } catch (M2MException e) {
+            // Right is not granted
+        }
+        return urisCount;
     }
 }

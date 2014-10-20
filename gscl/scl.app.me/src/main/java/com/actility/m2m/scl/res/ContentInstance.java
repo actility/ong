@@ -61,6 +61,7 @@ import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.FormatUtils;
 import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.Profiler;
+import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -312,8 +313,8 @@ public final class ContentInstance extends SclResource {
         throw new UnsupportedOperationException();
     }
 
-    public void prepareResourceForResponse(SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria,
-            Set supported) throws XoException {
+    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
+            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws XoException {
         // TODO prepare according to contentType
         ContentInstanceFilterCriteria cifc = (ContentInstanceFilterCriteria) filterCriteria;
         XoObject content = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT);
@@ -430,5 +431,21 @@ public final class ContentInstance extends SclResource {
         } else {
             super.doRetrieveIndication(manager, path, resource, indication, partialAccessor);
         }
+    }
+
+    public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs) throws IOException,
+            StorageException, XoException {
+        int urisCount = remainingURIs;
+        try {
+            checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);
+            if (urisCount > 0) {
+                discoveryURIs.add(appPath + URIUtils.encodePath(path));
+            }
+            --urisCount;
+        } catch (M2MException e) {
+            // Right is not granted
+        }
+        return urisCount;
     }
 }

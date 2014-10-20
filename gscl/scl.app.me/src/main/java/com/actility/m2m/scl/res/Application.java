@@ -463,8 +463,8 @@ public final class Application extends SclResource implements VolatileResource, 
         throw new UnsupportedOperationException();
     }
 
-    public void prepareResourceForResponse(SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria,
-            Set supported) {
+    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
+            URI requestingEntity, FilterCriteria filterCriteria, Set supported) {
         String appPath = manager.getM2MContext().getApplicationPath();
         String accessRight = resource.getStringAttribute(M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D);
         if (accessRight != null) {
@@ -539,5 +539,73 @@ public final class Application extends SclResource implements VolatileResource, 
         deleteResource("expiration", manager, path, transaction);
         transaction.addTransientOp(new ExpirationTimerDeleteOp(manager, path));
         transaction.execute();
+    }
+
+    public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs) throws IOException,
+            StorageException, XoException {
+        int urisCount = remainingURIs;
+        try {
+            checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);
+            if (urisCount > 0) {
+                discoveryURIs.add(appPath + URIUtils.encodePath(path));
+            }
+            --urisCount;
+
+            // APoCPaths handling
+            XoObject aPoCPaths = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_A_PO_C_PATHS);
+            if (aPoCPaths != null) {
+                List aPoCPathList = aPoCPaths.getXoObjectListAttribute(M2MConstants.TAG_M2M_A_PO_C_PATH);
+
+                String aPoCPathPath = null;
+                String aPoCPathAccessRightID = null;
+                XoObject aPoCPathSearchStrings = null;
+                List aPoCPathSearchString = null;
+                boolean match = true;
+                Iterator it = aPoCPathList.iterator();
+                XoObject aPoCPath = null;
+                while (it.hasNext()) {
+                    aPoCPath = (XoObject) it.next();
+                    try {
+                        aPoCPathPath = aPoCPath.getStringAttribute(M2MConstants.TAG_M2M_PATH);
+                        // Check rights
+                        aPoCPathAccessRightID = aPoCPath.getStringAttribute(M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D);
+                        if (aPoCPathAccessRightID != null) {
+                            retrieveAndCheckPermissionFromAccessRightID(logId, manager, path, requestingEntity,
+                                    M2MConstants.FLAG_DISCOVER, aPoCPathAccessRightID);
+                        }
+                        match = true;
+                        if (searchStrings != null) {
+                            // Check searchStrings
+                            aPoCPathSearchStrings = aPoCPath.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
+                            aPoCPathSearchString = null;
+                            if (aPoCPathSearchStrings != null) {
+                                aPoCPathSearchString = aPoCPathSearchStrings
+                                        .getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
+                            }
+                            if (aPoCPathSearchString != null) {
+                                for (int i = 0; i < searchStrings.length; ++i) {
+                                    if (!aPoCPathSearchString.contains(searchStrings[i])) {
+                                        match = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (match) {
+                            if (urisCount > 0) {
+                                discoveryURIs.add(appPath + URIUtils.encodePath(path) + M2MConstants.URI_SEP + aPoCPathPath);
+                            }
+                            --urisCount;
+                        }
+                    } catch (M2MException e) {
+                        // Right is not granted
+                    }
+                }
+            }
+        } catch (M2MException e) {
+            // Right is not granted
+        }
+        return urisCount;
     }
 }
