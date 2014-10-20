@@ -31,6 +31,7 @@
 
 package com.actility.m2m.scl.res;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.ParseException;
@@ -262,8 +263,8 @@ public final class SclBase extends SclResource implements VolatileResource, Subs
         throw new UnsupportedOperationException();
     }
 
-    public void prepareResourceForResponse(SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria,
-            Set supported) {
+    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
+            URI requestingEntity, FilterCriteria filterCriteria, Set supported) {
         String appPath = manager.getM2MContext().getApplicationPath();
         String accessRight = resource.getStringAttribute(M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D);
         if (accessRight != null) {
@@ -307,5 +308,21 @@ public final class SclBase extends SclResource implements VolatileResource, Subs
         scl.setStringAttribute(M2MConstants.TAG_M2M_A_POC_HANDLING,
                 resource.getStringAttribute(M2MConstants.TAG_M2M_A_POC_HANDLING));
         return scl;
+    }
+
+    public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs) throws IOException,
+            StorageException, XoException {
+        int urisCount = remainingURIs;
+        try {
+            checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);
+            if (urisCount > 0) {
+                discoveryURIs.add(appPath + URIUtils.encodePath(path));
+            }
+            --urisCount;
+        } catch (M2MException e) {
+            // Right is not granted
+        }
+        return urisCount;
     }
 }

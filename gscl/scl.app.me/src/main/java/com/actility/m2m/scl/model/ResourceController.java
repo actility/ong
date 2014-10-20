@@ -33,7 +33,9 @@ package com.actility.m2m.scl.model;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
 import java.text.ParseException;
+import java.util.List;
 
 import com.actility.m2m.m2m.Indication;
 import com.actility.m2m.m2m.M2MException;
@@ -72,4 +74,24 @@ public interface ResourceController {
 
     void sessionExpired(SclManager manager, String path, M2MSession session) throws ParseException, IOException,
             StorageException, XoException, M2MException;
+
+    /**
+     * Appends discovery URIs to the list of discovery URIs until limit is reached. In case, the limit is reached the counting
+     * process continue to learn how many URIs cannot be added
+     *
+     * @param logId An ID that will be used to log messages
+     * @param resource The resource targeted by the current operation
+     * @param requestingEntity The requesting entity for which DISCOVER right must be granted
+     * @param targetID The target ID of the discovery request
+     * @param appPath The song application root path
+     * @param searchStrings The search strings to match in order to add a sub-URI
+     * @param discoveryURIs The current list of discovery URIs
+     * @param remainingURIs The remaining number of URIs which can be added (it can be negative in which case no URI must be
+     *            added)
+     * @return The remaining number of URIs minus the number of matching URIs (URIs must be counted even if there are not
+     *         added). So, if the number is negative it means that this negative number of URIs were not added
+     */
+    int appendDiscoveryURIs(String transactionId, SclManager manager, String refPath, XoObject xoObject, URI requestingEntity,
+            URI targetID, String appPath, String[] searchString, List discoveryUriList, int urisCount) throws IOException,
+            StorageException, XoException;
 }

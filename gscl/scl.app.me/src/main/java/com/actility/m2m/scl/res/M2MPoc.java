@@ -39,6 +39,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -58,6 +59,7 @@ import com.actility.m2m.scl.model.VolatileResource;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.FormatUtils;
 import com.actility.m2m.util.Pair;
+import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -266,5 +268,21 @@ public final class M2MPoc extends SclResource implements VolatileResource {
         } finally {
             resource.free(true);
         }
+    }
+
+    public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs)
+            throws IOException, StorageException, XoException {
+        int urisCount = remainingURIs;
+        try {
+            checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);
+            if (urisCount > 0) {
+                discoveryURIs.add(appPath + URIUtils.encodePath(path));
+            }
+            --urisCount;
+        } catch (M2MException e) {
+            // Right is not granted
+        }
+        return urisCount;
     }
 }

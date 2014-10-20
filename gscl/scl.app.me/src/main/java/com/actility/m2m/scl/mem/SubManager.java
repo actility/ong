@@ -111,6 +111,7 @@ public final class SubManager implements Serializable {
     private URI contactUri;
     private long expirationTime;
 
+    private final URI requestingEntity;
     private FilterCriteria filterCriteria;
     private String mediaType;
 
@@ -123,7 +124,7 @@ public final class SubManager implements Serializable {
     // private String attributeAccessor;
 
     public SubManager(SubsManager subsManager, SclManager manager, String path, String id,
-            SubscribedResource subscribeResource, String subscribedToPath, XoObject subscription,
+            SubscribedResource subscribeResource, String subscribedToPath, XoObject subscription, URI requestingEntity,
             FilterCriteria filterCriteria, String mediaType) {
         this.subsManager = subsManager;
         this.manager = manager;
@@ -132,6 +133,7 @@ public final class SubManager implements Serializable {
         this.subscribeResource = subscribeResource;
         this.subscribedPath = subscribedToPath;
         this.lastSuccessConfirmTime = 0;
+        this.requestingEntity = requestingEntity;
         this.filterCriteria = filterCriteria;
         this.mediaType = mediaType;
         subscriptionUpdated(subscription);
@@ -281,8 +283,8 @@ public final class SubManager implements Serializable {
             if (M2MConstants.MT_APPLICATION_EXI.equals(mediaType)) {
                 contentType = M2MConstants.MT_APPLICATION_EXI;
             }
-            byte[] notify = subscribeResource.getResponseRepresentation(manager, subscribedPath, filterCriteria, null,
-                    mediaType);
+            byte[] notify = subscribeResource.getResponseRepresentation(path, manager, subscribedPath, requestingEntity,
+                    filterCriteria, null, mediaType);
             if (notify != null) {
                 state = ST_PENDING_NOTIFY;
                 sendNotify(StatusCode.STATUS_OK, notify, mediaType, contentType);
@@ -891,6 +893,10 @@ public final class SubManager implements Serializable {
                 printFilterCriteria(buffer);
             }
         }
+    }
+
+    public URI getRequestingEntity() {
+        return requestingEntity;
     }
 
     public String getMediaType() {

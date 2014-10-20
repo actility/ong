@@ -124,8 +124,9 @@ public final class SubsManager {
                         } else {
                             resourceHandle = resource.copy(true);
                         }
-                        subscribedResource.prepareResourceForResponse(manager, subscribedPath, resourceHandle,
-                                subscription.getFilterCriteria(), null);
+
+                        subscribedResource.prepareResourceForResponse(path, manager, subscribedPath, resourceHandle,
+                                subscription.getRequestingEntity(), subscription.getFilterCriteria(), null);
 
                         // TODO Could be further optimized by backuping and precalculating data into the resourceContext
                         // just the first time and fix the resource in each iteration with this backup.

@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -276,8 +277,9 @@ public abstract class SclResource implements ResourceController {
         return result;
     }
 
-    public void prepareResourceForResponse(SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria,
-            Set supported) throws UnsupportedEncodingException, StorageException, XoException, M2MException {
+    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
+            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException,
+            StorageException, XoException, M2MException {
         // Must be overidden if needed
     }
 
@@ -289,13 +291,14 @@ public abstract class SclResource implements ResourceController {
         // Nothing to do
     }
 
-    public byte[] getResponseRepresentation(SclManager manager, String path, FilterCriteria filterCriteria, Set supported,
-            String mediaType) throws UnsupportedEncodingException, StorageException, XoException, M2MException {
+    public byte[] getResponseRepresentation(String logId, SclManager manager, String path, URI requestingEntity,
+            FilterCriteria filterCriteria, Set supported, String mediaType) throws UnsupportedEncodingException,
+            StorageException, XoException, M2MException {
         XoObject localResource = null;
         try {
             localResource = manager.getXoResource(path);
             if (filterMatches(localResource, filterCriteria)) {
-                prepareResourceForResponse(manager, path, localResource, filterCriteria, supported);
+                prepareResourceForResponse(logId, manager, path, localResource, requestingEntity, filterCriteria, supported);
                 if (M2MConstants.MT_APPLICATION_EXI.equals(mediaType)) {
                     return localResource.saveExi();
                 }
@@ -321,7 +324,8 @@ public abstract class SclResource implements ResourceController {
                     supported.add(it.next());
                 }
             }
-            prepareResourceForResponse(manager, path, resource, getFilterCriteria(indication), supported);
+            prepareResourceForResponse(indication.getTransactionId(), manager, path, resource,
+                    indication.getRequestingEntity(), getFilterCriteria(indication), supported);
         }
         URI resourceURI = manager.getM2MContext().createLocalUri(indication.getTargetID(), path);
         Response response = indication.createSuccessResponse(statusCode);
@@ -708,9 +712,10 @@ public abstract class SclResource implements ResourceController {
                 FormatUtils.formatDateTime(now, manager.getTimeZone()));
     }
 
-    public XoObject generateNamedReferenceCollection(SclManager manager, String path, XoObject resource, Map children,
-            String tagName) throws UnsupportedEncodingException, XoException {
-        Iterator it = children.keySet().iterator();
+    public XoObject generateNamedReferenceCollection(String logId, SclManager manager, SclResource controller,
+            URI requestingEntity, String path, XoObject resource, Map children, String tagName)
+            throws UnsupportedEncodingException, XoException {
+        Iterator it = children.entrySet().iterator();
         XoService xoService = manager.getXoService();
         XoObject namedReferenceCollection = xoService.newXmlXoObject(tagName);
         resource.setXoObjectAttribute(tagName, namedReferenceCollection);
@@ -719,14 +724,34 @@ public abstract class SclResource implements ResourceController {
         int pathLength = path.length();
         String subPath = null;
         XoObject referenceToNamedResource = null;
+        Entry entry = null;
+        byte[] rawXoObject = null;
+        XoObject xoObject = null;
         while (it.hasNext()) {
-            subPath = ((String) it.next());
-            subPath = subPath.substring(pathLength + 1, subPath.length());
-            referenceToNamedResource = xoService.newXmlXoObject(M2MConstants.TAG_M2M_NAMED_REFERENCE);
-            referenceToNamedResource.setStringAttribute(XoObject.ATTR_VALUE, URIUtils.encodePath(subPath)
-                    + M2MConstants.URI_SEP);
-            referenceToNamedResource.setStringAttribute(M2MConstants.ATTR_ID, subPath);
-            namedReferenceCollectionList.add(referenceToNamedResource);
+            entry = (Entry) it.next();
+            subPath = ((String) entry.getKey());
+            rawXoObject = (byte[]) entry.getValue();
+            xoObject = manager.getXoService().readBinaryXmlXoObject(rawXoObject);
+            try {
+                controller.checkRights(logId, manager, subPath, xoObject, requestingEntity, M2MConstants.FLAG_DISCOVER);
+                subPath = subPath.substring(pathLength + 1, subPath.length());
+
+                referenceToNamedResource = xoService.newXmlXoObject(M2MConstants.TAG_M2M_NAMED_REFERENCE);
+                referenceToNamedResource.setStringAttribute(XoObject.ATTR_VALUE, URIUtils.encodePath(subPath)
+                        + M2MConstants.URI_SEP);
+                referenceToNamedResource.setStringAttribute(M2MConstants.ATTR_ID, subPath);
+                namedReferenceCollectionList.add(referenceToNamedResource);
+            } catch (IOException e) {
+                LOG.error("IOException occurred while building namedReferenceCollection", e);
+            } catch (StorageException e) {
+                LOG.error("StorageException occurred while building namedReferenceCollection", e);
+            } catch (XoException e) {
+                LOG.error("XoException occurred while building namedReferenceCollection", e);
+            } catch (M2MException e) {
+                // Right not granted
+            } finally {
+                xoObject.free(true);
+            }
         }
         return namedReferenceCollection;
     }

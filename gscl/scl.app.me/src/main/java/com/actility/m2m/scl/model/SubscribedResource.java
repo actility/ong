@@ -32,6 +32,7 @@
 package com.actility.m2m.scl.model;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,15 +51,17 @@ public interface SubscribedResource {
 
     FilterCriteria mergeFilterCriteria(FilterCriteria mergedFilterCriteria, FilterCriteria filterCriteria);
 
-    void prepareResourceForResponse(SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria,
-            Set supported) throws UnsupportedEncodingException, StorageException, XoException, M2MException;
+    void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException, StorageException, XoException,
+            M2MException;
 
     void prepareResponse(Map context, SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria)
             throws UnsupportedEncodingException, StorageException, XoException, M2MException;
 
     void restoreResponse(Map context, XoObject resource);
 
-    byte[] getResponseRepresentation(SclManager manager, String path, FilterCriteria filterCriteria, Set supported,
-            String mediaType) throws UnsupportedEncodingException, StorageException, XoException, M2MException;
+    byte[] getResponseRepresentation(String logId, SclManager manager, String path, URI requestingEntity,
+            FilterCriteria filterCriteria, Set supported, String mediaType) throws UnsupportedEncodingException,
+            StorageException, XoException, M2MException;
 
 }

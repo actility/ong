@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -226,8 +227,9 @@ public final class Applications extends SclResource implements SubscribedResourc
         transaction.updateResource(path, resource, searchAttributes);
     }
 
-    public void prepareResourceForResponse(SclManager manager, String path, XoObject resource, FilterCriteria filterCriteria,
-            Set supported) throws UnsupportedEncodingException, StorageException, XoException {
+    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
+            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException,
+            StorageException, XoException {
         String appPath = manager.getM2MContext().getApplicationPath();
         String accessRight = resource.getStringAttribute(M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D);
         if (accessRight != null) {
@@ -244,8 +246,9 @@ public final class Applications extends SclResource implements SubscribedResourc
                 ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_APPLICATION);
         SearchResult searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, condition);
         Map children = searchResult.getResults();
-        generateNamedReferenceCollection(manager, path, resource, children, M2MConstants.TAG_M2M_APPLICATION_COLLECTION);
-        generateNamedReferenceCollection(manager, path, resource, EmptyUtils.EMPTY_MAP,
+        generateNamedReferenceCollection(logId, manager, Application.getInstance(), requestingEntity, path, resource, children,
+                M2MConstants.TAG_M2M_APPLICATION_COLLECTION);
+        generateNamedReferenceCollection(logId, manager, null, requestingEntity, path, resource, EmptyUtils.EMPTY_MAP,
                 M2MConstants.TAG_M2M_APPLICATION_ANNC_COLLECTION);
     }
 
@@ -326,5 +329,21 @@ public final class Applications extends SclResource implements SubscribedResourc
                 representation.free(true);
             }
         }
+    }
+
+    public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs) throws IOException,
+            StorageException, XoException {
+        int urisCount = remainingURIs;
+        try {
+            checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);
+            if (urisCount > 0) {
+                discoveryURIs.add(appPath + URIUtils.encodePath(path));
+            }
+            --urisCount;
+        } catch (M2MException e) {
+            // Right is not granted
+        }
+        return urisCount;
     }
 }

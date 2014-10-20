@@ -1104,6 +1104,63 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         return -1;
     }
 
+    public ResourceController getControllerFromTag(String tag) {
+        if (tag.equals(M2MConstants.TAG_M2M_SCL_BASE)) {
+            return SclBase.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_SCLS)) {
+            return Scls.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_SCL)) {
+            return Scl.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_APPLICATIONS)) {
+            return Applications.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_APPLICATION)) {
+            return Application.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_APPLICATION_ANNC)) {
+            return null;
+        } else if (tag.equals(M2MConstants.TAG_M2M_ACCESS_RIGHTS)) {
+            return AccessRights.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_ACCESS_RIGHT)) {
+            return AccessRight.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_ACCESS_RIGHT_ANNC)) {
+            return null;
+        } else if (tag.equals(M2MConstants.TAG_M2M_CONTAINERS)) {
+            return Containers.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_CONTAINER)) {
+            return Container.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_CONTAINER_ANNC)) {
+            return null;
+        } else if (tag.equals(M2MConstants.TAG_M2M_LOCATION_CONTAINER)) {
+            return null;
+        } else if (tag.equals(M2MConstants.TAG_M2M_LOCATION_CONTAINER_ANNC)) {
+            return null;
+        } else if (tag.equals(M2MConstants.TAG_M2M_CONTENT_INSTANCES)) {
+            return ContentInstances.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_CONTENT_INSTANCE)) {
+            return ContentInstance.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_GROUPS)) {
+            return null;
+        } else if (tag.equals(M2MConstants.TAG_M2M_GROUP)) {
+            return null;
+        } else if (tag.equals(M2MConstants.TAG_M2M_GROUP_ANNC)) {
+            return null;
+        } else if (tag.equals(M2MConstants.TAG_M2M_SUBSCRIPTIONS)) {
+            return Subscriptions.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_SUBSCRIPTION)) {
+            return Subscription.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_M2M_POCS)) {
+            return M2MPocs.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_M2M_POC)) {
+            return M2MPoc.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_NOTIFICATION_CHANNELS)) {
+            return NotificationChannels.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_NOTIFICATION_CHANNEL)) {
+            return NotificationChannel.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_DISCOVERY)) {
+            return Discovery.getInstance();
+        }
+        return null;
+    }
+
     public Object[] getControllerAndResource(String path) throws StorageException, XoException, M2MException {
         RequestTarget requestTarget = getRequestTarget(path);
         if (requestTarget != null && requestTarget.getAttribute() == null) {
@@ -1181,16 +1238,16 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
                 // Restore <sclBase>
                 SclBase.getInstance().reload(this, Constants.PATH_ROOT, sclBase, transaction);
                 // Restore <accessRight>
-                Condition condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                        Constants.TYPE_ACCESS_RIGHT);
+                Condition condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE,
+                        ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_ACCESS_RIGHT);
                 restoreResources(condition, AccessRight.getInstance(), transaction);
                 // Restore <application>
-                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE,
-                        ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_APPLICATION);
+                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
+                        Constants.TYPE_APPLICATION);
                 restoreResources(condition, Application.getInstance(), transaction);
                 // Restore <container>
-                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE,
-                        ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_CONTAINER);
+                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
+                        Constants.TYPE_CONTAINER);
                 restoreResources(condition, Container.getInstance(), transaction);
                 // Restore <scl>
                 condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
