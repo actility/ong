@@ -963,7 +963,11 @@ public abstract class SclResource implements ResourceController {
                     if (discover && LOG.isInfoEnabled()) {
                         LOG.info(logId + ": \"DISCOVER\" right granted from permission");
                     }
-                    allowed = permissionFlagsList.contains(flag);
+                    if (flag.equals(M2MConstants.FLAG_DISCOVER)) {
+                        allowed = discover;
+                    } else {
+                        allowed = permissionFlagsList.contains(flag);
+                    }
                     if (LOG.isInfoEnabled()) {
                         if (allowed) {
                             LOG.info(logId + ": \"" + flag + "\" right granted from permission");
