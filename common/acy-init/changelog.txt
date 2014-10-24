@@ -1,6 +1,18 @@
 -------------------------------------------------------------------------------
 Actility's generic init system project changelog
 -------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2014-10-24
+
+New Features:
+-------------
+ - N/A
+ 
+Bug Fixes:
+----------
+ - Reenforce tests in start/stop functions and add more traces.
+	
+-------------------------------------------------------------------------------
 Version: 1.0.0
 Date: 2014-10-16
 Initial version

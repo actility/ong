@@ -8,6 +8,7 @@ SERVICE_NAME=""
 START_DATE=""
 NB_RESTARTS=""
 OPTIONS=""
+RSPWN_LOGGER_CMD="stdin-logger $ROOTACT/var/log/respawn/ respawn 32 2 1 1 0"
 
 writeStatus() {
     if [ "$1" = "0" ]; then
@@ -22,6 +23,12 @@ extractPidFile() {
     SERVICE_NAME=$(cat $PIDFILE | cut -d "|" -f2)
     START_DATE=$(cat $PIDFILE | cut -d "|" -f3)
     NB_RESTARTS=$(cat $PIDFILE | cut -d "|" -f4)
+    [ -z "$SERVICE_PID" ] && \
+    echo "Failed to determinate SERVICE_PID ($(cat $PIDFILE))" | $RSPWN_LOGGER_CMD
+    [ -z "$SERVICE_NAME" ] && \
+    echo "Failed to determinate SERVICE_NAME ($(cat $PIDFILE))" | $RSPWN_LOGGER_CMD
+    [ -z "$START_DATE" ] && \
+    echo "Failed to determinate START_DATE ($(cat $PIDFILE))" | $RSPWN_LOGGER_CMD
 }
 
 serviceStarted() {
@@ -38,7 +45,7 @@ serviceStarted() {
             SS_NB_ATTEMPTS=$(expr $SS_NB_ATTEMPTS + 1)
         done
         if [ "$PID_NAME" = "($SERVICE_NAME)" ]; then
-            kill -0 $SERVICE_PID
+            kill -0 $SERVICE_PID 2> /dev/null
             ret=$?
         fi
     fi
@@ -53,11 +60,12 @@ respawnService() {
     COMMAND=$(serviceCommand)
     eval $COMMAND
     retval=$?
+    mkdir -p $ROOTACT/var/log/respawn/
 
     while [ ! -f $STOPFILE ]
     do
         sleep 5
-        echo "Respawning service $SERVICE" | stdin-logger $ROOTACT/var/log/respawn/ respawn 32 2 1 1 0
+        echo "Respawning service $SERVICE" | $RSPWN_LOGGER_CMD
         extractPidFile
         NB_RESTARTS=$(expr $NB_RESTARTS + 1)
         echo "$SERVICE_PID|$SERVICE_NAME|$START_DATE|$NB_RESTARTS" > $PIDFILE
@@ -87,15 +95,23 @@ start() {
 
         START_DATE=$(date +%Y-%m-%dT%H:%M:%S%z)
         nohup $SERVICE_DIR/$SERVICE_NAME _respawnService $OPTIONS < /dev/null > /dev/null 2>&1 &
+        ret=$?
         SERVICE_PID=$!
-        PIDDIR=$(dirname $PIDFILE)
-        [ ! -d $PIDDIR ] && mkdir -p $PIDDIR
-        echo "$SERVICE_PID|$SERVICE_NAME|$START_DATE|0" > $PIDFILE
-        ret=$?
+        if [ $ret -ne 0 ]; then
+            echo "Fails to start $SERVICE"
+        else
+            PIDDIR=$(dirname $PIDFILE)
+            [ ! -d $PIDDIR ] && mkdir -p $PIDDIR
+            echo "$SERVICE_PID|$SERVICE_NAME|$START_DATE|0" > $PIDFILE
+            [ -z "$SERVICE_PID" ] && echo "Failed to determinate SERVICE_PID"
+            [ -z "$SERVICE_NAME" ] && echo "Failed to determinate SERVICE_NAME"
+            [ -z "$START_DATE" ] && echo "Failed to determinate START_DATE"
+            ret=$?
 
-        postStart $ret
-        ret=$?
+            postStart $ret
+            ret=$?
 
+        fi
         writeStatus $ret
     fi
 
@@ -135,7 +151,7 @@ stop() {
             echo "[FAILED]"
             ALL_PIDS=$($ROOTACT/etc/pids $SERVICE_PID | tr -s '\n' ' ')
             echo -n "Shutting down pids: "
-            kill -KILL $ALL_PIDS
+            kill -KILL $ALL_PIDS 2> /dev/null
             sleep 5
         fi
         rm -f $PIDFILE
