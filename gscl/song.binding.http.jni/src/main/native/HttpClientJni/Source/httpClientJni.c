@@ -1,5 +1,4 @@
 
-
 #include <jni.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -55,28 +54,27 @@ void trace(int level, char *file, int line, char *msg, ...)
   va_list listArg;
 #ifndef _NATIVE_TESTER_
   union
-  { 
+  {
     JNIEnv *jenv;
     void *mem;
   } env;
 
   (*g_vm)->GetEnv(g_vm, &(env.mem), g_vmJniVersion);
 #endif
- 
+
   pthread_mutex_lock(&traceMutex);
-  
+
   va_start(listArg, msg);
   vsnprintf(message, sizeof(message), msg, listArg);
   va_end(listArg);
 
-  snprintf(message2, sizeof(message2), "[%s:%d] %s", file, line, message); 
+  snprintf(message2, sizeof(message2), "[%s:%d] %s", file, line, message);
 
 #ifdef _NATIVE_TESTER_ 
   printf("%s\n", message2);
 #else 
   jstring message_j = (*(env.jenv))->NewStringUTF(env.jenv, message2);
-  (*(env.jenv))->CallVoidMethod((env.jenv), g_httpClJniObj, g_httpClDoTrace, level,
-      message_j);
+  (*(env.jenv))->CallVoidMethod((env.jenv), g_httpClJniObj, g_httpClDoTrace, level, message_j);
   (*(env.jenv))->DeleteLocalRef((env.jenv), message_j);
 #endif
 
@@ -90,16 +88,15 @@ void trace(int level, char *file, int line, char *msg, ...)
  */
 static void songBindingHttpResponseCb(void *issuerHandler, transaction_t *transaction)
 {
-  (void)issuerHandler;
+  (void) issuerHandler;
   union
-  { 
+  {
     JNIEnv *jenv;
     void *mem;
   } env;
 
   (*g_vm)->GetEnv(g_vm, &(env.mem), g_vmJniVersion);
-  (*(env.jenv))->CallVoidMethod(env.jenv, g_httpClJniObj, g_httpClResponseCb, 
-    transaction->jTransaction);
+  (*(env.jenv))->CallVoidMethod(env.jenv, g_httpClJniObj, g_httpClResponseCb, transaction->jTransaction);
   (*(env.jenv))->DeleteGlobalRef(env.jenv, transaction->jTransaction);
 }
 
@@ -108,18 +105,16 @@ static void songBindingHttpResponseCb(void *issuerHandler, transaction_t *transa
  * Need to gather the information for program run (the pointers on the call backs method
  * and the tracing method) and to initialize CURL layer.
  */
-JNIEXPORT jboolean JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsInit
-  (JNIEnv *env, jobject obj)
+JNIEXPORT jboolean JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsInit(JNIEnv *env, jobject obj)
 {
   int i;
 
   // do Java/JNI stuff first
   (*env)->GetJavaVM(env, &g_vm);
   g_vmJniVersion = (*env)->GetVersion(env);
-  
-  jclass illegalStateExceptionClass = (*env)->FindClass(env,
-      "java/lang/IllegalStateException");                                                           
+
+  jclass illegalStateExceptionClass = (*env)->FindClass(env, "java/lang/IllegalStateException");
   if (illegalStateExceptionClass == NULL)
   {
     return (jboolean) 0;
@@ -134,34 +129,28 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsInit
     g_httpClJniObj = (*env)->NewGlobalRef(env, obj);
     if (g_httpClJniObj == NULL)
     {
-      (*env)->ThrowNew(env, illegalStateExceptionClass,
-          "Cannot create global ref from JHttpClient object");
+      (*env)->ThrowNew(env, illegalStateExceptionClass, "Cannot create global ref from JHttpClient object");
     }
   }
 
-  jclass httpClientClass = (*env)->GetObjectClass(env, /*g_httpClJniObj*/ obj);
+  jclass httpClientClass = (*env)->GetObjectClass(env, /*g_httpClJniObj*/obj);
   if (httpClientClass == NULL)
   {
-    (*env)->ThrowNew(env, illegalStateExceptionClass,
-        "Cannot get a reference on JHttpClients class");
+    (*env)->ThrowNew(env, illegalStateExceptionClass, "Cannot get a reference on JHttpClients class");
   }
 
   // retrieve pointer on doTrace method
-  g_httpClDoTrace = (*env)->GetMethodID(env, httpClientClass, "doTrace",
-    "(ILjava/lang/String;)V");
+  g_httpClDoTrace = (*env)->GetMethodID(env, httpClientClass, "doTrace", "(ILjava/lang/String;)V");
   if (g_httpClDoTrace == NULL)
   {
-    (*env)->ThrowNew(env, illegalStateExceptionClass,
-        "Cannot get a reference on doTrace");
+    (*env)->ThrowNew(env, illegalStateExceptionClass, "Cannot get a reference on doTrace");
   }
 
   // retrieve pointer on doResponseCompletion method
-  g_httpClResponseCb = (*env)->GetMethodID(env, httpClientClass, "doResponseCompletion",
-    "(Ljava/lang/Object;)V");
+  g_httpClResponseCb = (*env)->GetMethodID(env, httpClientClass, "doResponseCompletion", "(Ljava/lang/Object;)V");
   if (g_httpClResponseCb == NULL)
   {
-    (*env)->ThrowNew(env, illegalStateExceptionClass,
-        "Cannot get a reference on doResponseCompletion");
+    (*env)->ThrowNew(env, illegalStateExceptionClass, "Cannot get a reference on doResponseCompletion");
   }
 
   // and then all the initializations for native part
@@ -173,9 +162,10 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsInit
   g_nbClients = 0;
   if (g_clients)
   {
-    for(i = 0; i < g_nbMaxClients; i++)
+    for (i = 0; i < g_nbMaxClients; i++)
     {
-      if (NULL != g_clients[i]) g_clients[i]->free(g_clients[i]);
+      if (NULL != g_clients[i])
+        g_clients[i]->free(g_clients[i]);
     }
     free(g_clients);
   }
@@ -190,9 +180,8 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsInit
 /**
  * The main loop for all native processings.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsRun
-  (JNIEnv * env, jobject obj)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsRun(JNIEnv * env, jobject obj)
 {
   g_running = 1;
   int i;
@@ -205,7 +194,7 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsRun
     pthread_mutex_lock(&clientsMutex);
     nbClients = g_nbClients;
     pthread_mutex_unlock(&clientsMutex);
-    
+
     do
     {
       pthread_mutex_lock(&clientsMutex);
@@ -225,9 +214,8 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsRun
 /**
  * Stops the main loop for all the native processings.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsStop
-  (JNIEnv *env, jobject obj)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsStop(JNIEnv *env, jobject obj)
 {
   g_running = 0;
 }
@@ -236,9 +224,8 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_httpClientsStop
  * Change the log level.
  * @param level the new log level to set.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setTraceLevel
-  (JNIEnv *env, jobject obj, jint level)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setTraceLevel(JNIEnv *env, jobject obj, jint level)
 {
   g_traceLevel = level;
 }
@@ -248,18 +235,19 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setTraceLevel
  * @param curlDebugEnabled wether the debug mode for CURL layer is enable or not.
  * @return a pointer on the client data structure, or NULL.
  */
-JNIEXPORT jlong JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_createHttpClient
-  (JNIEnv *env, jobject jobj, jboolean curlDebugEnabled)
+JNIEXPORT jlong JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_createHttpClient(JNIEnv *env, jobject jobj,
+    jboolean curlDebugEnabled)
 {
   int i;
   httpClient_t * client = NULL;
   pthread_mutex_lock(&clientsMutex);
   if (g_nbClients < g_nbMaxClients)
   {
-    for(i = 0; i < g_nbMaxClients; i++)
+    for (i = 0; i < g_nbMaxClients; i++)
     {
-      if (NULL == g_clients[i]) break;
+      if (NULL == g_clients[i])
+        break;
     }
     if (i >= g_nbMaxClients)
     {
@@ -267,10 +255,9 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_createHttpClient
     }
     else
     {
-      g_clients[i] = new_httpClient_t((short)curlDebugEnabled, songBindingHttpResponseCb, 
-        (void *)((long)i));
-      client = g_clients[i]; 
-      g_nbClients ++;
+      g_clients[i] = new_httpClient_t((short) curlDebugEnabled, songBindingHttpResponseCb, (void *) ((long) i));
+      client = g_clients[i];
+      g_nbClients++;
     }
   }
   pthread_mutex_unlock(&clientsMutex);
@@ -285,16 +272,18 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_createHttpClient
  * @param proxyUsername the user account to connect with.
  * @param proxyPassword the user's password.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setProxyCredentials
-  (JNIEnv *env, jobject obj, jlong clientPtr, jstring proxyUsername, jstring proxyPassword)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setProxyCredentials(JNIEnv *env, jobject obj, jlong clientPtr,
+    jstring proxyUsername, jstring proxyPassword)
 {
   char szTemp[MAX_BUF_SIZE_B];
   const char *proxyUsernameStr;
   const char *proxyPasswordStr;
-  httpClient_t *client = (httpClient_t *) ((long)clientPtr);
-  if (!client) return;
-  if (!proxyUsername) return;
+  httpClient_t *client = (httpClient_t *) ((long) clientPtr);
+  if (!client)
+    return;
+  if (!proxyUsername)
+    return;
 
   proxyUsernameStr = (*env)->GetStringUTFChars(env, proxyUsername, 0);
   proxyPasswordStr = (*env)->GetStringUTFChars(env, proxyPassword, 0);
@@ -311,15 +300,17 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setProxyCredential
  * @param proxyHost the proxy host (IP or fqdn)
  * @param proxyPort the proxy port.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setProxy
-  (JNIEnv *env, jobject obj, jlong clientPtr, jstring proxyHost, jint proxyPort)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setProxy(JNIEnv *env, jobject obj, jlong clientPtr,
+    jstring proxyHost, jint proxyPort)
 {
   char szTemp[MAX_BUF_SIZE_B];
   const char *proxyHostStr;
-  httpClient_t *client = (httpClient_t *) ((long)clientPtr);
-  if (!client) return;
-  if (!proxyHost) return;
+  httpClient_t *client = (httpClient_t *) ((long) clientPtr);
+  if (!client)
+    return;
+  if (!proxyHost)
+    return;
 
   proxyHostStr = (*env)->GetStringUTFChars(env, proxyHost, 0);
   snprintf(szTemp, MAX_BUF_SIZE_S, "%s:%d", proxyHostStr, proxyPort);
@@ -333,12 +324,13 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setProxy
  * @param clientPtr the pointer on the httpClient_t data structure.
  * @param maxSocketsPerHost the limit to set.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setMaxSocketsPerHost
-  (JNIEnv *env, jobject obj, jlong clientPtr, jint maxSocketsPerHost)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setMaxSocketsPerHost(JNIEnv *env, jobject obj, jlong clientPtr,
+    jint maxSocketsPerHost)
 {
-  httpClient_t *client = (httpClient_t *) ((long)clientPtr);
-  if (!client) return;
+  httpClient_t *client = (httpClient_t *) ((long) clientPtr);
+  if (!client)
+    return;
 
   client->setMaxSocketsPerHost(client, maxSocketsPerHost);
 }
@@ -348,12 +340,13 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setMaxSocketsPerHo
  * @param clientPtr the pointer on the httpClient_t data structure.
  * @param maxTotalSockets the limit to set.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setMaxTotalSockets
-  (JNIEnv *env, jobject obj, jlong clientPtr, jint maxTotalSockets)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setMaxTotalSockets(JNIEnv *env, jobject obj, jlong clientPtr,
+    jint maxTotalSockets)
 {
-  httpClient_t *client = (httpClient_t *) ((long)clientPtr);
-  if (!client) return;
+  httpClient_t *client = (httpClient_t *) ((long) clientPtr);
+  if (!client)
+    return;
 
   client->setMaxTotalSockets(client, maxTotalSockets);
 }
@@ -363,12 +356,13 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setMaxTotalSockets
  * @param clientPtr the pointer on the httpClient_t data structure.
  * @param tcpNoDelay the flag value (up (1) or down (0)).
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setTcpNoDelay
-  (JNIEnv *env, jobject obj, jlong clientPtr, jboolean tcpNoDelay)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setTcpNoDelay(JNIEnv *env, jobject obj, jlong clientPtr,
+    jboolean tcpNoDelay)
 {
-  httpClient_t *client = (httpClient_t *) ((long)clientPtr);
-  if (!client) return;
+  httpClient_t *client = (httpClient_t *) ((long) clientPtr);
+  if (!client)
+    return;
 
   if (tcpNoDelay)
   {
@@ -385,12 +379,13 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setTcpNoDelay
  * @param clientPtr the pointer on the httpClient_t data structure.
  * @param requestTimeout the request timeout value to set.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setRequestTimeout
-  (JNIEnv *env, jobject obj, jlong clientPtr, jlong requestTimeout)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setRequestTimeout(JNIEnv *env, jobject obj, jlong clientPtr,
+    jlong requestTimeout)
 {
-  httpClient_t *client = (httpClient_t *) ((long)clientPtr);
-  if (!client) return;
+  httpClient_t *client = (httpClient_t *) ((long) clientPtr);
+  if (!client)
+    return;
 
   client->setRequestTimeout(client, requestTimeout);
 }
@@ -400,12 +395,13 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setRequestTimeout
  * @param clientPtr the pointer on the httpClient_t data structure.
  * @param connectionTimeout the connection timeout value to set.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setConnectionTimeout
-  (JNIEnv * env, jobject obj, jlong clientPtr, jlong connectionTimeout)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setConnectionTimeout(JNIEnv * env, jobject obj, jlong clientPtr,
+    jlong connectionTimeout)
 {
-  httpClient_t *client = (httpClient_t *) ((long)clientPtr);
-  if (!client) return;
+  httpClient_t *client = (httpClient_t *) ((long) clientPtr);
+  if (!client)
+    return;
 
   client->setConnectionTimeout(client, connectionTimeout);
 }
@@ -418,8 +414,8 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setConnectionTimeo
 static void dumpInfoClientCb(void *issuerHandle, char *msg, ...)
 {
   char info[1024];
-  msgInfo_t *message = (msgInfo_t *)issuerHandle;
-  va_list listArg;                                                                                  
+  msgInfo_t *message = (msgInfo_t *) issuerHandle;
+  va_list listArg;
 
   va_start(listArg, msg);
   vsnprintf(info, sizeof(info), msg, listArg);
@@ -436,23 +432,23 @@ static void dumpInfoClientCb(void *issuerHandle, char *msg, ...)
  * Dump the pending transactions in the logs.
  */
 JNIEXPORT jstring
-JNICALL Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_dumpPendingTransactions
-  (JNIEnv *env, jobject obj)
+JNICALL Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_dumpPendingTransactions(JNIEnv *env, jobject obj)
 {
   msgInfo_t message;
   int i;
   memset(&message, 0, sizeof(msgInfo_t));
 
   pthread_mutex_lock(&clientsMutex);
-  for(i = 0; i < g_nbMaxClients; i++)
+  for (i = 0; i < g_nbMaxClients; i++)
   {
-    if (NULL == g_clients[i]) break;
+    if (NULL == g_clients[i])
+      break;
     dumpInfoClientCb(&message, "client #%d:\n", i);
     g_clients[i]->dumpInfo(g_clients[i], dumpInfoClientCb, &message);
   }
   pthread_mutex_unlock(&clientsMutex);
 
-  return (*env)->NewStringUTF(env, message.msgBuf); 
+  return (*env)->NewStringUTF(env, message.msgBuf);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -466,12 +462,11 @@ JNICALL Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_dumpPendin
  * @param url the request URL
  * @return a pointer on the http
  */
-JNIEXPORT jlong JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_createTransaction
-  (JNIEnv * env, jobject obj, jlong clientPtr, jobject jTransaction, jstring transId, 
-  jstring method, jstring url)
+JNIEXPORT jlong JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_createTransaction(JNIEnv * env, jobject obj, jlong clientPtr,
+    jobject jTransaction, jstring transId, jstring method, jstring url)
 {
-  httpClient_t *client = (httpClient_t *) ((long)clientPtr);
+  httpClient_t *client = (httpClient_t *) ((long) clientPtr);
   transaction_t *trans = NULL;
   jobject jTransGR;
   char szTemp[255];
@@ -480,20 +475,23 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_createTransaction
   const char *methodStr = NULL;
   const char *urlStr = NULL;
 
-  if (!client) return 0;
-  if (!transId) return 0;
-  if (!method) return 0;
-  if (!url) return 0;
+  if (!client)
+    return 0;
+  if (!transId)
+    return 0;
+  if (!method)
+    return 0;
+  if (!url)
+    return 0;
 
   transIdStr = (*env)->GetStringUTFChars(env, transId, 0);
   methodStr = (*env)->GetStringUTFChars(env, method, 0);
   urlStr = (*env)->GetStringUTFChars(env, url, 0);
 
-  trans = client->getTransaction(client, (char *)transIdStr);
+  trans = client->getTransaction(client, (char *) transIdStr);
   if (trans)
   {
-    illegalArgumentExceptionClass = (*env)->FindClass(env,
-      "java/lang/IllegalArgumentException");
+    illegalArgumentExceptionClass = (*env)->FindClass(env, "java/lang/IllegalArgumentException");
     if (illegalArgumentExceptionClass == NULL)
     {
       LOG(TRACE_FATAL, "cannot find class java/lang/IllegalArgumentException");
@@ -501,17 +499,17 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_createTransaction
     else
     {
       snprintf(szTemp, sizeof(szTemp), "a transaction already exists with this id %s "
-        "(client:0x%p) (%s:%d)", transIdStr, client, __FILE__, __LINE__);
+          "(client:0x%p) (%s:%d)", transIdStr, client, __FILE__, __LINE__);
       (*env)->ThrowNew(env, illegalArgumentExceptionClass, szTemp);
     }
-  }  
+  }
 
-  client->createReq(client, (char *)transIdStr);
-  trans = client->getTransaction(client, (char *)transIdStr);
+  client->createReq(client, (char *) transIdStr);
+  trans = client->getTransaction(client, (char *) transIdStr);
   jTransGR = (*env)->NewGlobalRef(env, jTransaction);
-  trans->setJTransaction(trans, jTransGR); 
-  trans->setReqMethod(trans, (char *)methodStr); 
-  trans->setReqUrl(trans, (char *)urlStr); 
+  trans->setJTransaction(trans, jTransGR);
+  trans->setReqMethod(trans, (char *) methodStr);
+  trans->setReqUrl(trans, (char *) urlStr);
 
   (*env)->ReleaseStringUTFChars(env, transId, transIdStr);
   (*env)->ReleaseStringUTFChars(env, method, methodStr);
@@ -525,15 +523,17 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_createTransaction
  * @param clientPtr the pointer on the httpClient_t data structure.
  * @param transPtr the pointer on the transaction_t data structure to release.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_releaseTransaction
-  (JNIEnv *env, jobject obj, jlong clientPtr, jlong transPtr)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_releaseTransaction(JNIEnv *env, jobject obj, jlong clientPtr,
+    jlong transPtr)
 {
-  httpClient_t *client = (httpClient_t *) ((long)clientPtr);
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
- 
-  if (!client) return;
-  if (!trans) return;
+  httpClient_t *client = (httpClient_t *) ((long) clientPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
+
+  if (!client)
+    return;
+  if (!trans)
+    return;
 
   client->removeReq(client, trans->transId);
 }
@@ -545,21 +545,24 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_releaseTransaction
  * @param name the header name
  * @param value the header value to add.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_addRequestHeader
-  (JNIEnv *env, jobject obj, jlong transPtr, jstring name, jstring value)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_addRequestHeader(JNIEnv *env, jobject obj, jlong transPtr,
+    jstring name, jstring value)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   const char *nameStr = NULL;
   const char *valueStr = NULL;
- 
-  if (!trans) return;
-  if (!name) return;
-  if (!value) return;
+
+  if (!trans)
+    return;
+  if (!name)
+    return;
+  if (!value)
+    return;
 
   nameStr = (*env)->GetStringUTFChars(env, name, 0);
   valueStr = (*env)->GetStringUTFChars(env, value, 0);
-  trans->addReqHeader(trans, (char *)nameStr, (char *)valueStr);
+  trans->addReqHeader(trans, (char *) nameStr, (char *) valueStr);
   (*env)->ReleaseStringUTFChars(env, name, nameStr);
   (*env)->ReleaseStringUTFChars(env, value, valueStr);
 }
@@ -569,19 +572,19 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_addRequestHeader
  * @param transPtr the pointer on the transaction_t data structure.
  * @param content the request body to set.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setRequestBody
-  (JNIEnv *env, jobject obj, jlong transPtr, jbyteArray content)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setRequestBody(JNIEnv *env, jobject obj, jlong transPtr,
+    jbyteArray content)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   jsize len;
   jbyte *body = NULL;
- 
+
   if (trans && content)
   {
     len = (*env)->GetArrayLength(env, content);
     body = (*env)->GetByteArrayElements(env, content, 0);
-    trans->setReqBody(trans, (unsigned char *)body, len);
+    trans->setReqBody(trans, (unsigned char *) body, len);
   }
   if (content)
   {
@@ -595,16 +598,18 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setRequestBody
  * @param proxyHost the IP or fqdn of the proxy to target for the request.
  * @param proxyPort the port number to use for connecting the proxy for the request.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setRequestProxy
-  (JNIEnv *env, jobject obj, jlong transPtr, jstring proxyHost, jint proxyPort)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setRequestProxy(JNIEnv *env, jobject obj, jlong transPtr,
+    jstring proxyHost, jint proxyPort)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   const char *proxyHostStr = NULL;
   char szTemp[MAX_BUF_SIZE_B];
- 
-  if (!trans) return;
-  if (!proxyHost) return;
+
+  if (!trans)
+    return;
+  if (!proxyHost)
+    return;
   proxyHostStr = (*env)->GetStringUTFChars(env, proxyHost, 0);
   snprintf(szTemp, MAX_BUF_SIZE_B, "%s:%d", proxyHostStr, proxyPort);
   trans->setReqProxy(trans, szTemp);
@@ -615,13 +620,13 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_setRequestProxy
  * Ask the C layer to send the request.
  * @param transPtr the pointer on the transaction_t data structure.
  */
-JNIEXPORT void JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_sendRequest
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT void JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_sendRequest(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
- 
-  if (!trans) return;
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
+
+  if (!trans)
+    return;
   trans->sendReq(trans); // should we throw an exception here if request cannot be sent ??
 }
 
@@ -631,18 +636,17 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_sendRequest
  * @param transPtr the pointer on the transaction_t data structure.
  * @return the statusCode if any, a negative number otherwise.
  */
-JNIEXPORT jint JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseStatusCode
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT jint JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseStatusCode(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   jint res;
- 
+
   if (!trans)
   {
     res = -1;
   }
-  else if (! trans->response)
+  else if (!trans->response)
   {
     res = -2;
   }
@@ -650,7 +654,7 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseStatusC
   {
     res = trans->response->getMappedStatusCode(trans->response);
   }
-  
+
   return res;
 }
 
@@ -660,18 +664,17 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseStatusC
  * @return the statusCode if any, a negative number otherwise. Note that the cURL
  * stack will set a status code between 1 to 99 to report errors.
  */
-JNIEXPORT jint JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseRawStatusCode
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT jint JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseRawStatusCode(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   jint res;
- 
+
   if (!trans)
   {
     res = -1;
   }
-  else if (! trans->response)
+  else if (!trans->response)
   {
     res = -2;
   }
@@ -679,7 +682,7 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseRawStat
   {
     res = trans->response->statusCode;
   }
-  
+
   return res;
 }
 
@@ -688,18 +691,17 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseRawStat
  * @param transPtr the pointer on the transaction_t data structure.
  * @return the reason phrase if any.
  */
-JNIEXPORT jstring JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseReasonPhrase
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT jstring JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseReasonPhrase(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   jstring res = NULL;
- 
+
   if ((trans) && (trans->response) && (trans->response->reasonPhrase))
   {
     res = (*env)->NewStringUTF(env, trans->response->reasonPhrase);
   }
- 
+
   return res;
 }
 
@@ -710,26 +712,29 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseReasonP
  * @return the matching header value if found (when multi-valued, all values 
  * concatenated and coma-separated), NULL otherwise.
  */
-JNIEXPORT jstring JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseHeader
-  (JNIEnv *env, jobject obj, jlong transPtr, jstring name)
+JNIEXPORT jstring JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseHeader(JNIEnv *env, jobject obj, jlong transPtr,
+    jstring name)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   const char *nameStr = NULL;
   header_t *h = NULL;
   jstring res = NULL;
- 
-  if (!trans) return res;
-  if (!trans->response) return res;
-  if (!name) return res;
+
+  if (!trans)
+    return res;
+  if (!trans->response)
+    return res;
+  if (!name)
+    return res;
   nameStr = (*env)->GetStringUTFChars(env, name, 0);
-  h = trans->response->getHeader(trans->response, (char *)nameStr);
-  if (h) 
+  h = trans->response->getHeader(trans->response, (char *) nameStr);
+  if (h)
   {
     res = (*env)->NewStringUTF(env, h->values);
   }
   (*env)->ReleaseStringUTFChars(env, name, nameStr);
- 
+
   return res;
 }
 
@@ -739,22 +744,24 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseHeader
  * @param index the header index in the response header list.
  * @return the header name if found, NULL otherwise.
  */
-JNIEXPORT jstring JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getNthResponseHeaderName
-  (JNIEnv *env, jobject obj, jlong transPtr, jint index)
+JNIEXPORT jstring JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getNthResponseHeaderName(JNIEnv *env, jobject obj, jlong transPtr,
+    jint index)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   header_t *h = NULL;
   jstring res = NULL;
- 
-  if (!trans) return res;
-  if (!trans->response) return res;
+
+  if (!trans)
+    return res;
+  if (!trans->response)
+    return res;
   h = trans->response->getNthHeader(trans->response, index);
-  if (h) 
+  if (h)
   {
     res = (*env)->NewStringUTF(env, h->name);
   }
- 
+
   return res;
 }
 
@@ -765,22 +772,24 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getNthResponseHead
  * @return the header value if found (when multi-valued, all values 
  * concatenated and coma-separated), NULL otherwise.
  */
-JNIEXPORT jstring JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getNthResponseHeaderValue
-  (JNIEnv *env, jobject obj, jlong transPtr, jint index)
+JNIEXPORT jstring JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getNthResponseHeaderValue(JNIEnv *env, jobject obj,
+    jlong transPtr, jint index)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   header_t *h = NULL;
   jstring res = NULL;
- 
-  if (!trans) return res;
-  if (!trans->response) return res;
+
+  if (!trans)
+    return res;
+  if (!trans->response)
+    return res;
   h = trans->response->getNthHeader(trans->response, index);
-  if (h) 
+  if (h)
   {
     res = (*env)->NewStringUTF(env, h->values);
   }
- 
+
   return res;
 }
 
@@ -791,18 +800,17 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getNthResponseHead
  * @param transPtr the pointer on the transaction_t data structure.
  * @return the length of the received content if any, 0 otherwise.
  */
-JNIEXPORT jint JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseContentLength
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT jint JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseContentLength(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   jint res = 0;
- 
-  if ((trans) && (trans->response)) 
+
+  if ((trans) && (trans->response))
   {
     res = trans->response->contentLength;
   }
- 
+
   return res;
 }
 
@@ -811,20 +819,18 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseContent
  * @param transPtr the pointer on the transaction_t data structure.
  * @return the received content if any, NULL otherwise.
  */
-JNIEXPORT jbyteArray JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseBody
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT jbyteArray JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseBody(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   jbyteArray res = NULL;
- 
-  if ((trans) && (trans->response) && (trans->response->content)) 
+
+  if ((trans) && (trans->response) && (trans->response->content))
   {
-    res = (*env)->NewByteArray(env, trans->response->contentLength); 
-    (*env)->SetByteArrayRegion(env, res, 0, trans->response->contentLength,
-      (jbyte *)trans->response->content);
+    res = (*env)->NewByteArray(env, trans->response->contentLength);
+    (*env)->SetByteArrayRegion(env, res, 0, trans->response->contentLength, (jbyte *) trans->response->content);
   }
- 
+
   return res;
 }
 
@@ -833,26 +839,25 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getResponseBody
  * @param transPtr the pointer on the transaction_t data structure.
  * @return the remote address used for the transaction.
  */
-JNIEXPORT jstring JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getRemoteAddress
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT jstring JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getRemoteAddress(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   char *remoteAddr = NULL;
   jstring res = NULL;
- 
-  if (trans) 
+
+  if (trans)
   {
 // TEST-ML-20140520
 //pthread_mutex_lock(&clientsMutex); // TEST
     curl_easy_getinfo(trans->curlEasyHandle, CURLINFO_PRIMARY_IP, &remoteAddr);
 //pthread_mutex_unlock(&clientsMutex); // TEST
     if (remoteAddr && *remoteAddr)
-    { 
+    {
       res = (*env)->NewStringUTF(env, remoteAddr);
     }
   }
- 
+
   return res;
 }
 
@@ -861,21 +866,20 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getRemoteAddress
  * @param transPtr the pointer on the transaction_t data structure.
  * @return the remote port used for the transaction.
  */
-JNIEXPORT jint JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getRemotePort
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT jint JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getRemotePort(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   long remotePort = 0;
- 
-  if (trans) 
+
+  if (trans)
   {
 // TEST-ML-20140520
 //pthread_mutex_lock(&clientsMutex); // TEST
     curl_easy_getinfo(trans->curlEasyHandle, CURLINFO_PRIMARY_PORT, &remotePort);
 //pthread_mutex_unlock(&clientsMutex); // TEST
   }
- 
+
   return (jlong) remotePort;
 }
 
@@ -884,26 +888,25 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getRemotePort
  * @param transPtr the pointer on the transaction_t data structure.
  * @return the local address used for the transaction.
  */
-JNIEXPORT jstring JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getLocalAddress
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT jstring JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getLocalAddress(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   char *localAddr = NULL;
   jstring res = NULL;
- 
-  if (trans) 
+
+  if (trans)
   {
 // TEST-ML-20140520
 //pthread_mutex_lock(&clientsMutex); // TEST
     curl_easy_getinfo(trans->curlEasyHandle, CURLINFO_LOCAL_IP, &localAddr);
 //pthread_mutex_unlock(&clientsMutex); // TEST
     if (localAddr && *localAddr)
-    { 
+    {
       res = (*env)->NewStringUTF(env, localAddr);
     }
   }
- 
+
   return res;
 }
 
@@ -912,21 +915,20 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getLocalAddress
  * @param transPtr the pointer on the transaction_t data structure.
  * @return the local port used for the transaction.
  */
-JNIEXPORT jint JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getLocalPort
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT jint JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getLocalPort(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   long localPort = 0;
- 
-  if (trans) 
+
+  if (trans)
   {
 // TEST-ML-20140520
 //pthread_mutex_lock(&clientsMutex); // TEST
     curl_easy_getinfo(trans->curlEasyHandle, CURLINFO_LOCAL_PORT, &localPort);
 //pthread_mutex_unlock(&clientsMutex); // TEST
   }
- 
+
   return (jlong) localPort;
 }
 
@@ -935,18 +937,17 @@ Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getLocalPort
  * @param transPtr the pointer on the transaction_t data structure.
  * @return the received protocol if detected, NULL otherwise.
  */
-JNIEXPORT jstring JNICALL 
-Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getProtocol
-  (JNIEnv *env, jobject obj, jlong transPtr)
+JNIEXPORT jstring JNICALL
+Java_com_actility_m2m_song_binding_http_jni_impl_JHttpClients_getProtocol(JNIEnv *env, jobject obj, jlong transPtr)
 {
-  transaction_t *trans = (transaction_t *) ((long)transPtr);
+  transaction_t *trans = (transaction_t *) ((long) transPtr);
   jstring res = NULL;
- 
-  if ((trans) && (trans->response) && (trans->response->protocol)) 
+
+  if ((trans) && (trans->response) && (trans->response->protocol))
   {
     res = (*env)->NewStringUTF(env, trans->response->protocol);
   }
- 
+
   return res;
 }
 

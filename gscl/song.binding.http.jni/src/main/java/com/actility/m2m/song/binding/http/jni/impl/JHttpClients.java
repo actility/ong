@@ -13,6 +13,8 @@ public final class JHttpClients implements Runnable {
 
     private static final Level[] LEVELS = { Level.FATAL, Level.ERROR, Level.WARN, Level.INFO, Level.DEBUG, Level.TRACE };
 
+    private static final Logger LOG = OSGiLogger.getLogger(JHttpClients.class, BundleLogger.LOG);
+
     static {
         try {
             System.loadLibrary("HttpClient");
@@ -20,8 +22,6 @@ public final class JHttpClients implements Runnable {
             System.err.println("Failed to load native code library libHttpClient.so.\n" + e);
         }
     }
-
-    private static final Logger LOG = OSGiLogger.getLogger(JHttpClients.class, BundleLogger.LOG);
 
     public RuntimeException e;
     private HttpClientHandler handler;
@@ -71,7 +71,7 @@ public final class JHttpClients implements Runnable {
 
     /**
      * Create a new handler for a new HTTP client.
-     * 
+     *
      * @param curlDebugEnable tells if debug mode must be enable while creating the client.
      * @return return the pointer value on the native data structure. The issuer have then to provide this identifier for each
      *         query. If 0, client handler cannot be created.

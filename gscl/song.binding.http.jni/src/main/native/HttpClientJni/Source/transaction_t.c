@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -29,7 +28,6 @@
       curl_easy_strerror(rc), l); \
   } \
 }
-
 
 static void transaction_t_init(transaction_t *This);
 
@@ -96,8 +94,8 @@ transaction_t *new_transaction_t(httpClient_t *client)
 
   s_curl_prepareEasyHandle(This);
 
-  LOG(TRACE_DEBUG, "new transaction_t (transId:%s) (This:0x%.8x) (easyHandle:0x%.8x)", 
-    This->transId, This, This->curlEasyHandle);
+  LOG(TRACE_DEBUG, "new transaction_t (transId:%s) (This:0x%.8x) (easyHandle:0x%.8x)", This->transId, This,
+      This->curlEasyHandle);
   return This;
 }
 
@@ -107,8 +105,7 @@ transaction_t *new_transaction_t(httpClient_t *client)
  */
 void transaction_t_newFree(transaction_t *This)
 {
-  LOG(TRACE_DEBUG, "transaction_t::newFree (This:0x%.8x) (transId:%s)", This, 
-    This->transId);
+  LOG(TRACE_DEBUG, "transaction_t::newFree (This:0x%.8x) (transId:%s)", This, This->transId);
 
   if (This->reqHeaderlist)
   {
@@ -163,8 +160,7 @@ void transaction_t_reset(transaction_t *This)
  */
 void transaction_t_setTransId(transaction_t *This, char *transId)
 {
-  LOG(TRACE_DEBUG, "transaction_t::setTransId (This:0x%.8x) (transId:%s)", This, 
-    transId);
+  LOG(TRACE_DEBUG, "transaction_t::setTransId (This:0x%.8x) (transId:%s)", This, transId);
   This->transId = strdup(transId);
 }
 
@@ -174,8 +170,7 @@ void transaction_t_setTransId(transaction_t *This, char *transId)
  */
 void transaction_t_setJTransaction(transaction_t *This, jobject jTransaction)
 {
-  LOG(TRACE_DEBUG, "transaction_t::setJTransaction (This:0x%.8x) (transId:%s)", 
-    This, This->transId);
+  LOG(TRACE_DEBUG, "transaction_t::setJTransaction (This:0x%.8x) (transId:%s)", This, This->transId);
   This->jTransaction = jTransaction;
 }
 
@@ -185,8 +180,7 @@ void transaction_t_setJTransaction(transaction_t *This, jobject jTransaction)
  */
 void transaction_t_setReqUrl(transaction_t *This, char *url)
 {
-  LOG(TRACE_DEBUG, "transaction_t::setReqUrl (This:0x%.8x) (transId:%s) (url:%s)", 
-    This, This->transId, url);
+  LOG(TRACE_DEBUG, "transaction_t::setReqUrl (This:0x%.8x) (transId:%s) (url:%s)", This, This->transId, url);
   CURLE_SETOPT(This->curlEasyHandle, CURLOPT_URL, url, __LINE__);
 }
 
@@ -199,17 +193,17 @@ void transaction_t_setReqUrl(transaction_t *This, char *url)
 void transaction_t_addReqHeader(transaction_t *This, char *name, char *value)
 {
   LOG(TRACE_DEBUG, "transaction_t::addReqHeader (This:0x%.8x) (transId:%s) (name:%s) "
-    "(value:%s)", This, This->transId, name, value);
+      "(value:%s)", This, This->transId, name, value);
   if ((!name) || (!*name))
   {
     LOG(TRACE_ERROR, "transaction_t::addHeader: error - no name provided"
-      " (transId:%s)", This->transId);
+        " (transId:%s)", This->transId);
     return;
   }
   if (!value)
   {
     LOG(TRACE_ERROR, "transaction_t::addHeader: error - no value provided"
-      " (transId:%s)", This->transId);
+        " (transId:%s)", This->transId);
     return;
   }
 
@@ -218,8 +212,8 @@ void transaction_t_addReqHeader(transaction_t *This, char *name, char *value)
     This->contenLenHeaderAdded = 1;
   }
 
-  int len = strlen(name) + strlen(value) + 2 /* ": " */ + 1;
-  char *header = (char *)malloc(len);
+  int len = strlen(name) + strlen(value) + 2 /* ": " */+ 1;
+  char *header = (char *) malloc(len);
   memset(header, 0, len);
   sprintf(header, "%s: %s", name, value);
   This->reqHeaderlist = curl_slist_append(This->reqHeaderlist, header);
@@ -233,8 +227,7 @@ void transaction_t_addReqHeader(transaction_t *This, char *name, char *value)
  */
 void transaction_t_setReqMethod(transaction_t *This, char *method)
 {
-  LOG(TRACE_DEBUG, "transaction_t::setReqMethod (This:0x%.8x) (transId:%s) (method:%s)",
-    This, This->transId, method);
+  LOG(TRACE_DEBUG, "transaction_t::setReqMethod (This:0x%.8x) (transId:%s) (method:%s)", This, This->transId, method);
   if (!strcasecmp(method, METHOD_POST))
   {
     CURLE_SETOPT(This->curlEasyHandle, CURLOPT_POST, 1L, __LINE__);
@@ -263,8 +256,7 @@ void transaction_t_setReqMethod(transaction_t *This, char *method)
  */
 void transaction_t_setReqBody(transaction_t *This, unsigned char *body, size_t len)
 {
-  LOG(TRACE_DEBUG, "transaction_t::setReqBody (This:0x%.8x) (transId:%s) (len:%d)",
-    This, This->transId, len);
+  LOG(TRACE_DEBUG, "transaction_t::setReqBody (This:0x%.8x) (transId:%s) (len:%d)", This, This->transId, len);
   if (This->reqBody)
   {
     free(This->reqBody);
@@ -285,8 +277,7 @@ void transaction_t_setReqBody(transaction_t *This, unsigned char *body, size_t l
  */
 void transaction_t_setReqProxy(transaction_t *This, char *proxy)
 {
-  LOG(TRACE_DEBUG, "transaction_t::setReqProxy (This:0x%.8x) (transId:%s) (proxy:%s)",
-    This, This->transId, proxy);
+  LOG(TRACE_DEBUG, "transaction_t::setReqProxy (This:0x%.8x) (transId:%s) (proxy:%s)", This, This->transId, proxy);
   CURLE_SETOPT(This->curlEasyHandle, CURLOPT_PROXY, proxy, __LINE__);
 //  CURLE_SETOPT(This->curlEasyHandle, CURLOPT_HTTPPROXYTUNNEL, 1L, __LINE__);
 }
@@ -299,12 +290,11 @@ void transaction_t_setReqProxy(transaction_t *This, char *proxy)
 int transaction_t_sendReq(transaction_t *This)
 {
   char szContentLen[MAX_BUF_SIZE_S];
- 
-  LOG(TRACE_INFO, ">>> transaction_t::sendReq (This:0x%.8x) (transId:%s)", 
-    This, This->transId);
+
+  LOG(TRACE_INFO, ">>> transaction_t::sendReq (This:0x%.8x) (transId:%s)", This, This->transId);
 
   // Add Content-Length header if not already done
-  if (! This->contenLenHeaderAdded)
+  if (!This->contenLenHeaderAdded)
   {
     sprintf(szContentLen, "%zd", This->reqBodyLen);
     This->addReqHeader(This, HEADER_CONTENT_LENGTH, szContentLen);
@@ -329,9 +319,8 @@ char *transaction_t_dumpInfo(transaction_t *This, char *dest)
   double duration;
   curl_easy_getinfo(This->curlEasyHandle, CURLINFO_EFFECTIVE_URL, &urlInfo);
   curl_easy_getinfo(This->curlEasyHandle, CURLINFO_TOTAL_TIME, &duration);
-  sprintf(dest, "(transId:%s)(url:%s)(duration:%gs)", This->transId, urlInfo, 
-    duration);
-  return dest; 
+  sprintf(dest, "(transId:%s)(url:%s)(duration:%gs)", This->transId, urlInfo, duration);
+  return dest;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -367,8 +356,7 @@ static void s_curl_prepareEasyHandle(transaction_t *This)
   CURLE_SETOPT(This->curlEasyHandle, CURLOPT_NOPROGRESS, 1L, __LINE__);
   /* Timeout */
   CURLE_SETOPT(This->curlEasyHandle, CURLOPT_TIMEOUT_MS, This->client->requestTimeout, __LINE__);
-  CURLE_SETOPT(This->curlEasyHandle, CURLOPT_CONNECTTIMEOUT_MS, This->client->connectionTimeout, 
-    __LINE__);
+  CURLE_SETOPT(This->curlEasyHandle, CURLOPT_CONNECTTIMEOUT_MS, This->client->connectionTimeout, __LINE__);
 
   CURLE_SETOPT(This->curlEasyHandle, CURLOPT_FAILONERROR, 0, __LINE__);
   //CURLE_SETOPT(This->curlEasyHandle, CURLOPT_LOW_SPEED_TIME, 1, __LINE__);
@@ -389,8 +377,7 @@ static void s_curl_prepareEasyHandle(transaction_t *This)
   }
   if (This->client->proxyUserPwd)
   {
-    CURLE_SETOPT(This->curlEasyHandle, CURLOPT_PROXYUSERPWD, This->client->proxyUserPwd, 
-      __LINE__);
+    CURLE_SETOPT(This->curlEasyHandle, CURLOPT_PROXYUSERPWD, This->client->proxyUserPwd, __LINE__);
   }
 }
 
@@ -410,7 +397,6 @@ static void s_curl_prepareEasyHandle(transaction_t *This)
 //  LOG(TRACE_DEBUG, "s_curl_progressCb");
 //  return 0;
 //}
-
 /**
  * The call back is invoked when the content is received, if there is one.
  * @param ptr the content.
@@ -421,17 +407,17 @@ static void s_curl_prepareEasyHandle(transaction_t *This)
  */
 static size_t s_curl_receivedBodyCb(char *ptr, size_t size, size_t nmemb, void *userp)
 {
-  transaction_t *This = (transaction_t*)userp;
+  transaction_t *This = (transaction_t*) userp;
 
   LOG(TRACE_DEBUG, "s_curl_receivedBodyCb (transId:%s) (ptr:%0.8p) (size:%d) "
-    "(nmemb:%d)", This?This->transId:"(nil)", ptr, size, nmemb);
+      "(nmemb:%d)", This ? This->transId : "(nil)", ptr, size, nmemb);
 
   if (This->response)
   {
     // collect the response content
     if (nmemb * size > 0)
     {
-      This->response->addToContent(This->response, (unsigned char *)ptr, nmemb * size);
+      This->response->addToContent(This->response, (unsigned char *) ptr, nmemb * size);
     }
 
     return nmemb * size;
@@ -449,25 +435,26 @@ static size_t s_curl_receivedBodyCb(char *ptr, size_t size, size_t nmemb, void *
  */
 static size_t s_curl_receivedHeaderCb(char *ptr, size_t size, size_t nmemb, void *userp)
 {
-  transaction_t *This = (transaction_t*)userp;
+  transaction_t *This = (transaction_t*) userp;
   int rc;
   //header_t * h;
   char szTemp[255];
 
   LOG(TRACE_DEBUG, "s_curl_receivedHeaderCb (transId:%s) (ptr:%0.8p) (size:%d)"
-    " (nmemb:%d)", This?This->transId:"(nil)", ptr, size, nmemb);
+      " (nmemb:%d)", This ? This->transId : "(nil)", ptr, size, nmemb);
 
-  if (! This) return 0;
+  if (!This)
+    return 0;
 
   if (NULL == This->response)
   {
     This->response = new_response_t();
     rc = This->response->parseStatusLine(This->response, ptr, size * nmemb);
 
-    if (! rc)
+    if (!rc)
     {
       This->response->statusCode = STATUS_CODE_PARSE_ERR;
-      snprintf(szTemp, sizeof(szTemp), "Unable to parse the read status line (%s)", ptr); 
+      snprintf(szTemp, sizeof(szTemp), "Unable to parse the read status line (%s)", ptr);
       This->response->reasonPhrase = strdup(szTemp);
     }
   }
@@ -493,16 +480,17 @@ static size_t s_curl_receivedHeaderCb(char *ptr, size_t size, size_t nmemb, void
  */
 static size_t s_curl_sendReqBodyCb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
-  transaction_t *This = (transaction_t*)userdata;
+  transaction_t *This = (transaction_t*) userdata;
   size_t toWrite;
   size_t res;
 
   LOG(TRACE_DEBUG, "s_curl_sendReqBodyCb (transId:%s) (ptr:%0.8p) (size:%d)"
-    " (nmemb:%d) (reqBodyLen:%d) (readReqBodyLen:%d)", This?This->transId:"(nil)", 
-    ptr, size, nmemb, This?This->reqBodyLen:-1, This?This->readReqBodyLen:-1);
+      " (nmemb:%d) (reqBodyLen:%d) (readReqBodyLen:%d)", This ? This->transId : "(nil)", ptr, size, nmemb,
+      This ? This->reqBodyLen : -1, This ? This->readReqBodyLen : -1);
 
-  if (! This) return 0;
-  
+  if (!This)
+    return 0;
+
   toWrite = (This->reqBodyLen - This->readReqBodyLen) /* * sizeof(unsigned char) */;
 
   if (0 == toWrite)
@@ -510,16 +498,16 @@ static size_t s_curl_sendReqBodyCb(void *ptr, size_t size, size_t nmemb, void *u
     // all was already sent
     res = 0;
   }
-  else 
+  else
   {
-    if ( toWrite > (size * nmemb))
+    if (toWrite > (size * nmemb))
     {
       // not enough space available.
       toWrite = (size * nmemb);
     }
     memcpy(ptr, This->reqBody + This->readReqBodyLen, toWrite);
-    This->readReqBodyLen += toWrite /* / sizeof(unsigned char)*/ ; 
-    res = toWrite /* / sizeof(unsigned char)*/ ;
+    This->readReqBodyLen += toWrite /* / sizeof(unsigned char)*/;
+    res = toWrite /* / sizeof(unsigned char)*/;
   }
   return res;
 }
@@ -533,52 +521,52 @@ static size_t s_curl_sendReqBodyCb(void *ptr, size_t size, size_t nmemb, void *u
  * @param userdata the transactionId involved.
  * @return must return 0;
  */
-static int s_curl_debugCb(CURL *eh, curl_infotype type, char *msg, size_t msgLen,
-  void *userdata)
+static int s_curl_debugCb(CURL *eh, curl_infotype type, char *msg, size_t msgLen, void *userdata)
 {
   char message[MAX_BUF_SIZE_VL];
   char head[MAX_BUF_SIZE_H];
-  transaction_t *This = (transaction_t*)userdata;
+  transaction_t *This = (transaction_t*) userdata;
   int max = msgLen;
 
-  if (! This) return 0;
+  if (!This)
+    return 0;
 
   memset(message, 0, MAX_BUF_SIZE_VL);
 
   switch (type)
   {
-    case CURLINFO_TEXT:
-      sprintf(head, "(transId:%s) [TXT   ] ", This->transId);
-      break;
-    case CURLINFO_HEADER_IN:
-      sprintf(head, "(transId:%s) [HEAD_I] ", This->transId);
-      break;
-    case CURLINFO_HEADER_OUT:
-      sprintf(head, "(transId:%s) [HEAD_O] ", This->transId);
-      break;
-    case CURLINFO_DATA_IN:
-      sprintf(head, "(transId:%s) [DATA_I] ", This->transId);
-      break;
-    case CURLINFO_DATA_OUT:
-      sprintf(head, "(transId:%s) [DATA_O] ", This->transId);
-      break;
-    case CURLINFO_SSL_DATA_IN:
-      sprintf(head, "(transId:%s) [DSSL_I] ", This->transId);
-      break;
-    case CURLINFO_SSL_DATA_OUT:
-      sprintf(head, "(transId:%s) [DSSL_O] ", This->transId);
-      break;
-    case CURLINFO_END:
-      sprintf(head, "(transId:%s) [END   ] ", This->transId);
-      break;
+  case CURLINFO_TEXT:
+    sprintf(head, "(transId:%s) [TXT   ] ", This->transId);
+    break;
+  case CURLINFO_HEADER_IN:
+    sprintf(head, "(transId:%s) [HEAD_I] ", This->transId);
+    break;
+  case CURLINFO_HEADER_OUT:
+    sprintf(head, "(transId:%s) [HEAD_O] ", This->transId);
+    break;
+  case CURLINFO_DATA_IN:
+    sprintf(head, "(transId:%s) [DATA_I] ", This->transId);
+    break;
+  case CURLINFO_DATA_OUT:
+    sprintf(head, "(transId:%s) [DATA_O] ", This->transId);
+    break;
+  case CURLINFO_SSL_DATA_IN:
+    sprintf(head, "(transId:%s) [DSSL_I] ", This->transId);
+    break;
+  case CURLINFO_SSL_DATA_OUT:
+    sprintf(head, "(transId:%s) [DSSL_O] ", This->transId);
+    break;
+  case CURLINFO_END:
+    sprintf(head, "(transId:%s) [END   ] ", This->transId);
+    break;
   }
 
   if (max >= MAX_BUF_SIZE_VL)
   {
-    max = MAX_BUF_SIZE_VL-1;
+    max = MAX_BUF_SIZE_VL - 1;
   }
 
-  snprintf(message, max, msg); 
+  snprintf(message, max, msg);
   LOG(TRACE_DEBUG, "%s%s", head, message);
 
   return 0;

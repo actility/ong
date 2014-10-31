@@ -1,16 +1,15 @@
-
 #ifndef _TRANSACTIONS_LIST_T__H_
 #define _TRANSACTIONS_LIST_T__H_
 
 typedef struct transactionsList_t
 {
-  void (* free) (struct transactionsList_t *);
-  transaction_t *(* get) (struct transactionsList_t *, char *);
-  transaction_t *(* getNth) (struct transactionsList_t *, int);
-  void (* add) (struct transactionsList_t *, transaction_t *trans);
-  transaction_t *(* remove) (struct transactionsList_t *, char *);
+  void (*free)(struct transactionsList_t *);
+  transaction_t *(*get)(struct transactionsList_t *, char *);
+  transaction_t *(*getNth)(struct transactionsList_t *, int);
+  void (*add)(struct transactionsList_t *, transaction_t *trans);
+  transaction_t *(*remove)(struct transactionsList_t *, char *);
   struct list_head transactions;
-  
+
 } transactionsList_t;
 
 transactionsList_t *new_transactionsList_t();
