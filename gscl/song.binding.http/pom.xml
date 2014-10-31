@@ -22,12 +22,12 @@
   or visit www.actility.com if you need additional
   information or have any questions.
   
-  id $Id: pom.xml 8980 2014-06-23 15:52:24Z mlouiset $
-  author $Author: mlouiset $
-  version $Revision: 8980 $
-  lastrevision $Date: 2014-06-23 17:52:24 +0200 (Mon, 23 Jun 2014) $
-  modifiedby $LastChangedBy: mlouiset $
-  lastmodified $LastChangedDate: 2014-06-23 17:52:24 +0200 (Mon, 23 Jun 2014) $
+  id $Id: pom.xml 9045 2014-07-03 15:51:41Z JReich $
+  author $Author: JReich $
+  version $Revision: 9045 $
+  lastrevision $Date: 2014-07-03 17:51:41 +0200 (Thu, 03 Jul 2014) $
+  modifiedby $LastChangedBy: JReich $
+  lastmodified $LastChangedDate: 2014-07-03 17:51:41 +0200 (Thu, 03 Jul 2014) $
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -39,7 +39,7 @@
     <version>3.0.0</version>
   </parent>
   <artifactId>song.binding.http</artifactId>
-  <version>4.0.0</version>
+  <version>5.0.0</version>
   <packaging>bundle</packaging>
 
   <name>[Bnd] Song/Http binding</name>
@@ -56,12 +56,12 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>song.api</artifactId>
-      <version>4.0.0</version>
+      <version>5.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>util</artifactId>
-      <version>[4.0.0,5)</version>
+      <version>4.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -76,7 +76,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>m2m.api</artifactId>
-      <version>3.0.0</version>
+      <version>[4.0.0,5)</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>

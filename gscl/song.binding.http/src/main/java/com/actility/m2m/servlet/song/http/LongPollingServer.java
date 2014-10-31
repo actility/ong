@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: LongPollingServer.java 8521 2014-04-14 09:05:59Z JReich $
+ * id $Id: LongPollingServer.java 9489 2014-09-08 08:29:20Z JReich $
  * author $Author: JReich $
- * version $Revision: 8521 $
- * lastrevision $Date: 2014-04-14 11:05:59 +0200 (Mon, 14 Apr 2014) $
+ * version $Revision: 9489 $
+ * lastrevision $Date: 2014-09-08 10:29:20 +0200 (Mon, 08 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-04-14 11:05:59 +0200 (Mon, 14 Apr 2014) $
+ * lastmodified $LastChangedDate: 2014-09-08 10:29:20 +0200 (Mon, 08 Sep 2014) $
  */
 
 package com.actility.m2m.servlet.song.http;
@@ -48,6 +48,7 @@ import com.actility.m2m.servlet.song.http.stats.LongPollingServerStatsImpl;
 import com.actility.m2m.song.binding.http.LongPollingServerStats;
 import com.actility.m2m.util.UUID;
 import com.actility.m2m.util.log.OSGiLogger;
+import com.actility.m2m.xo.XoException;
 
 /**
  * Manages a server long polling connection.
@@ -66,6 +67,7 @@ public final class LongPollingServer {
     private final String longPollingId;
     private final ContactWaitingLongPollingRequest[] queue;
     private final Timer timerService;
+    private final boolean cc;
     private long contactRequestWaitingTimer;
     private long longPollingServerRequestExpirationTimer;
     private int readIndex;
@@ -104,9 +106,10 @@ public final class LongPollingServer {
      *            expired
      * @param longPollingServerRequestExpirationTimer The time to wait a contact request to send in a long polling response
      *            before to consider a long polling request as expired
+     * @param cc Whether this is a commincationChannel (otherwise it is a notificationChannel)
      */
     public LongPollingServer(SongHttpBinding songHttpBinding, Timer timerService, String longPollingId,
-            long contactRequestWaitingTimer, long longPollingServerRequestExpirationTimer) {
+            long contactRequestWaitingTimer, long longPollingServerRequestExpirationTimer, boolean cc) {
         this.songHttpBinding = songHttpBinding;
         this.timerService = timerService;
         this.longPollingId = longPollingId;
@@ -115,6 +118,7 @@ public final class LongPollingServer {
         this.writeIndex = 0;
         this.contactRequestWaitingTimer = contactRequestWaitingTimer;
         this.longPollingServerRequestExpirationTimer = longPollingServerRequestExpirationTimer;
+        this.cc = cc;
         this.index = -1;
     }
 
@@ -223,10 +227,20 @@ public final class LongPollingServer {
             String transactionId = UUID.randomUUID(40);
             songHttpBinding.addPendingContactRequest(this, transactionId, songRequest);
             try {
-                songHttpBinding.buildHttpLongPollingResponseFromSongRequest(transactionId, httpTransaction, songRequest);
+                if (cc) {
+                    songHttpBinding.buildHttpCCLongPollingResponseFromSongRequest(transactionId, httpTransaction, songRequest);
+                } else {
+                    songHttpBinding.buildHttpNCLongPollingResponseFromSongRequest(transactionId, httpTransaction, songRequest);
+                    songRequest.createResponse(SongServletResponse.SC_OK).send();
+                }
                 ++accOfContactEndLongPollingRequests;
                 ++nbOfContactRequests;
                 ++nbOfWaitingResponseContactRequests;
+            } catch (XoException e) {
+                ++accOfErrorEndLongPollingRequests;
+                ++accOfErrorEndContactRequests;
+                songHttpBinding.removePendingContactRequest(transactionId);
+                throw new IOException(e.getMessage());
             } catch (IOException e) {
                 ++accOfErrorEndLongPollingRequests;
                 ++accOfErrorEndContactRequests;
@@ -366,9 +380,22 @@ public final class LongPollingServer {
                 songHttpBinding.addPendingContactRequest(this, transactionId, songRequest);
                 try {
                     --nbOfWaitingContactRequests;
-                    songHttpBinding.buildHttpLongPollingResponseFromSongRequest(transactionId, httpTransaction, songRequest);
+                    if (cc) {
+                        songHttpBinding.buildHttpCCLongPollingResponseFromSongRequest(transactionId, httpTransaction,
+                                songRequest);
+                    } else {
+                        songHttpBinding.buildHttpNCLongPollingResponseFromSongRequest(transactionId, httpTransaction,
+                                songRequest);
+                        songRequest.createResponse(SongServletResponse.SC_OK).send();
+                    }
                     ++accOfContactEndLongPollingRequests;
                     ++nbOfWaitingResponseContactRequests;
+                } catch (XoException e) {
+                    // TODO should respond to contact request
+                    ++accOfErrorEndContactRequests;
+                    ++accOfErrorEndLongPollingRequests;
+                    songHttpBinding.removePendingContactRequest(transactionId);
+                    throw new IOException(e.getMessage());
                 } catch (IOException e) {
                     // TODO should respond to contact request
                     ++accOfErrorEndContactRequests;

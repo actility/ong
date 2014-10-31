@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: LongPollingClient.java 8543 2014-04-14 15:47:19Z JReich $
+ * id $Id: LongPollingClient.java 9625 2014-09-25 15:18:00Z JReich $
  * author $Author: JReich $
- * version $Revision: 8543 $
- * lastrevision $Date: 2014-04-14 17:47:19 +0200 (Mon, 14 Apr 2014) $
+ * version $Revision: 9625 $
+ * lastrevision $Date: 2014-09-25 17:18:00 +0200 (Thu, 25 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-04-14 17:47:19 +0200 (Mon, 14 Apr 2014) $
+ * lastmodified $LastChangedDate: 2014-09-25 17:18:00 +0200 (Thu, 25 Sep 2014) $
  */
 
 package com.actility.m2m.servlet.song.http;
@@ -37,7 +37,6 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Random;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,13 +47,18 @@ import com.actility.m2m.http.HttpUtils;
 import com.actility.m2m.http.client.ni.HttpClient;
 import com.actility.m2m.http.client.ni.HttpClientException;
 import com.actility.m2m.http.client.ni.HttpClientTransaction;
+import com.actility.m2m.m2m.M2MException;
+import com.actility.m2m.servlet.song.ChannelClientListener;
 import com.actility.m2m.servlet.song.SongServletRequest;
+import com.actility.m2m.servlet.song.SongServletResponse;
 import com.actility.m2m.servlet.song.SongURI;
 import com.actility.m2m.servlet.song.http.log.BundleLogger;
 import com.actility.m2m.servlet.song.http.stats.LongPollingClientStatsImpl;
 import com.actility.m2m.song.binding.http.LongPollingClientStats;
 import com.actility.m2m.util.Profiler;
+import com.actility.m2m.util.RunnableTimerTask;
 import com.actility.m2m.util.log.OSGiLogger;
+import com.actility.m2m.xo.XoException;
 
 /**
  * Manages a client long polling connection.
@@ -66,19 +70,24 @@ import com.actility.m2m.util.log.OSGiLogger;
  * polling HTTP request to the remote long polling URI.
  *
  */
-public final class LongPollingClient extends TimerTask {
+public final class LongPollingClient implements Runnable {
     private static final Logger LOG = OSGiLogger.getLogger(LongPollingClient.class, BundleLogger.LOG);
 
+    private static final int MAX_ERRORS = 7;
     private static final long RETRY_TIMER = 5000L;
     private static final long RANDOM_RETRY_TIMER = 20000L;
 
     private final SongHttpBinding songHttpBinding;
     private final String longPollingURI;
+    private final String requestingEntity;
+    private final SongURI relatedRequestingEntity;
+    private final SongURI relatedTargetID;
     private final InetAddress remoteAddress;
     private final int remotePort;
-    private final SongURI baseURI;
     private final Timer timerService;
     private final HttpClient httpClient;
+    private final boolean cc;
+    private final ChannelClientListener channelListener;
 
     private volatile boolean end;
 
@@ -100,8 +109,9 @@ public final class LongPollingClient extends TimerTask {
     private long accOfErrorEndLongPollingRequests;
     private long accOfExceptionEndLongPollingRequests;
     private long accOfExpiredEndLongPollingRequests;
-    private boolean error;
+    private int nbErrors;
     private long nextExecution;
+    private RunnableTimerTask timerTask;
 
     /**
      * Builds a client long polling thread.
@@ -109,33 +119,42 @@ public final class LongPollingClient extends TimerTask {
      * @param songHttpBinding The HTTP SONG binding which will be used to convert an HTTP response to a SONG request
      * @param timerService Service that permits to start timers
      * @param httpClient The HTTP client that will be used as a based
-     * @param contactURI The contact URI used by the long polling connection. This is necessary to build the requested URI of a
-     *            SONG request
      * @param remoteAddress The long polling remote host address
      * @param remotePort The long polling remote port
      * @param longPollingURI The long polling URI
+     * @param cc Whether this is a <communicationChannel> (otherwise this is a <notificationChannel>)
      */
-    public LongPollingClient(SongHttpBinding songHttpBinding, Timer timerService, HttpClient httpClient, SongURI contactURI,
-            InetAddress remoteAddress, int remotePort, String longPollingURI) {
+    public LongPollingClient(SongHttpBinding songHttpBinding, Timer timerService, HttpClient httpClient,
+            InetAddress remoteAddress, int remotePort, String longPollingURI, String requestingEntity,
+            SongURI relatedRequestingEntity, SongURI relatedTargetID, ChannelClientListener channelListener, boolean cc) {
         this.songHttpBinding = songHttpBinding;
         this.remoteAddress = remoteAddress;
         this.remotePort = remotePort;
         this.longPollingURI = longPollingURI;
-        this.baseURI = contactURI;
         this.timerService = timerService;
         this.httpClient = httpClient;
+        this.requestingEntity = requestingEntity;
+        this.relatedRequestingEntity = relatedRequestingEntity;
+        this.relatedTargetID = relatedTargetID;
+        this.channelListener = channelListener;
+        this.cc = cc;
+        this.nbErrors = 0;
+        this.timerTask = new RunnableTimerTask(this);
     }
 
-    private void startRetryTimer() {
+    private void startRetryTimer(boolean error) {
         long waitDuration = RETRY_TIMER + (Math.abs(new Random().nextLong()) % (RANDOM_RETRY_TIMER + 1000L));
         synchronized (this) {
-            error = true;
+            if (error) {
+                channelListener.channelError();
+            }
             nextExecution = System.currentTimeMillis() + waitDuration;
         }
         if (LOG.isInfoEnabled()) {
             LOG.info(longPollingURI + ": Sleep " + waitDuration + "ms to retry connection");
         }
-        timerService.schedule(this, waitDuration);
+        timerTask = new RunnableTimerTask(this);
+        timerService.schedule(timerTask, waitDuration);
     }
 
     /**
@@ -146,20 +165,21 @@ public final class LongPollingClient extends TimerTask {
             LOG.info(longPollingURI + ": Stopping client long polling connection");
         }
         end = true;
-        cancel();
+        timerTask.cancel();
         if (LOG.isInfoEnabled()) {
             LOG.info(longPollingURI + ": Client long polling connection is stopped: " + longPollingURI);
         }
     }
 
     public synchronized LongPollingClientStats getLongPollingClientStats() {
+        long now = System.currentTimeMillis();
         return new LongPollingClientStatsImpl(new Date(lastContactRequest), nbOfContactRequests, accOfContactRequests,
                 accOfNormalEndContactRequests, accOfBadRequestEndContactRequests, accOfErrorEndContactRequests, new Date(
                         lastContactResponse), accOfContactResponses, accOfErrorEndContactResponses, new Date(
                         lastLongPollingRequest), nbOfLongPollingRequests, accOfLongPollingRequests,
                 accOfContactEndLongPollingRequests, accOfEmptyEndLongPollingRequests, accOfErrorEndLongPollingRequests,
-                accOfExceptionEndLongPollingRequests, accOfExpiredEndLongPollingRequests,
-                (error) ? "ERROR (while be resumed in " + (nextExecution - System.currentTimeMillis()) + "ms)" : "OK");
+                accOfExceptionEndLongPollingRequests, accOfExpiredEndLongPollingRequests, (nbErrors > 0) ? "ERROR (" + nbErrors
+                        + ") " + ((nextExecution > now) ? "(while be resumed in " + (nextExecution - now) + "ms)" : "") : "OK");
     }
 
     public synchronized void sentContactResponse() {
@@ -182,10 +202,12 @@ public final class LongPollingClient extends TimerTask {
     public void sendLongPollingRequest() {
         boolean wait = false;
         boolean sent = false;
+        int nbErrors = this.nbErrors;
         try {
             LOG.debug("Create long polling POST request");
             HttpClientTransaction httpTransaction = httpClient.createTransaction(HttpUtils.MD_POST, longPollingURI);
             httpTransaction.addRequestHeader(HttpUtils.HD_CONTENT_LENGTH, "0");
+            httpTransaction.addRequestHeader(HttpUtils.HD_FROM, requestingEntity);
 
             // Execute the request
             if (Profiler.getInstance().isTraceEnabled()) {
@@ -208,6 +230,7 @@ public final class LongPollingClient extends TimerTask {
         } catch (HttpClientException e) {
             LOG.error(longPollingURI + ": HTTP problem between client and server in long polling connection", e);
             wait = true;
+            this.nbErrors += MAX_ERRORS + 1;
             synchronized (this) {
                 if (sent) {
                     --nbOfLongPollingRequests;
@@ -217,6 +240,7 @@ public final class LongPollingClient extends TimerTask {
         } catch (RuntimeException e) {
             LOG.error(longPollingURI + ": Long polling runtime exception", e);
             wait = true;
+            this.nbErrors += MAX_ERRORS + 1;
             synchronized (this) {
                 if (sent) {
                     --nbOfLongPollingRequests;
@@ -226,6 +250,7 @@ public final class LongPollingClient extends TimerTask {
         } catch (Throwable e) {
             LOG.error(longPollingURI + ": Long polling fatal error", e);
             wait = true;
+            this.nbErrors += MAX_ERRORS + 1;
             synchronized (this) {
                 if (sent) {
                     --nbOfLongPollingRequests;
@@ -234,7 +259,7 @@ public final class LongPollingClient extends TimerTask {
             }
         } finally {
             if (!end && wait) {
-                startRetryTimer();
+                startRetryTimer(nbErrors <= MAX_ERRORS && this.nbErrors > MAX_ERRORS);
             }
         }
     }
@@ -243,40 +268,22 @@ public final class LongPollingClient extends TimerTask {
         if (LOG.isInfoEnabled()) {
             LOG.info(longPollingURI + ": Handle received long polling HTTP response");
         }
-        int nbRequiredHeaders = 0;
         SongServletRequest songRequest = null;
         if (songHttpBinding.checkHttpResponse(httpTransaction)) {
-            nbRequiredHeaders = 0;
-
-            if (httpTransaction.getResponseHeader(SongHttpBinding.HTTP_HD_TARGET_ID) != null) {
-                ++nbRequiredHeaders;
-            }
-            if (httpTransaction.getResponseHeader(SongHttpBinding.HTTP_HD_REQUESTING_ENTITY) != null) {
-                ++nbRequiredHeaders;
-            }
-            if (httpTransaction.getResponseHeader(SongHttpBinding.HTTP_HD_METHOD) != null) {
-                ++nbRequiredHeaders;
-            }
-            if (httpTransaction.getResponseHeader(SongHttpBinding.HTTP_HD_TRANSACTION_ID) != null) {
-                ++nbRequiredHeaders;
-            }
-            // if (httpTransaction.getResponseHeader(SongHttpBinding.HTTP_HD_ETSI_CORRELATION_ID) != null) {
-            // ++nbRequiredHeaders;
-            // }
-            // if (httpTransaction.getResponseHeader(SongHttpBinding.HTTP_HD_ETSI_CONTACT_URI) != null) {
-            // ++nbRequiredHeaders;
-            // }
-            if (nbRequiredHeaders == 4) {
-                // if (nbRequiredHeaders == 5) {
+            if (httpTransaction.getResponseContentLength() > 0) {
                 synchronized (this) {
                     lastContactRequest = System.currentTimeMillis();
                     ++accOfContactRequests;
                 }
-                // Received SONG request
-                LOG.debug("Long polling HTTP response is sane");
+
                 try {
-                    songRequest = songHttpBinding.buildSongRequestFromHttpLongPollingResponse(this, httpTransaction, baseURI,
-                            remoteAddress, remotePort, longPollingURI);
+                    if (cc) {
+                        songRequest = songHttpBinding.buildSongRequestFromHttpCCLongPollingResponse(this, httpTransaction,
+                                remoteAddress, remotePort);
+                    } else {
+                        songRequest = songHttpBinding.buildSongRequestFromHttpNCLongPollingResponse(this, httpTransaction,
+                                remoteAddress, remotePort, relatedRequestingEntity, relatedTargetID);
+                    }
                     synchronized (this) {
                         ++accOfContactEndLongPollingRequests;
                     }
@@ -290,16 +297,20 @@ public final class LongPollingClient extends TimerTask {
                         ++accOfErrorEndContactRequests;
                     }
                     LOG.warn("Cannot create SONG request from HTTP long polling response", e);
-                }
-            } else if (nbRequiredHeaders > 0) {
-                synchronized (this) {
-                    lastContactRequest = System.currentTimeMillis();
-                    ++accOfBadRequestEndContactRequests;
-                }
-                if (LOG.isEnabledFor(Level.WARN)) {
-                    LOG.warn("Received a long polling response which does not include all required headers: "
-                            + SongHttpBinding.HTTP_HD_TARGET_ID + ", " + SongHttpBinding.HTTP_HD_REQUESTING_ENTITY + ", "
-                            + SongHttpBinding.HTTP_HD_METHOD + ", " + SongHttpBinding.HTTP_HD_TRANSACTION_ID);
+                } catch (XoException e) {
+                    synchronized (this) {
+                        ++accOfBadRequestEndContactRequests;
+                    }
+                    if (LOG.isEnabledFor(Level.WARN)) {
+                        LOG.warn("Cannot create SONG request from HTTP long polling response", e);
+                    }
+                } catch (M2MException e) {
+                    synchronized (this) {
+                        ++accOfBadRequestEndContactRequests;
+                    }
+                    if (LOG.isEnabledFor(Level.WARN)) {
+                        LOG.warn("Cannot create SONG request from HTTP long polling response", e);
+                    }
                 }
             } else {
                 synchronized (this) {
@@ -339,61 +350,71 @@ public final class LongPollingClient extends TimerTask {
      */
     public void receivedLongPollingResponse(HttpClientTransaction httpTransaction) {
         boolean wait = false;
+        int nbErrors = this.nbErrors;
         try {
             synchronized (this) {
                 --nbOfLongPollingRequests;
             }
             int statusCode = httpTransaction.getResponseStatusCode();
 
+            if (Profiler.getInstance().isTraceEnabled()) {
+                Profiler.getInstance().trace(
+                        longPollingURI + ": <<< HTTP.HTTPBinding: " + httpTransaction.getResponseStatusCode() + " "
+                                + httpTransaction.getResponseStatusText() + " (Long Polling Response)");
+            }
+            if (LOG.isInfoEnabled()) {
+                LOG.info(longPollingURI + ": <<< HTTP.HTTPBinding: " + httpTransaction.getResponseStatusCode() + " "
+                        + httpTransaction.getResponseStatusText() + " (Long Polling Response)");
+            }
             if (statusCode == HttpServletResponse.SC_OK) {
-                if (Profiler.getInstance().isTraceEnabled()) {
-                    Profiler.getInstance().trace(
-                            longPollingURI + ": <<< HTTP.HTTPBinding: " + httpTransaction.getResponseStatusCode() + " "
-                                    + httpTransaction.getResponseStatusText() + " (Long Polling Response)");
-                }
-                if (LOG.isInfoEnabled()) {
-                    LOG.info(longPollingURI + ": <<< HTTP.HTTPBinding: " + httpTransaction.getResponseStatusCode() + " "
-                            + httpTransaction.getResponseStatusText() + " (Long Polling Response)");
-                }
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(SongHttpBinding.getClientHttpResponseAsString(httpTransaction));
                 }
                 handleLongPollingResponse(httpTransaction);
+                synchronized (this) {
+                    if (this.nbErrors > MAX_ERRORS) {
+                        channelListener.channelOk();
+                    }
+                    this.nbErrors = 0;
+                }
             } else {
-                if (Profiler.getInstance().isTraceEnabled()) {
-                    Profiler.getInstance().trace(
-                            longPollingURI + ": <<< HTTP.HTTPBinding: " + httpTransaction.getResponseStatusCode() + " "
-                                    + httpTransaction.getResponseStatusText() + " (Long Polling Response)");
-                }
-                if (LOG.isInfoEnabled()) {
-                    LOG.info(longPollingURI + ": <<< HTTP.HTTPBinding: " + httpTransaction.getResponseStatusCode() + " "
-                            + httpTransaction.getResponseStatusText() + " (Long Polling Response)");
-                }
                 synchronized (this) {
                     if (statusCode >= HttpServletResponse.SC_MULTIPLE_CHOICES) {
                         wait = true;
                         ++accOfErrorEndLongPollingRequests;
+                        if (statusCode == SongServletResponse.SC_REQUEST_TIMEOUT
+                                || statusCode == SongServletResponse.SC_GATEWAY_TIMEOUT) {
+                            ++this.nbErrors;
+                        } else {
+                            this.nbErrors += MAX_ERRORS + 1;
+                        }
                     } else {
                         ++accOfEmptyEndLongPollingRequests;
+                        if (this.nbErrors > MAX_ERRORS) {
+                            channelListener.channelOk();
+                        }
+                        this.nbErrors = 0;
                     }
                 }
             }
         } catch (RuntimeException e) {
             LOG.error(longPollingURI + ": Long polling runtime exception", e);
             wait = true;
+            this.nbErrors += MAX_ERRORS + 1;
             synchronized (this) {
                 ++accOfExceptionEndLongPollingRequests;
             }
         } catch (Throwable e) {
             LOG.error(longPollingURI + ": Long polling fatal error", e);
             wait = true;
+            this.nbErrors += MAX_ERRORS + 1;
             synchronized (this) {
                 ++accOfExceptionEndLongPollingRequests;
             }
         } finally {
             if (!end) {
                 if (wait) {
-                    startRetryTimer();
+                    startRetryTimer(nbErrors <= MAX_ERRORS && this.nbErrors > MAX_ERRORS);
                 } else {
                     // Send long polling request as soon as possible
                     sendLongPollingRequest();
@@ -408,9 +429,6 @@ public final class LongPollingClient extends TimerTask {
      * Sends a new long polling HTTP request
      */
     public void run() {
-        synchronized (this) {
-            error = false;
-        }
         sendLongPollingRequest();
     }
 }

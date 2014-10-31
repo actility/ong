@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: HttpServerManager.java 8521 2014-04-14 09:05:59Z JReich $
+ * id $Id: HttpServerManager.java 9482 2014-09-06 09:37:41Z JReich $
  * author $Author: JReich $
- * version $Revision: 8521 $
- * lastrevision $Date: 2014-04-14 11:05:59 +0200 (Mon, 14 Apr 2014) $
+ * version $Revision: 9482 $
+ * lastrevision $Date: 2014-09-06 11:37:41 +0200 (Sat, 06 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-04-14 11:05:59 +0200 (Mon, 14 Apr 2014) $
+ * lastmodified $LastChangedDate: 2014-09-06 11:37:41 +0200 (Sat, 06 Sep 2014) $
  */
 
 package com.actility.m2m.http.server;
@@ -251,16 +251,16 @@ public final class HttpServerManager implements Runnable {
             }
         }
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info("getTransaction: " + transaction);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("getTransaction: " + transaction);
         }
         return transaction;
     }
 
     private void putTransaction(HttpServerTransaction transaction) {
         transaction.destroy();
-        if (LOG.isInfoEnabled()) {
-            LOG.info("putTransaction: " + transaction);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("putTransaction: " + transaction);
         }
         synchronized (transactionsPool) {
             if (transactionsCount < transactionsPool.length) {

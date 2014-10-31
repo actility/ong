@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongHttpBinding.java 8679 2014-04-30 15:24:21Z JReich $
+ * id $Id: SongHttpBinding.java 9836 2014-10-31 17:00:36Z JReich $
  * author $Author: JReich $
- * version $Revision: 8679 $
- * lastrevision $Date: 2014-04-30 17:24:21 +0200 (Wed, 30 Apr 2014) $
+ * version $Revision: 9836 $
+ * lastrevision $Date: 2014-10-31 18:00:36 +0100 (Fri, 31 Oct 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-04-30 17:24:21 +0200 (Wed, 30 Apr 2014) $
+ * lastmodified $LastChangedDate: 2014-10-31 18:00:36 +0100 (Fri, 31 Oct 2014) $
  */
 
 package com.actility.m2m.servlet.song.http;
@@ -35,11 +35,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -64,17 +65,22 @@ import com.actility.m2m.http.client.ni.HttpClientHandler;
 import com.actility.m2m.http.client.ni.HttpClientTransaction;
 import com.actility.m2m.http.server.HttpServerHandler;
 import com.actility.m2m.http.server.HttpServerTransaction;
+import com.actility.m2m.m2m.ContentInstanceFilterCriteria;
+import com.actility.m2m.m2m.FilterCriteria;
 import com.actility.m2m.m2m.M2MConstants;
 import com.actility.m2m.m2m.M2MException;
 import com.actility.m2m.m2m.M2MService;
 import com.actility.m2m.m2m.StatusCode;
-import com.actility.m2m.servlet.song.LongPollURIs;
-import com.actility.m2m.servlet.song.SongBindingFactory;
+import com.actility.m2m.m2m.Trpdt;
+import com.actility.m2m.servlet.song.ChannelClientListener;
+import com.actility.m2m.servlet.song.ChannelServerListener;
+import com.actility.m2m.servlet.song.LongPollingURIs;
 import com.actility.m2m.servlet.song.SongServlet;
 import com.actility.m2m.servlet.song.SongServletMessage;
 import com.actility.m2m.servlet.song.SongServletRequest;
 import com.actility.m2m.servlet.song.SongServletResponse;
 import com.actility.m2m.servlet.song.SongURI;
+import com.actility.m2m.servlet.song.binding.SongBindingFactory;
 import com.actility.m2m.servlet.song.http.log.BundleLogger;
 import com.actility.m2m.song.binding.http.LongPollingClientStats;
 import com.actility.m2m.song.binding.http.LongPollingServerStats;
@@ -83,9 +89,9 @@ import com.actility.m2m.util.CharacterUtils;
 import com.actility.m2m.util.FormatUtils;
 import com.actility.m2m.util.MultiMap;
 import com.actility.m2m.util.Profiler;
-import com.actility.m2m.util.StringUtils;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.UUID;
+import com.actility.m2m.util.UtilConstants;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -107,54 +113,27 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
 
     private static final String HTTP_AT_LONG_POLLING_SERVER = "com.actility.m2m.servlet.song.http.LongPollingServer";
     private static final String HTTP_AT_LONG_POLLING_CLIENT = "com.actility.m2m.servlet.song.http.LongPollingClient";
-    private static final String HTTP_AT_TRANSACTION_ID = "com.actility.m2m.servlet.song.http.TransactionId";
     private static final String HTTP_AT_HTTP_TRANSACTION = "com.actility.m2m.servlet.song.http.HttpTransaction";
-    // private static final String HTTP_AT_CONTACT_URI = "com.actility.m2m.servlet.song.http.ContactUri";
-    // private static final String HTTP_AT_CORRELATION_ID = "com.actility.m2m.servlet.song.http.CorrelationId";
+    private static final String HTTP_AT_CONTACT_URI = "com.actility.m2m.servlet.song.http.ContactUri";
+    private static final String HTTP_AT_CORRELATION_ID = "com.actility.m2m.servlet.song.http.CorrelationId";
 
     public static final long L_BASIC = URIUtils.L_UNRESERVED | CharacterUtils.L_ESCAPED
             | CharacterUtils.lowMask(".?@&=+$,;/[]");
     public static final long H_BASIC = URIUtils.H_UNRESERVED | CharacterUtils.H_ESCAPED
             | CharacterUtils.highMask(".?@&=+$,;/[]");
 
-    // /**
-    // * Special HTTP header to declare the contact to which the ETSI response will be sent in an asynchronous dialog.
-    // */
-    // public static final String HTTP_HD_ETSI_CONTACT_URI = "X-etsi-contactURI";
-    // /**
-    // * Special HTTP header to declare an id to map an ETSI request to an ETSI response in an asynchronous dialog.
-    // */
-    // public static final String HTTP_HD_ETSI_CORRELATION_ID = "X-etsi-correlationID";
+    /**
+     * Special HTTP header to declare the contact to which the ETSI response will be sent in an asynchronous dialog.
+     */
+    public static final String HTTP_HD_ETSI_CONTACT_URI = "X-etsi-contactURI";
+    /**
+     * Special HTTP header to declare an id to map an ETSI request to an ETSI response in an asynchronous dialog.
+     */
+    public static final String HTTP_HD_ETSI_CORRELATION_ID = "X-etsi-correlationID";
     /**
      * Special HTTP header to declare the original IP of HTTP request if it is treated by a proxy.
      */
     public static final String HTTP_HD_FORWARD_FOR = "X-Forwarded-For";
-    /**
-     * Special HTTP header to embed the SONG method of a SONG request in a long polling HTTP response.
-     */
-    public static final String HTTP_HD_METHOD = "X-Acy-Method";
-    /**
-     * Special HTTP header to embed a transaction ID in the long polling HTTP response and the long polling HTTP request to
-     * correlate the SONG request to its SONG response.
-     */
-    public static final String HTTP_HD_TRANSACTION_ID = "X-Acy-Transaction-ID";
-    /**
-     * Special HTTP header to embed the Target-ID of a SONG request in a long polling HTTP response. It is also used to change
-     * the targetID as received from the HTTP request
-     */
-    public static final String HTTP_HD_TARGET_ID = "X-Acy-Target-ID";
-    /**
-     * Special HTTP header to embed the Requesting-Entity of a SONG request in a long polling HTTP response.
-     */
-    public static final String HTTP_HD_REQUESTING_ENTITY = "X-Acy-Requesting-Entity";
-    /**
-     * Special HTTP header to embed the status code of a SONG response in a long polling HTTP request.
-     */
-    public static final String HTTP_HD_STATUS_CODE = "X-Acy-Status-Code";
-    /**
-     * Special HTTP header to embed the status code of a SONG response in a long polling HTTP request.
-     */
-    public static final String HTTP_HD_NEXT_HOP_URI = "X-Acy-Next-Hop-URI";
     /**
      * Query parameter to override the targetID as received from the HTTP request
      */
@@ -163,6 +142,89 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      * Query parameter to override declare the targetID as server or proxy
      */
     public static final String HTTP_QUERY_MODE = "mode";
+
+    private static final StatusCode[][] SONG_STATUS_TO_M2M_STATUS = new StatusCode[4][];
+
+    static {
+        // 2xx responses
+        SONG_STATUS_TO_M2M_STATUS[0] = new StatusCode[5];
+        SONG_STATUS_TO_M2M_STATUS[0][0] = StatusCode.STATUS_OK;
+        SONG_STATUS_TO_M2M_STATUS[0][1] = StatusCode.STATUS_CREATED;
+        SONG_STATUS_TO_M2M_STATUS[0][2] = StatusCode.STATUS_ACCEPTED;
+        SONG_STATUS_TO_M2M_STATUS[0][3] = StatusCode.STATUS_OK;
+        SONG_STATUS_TO_M2M_STATUS[0][4] = StatusCode.STATUS_OK;
+
+        // 3xx responses
+        SONG_STATUS_TO_M2M_STATUS[1] = new StatusCode[5];
+        SONG_STATUS_TO_M2M_STATUS[1][0] = null;
+        SONG_STATUS_TO_M2M_STATUS[1][1] = null;
+        SONG_STATUS_TO_M2M_STATUS[1][2] = null;
+        SONG_STATUS_TO_M2M_STATUS[1][3] = null;
+        SONG_STATUS_TO_M2M_STATUS[1][4] = StatusCode.STATUS_OK;
+
+        // 4xx responses
+        SONG_STATUS_TO_M2M_STATUS[2] = new StatusCode[16];
+        SONG_STATUS_TO_M2M_STATUS[2][0] = StatusCode.STATUS_BAD_REQUEST;
+        SONG_STATUS_TO_M2M_STATUS[2][1] = StatusCode.STATUS_PERMISSION_DENIED;
+        SONG_STATUS_TO_M2M_STATUS[2][2] = StatusCode.STATUS_BAD_REQUEST;
+        SONG_STATUS_TO_M2M_STATUS[2][3] = StatusCode.STATUS_FORBIDDEN;
+        SONG_STATUS_TO_M2M_STATUS[2][4] = StatusCode.STATUS_NOT_FOUND;
+        SONG_STATUS_TO_M2M_STATUS[2][5] = StatusCode.STATUS_METHOD_NOT_ALLOWED;
+        SONG_STATUS_TO_M2M_STATUS[2][6] = StatusCode.STATUS_NOT_ACCEPTABLE;
+        SONG_STATUS_TO_M2M_STATUS[2][7] = StatusCode.STATUS_NOT_IMPLEMENTED;
+        SONG_STATUS_TO_M2M_STATUS[2][8] = StatusCode.STATUS_REQUEST_TIMEOUT;
+        SONG_STATUS_TO_M2M_STATUS[2][9] = StatusCode.STATUS_CONFLICT;
+        SONG_STATUS_TO_M2M_STATUS[2][10] = StatusCode.STATUS_DELETED;
+        SONG_STATUS_TO_M2M_STATUS[2][11] = null;
+        SONG_STATUS_TO_M2M_STATUS[2][12] = StatusCode.STATUS_BAD_REQUEST;
+        SONG_STATUS_TO_M2M_STATUS[2][13] = null;
+        SONG_STATUS_TO_M2M_STATUS[2][14] = null;
+        SONG_STATUS_TO_M2M_STATUS[2][15] = StatusCode.STATUS_UNSUPPORTED_MEDIA_TYPE;
+
+        // 5xx responses
+        SONG_STATUS_TO_M2M_STATUS[3] = new StatusCode[5];
+        SONG_STATUS_TO_M2M_STATUS[3][0] = StatusCode.STATUS_INTERNAL_SERVER_ERROR;
+        SONG_STATUS_TO_M2M_STATUS[3][1] = StatusCode.STATUS_NOT_IMPLEMENTED;
+        SONG_STATUS_TO_M2M_STATUS[3][2] = StatusCode.STATUS_BAD_GATEWAY;
+        SONG_STATUS_TO_M2M_STATUS[3][3] = StatusCode.STATUS_SERVICE_UNAVAILABLE;
+        SONG_STATUS_TO_M2M_STATUS[3][4] = StatusCode.STATUS_GATEWAY_TIMEOUT;
+    }
+
+    private static final Map M2M_STATUS_TO_SONG_STATUS = new HashMap();
+
+    static {
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_OK.name(), new Integer(SongServletResponse.SC_INTERNAL_SERVER_ERROR));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_CREATED.name(), new Integer(
+                SongServletResponse.SC_INTERNAL_SERVER_ERROR));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_ACCEPTED.name(), new Integer(
+                SongServletResponse.SC_INTERNAL_SERVER_ERROR));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_BAD_REQUEST.name(), new Integer(SongServletResponse.SC_BAD_REQUEST));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_PERMISSION_DENIED.name(), new Integer(
+                SongServletResponse.SC_PERMISSION_DENIED));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_FORBIDDEN.name(), new Integer(SongServletResponse.SC_FORBIDDEN));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_NOT_FOUND.name(), new Integer(SongServletResponse.SC_NOT_FOUND));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_METHOD_NOT_ALLOWED.name(), new Integer(
+                SongServletResponse.SC_METHOD_NOT_ALLOWED));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_NOT_ACCEPTABLE.name(), new Integer(
+                SongServletResponse.SC_NOT_ACCEPTABLE));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_REQUEST_TIMEOUT.name(), new Integer(
+                SongServletResponse.SC_REQUEST_TIMEOUT));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_CONFLICT.name(), new Integer(SongServletResponse.SC_CONFLICT));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_UNSUPPORTED_MEDIA_TYPE.name(), new Integer(
+                SongServletResponse.SC_UNSUPPORTED_MEDIA_TYPE));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_INTERNAL_SERVER_ERROR.name(), new Integer(
+                SongServletResponse.SC_INTERNAL_SERVER_ERROR));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_NOT_IMPLEMENTED.name(), new Integer(
+                SongServletResponse.SC_NOT_IMPLEMENTED));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_BAD_GATEWAY.name(), new Integer(SongServletResponse.SC_BAD_GATEWAY));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_SERVICE_UNAVAILABLE.name(), new Integer(
+                SongServletResponse.SC_SERVICE_UNAVAILABLE));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_GATEWAY_TIMEOUT.name(), new Integer(
+                SongServletResponse.SC_GATEWAY_TIMEOUT));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_DELETED.name(), new Integer(SongServletResponse.SC_DELETED));
+        M2M_STATUS_TO_SONG_STATUS.put(StatusCode.STATUS_EXPIRED.name(), new Integer(
+                SongServletResponse.SC_INTERNAL_SERVER_ERROR));
+    }
 
     /**
      * Serialize the given server http request.
@@ -408,7 +470,7 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
         this.readIndex = 0;
         this.writeIndex = 0;
         this.favicon = favicon;
-        this.longPollingServersCleaner = new LongPollingServersCleaner(this);
+        this.longPollingServersCleaner = null;
 
         this.notCopiedHttpHeaders = new TreeSet(String.CASE_INSENSITIVE_ORDER);
         this.notCopiedHttpHeaders.add(HttpUtils.HD_AUTHORIZATION);
@@ -435,13 +497,6 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
         this.notCopiedHttpHeaders.add(HttpUtils.HD_WARNING);
         this.notCopiedHttpHeaders.add(HttpUtils.HD_USER_AGENT);
         this.notCopiedHttpHeaders.add(HttpUtils.HD_SERVER);
-        // this.notCopiedHttpHeaders.add(HTTP_HD_ETSI_CONTACT_URI);
-        // this.notCopiedHttpHeaders.add(HTTP_HD_ETSI_CORRELATION_ID);
-        this.notCopiedHttpHeaders.add(HTTP_HD_TRANSACTION_ID);
-        this.notCopiedHttpHeaders.add(HTTP_HD_STATUS_CODE);
-        this.notCopiedHttpHeaders.add(HTTP_HD_METHOD);
-        this.notCopiedHttpHeaders.add(HTTP_HD_TARGET_ID);
-        this.notCopiedHttpHeaders.add(HTTP_HD_REQUESTING_ENTITY);
 
         this.notCopiedSongHeaders = new TreeSet(String.CASE_INSENSITIVE_ORDER);
         this.notCopiedSongHeaders.add(SongServletMessage.HD_USER_AGENT);
@@ -449,13 +504,6 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
         this.notCopiedSongHeaders.add(SongServletMessage.HD_CONTENT_TYPE);
         this.notCopiedSongHeaders.add(HttpUtils.HD_AUTHORIZATION);
         this.notCopiedSongHeaders.add(HttpUtils.HD_LOCATION);
-        this.notCopiedSongHeaders.add(HTTP_HD_NEXT_HOP_URI);
-        this.notCopiedSongHeaders.add(HTTP_HD_METHOD);
-        this.notCopiedSongHeaders.add(HTTP_HD_TARGET_ID);
-        this.notCopiedSongHeaders.add(HTTP_HD_REQUESTING_ENTITY);
-        this.notCopiedSongHeaders.add(HTTP_HD_TRANSACTION_ID);
-        // this.notCopiedSongHeaders.add(HTTP_HD_ETSI_CONTACT_URI);
-        // this.notCopiedSongHeaders.add(HTTP_HD_ETSI_CORRELATION_ID);
         this.notCopiedSongHeaders.add(SongServletMessage.HD_CONTENT_LENGTH);
 
         if (proxyHost != null) {
@@ -470,8 +518,6 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
         httpClient.setTcpNoDelay(true);
         httpClient.setRequestTimeout(requestExpirationTimer);
         httpClient.setConnectionTimeout(requestExpirationTimer);
-
-        this.longPollingServersCleaner.start();
     }
 
     public void init() {
@@ -617,7 +663,14 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
             pendingHttpClientRequests.clear();
         }
         timerService.cancel();
-        longPollingServersCleaner.end();
+        synchronized (contactToLongPollingServer) {
+            synchronized (longPollingToLongPollingServer) {
+                if (longPollingServersCleaner != null) {
+                    longPollingServersCleaner.end();
+                    longPollingServersCleaner = null;
+                }
+            }
+        }
     }
 
     /*
@@ -630,13 +683,12 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
 
         if (httpTransaction.getMethodCode() == HttpUtils.MD_POST_CODE
                 && httpTransaction.getRawRequestUri().startsWith("/http/lp/")
-                && httpTransaction.getHeaders().get(/* HTTP_HD_ETSI_CORRELATION_ID */HTTP_HD_TRANSACTION_ID) != null) {
+                && httpTransaction.getHeaders().get(HTTP_HD_ETSI_CORRELATION_ID) != null) {
             try {
                 // responseNotify request with a song response
                 SongServletRequest songRequest = null;
                 MultiMap headers = httpTransaction.getHeaders();
-                // String requestId = (String) headers.get(HTTP_HD_ETSI_CORRELATION_ID);
-                String requestId = (String) headers.get(HTTP_HD_TRANSACTION_ID);
+                String requestId = (String) headers.get(HTTP_HD_ETSI_CORRELATION_ID);
                 int statusCode = HttpServletResponse.SC_BAD_GATEWAY;
                 synchronized (pendingContactRequests) {
                     ContactWaitingResponseNotifyRequest contactWaitingResponseNotify = (ContactWaitingResponseNotifyRequest) pendingContactRequests
@@ -783,7 +835,7 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
         if (httpTransaction.getMethodCode() == HttpUtils.MD_POST_CODE) {
             if (httpTransaction.getRawRequestUri().startsWith("/http/lp/")) {
                 // Long polling
-                if (httpTransaction.getHeaders().get(/* HTTP_HD_ETSI_CORRELATION_ID */HTTP_HD_TRANSACTION_ID) != null) {
+                if (httpTransaction.getHeaders().get(HTTP_HD_ETSI_CORRELATION_ID) != null) {
                     handleSongResponseFromHttpResponseNotifyRequest(httpTransaction);
                 } else {
                     handleHttpLongPollingRequest(httpTransaction);
@@ -1042,9 +1094,9 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      *            {@link LongPollURIs}
      * @return The contact and long polling URI of the long polling connection
      */
-    public LongPollURIs createServerLongPolling(SongURI serverURI) {
+    public LongPollingURIs createServerNotificationChannel(SongURI serverURI, ChannelServerListener listener) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("createServerLongPolling from: " + serverURI.absoluteURI());
+            LOG.info("createServerNotificationChannel from: " + serverURI.absoluteURI());
         }
         // Generate contact + long polling uri
         String contactPath = "/contact/" + UUID.randomUUID(40);
@@ -1065,7 +1117,11 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
                     throw new RuntimeException("Collision detected while generating server long polling URIs");
                 }
                 LongPollingServer longPollingServer = new LongPollingServer(this, timerService, contactPath + "|"
-                        + longPollingPath, contactRequestWaitingTimer, longPollingServerRequestExpirationTimer);
+                        + longPollingPath, contactRequestWaitingTimer, longPollingServerRequestExpirationTimer, false);
+                if (longPollingServersCleaner == null) {
+                    longPollingServersCleaner = new LongPollingServersCleaner(this);
+                    longPollingServersCleaner.start();
+                }
                 contactToLongPollingServer.put(contactPath, longPollingServer);
                 longPollingToLongPollingServer.put(longPollingPath, longPollingServer);
             }
@@ -1078,7 +1134,7 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
             LOG.info("Long polling server connection created with contact URI " + contactURI.absoluteURI()
                     + " and long polling URI " + longPollingURI.absoluteURI());
         }
-        return new LongPollURIs(contactURI, longPollingURI);
+        return new LongPollingURIs(contactURI, longPollingURI);
     }
 
     /**
@@ -1090,9 +1146,10 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      * @param longPollingURI The long polling URI to use in the long polling connection
      * @throws ServletException If the binding cannot manage the given contact and long polling URIs
      */
-    public void createServerLongPolling(SongURI contactURI, SongURI longPollingURI) throws ServletException {
+    public void createServerNotificationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException {
         if (LOG.isInfoEnabled()) {
-            LOG.info("createServerLongPolling for: contact=" + contactURI.absoluteURI() + " longPolling="
+            LOG.info("createServerNotificationChannel for: contact=" + contactURI.absoluteURI() + " longPolling="
                     + longPollingURI.absoluteURI());
         }
         String contactBasePath = servletContext.getContextPath() + "/contact/";
@@ -1107,7 +1164,7 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
         }
         int contextPathLength = servletContext.getContextPath().length();
         LongPollingServer longPollingServer = new LongPollingServer(this, timerService, contactURI.getPath() + "|"
-                + longPollingURI.getPath(), contactRequestWaitingTimer, longPollingServerRequestExpirationTimer);
+                + longPollingURI.getPath(), contactRequestWaitingTimer, longPollingServerRequestExpirationTimer, false);
         synchronized (contactToLongPollingServer) {
             synchronized (longPollingToLongPollingServer) {
                 String contactPath = contactURI.getPath().substring(contextPathLength);
@@ -1115,6 +1172,10 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
                 if (contactToLongPollingServer.containsKey(contactPath)
                         || longPollingToLongPollingServer.containsKey(longPollingPath)) {
                     throw new RuntimeException("Collision detected while generating server long polling URIs");
+                }
+                if (longPollingServersCleaner == null) {
+                    longPollingServersCleaner = new LongPollingServersCleaner(this);
+                    longPollingServersCleaner.start();
                 }
                 contactToLongPollingServer.put(contactPath, longPollingServer);
                 longPollingToLongPollingServer.put(longPollingPath, longPollingServer);
@@ -1132,9 +1193,9 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
      */
-    public void deleteServerLongPolling(SongURI contactURI, SongURI longPollingURI) {
+    public void deleteServerNotificationChannel(SongURI contactURI, SongURI longPollingURI) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("deleteServerLongPolling for: contact=" + contactURI.absoluteURI() + " longPolling="
+            LOG.info("deleteServerNotificationChannel for: contact=" + contactURI.absoluteURI() + " longPolling="
                     + longPollingURI.absoluteURI());
         }
         int contextPathLength = servletContext.getContextPath().length();
@@ -1144,6 +1205,10 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
                 longPollingServer = (LongPollingServer) contactToLongPollingServer.remove(contactURI.getPath().substring(
                         contextPathLength));
                 longPollingToLongPollingServer.remove(longPollingURI.getPath().substring(contextPathLength));
+                if (contactToLongPollingServer.isEmpty() && longPollingToLongPollingServer.isEmpty()) {
+                    longPollingServersCleaner.end();
+                    longPollingServersCleaner = null;
+                }
             }
         }
         if (longPollingServer != null) {
@@ -1179,9 +1244,10 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      * @param longPollingURI The long polling URI of the long polling connection
      * @throws ServletException If a long polling connection if already opened for the given contact and long polling URIs
      */
-    public void createClientLongPolling(SongURI contactURI, SongURI longPollingURI) throws ServletException {
+    public void createClientNotificationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            SongURI relatedRequestingEntity, SongURI relatedTargetID, ChannelClientListener listener) throws ServletException {
         if (LOG.isInfoEnabled()) {
-            LOG.info("createClientLongPolling for: contact=" + contactURI.absoluteURI() + " longPolling="
+            LOG.info("createClientNotificationChannel for: contact=" + contactURI.absoluteURI() + " longPolling="
                     + longPollingURI.absoluteURI());
         }
         try {
@@ -1189,8 +1255,9 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
             InetAddress address = InetAddress.getByName(longPollingURI.getHost());
             HttpClient httpClient = this.httpClient.copy();
             httpClient.setRequestTimeout(longPollingClientRequestExpirationTimer);
-            LongPollingClient lpClient = new LongPollingClient(this, timerService, httpClient, contactURI, address,
-                    longPollingURI.getPort(), longPollingURI.absoluteURI());
+            LongPollingClient lpClient = new LongPollingClient(this, timerService, httpClient, address,
+                    longPollingURI.getPort(), longPollingURI.absoluteURI(), requestingEntity.absoluteURI(),
+                    relatedRequestingEntity, relatedTargetID, listener, false);
             synchronized (longPollingIdToLongPollingClient) {
                 if (longPollingIdToLongPollingClient.containsKey(longPollingId)) {
                     throw new ServletException("Long polling connection is already opened");
@@ -1213,9 +1280,225 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
      */
-    public void deleteClientLongPolling(SongURI contactURI, SongURI longPollingURI) {
+    public void deleteClientNotificationChannel(SongURI contactURI, SongURI longPollingURI) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("deleteClientLongPolling for: contact=" + contactURI.absoluteURI() + " longPolling="
+            LOG.info("deleteClientNotificationChannel for: contact=" + contactURI.absoluteURI() + " longPolling="
+                    + longPollingURI.absoluteURI());
+        }
+        String longPollingId = contactURI.absoluteURI() + "|" + longPollingURI.absoluteURI();
+        LongPollingClient lpClient = null;
+        synchronized (longPollingIdToLongPollingClient) {
+            lpClient = (LongPollingClient) longPollingIdToLongPollingClient.remove(longPollingId);
+        }
+        if (lpClient != null) {
+            lpClient.stopLongPolling();
+        } else {
+            LOG.error("Try to stop an unknown client long polling connection");
+        }
+        if (LOG.isInfoEnabled()) {
+            LOG.info("client long polling deleted for: contact=" + contactURI.absoluteURI() + " longPolling="
+                    + longPollingURI.absoluteURI());
+        }
+    }
+
+    /**
+     * Creates a server long polling connection with the given URI.
+     * <p>
+     * The method is in charge to generate a contact and long polling URI for the created connection.
+     *
+     * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
+     *            {@link LongPollURIs}
+     * @return The contact and long polling URI of the long polling connection
+     */
+    public LongPollingURIs createServerCommunicationChannel(SongURI serverURI, ChannelServerListener listener) {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("createServerCommunicationChannel from: " + serverURI.absoluteURI());
+        }
+        // Generate contact + long polling uri
+        String contactPath = "/contact/" + UUID.randomUUID(40);
+        String longPollingPath = "/lp/" + UUID.randomUUID(40);
+        synchronized (contactToLongPollingServer) {
+            synchronized (longPollingToLongPollingServer) {
+                int retry = 10;
+                while (retry > 0
+                        && (contactToLongPollingServer.containsKey(contactPath) || longPollingToLongPollingServer
+                                .containsKey(longPollingPath))) {
+                    // Generate contact + long polling uri
+                    contactPath = "/contact/" + UUID.randomUUID(40 - retry);
+                    longPollingPath = "/lp/" + UUID.randomUUID(40 - retry);
+                    --retry;
+                }
+                if (contactToLongPollingServer.containsKey(contactPath)
+                        || longPollingToLongPollingServer.containsKey(longPollingPath)) {
+                    throw new RuntimeException("Collision detected while generating server long polling URIs");
+                }
+                LongPollingServer longPollingServer = new LongPollingServer(this, timerService, contactPath + "|"
+                        + longPollingPath, contactRequestWaitingTimer, longPollingServerRequestExpirationTimer, true);
+                if (longPollingServersCleaner == null) {
+                    longPollingServersCleaner = new LongPollingServersCleaner(this);
+                    longPollingServersCleaner.start();
+                }
+                contactToLongPollingServer.put(contactPath, longPollingServer);
+                longPollingToLongPollingServer.put(longPollingPath, longPollingServer);
+            }
+        }
+        SongURI contactURI = songBindingFactory.createURI(serverURI.isSecure() ? "https" : "http", serverURI.getHost(),
+                serverURI.getPort(), servletContext.getContextPath() + contactPath);
+        SongURI longPollingURI = songBindingFactory.createURI(serverURI.isSecure() ? "https" : "http", serverURI.getHost(),
+                serverURI.getPort(), servletContext.getContextPath() + longPollingPath);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Long polling server connection created with contact URI " + contactURI.absoluteURI()
+                    + " and long polling URI " + longPollingURI.absoluteURI());
+        }
+        return new LongPollingURIs(contactURI, longPollingURI);
+    }
+
+    /**
+     * Creates a server long polling connection with the given contact and long polling URIs.
+     * <p>
+     * The container is allowed to reject the given URIs if it cannot managed them.
+     *
+     * @param contactURI The contact URI to use in the long polling connection
+     * @param longPollingURI The long polling URI to use in the long polling connection
+     * @throws ServletException If the binding cannot manage the given contact and long polling URIs
+     */
+    public void createServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("createServerCommunicationChannel for: contact=" + contactURI.absoluteURI() + " longPolling="
+                    + longPollingURI.absoluteURI());
+        }
+        String contactBasePath = servletContext.getContextPath() + "/contact/";
+        String longPollingBasePath = servletContext.getContextPath() + "/lp/";
+        if (!contactURI.getPath().startsWith(contactBasePath)) {
+            throw new ServletException("Try to create a long polling server connection with a bad contact path: "
+                    + contactURI.getPath() + " while it should start with " + contactBasePath);
+        }
+        if (!longPollingURI.getPath().startsWith(longPollingBasePath)) {
+            throw new ServletException("Try to create a long polling server connection with a bad long polling path: "
+                    + longPollingURI.getPath() + " while it should start with " + longPollingBasePath);
+        }
+        int contextPathLength = servletContext.getContextPath().length();
+        LongPollingServer longPollingServer = new LongPollingServer(this, timerService, contactURI.getPath() + "|"
+                + longPollingURI.getPath(), contactRequestWaitingTimer, longPollingServerRequestExpirationTimer, true);
+        synchronized (contactToLongPollingServer) {
+            synchronized (longPollingToLongPollingServer) {
+                String contactPath = contactURI.getPath().substring(contextPathLength);
+                String longPollingPath = longPollingURI.getPath().substring(contextPathLength);
+                if (contactToLongPollingServer.containsKey(contactPath)
+                        || longPollingToLongPollingServer.containsKey(longPollingPath)) {
+                    throw new RuntimeException("Collision detected while generating server long polling URIs");
+                }
+                if (longPollingServersCleaner == null) {
+                    longPollingServersCleaner = new LongPollingServersCleaner(this);
+                    longPollingServersCleaner.start();
+                }
+                contactToLongPollingServer.put(contactPath, longPollingServer);
+                longPollingToLongPollingServer.put(longPollingPath, longPollingServer);
+            }
+        }
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Long polling server connection created with contact URI " + contactURI.absoluteURI()
+                    + " and long polling URI " + longPollingURI.absoluteURI());
+        }
+    }
+
+    /**
+     * Deletes a server long polling connection given its contact and long polling URI.
+     *
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
+     */
+    public void deleteServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI) {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("deleteServerCommunicationChannel for: contact=" + contactURI.absoluteURI() + " longPolling="
+                    + longPollingURI.absoluteURI());
+        }
+        int contextPathLength = servletContext.getContextPath().length();
+        LongPollingServer longPollingServer = null;
+        synchronized (contactToLongPollingServer) {
+            synchronized (longPollingToLongPollingServer) {
+                longPollingServer = (LongPollingServer) contactToLongPollingServer.remove(contactURI.getPath().substring(
+                        contextPathLength));
+                longPollingToLongPollingServer.remove(longPollingURI.getPath().substring(contextPathLength));
+                if (contactToLongPollingServer.isEmpty() && longPollingToLongPollingServer.isEmpty()) {
+                    longPollingServersCleaner.end();
+                    longPollingServersCleaner = null;
+                }
+            }
+        }
+        if (longPollingServer != null) {
+            synchronized (longPollingServer) {
+                if (longPollingServer.getCount() == 0) {
+                    // Sends a message to flush the long polling request
+                    longPollingServer.offer(new ContactWaitingLongPollingRequest());
+                } else {
+                    ContactWaitingLongPollingRequest waitingRequest = longPollingServer.poll();
+                    while (waitingRequest != null) {
+                        if (waitingRequest.cancel()) {
+                            try {
+                                waitingRequest.popRequest().createResponse(SongServletResponse.SC_NOT_FOUND).send();
+                            } catch (IOException e) {
+                                LOG.error("Cannot send 404 to pending SONG requests in the deleted long polling queue: "
+                                        + contactURI.getPath(), e);
+                            }
+                        }
+                        waitingRequest = longPollingServer.poll();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a client long polling connection from the given contact and long polling URIs.
+     * <p>
+     * This will trigger the connection creation on the long polling URI. An entry will also be added to the container external
+     * aliases route table mapping the contact URI to the current application.
+     *
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
+     * @throws ServletException If a long polling connection if already opened for the given contact and long polling URIs
+     */
+    public void createClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            ChannelClientListener listener) throws ServletException {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("createClientCommunicationChannel for: contact=" + contactURI.absoluteURI() + " longPolling="
+                    + longPollingURI.absoluteURI());
+        }
+        try {
+            String longPollingId = contactURI.absoluteURI() + "|" + longPollingURI.absoluteURI();
+            InetAddress address = InetAddress.getByName(longPollingURI.getHost());
+            HttpClient httpClient = this.httpClient.copy();
+            httpClient.setRequestTimeout(longPollingClientRequestExpirationTimer);
+            LongPollingClient lpClient = new LongPollingClient(this, timerService, httpClient, address,
+                    longPollingURI.getPort(), longPollingURI.absoluteURI(), requestingEntity.absoluteURI(), null, null,
+                    listener, true);
+            synchronized (longPollingIdToLongPollingClient) {
+                if (longPollingIdToLongPollingClient.containsKey(longPollingId)) {
+                    throw new ServletException("Long polling connection is already opened");
+                }
+                longPollingIdToLongPollingClient.put(longPollingId, lpClient);
+            }
+            lpClient.sendLongPollingRequest();
+            if (LOG.isInfoEnabled()) {
+                LOG.info("client long polling created for: contact=" + contactURI.absoluteURI() + " longPolling="
+                        + longPollingURI.absoluteURI());
+            }
+        } catch (UnknownHostException e) {
+            throw new ServletException("Cannot determine the address of the long polling connection", e);
+        }
+    }
+
+    /**
+     * Deletes a client long polling connection given its contact and long polling URI.
+     *
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
+     */
+    public void deleteClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI) {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("deleteClientCommunicationChannel for: contact=" + contactURI.absoluteURI() + " longPolling="
                     + longPollingURI.absoluteURI());
         }
         String longPollingId = contactURI.absoluteURI() + "|" + longPollingURI.absoluteURI();
@@ -1388,11 +1671,10 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
 
     private void handleSongResponse(SongServletResponse songResponse) throws ServletException, IOException {
         LOG.debug("handleSongResponse");
-        boolean longPollingRequest = songResponse.getRequest().getAttribute(
-        /* HTTP_AT_CONTACT_URI */SongBindingFactory.AT_LONG_POLL_URI) != null;
+        boolean longPollingRequest = songResponse.getRequest().getAttribute(HTTP_AT_LONG_POLLING_CLIENT) != null;
         if (!longPollingRequest) {
             handleHttpResponseFromSongResponse(songResponse);
-        } else {
+        } else if (songResponse.getRequest().getAttribute(HTTP_AT_CORRELATION_ID) != null) {
             handleHttpResponseNotifyRequestFromSongResponse(songResponse);
         }
     }
@@ -1550,51 +1832,72 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
 
         SongServletRequest songRequest = null;
         MultiMap headers = httpTransaction.getHeaders();
-        String statusStr = (String) headers.get(HTTP_HD_STATUS_CODE);
-        // String requestId = (String) headers.get(HTTP_HD_ETSI_CORRELATION_ID);
-        String requestId = (String) headers.get(HTTP_HD_TRANSACTION_ID);
+        String requestId = (String) headers.get(HTTP_HD_ETSI_CORRELATION_ID);
         int statusCode = HttpServletResponse.SC_ACCEPTED;
         String reasonPhrase = "Accepted";
+        XoObject responseNotify = null;
         try {
-            if (statusStr != null) {
-                int status = Integer.valueOf(statusStr).intValue();
-                synchronized (pendingContactRequests) {
-                    ContactWaitingResponseNotifyRequest contactWaitingResponseNotify = null;
-                    if (status < 200) {
-                        contactWaitingResponseNotify = (ContactWaitingResponseNotifyRequest) pendingContactRequests
-                                .get(requestId);
-                        if (contactWaitingResponseNotify != null && contactWaitingResponseNotify.cancel()) {
-                            songRequest = contactWaitingResponseNotify.getRequest();
-                        }
-                    } else {
-                        contactWaitingResponseNotify = (ContactWaitingResponseNotifyRequest) pendingContactRequests
-                                .remove(requestId);
-                        if (contactWaitingResponseNotify != null && contactWaitingResponseNotify.cancel()) {
-                            songRequest = contactWaitingResponseNotify.popRequest();
-                        }
+            responseNotify = xoService.readXmlXmlXoObject(httpTransaction.getRawContent(), M2MConstants.ENC_UTF8);
+
+            // m2m:ResponseNotify from ong:t_xml_obj
+            // {
+            // m2m:statusCode XoString { } // (xmlType: m2m:StatusCode) (enum: STATUS_OK STATUS_ACCEPTED STATUS_BAD_REQUEST
+            // STATUS_PERMISSION_DENIED STATUS_FORBIDDEN STATUS_NOT_FOUND STATUS_METHOD_NOT_ALLOWED STATUS_NOT_ACCEPTABLE
+            // STATUS_REQUEST_TIMEOUT STATUS_CONFLICT STATUS_UNSUPPORTED_MEDIA_TYPE STATUS_INTERNAL_SERVER_ERROR
+            // STATUS_NOT_IMPLEMENTED STATUS_BAD_GATEWAY STATUS_SERVICE_UNAVAILABLE STATUS_GATEWAY_TIMEOUT STATUS_DELETED
+            // STATUS_EXPIRED )
+            // representation xmime:base64Binary { } // (optional)
+            // locationHeader XoString { } // (optional) (xmlType: xsd:string)
+            // etagHeader XoString { } // (optional) (xmlType: xsd:string)
+            // lastModifiedHeader XoString { } // (optional) (xmlType: xsd:string)
+            // }
+            // alias m2m:ResponseNotify with m2m:responseNotify
+
+            checkRepresentation(responseNotify, M2MConstants.TAG_M2M_RESPONSE_NOTIFY);
+            String rnStatusCode = getAndCheckStringMode(responseNotify, M2MConstants.TAG_M2M_STATUS_CODE, ID_MODE_REQUIRED);
+
+            Integer statusInteger = (Integer) M2M_STATUS_TO_SONG_STATUS.get(rnStatusCode);
+            int status = 0;
+            if (statusInteger != null) {
+                status = statusInteger.intValue();
+            } else {
+                LOG.error("Unknown status code received in <responseNotify>: " + rnStatusCode);
+                status = SongServletResponse.SC_INTERNAL_SERVER_ERROR;
+            }
+            synchronized (pendingContactRequests) {
+                ContactWaitingResponseNotifyRequest contactWaitingResponseNotify = null;
+                if (status < 200) {
+                    contactWaitingResponseNotify = (ContactWaitingResponseNotifyRequest) pendingContactRequests.get(requestId);
+                    if (contactWaitingResponseNotify != null && contactWaitingResponseNotify.cancel()) {
+                        songRequest = contactWaitingResponseNotify.getRequest();
+                    }
+                } else {
+                    contactWaitingResponseNotify = (ContactWaitingResponseNotifyRequest) pendingContactRequests
+                            .remove(requestId);
+                    if (contactWaitingResponseNotify != null && contactWaitingResponseNotify.cancel()) {
+                        songRequest = contactWaitingResponseNotify.popRequest();
                     }
                 }
-                if (songRequest != null) {
-                    // Retrieve long polling server connection
-                    LongPollingServer lpServer = (LongPollingServer) songRequest.getAttribute(HTTP_AT_LONG_POLLING_SERVER);
-                    SongServletResponse songResponse = buildSongResponseFromHttpResponseNotifyRequest(status, httpTransaction,
-                            songRequest);
-                    lpServer.contactResponseReceived(songResponse);
-                    initHttpLongPollingResponse(statusCode, reasonPhrase, httpTransaction);
-                } else {
-                    LOG.error("Received a song response in a long polling request with an unknown transaction id: " + requestId);
-                    statusCode = HttpServletResponse.SC_FORBIDDEN;
-                    reasonPhrase = "Forbidden";
-                    initHttpLongPollingResponse(statusCode, reasonPhrase, httpTransaction);
-                }
+            }
+            if (songRequest != null) {
+                // Retrieve long polling server connection
+                LongPollingServer lpServer = (LongPollingServer) songRequest.getAttribute(HTTP_AT_LONG_POLLING_SERVER);
+                SongServletResponse songResponse = buildSongResponseFromHttpResponseNotifyRequest(status, httpTransaction,
+                        responseNotify, songRequest);
+                lpServer.contactResponseReceived(songResponse);
+                initHttpLongPollingResponse(statusCode, reasonPhrase, httpTransaction);
             } else {
-                LOG.error("Received a song response in a long polling request with no status code");
-                statusCode = HttpServletResponse.SC_BAD_REQUEST;
-                reasonPhrase = "Bad Request";
+                LOG.error("Received a song response in a long polling request with an unknown transaction id: " + requestId);
+                statusCode = HttpServletResponse.SC_FORBIDDEN;
+                reasonPhrase = "Forbidden";
                 initHttpLongPollingResponse(statusCode, reasonPhrase, httpTransaction);
             }
-        } catch (NumberFormatException e) {
-            LOG.error("Received a song response in a long polling request with a bad status code: " + statusStr, e);
+        } catch (M2MException e) {
+            LOG.error("Bad <responseNotify> request", e);
+        } catch (XoException e) {
+            LOG.error("Bad <responseNotify> request", e);
+        } finally {
+            responseNotify.free(true);
         }
     }
 
@@ -1668,8 +1971,7 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
             HttpClientTransaction httpTransaction = buildHttpResponseNotifyRequestFromSongResponse(songResponse);
             // Execute the request
             if (LOG.isInfoEnabled()) {
-                String target = (String) songResponse.getRequest().getAttribute(
-                /* HTTP_AT_CONTACT_URI */SongBindingFactory.AT_LONG_POLL_URI);
+                String target = (String) songResponse.getRequest().getAttribute(HTTP_AT_CONTACT_URI);
                 LOG.info(songResponse.getId() + ": <<< HTTP.HTTPBinding: POST " + target + " (Response Notify Request)");
             }
             // TODO ?
@@ -1677,14 +1979,16 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
             // LOG.debug(getClientHttpRequestAsString(httpTransaction));
             // }
             if (Profiler.getInstance().isTraceEnabled()) {
-                String target = (String) songResponse.getRequest().getAttribute(
-                /* HTTP_AT_CONTACT_URI */SongBindingFactory.AT_LONG_POLL_URI);
+                String target = (String) songResponse.getRequest().getAttribute(HTTP_AT_CONTACT_URI);
                 Profiler.getInstance().trace(
                         songResponse.getId() + ": <<< HTTP.HTTPBinding: POST " + target + " (Response Notify Request)");
             }
             sendClientRequest(httpTransaction, songResponse);
         } catch (HttpClientException e) {
             LOG.error("HTTP binding exception", e);
+            // Ignore
+        } catch (XoException e) {
+            LOG.error("HTTP XO exception", e);
             // Ignore
         }
     }
@@ -1764,19 +2068,9 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
         // Build requestingEntity
         MultiMap headers = httpTransaction.getHeaders();
         SongURI requestingEntity = null;
-        String authorization = (String) headers.get(HttpUtils.HD_AUTHORIZATION);
-        if (authorization != null && authorization.startsWith("Basic ")) {
-            String tmpRequestingEntity = null;
-            String base64 = authorization.substring(6);
+        String tmpRequestingEntity = (String) headers.get(HttpUtils.HD_FROM);
+        if (tmpRequestingEntity != null) {
             try {
-                authorization = new String(FormatUtils.parseBase64(base64), "US-ASCII");
-                int semiColonIndex = authorization.indexOf(':');
-                if (semiColonIndex != -1) {
-                    tmpRequestingEntity = URLDecoder.decode(authorization.substring(0, semiColonIndex), "US-ASCII");
-                } else {
-                    tmpRequestingEntity = URLDecoder.decode(authorization, "US-ASCII");
-                }
-
                 requestingEntity = songBindingFactory.createURI(tmpRequestingEntity);
             } catch (IllegalArgumentException e) {
                 throw new com.actility.m2m.http.server.HttpServerException("Requesting entity is not a valid URI: "
@@ -1786,10 +2080,6 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
                 throw new com.actility.m2m.http.server.HttpServerException("Requesting entity is not a valid URI: "
                         + tmpRequestingEntity, StatusCode.STATUS_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST,
                         HttpUtils.RP_BAD_REQUEST, e);
-            } catch (ParseException e) {
-                throw new com.actility.m2m.http.server.HttpServerException(
-                        "Authorization header basic value is not a valid base64 string: " + base64,
-                        StatusCode.STATUS_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST, HttpUtils.RP_BAD_REQUEST, e);
             }
         } else {
             throw new com.actility.m2m.http.server.HttpServerException("No requesting entity found in HTTP request",
@@ -1881,61 +2171,276 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      *            The long polling message only defines the requested local path
      * @param remoteAddress The remote address of the server which has generated the HTTP response
      * @param remotePort The remote port of the server which has generated the HTTP response
+     * @return The created SONG Request
+     * @throws URISyntaxException If the Request URI embedded in the HTTP response is invalid
+     * @throws IOException If the HTTP response content cannot be read or the SONG request content cannot be set
+     */
+    SongServletRequest buildSongRequestFromHttpNCLongPollingResponse(LongPollingClient longPollingClient,
+            HttpClientTransaction httpTransaction, InetAddress remoteAddress, int remotePort, SongURI relatedRequestingEntity,
+            SongURI relatedTargetID) throws XoException, M2MException, URISyntaxException, IOException {
+        LOG.debug("buildSongRequestFromHttpNCLongPollingResponse");
+
+        // m2m:Notify from ong:t_xml_obj
+        // {
+        // m2m:statusCode XoString { } // (xmlType: m2m:StatusCode) (enum: STATUS_OK STATUS_ACCEPTED
+        // STATUS_BAD_REQUEST
+        // STATUS_PERMISSION_DENIED STATUS_FORBIDDEN STATUS_NOT_FOUND STATUS_METHOD_NOT_ALLOWED
+        // STATUS_NOT_ACCEPTABLE
+        // STATUS_REQUEST_TIMEOUT STATUS_CONFLICT STATUS_UNSUPPORTED_MEDIA_TYPE STATUS_INTERNAL_SERVER_ERROR
+        // STATUS_NOT_IMPLEMENTED STATUS_BAD_GATEWAY STATUS_SERVICE_UNAVAILABLE STATUS_GATEWAY_TIMEOUT
+        // STATUS_DELETED
+        // STATUS_EXPIRED )
+        // representation xmime:base64Binary { } // (optional)
+        // timeoutReason XoString { } // (optional) (xmlType: xsd:string)
+        // subscriptionReference XoString { } // (xmlType: xsd:anyURI)
+        // requestingEntity XoString { } // (optional) (xmlType: xsd:anyURI)
+        // contact XoString { } // (optional) (xmlType: xsd:anyURI)
+        // }
+        // alias m2m:Notify with m2m:notify
+
+        XoObject representation = xoService.readXmlXmlXoObject(httpTransaction.getResponseBody(), M2MConstants.ENC_UTF8);
+        try {
+            checkRepresentation(representation, M2MConstants.TAG_M2M_NOTIFY);
+
+            SongServletRequest songRequest = songBindingFactory.createRequest(httpTransaction.getProtocol(),
+                    SongServletRequest.MD_CREATE, relatedRequestingEntity, relatedTargetID, localAddress, localPort,
+                    remoteAddress, remotePort, false);
+
+            if (httpTransaction.getResponseHeader(HttpUtils.HD_SERVER) != null) {
+                songRequest.setHeader(SongServletMessage.HD_USER_AGENT, httpTransaction.getResponseHeader(HttpUtils.HD_SERVER));
+            }
+
+            Iterator it = httpTransaction.getResponseHeaders();
+            while (it.hasNext()) {
+                Entry entry = (Entry) it.next();
+                if (((String) entry.getKey()).startsWith("X-Acy-")) {
+                    songRequest.addHeader((String) entry.getKey(), (String) entry.getValue());
+                }
+            }
+
+            String contentTypeHeader = httpTransaction.getResponseHeader(HttpUtils.HD_CONTENT_TYPE);
+            if (contentTypeHeader == null) {
+                LOG.error("Received an HTTP Long polling response without a Content-Type header. Default to "
+                        + HTTP_DEFAULT_CONTENT_TYPE);
+                contentTypeHeader = HTTP_DEFAULT_CONTENT_TYPE;
+            }
+            songRequest.setContent(httpTransaction.getResponseBody(), contentTypeHeader);
+
+            songRequest.setAttribute(HTTP_AT_LONG_POLLING_CLIENT, longPollingClient);
+            return songRequest;
+        } finally {
+            representation.free(true);
+        }
+    }
+
+    /**
+     * Builds a SONG request from an HTTP response coming from a long polling connection.
+     *
+     * @param longPollingClient The object that manages the long polling client connection from which this HTTP response was
+     *            received
+     * @param httpTransaction The HTTP transaction where the HTTP response is embedded
+     * @param baseURI All messages received from the long polling connection are considered to be received from this base URI.
+     *            The long polling message only defines the requested local path
+     * @param remoteAddress The remote address of the server which has generated the HTTP response
+     * @param remotePort The remote port of the server which has generated the HTTP response
      * @param longPollingURI The remote long polling URI from which the response is received
      * @return The created SONG Request
      * @throws URISyntaxException If the Request URI embedded in the HTTP response is invalid
      * @throws IOException If the HTTP response content cannot be read or the SONG request content cannot be set
      */
-    SongServletRequest buildSongRequestFromHttpLongPollingResponse(LongPollingClient longPollingClient,
-            HttpClientTransaction httpTransaction, SongURI baseURI, InetAddress remoteAddress, int remotePort,
-            /* String correlationId */String longPollingURI) throws URISyntaxException, IOException {
-        LOG.debug("buildSongRequestFromHttpLongPollingResponse");
-        String method = httpTransaction.getResponseHeader(HTTP_HD_METHOD);
-        String uri = httpTransaction.getResponseHeader(HTTP_HD_TARGET_ID);
-        SongURI targetId = null;
-        if (uri.charAt(0) == '/') {
-            targetId = baseURI.copy();
-            targetId.setPath(httpTransaction.getResponseHeader(HTTP_HD_TARGET_ID));
-        } else {
-            targetId = songBindingFactory.createURI(uri);
-        }
+    SongServletRequest buildSongRequestFromHttpCCLongPollingResponse(LongPollingClient longPollingClient,
+            HttpClientTransaction httpTransaction, InetAddress remoteAddress, int remotePort) throws XoException, M2MException,
+            URISyntaxException, IOException {
+        LOG.debug("buildSongRequestFromHttpCCLongPollingResponse");
 
-        // Build requestingEntity
-        SongURI requestingEntity = songBindingFactory.createURI(httpTransaction.getResponseHeader(HTTP_HD_REQUESTING_ENTITY));
+        // m2m:RequestNotify from ong:t_xml_obj
+        // {
+        // requestingEntity XoString { } // (xmlType: xsd:anyURI)
+        // targetID XoString { } // (xmlType: xsd:anyURI)
+        // method XoString { } // (xmlType: m2m:MethodType) (enum: CREATE RETRIEVE UPDATE DELETE EXECUTE NOTIFY
+        // )
+        // filterCriteria XoVoidObj { default=m2m:FilterCriteriaType } // (optional)
+        // maxSize XoString { } // (optional) (xmlType: xsd:long)
+        // searchPrefix XoString { } // (optional) (xmlType: xsd:anyURI)
+        // groupRequestIdentifier XoString { } // (optional) (xmlType: xsd:hexBinary)
+        // TRPDT m2m:TrpdtType { } // (optional)
+        // RCAT XoString { } // (optional) (xmlType: m2m:RcatType) (enum: RCAT_0 RCAT_1 RCAT_2 RCAT_3 RCAT_4
+        // RCAT_5
+        // RCAT_6 RCAT_7 )
+        // contentTypeHeader XoString { } // (optional) (xmlType: xsd:string)
+        // acceptHeader XoString { } // (optional) (xmlType: xsd:string)
+        // ifModifiedSinceHeader XoString { } // (optional) (xmlType: xsd:string)
+        // ifUnmodifiedSinceHeader XoString { } // (optional) (xmlType: xsd:string)
+        // ifMatchHeader XoString { } // (optional) (xmlType: xsd:string)
+        // ifNoneMatchHeader XoString { } // (optional) (xmlType: xsd:string)
+        // xEtsiContactUriHeader XoString { } // (xmlType: xsd:string)
+        // xEtsiCorrelationIDHeader XoString { } // (xmlType: xsd:string)
+        // representation xmime:base64Binary { } // (optional)
+        // }
+        // alias m2m:RequestNotify with m2m:requestNotify
 
-        SongServletRequest songRequest = songBindingFactory.createRequest(httpTransaction.getProtocol(), method,
-                requestingEntity, targetId, localAddress, localPort, remoteAddress, remotePort, false/* , correlationId */);
+        XoObject representation = xoService.readXmlXmlXoObject(httpTransaction.getResponseBody(), M2MConstants.ENC_UTF8);
 
-        if (httpTransaction.getResponseHeader(HttpUtils.HD_SERVER) != null) {
-            songRequest.setHeader(SongServletMessage.HD_USER_AGENT, httpTransaction.getResponseHeader(HttpUtils.HD_SERVER));
-        }
+        try {
+            checkRepresentation(representation, M2MConstants.TAG_M2M_REQUEST_NOTIFY);
+            URI ccRequestingEntity = getAndCheckURI(representation, M2MConstants.TAG_REQUESTING_ENTITY, ID_MODE_REQUIRED);
+            URI ccTargetID = getAndCheckURI(representation, M2MConstants.TAG_TARGET_I_D, ID_MODE_REQUIRED);
+            String method = getAndCheckStringMode(representation, M2MConstants.TAG_METHOD, ID_MODE_REQUIRED);
+            FilterCriteria filterCriteria = getAndCheckFilterCriteriaType(representation, M2MConstants.TAG_FILTER_CRITERIA,
+                    ID_MODE_OPTIONAL);
+            long maxSize = getAndCheckLong(representation, M2MConstants.TAG_MAX_SIZE, ID_MODE_OPTIONAL);
+            URI searchPrefix = getAndCheckURI(representation, M2MConstants.TAG_SEARCH_PREFIX, ID_MODE_OPTIONAL);
+            String groupRequestIdentifier = getAndCheckStringMode(representation, M2MConstants.TAG_GROUP_REQUEST_IDENTIFIER,
+                    ID_MODE_OPTIONAL);
+            Trpdt trpdt = getAndCheckTrpdtType(representation, M2MConstants.TAG_T_R_P_D_T, ID_MODE_OPTIONAL);
+            String rcat = getAndCheckStringMode(representation, M2MConstants.TAG_R_C_A_T, ID_MODE_OPTIONAL);
+            String contentTypeHeader = getAndCheckStringMode(representation, M2MConstants.TAG_CONTENT_TYPE_HEADER,
+                    ID_MODE_OPTIONAL);
+            String acceptHeader = getAndCheckStringMode(representation, M2MConstants.TAG_ACCEPT_HEADER, ID_MODE_OPTIONAL);
+            String ifModifiedSinceHeader = getAndCheckStringMode(representation, M2MConstants.TAG_IF_MODIFIED_SINCE_HEADER,
+                    ID_MODE_OPTIONAL);
+            String ifUnmodifiedSinceHeader = getAndCheckStringMode(representation, M2MConstants.TAG_IF_UNMODIFIED_SINCE_HEADER,
+                    ID_MODE_OPTIONAL);
+            String ifMatchHeader = getAndCheckStringMode(representation, M2MConstants.TAG_IF_MATCH_HEADER, ID_MODE_OPTIONAL);
+            String ifNoneMatchHeader = getAndCheckStringMode(representation, M2MConstants.TAG_IF_NONE_MATCH_HEADER,
+                    ID_MODE_OPTIONAL);
+            String xEtsiContactUriHeader = getAndCheckStringMode(representation, M2MConstants.TAG_X_ETSI_CONTACT_URI_HEADER,
+                    ID_MODE_OPTIONAL);
+            String xEtsiCorrelationIDHeader = getAndCheckStringMode(representation,
+                    M2MConstants.TAG_X_ETSI_CORRELATION_I_D_HEADER, ID_MODE_OPTIONAL);
+            int contentLength = getAndCheckXmimeBase64(representation, M2MConstants.TAG_REPRESENTATION, ID_MODE_OPTIONAL);
 
-        Iterator it = httpTransaction.getResponseHeaders();
-        while (it.hasNext()) {
-            Entry entry = (Entry) it.next();
-            if (!notCopiedHttpHeaders.contains(entry.getKey())) {
-                songRequest.addHeader((String) entry.getKey(), (String) entry.getValue());
+            SongURI targetId = songBindingFactory.createURI(ccTargetID);
+            SongURI requestingEntity = songBindingFactory.createURI(ccRequestingEntity);
+
+            SongServletRequest songRequest = songBindingFactory.createRequest(httpTransaction.getProtocol(), method,
+                    requestingEntity, targetId, localAddress, localPort, remoteAddress, remotePort, false,
+                    xEtsiCorrelationIDHeader);
+
+            if (filterCriteria != null) {
+                if (filterCriteria.getIfModifiedSince() != null) {
+                    songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_IF_MODIFIED_SINCE,
+                            FormatUtils.formatDateTime(filterCriteria.getIfModifiedSince(), UtilConstants.LOCAL_TIMEZONE));
+                }
+                if (filterCriteria.getIfUnmodifiedSince() != null) {
+                    songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_IF_UNMODIFIED_SINCE,
+                            FormatUtils.formatDateTime(filterCriteria.getIfUnmodifiedSince(), UtilConstants.LOCAL_TIMEZONE));
+                }
+                if (filterCriteria.getIfNoneMatch() != null) {
+                    String[] values = filterCriteria.getIfNoneMatch();
+                    for (int i = 0; i < values.length; ++i) {
+                        songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_IF_NONE_MATCH, values[i]);
+                    }
+                }
+                if (filterCriteria.getAttributeAccessor() != null) {
+                    songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_ATTRIBUTE_ACCESSOR,
+                            filterCriteria.getAttributeAccessor());
+                }
+                if (filterCriteria.getSearchString() != null) {
+                    String[] values = filterCriteria.getSearchString();
+                    for (int i = 0; i < values.length; ++i) {
+                        songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_SEARCH_STRING, values[i]);
+                    }
+                }
+                if (filterCriteria.getCreatedAfter() != null) {
+                    songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_CREATED_AFTER,
+                            FormatUtils.formatDateTime(filterCriteria.getCreatedAfter(), UtilConstants.LOCAL_TIMEZONE));
+                }
+                if (filterCriteria.getCreatedBefore() != null) {
+                    songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_CREATED_BEFORE,
+                            FormatUtils.formatDateTime(filterCriteria.getCreatedBefore(), UtilConstants.LOCAL_TIMEZONE));
+                }
+                if (filterCriteria instanceof ContentInstanceFilterCriteria) {
+                    ContentInstanceFilterCriteria ciFilterCriteria = (ContentInstanceFilterCriteria) filterCriteria;
+                    if (ciFilterCriteria.getSizeFrom() != null) {
+                        songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_SIZE_FROM,
+                                ciFilterCriteria.getSizeFrom().toString());
+                    }
+                    if (ciFilterCriteria.getSizeUntil() != null) {
+                        songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_SIZE_UNTIL,
+                                ciFilterCriteria.getSizeUntil().toString());
+                    }
+                    if (ciFilterCriteria.getContentType() != null) {
+                        String[] values = ciFilterCriteria.getContentType();
+                        for (int i = 0; i < values.length; ++i) {
+                            songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_CONTENT_TYPE, values[i]);
+                        }
+                    }
+                    if (ciFilterCriteria.getMetaDataOnly() != null) {
+                        songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_META_DATA_ONLY,
+                                ciFilterCriteria.getMetaDataOnly().toString());
+                    }
+                }
             }
-        }
-
-        int contentLength = httpTransaction.getResponseContentLength();
-
-        if (contentLength > 0) {
-            String contentType = httpTransaction.getResponseHeader(HttpUtils.HD_CONTENT_TYPE);
-            if (contentType == null) {
-                LOG.error("Received an HTTP Long polling response without a Content-Type header. Default to "
-                        + HTTP_DEFAULT_CONTENT_TYPE);
-                contentType = HTTP_DEFAULT_CONTENT_TYPE;
+            if (maxSize != -1L) {
+                songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_MAX_SIZE, Long.toString(maxSize));
             }
-            songRequest.setContent(httpTransaction.getResponseBody(), contentType);
-        }
+            if (searchPrefix != null) {
+                songRequest.getTargetID().addQueryParameter(M2MConstants.ATTR_SEARCH_PREFIX, searchPrefix.toString());
+            }
+            if (groupRequestIdentifier != null) {
+                songRequest.addHeader("X-etsi-group-request-id", groupRequestIdentifier);
+            }
+            if (trpdt != null) {
+                if (trpdt.getTolerableDelay() != -1L) {
+                    songRequest.addHeader("X-etsi-trpdt", FormatUtils.formatDuration(trpdt.getTolerableDelay()));
+                }
+                if (trpdt.getTolerableTime() != null) {
+                    songRequest.addHeader("X-etsi-trpdt",
+                            FormatUtils.formatTime(trpdt.getTolerableTime(), UtilConstants.LOCAL_TIMEZONE));
+                }
+            }
+            if (rcat != null) {
+                songRequest.addHeader("X-etsi-rcat", rcat);
+            }
+            if (acceptHeader != null) {
+                songRequest.addHeader(SongServletRequest.HD_ACCEPT, acceptHeader);
+            }
+            if (ifModifiedSinceHeader != null) {
+                songRequest.addHeader(SongServletRequest.HD_IF_MODIFIED_SINCE, ifModifiedSinceHeader);
+            }
+            if (ifUnmodifiedSinceHeader != null) {
+                songRequest.addHeader(SongServletRequest.HD_IF_UNMODIFIED_SINCE, ifUnmodifiedSinceHeader);
+            }
+            if (ifMatchHeader != null) {
+                songRequest.addHeader(SongServletRequest.HD_IF_MATCH, ifMatchHeader);
+            }
+            if (ifNoneMatchHeader != null) {
+                songRequest.addHeader(SongServletRequest.HD_IF_NONE_MATCH, ifNoneMatchHeader);
+            }
 
-        // songRequest.setAttribute(HTTP_AT_CONTACT_URI, httpTransaction.getResponseHeader(HTTP_HD_ETSI_CONTACT_URI));
-        // songRequest.setAttribute(HTTP_AT_CORRELATION_ID, correlationId);
-        songRequest.setAttribute(HTTP_AT_LONG_POLLING_CLIENT, longPollingClient);
-        songRequest.setAttribute(SongBindingFactory.AT_LONG_POLL_URI, longPollingURI);
-        songRequest.setAttribute(HTTP_AT_TRANSACTION_ID, httpTransaction.getResponseHeader(HTTP_HD_TRANSACTION_ID));
-        return songRequest;
+            if (httpTransaction.getResponseHeader(HttpUtils.HD_SERVER) != null) {
+                songRequest.setHeader(SongServletMessage.HD_USER_AGENT, httpTransaction.getResponseHeader(HttpUtils.HD_SERVER));
+            }
+
+            Iterator it = httpTransaction.getResponseHeaders();
+            while (it.hasNext()) {
+                Entry entry = (Entry) it.next();
+                if (((String) entry.getKey()).startsWith("X-Acy-")) {
+                    songRequest.addHeader((String) entry.getKey(), (String) entry.getValue());
+                }
+            }
+
+            if (contentLength > 0) {
+                if (contentTypeHeader == null) {
+                    LOG.error("Received an HTTP Long polling response without a Content-Type header. Default to "
+                            + HTTP_DEFAULT_CONTENT_TYPE);
+                    contentTypeHeader = HTTP_DEFAULT_CONTENT_TYPE;
+                }
+                songRequest.setContent(
+                        representation.getXoObjectAttribute(M2MConstants.TAG_REPRESENTATION).getBufferAttribute(
+                                XoObject.ATTR_VALUE), contentTypeHeader);
+            }
+
+            songRequest.setAttribute(HTTP_AT_CONTACT_URI, xEtsiContactUriHeader);
+            songRequest.setAttribute(HTTP_AT_CORRELATION_ID, xEtsiCorrelationIDHeader);
+            songRequest.setAttribute(HTTP_AT_LONG_POLLING_CLIENT, longPollingClient);
+            // songRequest.setAttribute(SongBindingFactory.AT_LONG_POLL_URI, longPollingURI);
+            // songRequest.setAttribute(HTTP_AT_TRANSACTION_ID, httpTransaction.getResponseHeader(HTTP_HD_TRANSACTION_ID));
+            return songRequest;
+        } finally {
+            representation.free(true);
+        }
     }
 
     private SongServletResponse buildSongResponseFromHttpResponse(HttpClientTransaction httpTransaction,
@@ -1995,20 +2500,28 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
     }
 
     private SongServletResponse buildSongResponseFromHttpResponseNotifyRequest(int status,
-            HttpServerTransaction httpTransaction, SongServletRequest songRequest) throws UnsupportedEncodingException {
-        LOG.debug("buildSongResponseFromHttpContactResponse");
+            HttpServerTransaction httpTransaction, XoObject responseNotify, SongServletRequest songRequest)
+            throws UnsupportedEncodingException, M2MException {
+        LOG.debug("buildSongResponseFromHttpResponseNotifyRequest");
+
+        int representationSize = getAndCheckXmimeBase64(responseNotify, M2MConstants.TAG_REPRESENTATION, ID_MODE_OPTIONAL);
+        String locationHeader = getAndCheckStringMode(responseNotify, M2MConstants.TAG_LOCATION_HEADER, ID_MODE_OPTIONAL);
+        String etagHeader = getAndCheckStringMode(responseNotify, M2MConstants.TAG_ETAG_HEADER, ID_MODE_OPTIONAL);
+        String lastModifiedHeader = getAndCheckStringMode(responseNotify, M2MConstants.TAG_LAST_MODIFIED_HEADER,
+                ID_MODE_OPTIONAL);
+
         SongServletResponse songResponse = songRequest.createResponse(convertHttpStatusToSongStatus(status,
                 songRequest.isProxy()));
         MultiMap headers = httpTransaction.getHeaders();
 
-        if (SongServletRequest.MD_CREATE.equals(songRequest.getMethod())) {
-            String contentLocation = (String) headers.get(HttpUtils.HD_CONTENT_LOCATION);
-            if (contentLocation == null) {
-                contentLocation = (String) headers.get(HttpUtils.HD_LOCATION);
-                if (contentLocation != null) {
-                    songResponse.setHeader(SongServletMessage.HD_CONTENT_LOCATION, contentLocation);
-                }
-            }
+        if (locationHeader != null) {
+            songResponse.setHeader(SongServletMessage.HD_CONTENT_LOCATION, locationHeader);
+        }
+        if (etagHeader != null) {
+            songResponse.setHeader(SongServletMessage.HD_ETAG, etagHeader);
+        }
+        if (lastModifiedHeader != null) {
+            songResponse.setHeader(SongServletMessage.HD_LAST_MODIFIED, lastModifiedHeader);
         }
         songResponse.setHeader(SongServletMessage.HD_SERVER, (String) headers.get(HttpUtils.HD_USER_AGENT));
 
@@ -2018,22 +2531,21 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
         while (it.hasNext()) {
             entry = (Entry) it.next();
             headerName = (String) entry.getKey();
-            if (!notCopiedHttpHeaders.contains(headerName)) {
+            if (headerName.startsWith("X-Acy-")) {
                 songResponse.addHeader(headerName, (String) entry.getValue());
             }
         }
 
         // Set content
-        if (httpTransaction.getContentLength() > 0) {
-            String contentType = (String) headers.get(HttpUtils.HD_CONTENT_TYPE);
+        if (representationSize > 0) {
+            XoObject representation = responseNotify.getXoObjectAttribute(M2MConstants.TAG_REPRESENTATION);
+            String contentType = representation.getStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE);
             if (contentType == null) {
-                LOG.error("Received an HTTP response notify request without a Content-Type header. Default to "
+                LOG.error("Received an HTTP response notify request without an xmime:contentType attribute. Default to "
                         + HTTP_DEFAULT_CONTENT_TYPE);
                 contentType = HTTP_DEFAULT_CONTENT_TYPE;
             }
-            byte[] copiedRawContent = new byte[httpTransaction.getContentLength()];
-            System.arraycopy(httpTransaction.getRawContent(), 0, copiedRawContent, 0, httpTransaction.getContentLength());
-            songResponse.setContent(copiedRawContent, contentType);
+            songResponse.setContent(representation.getBufferAttribute(XoObject.ATTR_VALUE), contentType);
         }
 
         return songResponse;
@@ -2083,19 +2595,12 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
 
         SongURI requestingEntity = songRequest.getRequestingEntity();
         if (requestingEntity != null) {
-            String authorization = StringUtils.quote(requestingEntity.absoluteURI(), L_BASIC, H_BASIC) + ":";
-            authorization = "Basic " + FormatUtils.formatBase64(authorization.getBytes("US-ASCII"));
-            httpTransaction.addRequestHeader(HttpUtils.HD_AUTHORIZATION, authorization);
+            httpTransaction.addRequestHeader(HttpUtils.HD_FROM, requestingEntity.absoluteURI());
         }
         if (content) {
             httpTransaction.addRequestHeader(HttpUtils.HD_CONTENT_LENGTH, String.valueOf(songRequest.getContentLength()));
         }
 
-        if (proxyTo != null && proxyTo.getPath() != null && !"/".equals(proxyTo.getPath())) {
-            httpTransaction.addRequestHeader(HTTP_HD_NEXT_HOP_URI, proxyTo.getPath());
-        } else if (pocUri != null && pocUri.getPath() != null && !"/".equals(pocUri.getPath())) {
-            httpTransaction.addRequestHeader(HTTP_HD_NEXT_HOP_URI, pocUri.getPath());
-        }
         httpTransaction.addRequestHeader(HttpUtils.HD_USER_AGENT, songRequest.getHeader(SongServletMessage.HD_USER_AGENT));
 
         Iterator headers = songRequest.getHeaderNames();
@@ -2118,47 +2623,125 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
     }
 
     private HttpClientTransaction buildHttpResponseNotifyRequestFromSongResponse(SongServletResponse songResponse)
-            throws IOException, HttpClientException {
+            throws XoException, IOException, HttpClientException {
         LOG.debug("buildHttpLongPollingRequestFromSongResponse");
         SongServletRequest songRequest = songResponse.getRequest();
         HttpClientTransaction httpTransaction = httpClient.createTransaction(HttpUtils.MD_POST,
-                (String) songRequest.getAttribute(/* HTTP_AT_CONTACT_URI */SongBindingFactory.AT_LONG_POLL_URI));
+                (String) songRequest.getAttribute(HTTP_AT_CONTACT_URI));
 
-        httpTransaction.addRequestHeader(HttpUtils.HD_USER_AGENT, songResponse.getHeader(SongServletMessage.HD_SERVER));
-        httpTransaction.addRequestHeader(HttpUtils.HD_CONTENT_LENGTH, String.valueOf(songResponse.getContentLength()));
-        if (SongServletRequest.MD_CREATE.equals(songResponse.getRequest().getMethod())) {
-            String contentLocation = songResponse.getHeader(SongServletMessage.HD_CONTENT_LOCATION);
-            if (contentLocation != null) {
-                httpTransaction.addRequestHeader(HttpUtils.HD_LOCATION, contentLocation);
+        // m2m:ResponseNotify from ong:t_xml_obj
+        // {
+        // m2m:statusCode XoString { } // (xmlType: m2m:StatusCode) (enum: STATUS_OK STATUS_ACCEPTED STATUS_BAD_REQUEST
+        // STATUS_PERMISSION_DENIED STATUS_FORBIDDEN STATUS_NOT_FOUND STATUS_METHOD_NOT_ALLOWED STATUS_NOT_ACCEPTABLE
+        // STATUS_REQUEST_TIMEOUT STATUS_CONFLICT STATUS_UNSUPPORTED_MEDIA_TYPE STATUS_INTERNAL_SERVER_ERROR
+        // STATUS_NOT_IMPLEMENTED STATUS_BAD_GATEWAY STATUS_SERVICE_UNAVAILABLE STATUS_GATEWAY_TIMEOUT STATUS_DELETED
+        // STATUS_EXPIRED )
+        // representation xmime:base64Binary { } // (optional)
+        // locationHeader XoString { } // (optional) (xmlType: xsd:string)
+        // etagHeader XoString { } // (optional) (xmlType: xsd:string)
+        // lastModifiedHeader XoString { } // (optional) (xmlType: xsd:string)
+        // }
+        // alias m2m:ResponseNotify with m2m:responseNotify
+
+        XoObject responseNotify = xoService.newXmlXoObject(M2MConstants.TAG_M2M_RESPONSE_NOTIFY);
+        responseNotify.setNameSpace(M2MConstants.PREFIX_M2M);
+        try {
+            int status = songResponse.getStatus();
+            int statusClass = status / 100;
+            int statusValue = status % 100;
+            StatusCode m2mStatus = null;
+            if (statusClass == 2) {
+                if (statusValue < SONG_STATUS_TO_M2M_STATUS[0].length) {
+                    m2mStatus = SONG_STATUS_TO_M2M_STATUS[0][statusValue];
+                }
+            } else if (statusClass == 3) {
+                if (statusValue < SONG_STATUS_TO_M2M_STATUS[1].length) {
+                    m2mStatus = SONG_STATUS_TO_M2M_STATUS[1][statusValue];
+                }
+            } else if (statusClass == 4) {
+                if (statusValue < SONG_STATUS_TO_M2M_STATUS[2].length) {
+                    m2mStatus = SONG_STATUS_TO_M2M_STATUS[2][statusValue];
+                }
+            } else if (statusClass == 5) {
+                if (statusValue < SONG_STATUS_TO_M2M_STATUS[3].length) {
+                    m2mStatus = SONG_STATUS_TO_M2M_STATUS[3][statusValue];
+                }
             }
-        }
+            if (m2mStatus == null) {
+                LOG.error("Received an unknown SONG status code: " + status);
+                responseNotify.setStringAttribute(M2MConstants.TAG_M2M_STATUS_CODE,
+                        StatusCode.STATUS_INTERNAL_SERVER_ERROR.name());
+            } else {
+                responseNotify.setStringAttribute(M2MConstants.TAG_M2M_STATUS_CODE, m2mStatus.name());
 
-        // httpTransaction
-        // .addRequestHeader(HTTP_HD_ETSI_CORRELATION_ID, (String) songRequest.getAttribute(HTTP_AT_CORRELATION_ID));
-        httpTransaction.addRequestHeader(HTTP_HD_TRANSACTION_ID, (String) songRequest.getAttribute(HTTP_AT_TRANSACTION_ID));
-        httpTransaction.addRequestHeader(HTTP_HD_STATUS_CODE, String.valueOf(songResponse.getStatus()));
-        if (LOG.isDebugEnabled()) {
-            // LOG.debug("Set transaction id header to: " + (String) songRequest.getAttribute(HTTP_AT_CORRELATION_ID));
-            LOG.debug("Set transaction id header to: " + (String) songRequest.getAttribute(HTTP_AT_TRANSACTION_ID));
-            LOG.debug("Set status code header to: " + String.valueOf(songResponse.getStatus()));
-        }
-
-        Iterator headers = songResponse.getHeaderNames();
-        String headerName = null;
-        while (headers.hasNext()) {
-            headerName = (String) headers.next();
-            if (!notCopiedSongHeaders.contains(headerName)) {
-                httpTransaction.addRequestHeader(headerName, songResponse.getHeader(headerName));
+                if (songResponse.getHeader(SongServletRequest.HD_CONTENT_LOCATION) != null) {
+                    responseNotify.setStringAttribute(M2MConstants.TAG_LOCATION_HEADER,
+                            songResponse.getHeader(SongServletMessage.HD_CONTENT_LOCATION));
+                }
+                if (songResponse.getHeader(SongServletRequest.HD_ETAG) != null) {
+                    responseNotify.setStringAttribute(M2MConstants.TAG_ETAG_HEADER,
+                            songResponse.getHeader(SongServletMessage.HD_ETAG));
+                }
+                if (songResponse.getHeader(SongServletRequest.HD_LAST_MODIFIED) != null) {
+                    responseNotify.setStringAttribute(M2MConstants.TAG_LAST_MODIFIED_HEADER,
+                            songResponse.getHeader(SongServletMessage.HD_LAST_MODIFIED));
+                }
             }
-        }
 
-        if (songResponse.getContentLength() > 0) {
-            if (songResponse.getContentType() != null) {
-                httpTransaction.addRequestHeader(HttpUtils.HD_CONTENT_TYPE, String.valueOf(songResponse.getContentType()));
+            httpTransaction.addRequestHeader(HttpUtils.HD_USER_AGENT, songResponse.getHeader(SongServletMessage.HD_SERVER));
+
+            // httpTransaction
+            httpTransaction.addRequestHeader(HTTP_HD_ETSI_CORRELATION_ID,
+                    (String) songRequest.getAttribute(HTTP_AT_CORRELATION_ID));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Set correlation id header to: " + (String) songRequest.getAttribute(HTTP_AT_CORRELATION_ID));
             }
-            httpTransaction.setRequestBody(songResponse.getRawContent());
+
+            Iterator headers = songResponse.getHeaderNames();
+            String headerName = null;
+            while (headers.hasNext()) {
+                headerName = (String) headers.next();
+                if (headerName.toLowerCase().startsWith("x-acy-")) {
+                    httpTransaction.addRequestHeader(headerName, songResponse.getHeader(headerName));
+                }
+            }
+
+            if (songResponse.getContentLength() > 0 || m2mStatus == null) {
+                XoObject representation = xoService.newXmlXoObject(M2MConstants.TYPE_XMIME_BASE64_BINARY);
+                responseNotify.setXoObjectAttribute(M2MConstants.TAG_REPRESENTATION, representation);
+                representation.setName(M2MConstants.TAG_REPRESENTATION);
+                representation.setNameSpace(M2MConstants.PREFIX_XMIME);
+                if (m2mStatus == null) {
+                    representation
+                            .setStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE, M2MConstants.CT_APPLICATION_XML_UTF8);
+                    XoObject errorInfo = xoService.newXmlXoObject(M2MConstants.TAG_M2M_ERROR_INFO);
+                    try {
+                        errorInfo.setNameSpace(M2MConstants.PREFIX_M2M);
+                        errorInfo.setStringAttribute(M2MConstants.TAG_M2M_STATUS_CODE,
+                                StatusCode.STATUS_INTERNAL_SERVER_ERROR.name());
+                        errorInfo.setStringAttribute(M2MConstants.TAG_M2M_ADDITIONAL_INFO, "Cannot map status code " + status
+                                + " in M2M Status");
+
+                        representation.setBufferAttribute(XoObject.ATTR_VALUE, errorInfo.saveXml());
+                    } finally {
+                        errorInfo.free(true);
+                    }
+                } else {
+                    if (songResponse.getContentType() != null) {
+                        representation.setStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE, songResponse.getContentType());
+                    }
+                    representation.setBufferAttribute(XoObject.ATTR_VALUE, songResponse.getRawContent());
+                }
+            }
+
+            byte[] body = responseNotify.saveXml();
+            httpTransaction.addRequestHeader(HttpUtils.HD_CONTENT_TYPE, M2MConstants.CT_APPLICATION_XML_UTF8);
+            httpTransaction.setRequestBody(body);
+
+            return httpTransaction;
+        } finally {
+            responseNotify.free(true);
         }
-        return httpTransaction;
     }
 
     private void buildHttpResponseFromSongResponse(HttpServerTransaction httpTransaction, SongServletResponse songResponse)
@@ -2242,57 +2825,34 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
         }
     }
 
-    void buildHttpLongPollingResponseFromSongRequest(String transactionId, HttpServerTransaction httpTransaction,
-            SongServletRequest songRequest) throws IOException {
+    private XoObject buildFilterCriteria(XoObject filterCriteria, XoObject requestNotify) throws XoException {
+        if (filterCriteria == null) {
+            filterCriteria = xoService.newXmlXoObject(M2MConstants.TYPE_M2M_CONTENT_INSTANCE_FILTER_CRITERIA_TYPE);
+            requestNotify.setXoObjectAttribute(M2MConstants.TAG_FILTER_CRITERIA, filterCriteria);
+        }
+        return filterCriteria;
+    }
+
+    void buildHttpNCLongPollingResponseFromSongRequest(String transactionId, HttpServerTransaction httpTransaction,
+            SongServletRequest songRequest) throws IOException, XoException {
         LOG.debug("buildHttpLongPollingResponseFromSongRequest");
         try {
+            byte[] notifyContent = songRequest.getRawContent();
+
             httpTransaction.print(httpTransaction.getHttpVersion());
             httpTransaction.print(' ');
             httpTransaction.print(HttpServletResponse.SC_OK);
             httpTransaction.print(" OK\r\n");
 
-            if (songRequest.getContentType() != null) {
-                httpTransaction.print(HttpUtils.HD_CONTENT_TYPE);
-                httpTransaction.print(": ");
-                httpTransaction.print(songRequest.getContentType());
-                httpTransaction.print("\r\n");
-            }
+            httpTransaction.print(HttpUtils.HD_CONTENT_TYPE);
+            httpTransaction.print(": ");
+            httpTransaction.print(songRequest.getContentType());
+            httpTransaction.print("\r\n");
 
             httpTransaction.print(HttpUtils.HD_CONTENT_LENGTH);
             httpTransaction.print(": ");
-            httpTransaction.print(String.valueOf(songRequest.getContentLength()));
+            httpTransaction.print(notifyContent.length);
             httpTransaction.print("\r\n");
-
-            // Long polling headers
-            httpTransaction.print(HTTP_HD_METHOD);
-            httpTransaction.print(": ");
-            httpTransaction.print(songRequest.getMethod());
-            httpTransaction.print("\r\n");
-            httpTransaction.print(HTTP_HD_TARGET_ID);
-            httpTransaction.print(": ");
-            httpTransaction.print(songRequest.getTargetID().absoluteURI());
-            httpTransaction.print("\r\n");
-
-            httpTransaction.print(HTTP_HD_REQUESTING_ENTITY);
-            httpTransaction.print(": ");
-            httpTransaction.print(songRequest.getRequestingEntity().absoluteURI());
-            httpTransaction.print("\r\n");
-
-            httpTransaction.print(HTTP_HD_TRANSACTION_ID);
-            httpTransaction.print(": ");
-            httpTransaction.print(transactionId);
-            httpTransaction.print("\r\n");
-
-            // httpTransaction.print(HTTP_HD_ETSI_CORRELATION_ID);
-            // httpTransaction.print(": ");
-            // httpTransaction.print(transactionId);
-            // httpTransaction.print("\r\n");
-            //
-            // httpTransaction.print(HTTP_HD_ETSI_CONTACT_URI);
-            // httpTransaction.print(": ");
-            // httpTransaction.print((httpTransaction.isSecure() ? "https://" : "http://") + httpTransaction.getHost()
-            // + httpTransaction.getRawRequestUri());
-            // httpTransaction.print("\r\n");
 
             httpTransaction.print(HttpUtils.HD_SERVER);
             httpTransaction.print(": ");
@@ -2304,7 +2864,7 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
             ListIterator lit = null;
             while (it.hasNext()) {
                 header = (String) it.next();
-                if (!notCopiedSongHeaders.contains(header)) {
+                if (header.startsWith("X-Acy-")) {
                     lit = songRequest.getHeaders(header);
                     while (lit.hasNext()) {
                         httpTransaction.print(header);
@@ -2316,9 +2876,7 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
             }
 
             httpTransaction.print("\r\n");
-            if (songRequest.getContentLength() > 0) {
-                httpTransaction.writeBody(songRequest.getRawContent());
-            }
+            httpTransaction.writeBody(notifyContent);
             if (LOG.isInfoEnabled()) {
                 LOG.info(transactionId + ": <<< HTTP.HTTPBinding: 200 OK (Long Polling Response)");
             }
@@ -2328,6 +2886,275 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
             httpTransaction.send();
         } finally {
             httpTransaction.terminated();
+        }
+    }
+
+    void buildHttpCCLongPollingResponseFromSongRequest(String transactionId, HttpServerTransaction httpTransaction,
+            SongServletRequest songRequest) throws IOException, XoException {
+        LOG.debug("buildHttpLongPollingResponseFromSongRequest");
+        XoObject requestNotify = null;
+        try {
+            // Build <requestNotify>
+
+            // m2m:RequestNotify from ong:t_xml_obj
+            // {
+            // requestingEntity XoString { } // (xmlType: xsd:anyURI)
+            // targetID XoString { } // (xmlType: xsd:anyURI)
+            // method XoString { } // (xmlType: m2m:MethodType) (enum: CREATE RETRIEVE UPDATE DELETE EXECUTE NOTIFY
+            // )
+            // filterCriteria XoVoidObj { default=m2m:FilterCriteriaType } // (optional)
+            // maxSize XoString { } // (optional) (xmlType: xsd:long)
+            // searchPrefix XoString { } // (optional) (xmlType: xsd:anyURI)
+            // groupRequestIdentifier XoString { } // (optional) (xmlType: xsd:hexBinary)
+            // TRPDT m2m:TrpdtType { } // (optional)
+            // RCAT XoString { } // (optional) (xmlType: m2m:RcatType) (enum: RCAT_0 RCAT_1 RCAT_2 RCAT_3 RCAT_4
+            // RCAT_5
+            // RCAT_6 RCAT_7 )
+            // contentTypeHeader XoString { } // (optional) (xmlType: xsd:string)
+            // acceptHeader XoString { } // (optional) (xmlType: xsd:string)
+            // ifModifiedSinceHeader XoString { } // (optional) (xmlType: xsd:string)
+            // ifUnmodifiedSinceHeader XoString { } // (optional) (xmlType: xsd:string)
+            // ifMatchHeader XoString { } // (optional) (xmlType: xsd:string)
+            // ifNoneMatchHeader XoString { } // (optional) (xmlType: xsd:string)
+            // xEtsiContactUriHeader XoString { } // (xmlType: xsd:string)
+            // xEtsiCorrelationIDHeader XoString { } // (xmlType: xsd:string)
+            // representation xmime:base64Binary { } // (optional)
+            // }
+            // alias m2m:RequestNotify with m2m:requestNotify
+
+            requestNotify = xoService.newXmlXoObject(M2MConstants.TAG_M2M_REQUEST_NOTIFY);
+            requestNotify.setStringAttribute(M2MConstants.TAG_REQUESTING_ENTITY, songRequest.getRequestingEntity().toString());
+            requestNotify.setStringAttribute(M2MConstants.TAG_TARGET_I_D, songRequest.getTargetID().toString());
+            // TODO this is not exact could be EXECUTE or NOTIFY in case of CREATE
+            requestNotify.setStringAttribute(M2MConstants.TAG_METHOD, songRequest.getMethod());
+
+            // m2m:FilterCriteriaType from ong:t_xml_obj
+            // {
+            // xsi:type XoString { embattr } // (optional) (xmlType: xsd:QName)
+            // ifModifiedSince XoString { } // (optional) (xmlType: xsd:dateTime)
+            // ifUnmodifiedSince XoString { } // (optional) (xmlType: xsd:dateTime)
+            // ifNoneMatch XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
+            // attributeAccessor XoString { } // (xmlType: xsd:anyURI)
+            // searchString XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
+            // createdAfter XoString { } // (optional) (xmlType: xsd:dateTime)
+            // createdBefore XoString { } // (optional) (xmlType: xsd:dateTime)
+            // maxSize XoString { } // (optional) (xmlType: xsd:long)
+            // searchPrefix XoString { } // (optional) (xmlType: xsd:anyURI)
+            // inType XoString { list } // (xmlType: m2m:ResourceType) (list size: [0, infinity[) (enum: CS RS AN CI CT AP
+            // SB SL
+            // AR
+            // MT GP PM )
+            // outType XoString { list } // (xmlType: m2m:ResourceType) (list size: [0, infinity[) (enum: CS RS AN CI CT AP
+            // SB
+            // SL AR
+            // MT GP PM )
+            // }
+            // alias m2m:FilterCriteriaType with m2m:filterCriteria
+
+            // m2m:ContentInstancesFilterCriteriaType from m2m:FilterCriteriaType
+            // {
+            // sizeFrom XoString { } // (optional) (xmlType: xsd:long)
+            // sizeUntil XoString { } // (optional) (xmlType: xsd:long)
+            // contentType XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
+            // metaDataOnly XoString { } // (optional) (xmlType: xsd:boolean)
+            // }
+
+            SongURI targetID = songRequest.getTargetID();
+            XoObject filterCriteria = null;
+            List ifNoneMatch = null;
+            List searchString = null;
+            List inType = null;
+            List outType = null;
+            List contentType = null;
+            boolean contentInstanceFilterCriteria = false;
+
+            Iterator it = targetID.getQueryParameters();
+            while (it.hasNext()) {
+                Entry entry = (Entry) it.next();
+                String queryName = (String) entry.getKey();
+                if (M2MConstants.ATTR_IF_MODIFIED_SINCE.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    filterCriteria.setStringAttribute(M2MConstants.TAG_IF_MODIFIED_SINCE, (String) entry.getValue());
+                } else if (M2MConstants.ATTR_IF_UNMODIFIED_SINCE.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    filterCriteria.setStringAttribute(M2MConstants.TAG_IF_UNMODIFIED_SINCE, (String) entry.getValue());
+                } else if (M2MConstants.ATTR_IF_NONE_MATCH.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    if (ifNoneMatch == null) {
+                        ifNoneMatch = filterCriteria.getStringListAttribute(M2MConstants.TAG_IF_NONE_MATCH);
+                    }
+                    ifNoneMatch.add(entry.getValue());
+                } else if (M2MConstants.ATTR_ATTRIBUTE_ACCESSOR.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    filterCriteria.setStringAttribute(M2MConstants.TAG_ATTRIBUTE_ACCESSOR, (String) entry.getValue());
+                } else if (M2MConstants.ATTR_SEARCH_STRING.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    if (searchString == null) {
+                        searchString = filterCriteria.getStringListAttribute(M2MConstants.TAG_SEARCH_STRING);
+                    }
+                    searchString.add(entry.getValue());
+                } else if (M2MConstants.ATTR_CREATED_AFTER.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    filterCriteria.setStringAttribute(M2MConstants.TAG_CREATED_AFTER, (String) entry.getValue());
+                } else if (M2MConstants.ATTR_CREATED_BEFORE.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    filterCriteria.setStringAttribute(M2MConstants.TAG_CREATED_BEFORE, (String) entry.getValue());
+                } else if (M2MConstants.ATTR_MAX_SIZE.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    filterCriteria.setStringAttribute(M2MConstants.TAG_MAX_SIZE, (String) entry.getValue());
+                } else if (M2MConstants.ATTR_SEARCH_PREFIX.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    filterCriteria.setStringAttribute(M2MConstants.TAG_SEARCH_PREFIX, (String) entry.getValue());
+                } else if (M2MConstants.ATTR_IN_TYPE.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    if (inType == null) {
+                        inType = filterCriteria.getStringListAttribute(M2MConstants.TAG_IN_TYPE);
+                    }
+                    inType.add(entry.getValue());
+                } else if (M2MConstants.ATTR_OUT_TYPE.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    if (outType == null) {
+                        outType = filterCriteria.getStringListAttribute(M2MConstants.TAG_OUT_TYPE);
+                    }
+                    outType.add(entry.getValue());
+                } else if (M2MConstants.ATTR_SIZE_FROM.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    if (!contentInstanceFilterCriteria) {
+                        contentInstanceFilterCriteria = true;
+                        filterCriteria.setStringAttribute(M2MConstants.ATTR_XSI_TYPE,
+                                M2MConstants.TYPE_M2M_CONTENT_INSTANCE_FILTER_CRITERIA_TYPE);
+                    }
+                    filterCriteria.setStringAttribute(M2MConstants.TAG_SIZE_FROM, (String) entry.getValue());
+                } else if (M2MConstants.ATTR_SIZE_UNTIL.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    if (!contentInstanceFilterCriteria) {
+                        contentInstanceFilterCriteria = true;
+                        filterCriteria.setStringAttribute(M2MConstants.ATTR_XSI_TYPE,
+                                M2MConstants.TYPE_M2M_CONTENT_INSTANCE_FILTER_CRITERIA_TYPE);
+                    }
+                    filterCriteria.setStringAttribute(M2MConstants.TAG_SIZE_UNTIL, (String) entry.getValue());
+                } else if (M2MConstants.ATTR_CONTENT_TYPE.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    if (!contentInstanceFilterCriteria) {
+                        contentInstanceFilterCriteria = true;
+                        filterCriteria.setStringAttribute(M2MConstants.ATTR_XSI_TYPE,
+                                M2MConstants.TYPE_M2M_CONTENT_INSTANCE_FILTER_CRITERIA_TYPE);
+                    }
+                    if (contentType == null) {
+                        contentType = filterCriteria.getStringListAttribute(M2MConstants.TAG_CONTENT_TYPE);
+                    }
+                    contentType.add(entry.getValue());
+                } else if (M2MConstants.ATTR_META_DATA_ONLY.equals(queryName)) {
+                    filterCriteria = buildFilterCriteria(filterCriteria, requestNotify);
+                    if (!contentInstanceFilterCriteria) {
+                        contentInstanceFilterCriteria = true;
+                        filterCriteria.setStringAttribute(M2MConstants.ATTR_XSI_TYPE,
+                                M2MConstants.TYPE_M2M_CONTENT_INSTANCE_FILTER_CRITERIA_TYPE);
+                    }
+                    filterCriteria.setStringAttribute(M2MConstants.TAG_META_DATA_ONLY, (String) entry.getValue());
+                }
+            }
+            if (songRequest.getHeader("X-etsi-group-request-id") != null) {
+                requestNotify.setStringAttribute(M2MConstants.TAG_GROUP_REQUEST_IDENTIFIER,
+                        songRequest.getHeader("X-etsi-group-request-id"));
+            }
+            // TODO Trpdt ?
+            if (songRequest.getHeader("X-etsi-rcat") != null) {
+                requestNotify.setStringAttribute(M2MConstants.TAG_R_C_A_T, songRequest.getHeader("X-etsi-rcat"));
+            }
+
+            if (songRequest.getHeader(SongServletRequest.HD_CONTENT_TYPE) != null) {
+                requestNotify.setStringAttribute(M2MConstants.TAG_CONTENT_TYPE_HEADER,
+                        songRequest.getHeader(SongServletRequest.HD_CONTENT_TYPE));
+            }
+            if (songRequest.getHeader(SongServletRequest.HD_ACCEPT) != null) {
+                requestNotify.setStringAttribute(M2MConstants.TAG_ACCEPT_HEADER,
+                        songRequest.getHeader(SongServletRequest.HD_ACCEPT));
+            }
+            if (songRequest.getHeader(SongServletRequest.HD_IF_MODIFIED_SINCE) != null) {
+                requestNotify.setStringAttribute(M2MConstants.TAG_IF_MODIFIED_SINCE_HEADER,
+                        songRequest.getHeader(SongServletRequest.HD_IF_MODIFIED_SINCE));
+            }
+            if (songRequest.getHeader(SongServletRequest.HD_IF_UNMODIFIED_SINCE) != null) {
+                requestNotify.setStringAttribute(M2MConstants.TAG_IF_UNMODIFIED_SINCE_HEADER,
+                        songRequest.getHeader(SongServletRequest.HD_IF_UNMODIFIED_SINCE));
+            }
+            if (songRequest.getHeader(SongServletRequest.HD_IF_MATCH) != null) {
+                requestNotify.setStringAttribute(M2MConstants.TAG_IF_MATCH_HEADER,
+                        songRequest.getHeader(SongServletRequest.HD_IF_MATCH));
+            }
+            if (songRequest.getHeader(SongServletRequest.HD_IF_NONE_MATCH) != null) {
+                requestNotify.setStringAttribute(M2MConstants.TAG_IF_NONE_MATCH_HEADER,
+                        songRequest.getHeader(SongServletRequest.HD_IF_NONE_MATCH));
+            }
+            if (songRequest.getHeader(HTTP_HD_ETSI_CONTACT_URI) != null) {
+                requestNotify.setStringAttribute(M2MConstants.TAG_X_ETSI_CONTACT_URI_HEADER,
+                        songRequest.getHeader(HTTP_HD_ETSI_CONTACT_URI));
+            }
+            if (songRequest.getHeader(HTTP_HD_ETSI_CORRELATION_ID) != null) {
+                requestNotify.setStringAttribute(M2MConstants.TAG_X_ETSI_CORRELATION_I_D_HEADER,
+                        songRequest.getHeader(HTTP_HD_ETSI_CORRELATION_ID));
+            }
+            if (songRequest.getContentLength() > 0) {
+                XoObject representation = xoService.newXmlXoObject(M2MConstants.TYPE_XMIME_BASE64_BINARY);
+                requestNotify.setXoObjectAttribute(M2MConstants.TAG_REPRESENTATION, representation);
+                if (songRequest.getContentType() != null) {
+                    representation.setStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE, songRequest.getContentType());
+                }
+                representation.setBufferAttribute(XoObject.ATTR_VALUE, songRequest.getRawContent());
+            }
+            byte[] requestNotifyContent = requestNotify.saveXml();
+
+            httpTransaction.print(httpTransaction.getHttpVersion());
+            httpTransaction.print(' ');
+            httpTransaction.print(HttpServletResponse.SC_OK);
+            httpTransaction.print(" OK\r\n");
+
+            httpTransaction.print(HttpUtils.HD_CONTENT_TYPE);
+            httpTransaction.print(": ");
+            httpTransaction.print(M2MConstants.CT_APPLICATION_XML_UTF8);
+            httpTransaction.print("\r\n");
+
+            httpTransaction.print(HttpUtils.HD_CONTENT_LENGTH);
+            httpTransaction.print(": ");
+            httpTransaction.print(requestNotifyContent.length);
+            httpTransaction.print("\r\n");
+
+            httpTransaction.print(HttpUtils.HD_SERVER);
+            httpTransaction.print(": ");
+            httpTransaction.print(songRequest.getHeader(SongServletMessage.HD_USER_AGENT));
+            httpTransaction.print("\r\n");
+
+            it = songRequest.getHeaderNames();
+            String header = null;
+            ListIterator lit = null;
+            while (it.hasNext()) {
+                header = (String) it.next();
+                if (header.startsWith("X-Acy-")) {
+                    lit = songRequest.getHeaders(header);
+                    while (lit.hasNext()) {
+                        httpTransaction.print(header);
+                        httpTransaction.print(": ");
+                        httpTransaction.print((String) lit.next());
+                        httpTransaction.print("\r\n");
+                    }
+                }
+            }
+
+            httpTransaction.print("\r\n");
+            httpTransaction.writeBody(requestNotifyContent);
+            if (LOG.isInfoEnabled()) {
+                LOG.info(transactionId + ": <<< HTTP.HTTPBinding: 200 OK (Long Polling Response)");
+            }
+            if (Profiler.getInstance().isTraceEnabled()) {
+                Profiler.getInstance().trace(transactionId + ": <<< HTTP.HTTPBinding: 200 OK (Long Polling Response)");
+            }
+            httpTransaction.send();
+        } finally {
+            httpTransaction.terminated();
+            if (requestNotify != null) {
+                requestNotify.free(true);
+            }
         }
     }
 
@@ -2422,4 +3249,364 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
         }
         return results;
     }
+
+    private final int ID_MODE_FORBIDDEN = 0;
+    private final int ID_MODE_OPTIONAL = 1;
+    private final int ID_MODE_REQUIRED = 2;
+
+    private void checkMode(Object attribute, String tagName, int mode) throws M2MException {
+        switch (mode) {
+        case ID_MODE_FORBIDDEN:
+            if (attribute != null) {
+                throw new M2MException("Received representation declares a " + tagName + " attribute which is not authorized",
+                        StatusCode.STATUS_BAD_REQUEST);
+            }
+            break;
+        case ID_MODE_OPTIONAL:
+            // OK
+            break;
+        case ID_MODE_REQUIRED:
+            if (attribute == null) {
+                throw new M2MException("Received representation does not declare a " + tagName
+                        + " attribute which is mandatory", StatusCode.STATUS_BAD_REQUEST);
+            }
+            break;
+        }
+    }
+
+    private String getAndCheckRelativePath(XoObject representation, String tagName, int mode) throws M2MException {
+        String attribute = representation.getStringAttribute(tagName);
+        URI relativePath = checkURI(attribute, tagName, mode);
+        if (attribute != null) {
+            if (relativePath.isAbsolute()) {
+                throw new M2MException(tagName + " is absolute but only relative URI are supported: " + attribute,
+                        StatusCode.STATUS_PERMISSION_DENIED);
+            }
+            if (attribute.charAt(0) == '/') {
+                throw new M2MException(tagName + " is an absolute path with is not authorized: " + attribute,
+                        StatusCode.STATUS_PERMISSION_DENIED);
+            }
+            if (!attribute.endsWith(M2MConstants.URI_SEP)) {
+                attribute += M2MConstants.URI_SEP;
+                representation.setStringAttribute(tagName, attribute);
+            }
+        }
+        return attribute;
+    }
+
+    private Date getAndCheckDateTime(XoObject representation, String tagName, int mode, long minValue) throws M2MException {
+        String attribute = representation.getStringAttribute(tagName);
+        checkMode(attribute, tagName, mode);
+        Date dateAttribute = null;
+        if (attribute != null) {
+            try {
+                dateAttribute = FormatUtils.parseDateTime(attribute);
+                if (minValue != -1L && dateAttribute.getTime() < minValue) {
+                    throw new M2MException(tagName + " attribute value is too short: " + attribute,
+                            StatusCode.STATUS_BAD_REQUEST);
+                }
+            } catch (ParseException e) {
+                throw new M2MException(tagName + " attribute is not a valid xsd:dateTime: " + attribute,
+                        StatusCode.STATUS_BAD_REQUEST, e);
+            }
+        }
+        return dateAttribute;
+    }
+
+    private Date getAndCheckTime(XoObject representation, String tagName, int mode) throws M2MException {
+        String attribute = representation.getStringAttribute(tagName);
+        checkMode(attribute, tagName, mode);
+        Date timeAttribute = null;
+        if (attribute != null) {
+            try {
+                timeAttribute = FormatUtils.parseTime(attribute);
+            } catch (ParseException e) {
+                throw new M2MException(tagName + " attribute is not a valid xsd:time: " + attribute,
+                        StatusCode.STATUS_BAD_REQUEST, e);
+            }
+        }
+        return timeAttribute;
+    }
+
+    private String getAndCheckStringMode(XoObject representation, String tagName, int mode) throws M2MException {
+        String value = representation.getStringAttribute(tagName);
+        checkMode(value, tagName, mode);
+        return value;
+    }
+
+    private URI checkURI(String attribute, String tagName, int mode) throws M2MException {
+        checkMode(attribute, tagName, mode);
+        URI uri = null;
+        try {
+            if (attribute != null) {
+                uri = new URI(attribute);
+            }
+        } catch (URISyntaxException e) {
+            throw new M2MException(tagName + " attribute is not a valid URI: " + attribute, StatusCode.STATUS_BAD_REQUEST, e);
+        }
+        return uri;
+    }
+
+    private URI getAndCheckURI(XoObject representation, String tagName, int mode) throws M2MException {
+        String attribute = representation.getStringAttribute(tagName);
+        return checkURI(attribute, tagName, mode);
+    }
+
+    private Integer getAndCheckInt(XoObject representation, String tagName, int mode) throws M2MException {
+        String attribute = representation.getStringAttribute(tagName);
+        checkMode(attribute, tagName, mode);
+        if (attribute != null) {
+            try {
+                return Integer.valueOf(attribute);
+            } catch (NumberFormatException e) {
+                throw new M2MException(tagName + " attribute is not a valid xsd:int: " + attribute,
+                        StatusCode.STATUS_BAD_REQUEST, e);
+            }
+        }
+        return null;
+    }
+
+    private Boolean getAndCheckBoolean(XoObject representation, String tagName, int mode) throws M2MException {
+        String attribute = representation.getStringAttribute(tagName);
+        checkMode(attribute, tagName, mode);
+        if (attribute != null) {
+            if (M2MConstants.BOOLEAN_FALSE.equals(attribute)) {
+                return Boolean.FALSE;
+            } else if (M2MConstants.BOOLEAN_TRUE.equals(attribute)) {
+                return Boolean.TRUE;
+            } else {
+                throw new M2MException(tagName + " attribute is not a valid xsd:boolean: " + attribute,
+                        StatusCode.STATUS_BAD_REQUEST);
+            }
+        }
+        return null;
+    }
+
+    private List getAndCheckStringList(XoObject representation, String tagName) {
+        List result = null;
+        List listString = representation.getStringListAttribute(tagName);
+        if (!listString.isEmpty()) {
+            result = new ArrayList();
+            Iterator it = listString.iterator();
+            while (it.hasNext()) {
+                result.add(it.next());
+            }
+        }
+        return result;
+    }
+
+    private void checkFilterCriteriaType(XoObject filterCriteria, String tagName, FilterCriteria fc) throws M2MException {
+        // m2m:FilterCriteriaType from ong:t_xml_obj
+        // {
+        // xsi:type XoString { embattr } // (optional) (xmlType: xsd:QName)
+        // ifModifiedSince XoString { } // (optional) (xmlType: xsd:dateTime)
+        // ifUnmodifiedSince XoString { } // (optional) (xmlType: xsd:dateTime)
+        // ifNoneMatch XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
+        // attributeAccessor XoString { } // (xmlType: xsd:anyURI)
+        // searchString XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
+        // createdAfter XoString { } // (optional) (xmlType: xsd:dateTime)
+        // createdBefore XoString { } // (optional) (xmlType: xsd:dateTime)
+        // maxSize XoString { } // (optional) (xmlType: xsd:long)
+        // searchPrefix XoString { } // (optional) (xmlType: xsd:anyURI)
+        // inType XoString { list } // (xmlType: m2m:ResourceType) (list size: [0, infinity[) (enum: CS RS AN CI CT AP SB SL AR
+        // MT GP PM )
+        // outType XoString { list } // (xmlType: m2m:ResourceType) (list size: [0, infinity[) (enum: CS RS AN CI CT AP SB SL AR
+        // MT GP PM )
+        // }
+        // alias m2m:FilterCriteriaType with m2m:filterCriteria
+        Date dateValue = getAndCheckDateTime(filterCriteria, M2MConstants.TAG_IF_MODIFIED_SINCE, ID_MODE_OPTIONAL, -1L);
+        if (dateValue != null) {
+            fc.setIfModifiedSince(dateValue);
+        }
+        dateValue = getAndCheckDateTime(filterCriteria, M2MConstants.TAG_IF_UNMODIFIED_SINCE, ID_MODE_OPTIONAL, -1L);
+        if (dateValue != null) {
+            fc.setIfUnmodifiedSince(dateValue);
+        }
+        List listValue = getAndCheckStringList(filterCriteria, M2MConstants.TAG_IF_NONE_MATCH);
+        if (listValue != null) {
+            String[] arrayValue = null;
+            arrayValue = new String[listValue.size()];
+            listValue.toArray(arrayValue);
+            Arrays.sort(arrayValue);
+            fc.setIfNoneMatch(arrayValue);
+        }
+        String stringValue = getAndCheckRelativePath(filterCriteria, M2MConstants.TAG_ATTRIBUTE_ACCESSOR, ID_MODE_OPTIONAL);
+        if (stringValue != null) {
+            fc.setAttributeAccessor(stringValue);
+        }
+        listValue = getAndCheckStringList(filterCriteria, M2MConstants.TAG_SEARCH_STRING);
+        if (listValue != null) {
+            String[] arrayValue = null;
+            arrayValue = new String[listValue.size()];
+            listValue.toArray(arrayValue);
+            Arrays.sort(arrayValue);
+            fc.setSearchString(arrayValue);
+        }
+        dateValue = getAndCheckDateTime(filterCriteria, M2MConstants.TAG_CREATED_AFTER, ID_MODE_OPTIONAL, -1L);
+        if (dateValue != null) {
+            fc.setCreatedAfter(dateValue);
+        }
+        dateValue = getAndCheckDateTime(filterCriteria, M2MConstants.TAG_CREATED_BEFORE, ID_MODE_OPTIONAL, -1L);
+        if (dateValue != null) {
+            fc.setCreatedBefore(dateValue);
+        }
+        long longValue = getAndCheckLong(filterCriteria, M2MConstants.TAG_MAX_SIZE, ID_MODE_OPTIONAL);
+        if (longValue != -1L) {
+            fc.setMaxSize(longValue);
+        }
+        stringValue = getAndCheckStringMode(filterCriteria, M2MConstants.TAG_SEARCH_PREFIX, ID_MODE_OPTIONAL);
+        if (stringValue != null) {
+            fc.setSearchPrefix(stringValue);
+        }
+        listValue = getAndCheckStringList(filterCriteria, M2MConstants.TAG_IN_TYPE);
+        if (listValue != null) {
+            String[] arrayValue = null;
+            arrayValue = new String[listValue.size()];
+            listValue.toArray(arrayValue);
+            Arrays.sort(arrayValue);
+            fc.setInType(arrayValue);
+        }
+        listValue = getAndCheckStringList(filterCriteria, M2MConstants.TAG_OUT_TYPE);
+        if (listValue != null) {
+            String[] arrayValue = null;
+            arrayValue = new String[listValue.size()];
+            listValue.toArray(arrayValue);
+            Arrays.sort(arrayValue);
+            fc.setOutType(arrayValue);
+        }
+    }
+
+    private FilterCriteria getAndCheckFilterCriteriaType(XoObject representation, String tagName, int mode) throws M2MException {
+        // m2m:ContentInstancesFilterCriteriaType from m2m:FilterCriteriaType
+        // {
+        // sizeFrom XoString { } // (optional) (xmlType: xsd:long)
+        // sizeUntil XoString { } // (optional) (xmlType: xsd:long)
+        // contentType XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
+        // metaDataOnly XoString { } // (optional) (xmlType: xsd:boolean)
+        // }
+        FilterCriteria fc = null;
+        XoObject filterCriteria = representation.getXoObjectAttribute(tagName);
+        checkMode(filterCriteria, tagName, mode);
+        if (filterCriteria != null) {
+            String xsiType = filterCriteria.getStringAttribute(M2MConstants.ATTR_XSI_TYPE);
+            if (M2MConstants.TYPE_M2M_CONTENT_INSTANCE_FILTER_CRITERIA_TYPE.equals(xsiType)) {
+                ContentInstanceFilterCriteria cifc = new ContentInstanceFilterCriteria();
+                fc = cifc;
+                checkFilterCriteriaType(filterCriteria, tagName, fc);
+
+                Integer intValue = getAndCheckInt(filterCriteria, M2MConstants.TAG_SIZE_FROM, ID_MODE_OPTIONAL);
+                if (intValue != null) {
+                    cifc.setSizeFrom(intValue);
+                }
+                intValue = getAndCheckInt(filterCriteria, M2MConstants.TAG_SIZE_UNTIL, ID_MODE_OPTIONAL);
+                if (intValue != null) {
+                    cifc.setSizeUntil(intValue);
+                }
+                List listValue = getAndCheckStringList(filterCriteria, M2MConstants.TAG_CONTENT_TYPE);
+                if (listValue != null) {
+                    String[] arrayValue = null;
+                    arrayValue = new String[listValue.size()];
+                    listValue.toArray(arrayValue);
+                    Arrays.sort(arrayValue);
+                    cifc.setContentType(arrayValue);
+                }
+                Boolean metaDataOnly = getAndCheckBoolean(filterCriteria, M2MConstants.TAG_META_DATA_ONLY, ID_MODE_OPTIONAL);
+                if (metaDataOnly != null) {
+                    cifc.setMetaDataOnly(metaDataOnly);
+                }
+            } else {
+                fc = new FilterCriteria();
+                checkFilterCriteriaType(filterCriteria, tagName, fc);
+            }
+        }
+        return fc;
+    }
+
+    private long getAndCheckDuration(XoObject representation, String tagName, int mode) throws M2MException {
+        String attribute = representation.getStringAttribute(tagName);
+        checkMode(attribute, tagName, mode);
+        long value = -1L;
+        if (attribute != null) {
+            try {
+                value = FormatUtils.parseDuration(attribute);
+            } catch (ParseException e) {
+                throw new M2MException(tagName + " attribute is not a valid xsd:duration: " + attribute,
+                        StatusCode.STATUS_BAD_REQUEST, e);
+            }
+        }
+        return value;
+    }
+
+    private Trpdt getAndCheckTrpdtType(XoObject representation, String tagName, int mode) throws M2MException {
+        // m2m:TrpdtType from ong:t_xml_obj
+        // {
+        // tolerableDelay XoString { } // (optional) (xmlType: xsd:duration)
+        // tolerableTime XoString { } // (optional) (xmlType: xsd:time)
+        // }
+        Trpdt trpdt = null;
+        XoObject xoTrdpt = representation.getXoObjectAttribute(tagName);
+        checkMode(xoTrdpt, tagName, mode);
+        if (xoTrdpt != null) {
+            trpdt = new Trpdt();
+            trpdt.setTolerableDelay(getAndCheckDuration(xoTrdpt, M2MConstants.TAG_TOLERABLE_DELAY, ID_MODE_OPTIONAL));
+            trpdt.setTolerableTime(getAndCheckTime(xoTrdpt, M2MConstants.TAG_TOLERABLE_TIME, ID_MODE_OPTIONAL));
+        }
+        return trpdt;
+    }
+
+    private long getAndCheckLong(XoObject representation, String tagName, int mode) throws M2MException {
+        String attribute = representation.getStringAttribute(tagName);
+        checkMode(attribute, tagName, mode);
+        long value = -1L;
+        if (attribute != null) {
+            try {
+                value = Long.parseLong(attribute);
+            } catch (NumberFormatException e) {
+                throw new M2MException(tagName + " attribute is not a valid xsd:long: " + attribute,
+                        StatusCode.STATUS_BAD_REQUEST, e);
+            }
+        }
+        return value;
+    }
+
+    private void getAndCheckStringNonEmpty(XoObject representation, String tagName, int mode) throws M2MException {
+        String value = representation.getStringAttribute(tagName);
+        checkMode(value, tagName, mode);
+        if (value != null && "".equals(value)) {
+            throw new M2MException("Received representation declares a " + tagName + " attribute which has an empty value",
+                    StatusCode.STATUS_BAD_REQUEST);
+        }
+    }
+
+    private int getAndCheckBuffer(XoObject representation, String tagName, int mode) throws M2MException {
+        byte[] attribute = representation.getBufferAttribute(tagName);
+        int size = -1;
+        checkMode(attribute, tagName, mode);
+        if (attribute != null) {
+            size = attribute.length;
+        }
+        return size;
+    }
+
+    private void checkRepresentation(XoObject representation, String tagName) throws M2MException {
+        if (representation == null) {
+            throw new M2MException("Received a request without body or with an unsupported body representation",
+                    StatusCode.STATUS_BAD_REQUEST);
+        } else if (!tagName.equals(representation.getName())) {
+            throw new M2MException("Bad representation. Expected " + tagName + " and received " + representation.getName(),
+                    StatusCode.STATUS_BAD_REQUEST);
+        }
+    }
+
+    private int getAndCheckXmimeBase64(XoObject representation, String tagName, int mode) throws M2MException {
+        XoObject base64 = representation.getXoObjectAttribute(tagName);
+        int size = -1;
+        checkMode(base64, tagName, mode);
+        if (base64 != null) {
+            getAndCheckStringNonEmpty(base64, M2MConstants.TAG_XMIME_CONTENT_TYPE, ID_MODE_OPTIONAL);
+            size = getAndCheckBuffer(base64, XoObject.ATTR_VALUE, ID_MODE_REQUIRED);
+        }
+        return size;
+    }
+
 }

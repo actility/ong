@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: HttpServerTransaction.java 8521 2014-04-14 09:05:59Z JReich $
+ * id $Id: HttpServerTransaction.java 9482 2014-09-06 09:37:41Z JReich $
  * author $Author: JReich $
- * version $Revision: 8521 $
- * lastrevision $Date: 2014-04-14 11:05:59 +0200 (Mon, 14 Apr 2014) $
+ * version $Revision: 9482 $
+ * lastrevision $Date: 2014-09-06 11:37:41 +0200 (Sat, 06 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-04-14 11:05:59 +0200 (Mon, 14 Apr 2014) $
+ * lastmodified $LastChangedDate: 2014-09-06 11:37:41 +0200 (Sat, 06 Sep 2014) $
  */
 
 package com.actility.m2m.http.server;
@@ -130,8 +130,8 @@ public final class HttpServerTransaction implements Runnable {
      * Resets the HTTP server transaction so that it can be re-used and associated later to a new HTTP socket
      */
     public void reset() {
-        if (LOG.isInfoEnabled()) {
-            LOG.info(id + ": reset " + this);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(id + ": reset " + this);
         }
         sent = false;
         writerFlushed = false;
@@ -153,8 +153,8 @@ public final class HttpServerTransaction implements Runnable {
      * Deletes this transaction and stops the pending HTTP server transaction
      */
     public void destroy() {
-        if (LOG.isInfoEnabled()) {
-            LOG.info(id + ": destroy " + this);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(id + ": destroy " + this);
         }
         reset();
         socket = null;

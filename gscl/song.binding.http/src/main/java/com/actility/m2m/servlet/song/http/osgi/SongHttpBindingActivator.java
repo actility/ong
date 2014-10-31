@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongHttpBindingActivator.java 8536 2014-04-14 13:35:38Z JReich $
+ * id $Id: SongHttpBindingActivator.java 9285 2014-08-19 12:28:15Z JReich $
  * author $Author: JReich $
- * version $Revision: 8536 $
- * lastrevision $Date: 2014-04-14 15:35:38 +0200 (Mon, 14 Apr 2014) $
+ * version $Revision: 9285 $
+ * lastrevision $Date: 2014-08-19 14:28:15 +0200 (Tue, 19 Aug 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-04-14 15:35:38 +0200 (Mon, 14 Apr 2014) $
+ * lastmodified $LastChangedDate: 2014-08-19 14:28:15 +0200 (Tue, 19 Aug 2014) $
  */
 
 package com.actility.m2m.servlet.song.http.osgi;
@@ -60,11 +60,11 @@ import com.actility.m2m.http.client.ni.HttpClientNiService;
 import com.actility.m2m.http.server.HttpServerManager;
 import com.actility.m2m.m2m.M2MService;
 import com.actility.m2m.servlet.NamespaceException;
-import com.actility.m2m.servlet.song.SongBindingFacade;
+import com.actility.m2m.servlet.song.binding.SongBindingFacade;
+import com.actility.m2m.servlet.song.binding.service.SongBindingService;
 import com.actility.m2m.servlet.song.http.HttpBindingFacade;
 import com.actility.m2m.servlet.song.http.SongHttpBinding;
 import com.actility.m2m.servlet.song.http.log.BundleLogger;
-import com.actility.m2m.servlet.song.service.SongBindingService;
 import com.actility.m2m.song.binding.http.SongHttpBindingStatsService;
 import com.actility.m2m.util.ByteArrayOutputStream;
 import com.actility.m2m.util.FormatUtils;
@@ -82,10 +82,8 @@ public final class SongHttpBindingActivator implements BundleActivator, ManagedS
      */
     private static final Integer DEFAULT_MAX_CONTENT_LENGTH = new Integer(8192);
     private static final Long DEFAULT_REQUEST_EXPIRATION_TIMER = new Long(32000L);
-    private static final Long DEFAULT_LONG_POLLING_SERVER_REQUEST_EXPIRATION_TIMER = new Long(120000L); // 5.0 new
-                                                                                                        // Long(300000L);
-    private static final Long DEFAULT_LONG_POLLING_CLIENT_REQUEST_EXPIRATION_TIMER = new Long(240000L); // 5.0 new
-                                                                                                        // Long(420000L);
+    private static final Long DEFAULT_LONG_POLLING_SERVER_REQUEST_EXPIRATION_TIMER = new Long(300000L); // 5 mins
+    private static final Long DEFAULT_LONG_POLLING_CLIENT_REQUEST_EXPIRATION_TIMER = new Long(420000L); // 7 mins
     private static final Long DEFAULT_CONTACT_REQUEST_WAITING_TIMER = new Long(5000L);
     private static final Integer DEFAULT_PROXY_PORT = new Integer(3128);
     private static final Integer DEFAULT_SERVER_PORT = new Integer(8080);
@@ -217,8 +215,9 @@ public final class SongHttpBindingActivator implements BundleActivator, ManagedS
                 try {
                     defaultPortValue = new Integer(Integer.parseInt(defaultProxyPort));
                 } catch (NumberFormatException e) {
-                    LOG.error("Framework property com.actility.song.binding.http.config.proxyPort is not a valid number: "
-                            + defaultProxyPort + " use default value " + defaultPortValue + " instead");
+                    LOG.error("Framework property " + context.getBundle().getSymbolicName()
+                            + ".config.proxyPort is not a valid number: " + defaultProxyPort + " use default value "
+                            + defaultPortValue + " instead");
                 }
             }
         }
@@ -259,12 +258,31 @@ public final class SongHttpBindingActivator implements BundleActivator, ManagedS
                 try {
                     defaultPortValue = new Integer(Integer.parseInt(defaultServerPort));
                 } catch (NumberFormatException e) {
-                    LOG.error("Framework property com.actility.song.binding.http.config.serverPort is not a valid number: "
-                            + defaultServerPort + " use default value " + defaultPortValue + " instead");
+                    LOG.error("Framework property " + context.getBundle().getSymbolicName()
+                            + ".config.serverPort is not a valid number: " + defaultServerPort + " use default value "
+                            + defaultPortValue + " instead");
                 }
             }
         }
         return ((Integer) checkWithDefault(config, "serverPort", Integer.class, defaultPortValue)).intValue();
+    }
+
+    private Integer getVirtualServerPort(BundleContext context, Dictionary config) {
+        Integer virtualPortValue = null;
+        String defaultVirtualServerPort = resourcesAccessorService.getProperty(context, context.getBundle().getSymbolicName()
+                + ".config.virtualServerPort");
+        if (defaultVirtualServerPort != null) {
+            defaultVirtualServerPort = defaultVirtualServerPort.trim();
+            if (defaultVirtualServerPort.length() != 0) {
+                try {
+                    virtualPortValue = new Integer(Integer.parseInt(defaultVirtualServerPort));
+                } catch (NumberFormatException e) {
+                    LOG.error("Framework property " + context.getBundle().getSymbolicName()
+                            + ".config.virtualServerPort is not a valid number: " + defaultVirtualServerPort);
+                }
+            }
+        }
+        return (Integer) checkWithDefault(config, "virtualServerPort", Integer.class, virtualPortValue);
     }
 
     private int getServerMaxSockets(Dictionary config) {
@@ -450,6 +468,11 @@ public final class SongHttpBindingActivator implements BundleActivator, ManagedS
                 String proxyUsername = getProxyUsername(context, config);
                 String proxyPassword = getProxyPassword(context, config);
                 int serverPort = getServerPort(context, config);
+                Integer configVirtualServerPort = getVirtualServerPort(context, config);
+                int virtualServerPort = serverPort;
+                if (configVirtualServerPort != null) {
+                    virtualServerPort = configVirtualServerPort.intValue();
+                }
                 int serverMaxSockets = getServerMaxSockets(config);
                 int serverConnectionExpirationTimer = getServerConnectionExpirationTimer(config);
                 int serverMaxNbOfHeaders = getServerMaxNbOfHeaders(config);
@@ -467,7 +490,8 @@ public final class SongHttpBindingActivator implements BundleActivator, ManagedS
                 SongBindingFacade bindingFacade = new HttpBindingFacade(songHttpBinding);
 
                 songBindingService.registerBindingServlet(applicationContext, "SONGBinding", songHttpBinding, null,
-                        bindingFacade, "http", PROTOCOLS, true, DEFAULT_PROTOCOL, localAddress, serverPort, null);
+                        bindingFacade, "http", (virtualServerPort == 80) ? -1 : virtualServerPort, PROTOCOLS, true,
+                        DEFAULT_PROTOCOL, localAddress, virtualServerPort, null);
                 songBindingService.registerServiceServlet(applicationContext, "/", "LPService", songHttpBinding, null, null);
                 httpServer = new HttpServerManager(songHttpBinding, false, serverPort, serverMaxSockets,
                         serverConnectionExpirationTimer, serverMaxNbOfHeaders, serverMaxHeaderLineLength,
