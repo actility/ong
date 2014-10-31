@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongContainerFacade.java 7993 2014-03-07 15:02:32Z JReich $
+ * id $Id: SongContainerFacade.java 9309 2014-08-21 10:13:58Z JReich $
  * author $Author: JReich $
- * version $Revision: 7993 $
- * lastrevision $Date: 2014-03-07 16:02:32 +0100 (Fri, 07 Mar 2014) $
+ * version $Revision: 9309 $
+ * lastrevision $Date: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-03-07 16:02:32 +0100 (Fri, 07 Mar 2014) $
+ * lastmodified $LastChangedDate: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  */
 
 package com.actility.m2m.servlet.song.internal;
@@ -34,6 +34,7 @@ package com.actility.m2m.servlet.song.internal;
 import java.util.TimerTask;
 
 import com.actility.m2m.be.EndpointContext;
+import com.actility.m2m.framework.resources.ResourcesAccessorService;
 import com.actility.m2m.servlet.ext.ExtProtocolContainer;
 import com.actility.m2m.servlet.song.SongServletResponse;
 import com.actility.m2m.xo.XoService;
@@ -42,6 +43,8 @@ public interface SongContainerFacade extends ExtProtocolContainer {
     EndpointContext getContext();
 
     XoService getXoService();
+
+    ResourcesAccessorService getResourcesAccessorService();
 
     void scheduleTimer(TimerTask timer, long millis);
 

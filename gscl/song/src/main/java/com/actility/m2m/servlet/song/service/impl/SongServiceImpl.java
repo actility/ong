@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongServiceImpl.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: SongServiceImpl.java 9309 2014-08-21 10:13:58Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9309 $
+ * lastrevision $Date: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  */
 
 package com.actility.m2m.servlet.song.service.impl;
@@ -44,18 +44,19 @@ import org.apache.log4j.Logger;
 
 import com.actility.m2m.be.BackendException;
 import com.actility.m2m.be.BackendService;
+import com.actility.m2m.framework.resources.ResourcesAccessorService;
 import com.actility.m2m.servlet.NamespaceException;
 import com.actility.m2m.servlet.TimerListener;
 import com.actility.m2m.servlet.ext.ExtServletContext;
 import com.actility.m2m.servlet.log.BundleLogger;
 import com.actility.m2m.servlet.service.ext.ExtServletService;
-import com.actility.m2m.servlet.song.SongBindingFacade;
 import com.actility.m2m.servlet.song.SongServlet;
+import com.actility.m2m.servlet.song.binding.SongBindingFacade;
+import com.actility.m2m.servlet.song.binding.service.ext.ExtSongBindingService;
 import com.actility.m2m.servlet.song.ext.SongNode;
 import com.actility.m2m.servlet.song.impl.RouteConfiguration;
 import com.actility.m2m.servlet.song.impl.SongContainer;
 import com.actility.m2m.servlet.song.service.SongService;
-import com.actility.m2m.servlet.song.service.ext.ExtSongBindingService;
 import com.actility.m2m.servlet.song.service.ext.ExtSongService;
 import com.actility.m2m.servlet.song.service.ext.SongStats;
 import com.actility.m2m.transport.logger.TransportLoggerService;
@@ -82,16 +83,17 @@ public final class SongServiceImpl implements ExtSongService, ExtSongBindingServ
     private ExtServletService servletService;
 
     public SongServiceImpl(String[] config, ExtServletService servletService, BackendService backendService,
-            XoService xoService, TransportLoggerService transportLoggerService, String hostname, String domainName,
-            long maxRemoteRequests) throws BackendException, UnknownHostException {
+            XoService xoService, ResourcesAccessorService resourcesAccessorService,
+            TransportLoggerService transportLoggerService, String hostname, String domainName, long maxRemoteRequests)
+            throws BackendException, UnknownHostException {
         this.servletService = servletService;
         try {
             RouteConfiguration[] routesConfiguration = parseRoutesConfiguration(config);
             if (routesConfiguration == null) {
                 routesConfiguration = DEFAULT_ROUTES;
             }
-            container = new SongContainer(servletService, backendService, xoService, transportLoggerService,
-                    routesConfiguration, hostname, domainName, maxRemoteRequests);
+            container = new SongContainer(servletService, backendService, xoService, resourcesAccessorService,
+                    transportLoggerService, routesConfiguration, hostname, domainName, maxRemoteRequests);
         } catch (BackendException e) {
             LOG.error("Cannot start the SONG service", e);
             throw e;
@@ -179,7 +181,7 @@ public final class SongServiceImpl implements ExtSongService, ExtSongBindingServ
     }
 
     public void registerBindingServlet(ServletContext context, String servletName, SongServlet servlet, Map initParams,
-            SongBindingFacade facade, String serverScheme, String[] managedSchemes, boolean longPollSupported,
+            SongBindingFacade facade, String serverScheme, int serverPort, String[] managedSchemes, boolean longPollSupported,
             String defaultProtocol, InetAddress address, int port, Map configuration) throws NamespaceException,
             ServletException {
         if (context == null) {
@@ -216,8 +218,8 @@ public final class SongServiceImpl implements ExtSongService, ExtSongBindingServ
             throw new ServletException("Can't register a SONG binding with an invalid port");
         }
 
-        container.registerBindingServlet(context, servletName, servlet, initParams, facade, serverScheme, managedSchemes,
-                longPollSupported, defaultProtocol, address, port, configuration);
+        container.registerBindingServlet(context, servletName, servlet, initParams, facade, serverScheme, serverPort,
+                managedSchemes, longPollSupported, defaultProtocol, address, port, configuration);
     }
 
     public void registerServiceServlet(ServletContext context, String servletName, SongServlet servlet, Map initParams,

@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: TimerServiceImpl.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: TimerServiceImpl.java 9481 2014-09-06 09:37:01Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9481 $
+ * lastrevision $Date: 2014-09-06 11:37:01 +0200 (Sat, 06 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-09-06 11:37:01 +0200 (Sat, 06 Sep 2014) $
  */
 
 package com.actility.m2m.servlet.impl;
@@ -58,8 +58,8 @@ public final class TimerServiceImpl extends Timer implements TimerService {
     }
 
     public ServletTimer createTimer(ApplicationSession appSession, long delay, boolean isPersistent, Serializable info) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Create timer for application " + appSession.getApplicationName() + " (delay=" + delay + ", persistent="
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Create timer for application " + appSession.getApplicationName() + " (delay=" + delay + ", persistent="
                     + isPersistent + ")");
         }
         ApplicationSessionImpl applicationSessionImpl = (ApplicationSessionImpl) appSession;
@@ -80,8 +80,8 @@ public final class TimerServiceImpl extends Timer implements TimerService {
         if (period < 1) {
             throw new IllegalArgumentException("Period should be greater than 0");
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Create timer for application " + appSession.getApplicationName() + " (delay=" + delay + ", period="
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Create timer for application " + appSession.getApplicationName() + " (delay=" + delay + ", period="
                     + period + ", fixedDelay=" + fixedDelay + ", persistent=" + isPersistent + ")");
         }
         ApplicationSessionImpl applicationSessionImpl = (ApplicationSessionImpl) appSession;
@@ -156,14 +156,14 @@ public final class TimerServiceImpl extends Timer implements TimerService {
 
     public void stop() {
         super.cancel();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Stopped timer service " + this);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Stopped timer service " + this);
         }
     }
 
     public void start() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Started timer service " + this);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Started timer service " + this);
         }
     }
 }

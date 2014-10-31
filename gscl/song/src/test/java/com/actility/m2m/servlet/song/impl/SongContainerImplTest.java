@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongContainerImplTest.java 7993 2014-03-07 15:02:32Z JReich $
+ * id $Id: SongContainerImplTest.java 9309 2014-08-21 10:13:58Z JReich $
  * author $Author: JReich $
- * version $Revision: 7993 $
- * lastrevision $Date: 2014-03-07 16:02:32 +0100 (Fri, 07 Mar 2014) $
+ * version $Revision: 9309 $
+ * lastrevision $Date: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-03-07 16:02:32 +0100 (Fri, 07 Mar 2014) $
+ * lastmodified $LastChangedDate: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  */
 
 package com.actility.m2m.servlet.song.impl;
@@ -55,6 +55,7 @@ import com.actility.m2m.be.messaging.DeliveryChannel;
 import com.actility.m2m.be.messaging.InOut;
 import com.actility.m2m.be.messaging.MessageExchangeFactory;
 import com.actility.m2m.be.messaging.MessagingException;
+import com.actility.m2m.framework.resources.ResourcesAccessorService;
 import com.actility.m2m.log.LogService;
 import com.actility.m2m.m2m.M2MConstants;
 import com.actility.m2m.m2m.StatusCode;
@@ -85,6 +86,7 @@ public class SongContainerImplTest extends TestCase {
     private BackendService backendService;
     private XoService xoService;
     private XoObject xoObject;
+    private ResourcesAccessorService resourcesAccessorService;
     private TransportLoggerService transportLoggerService;
     private EndpointContext containerEndpointContext;
     private EndpointContext servletEndpointContext;
@@ -111,6 +113,7 @@ public class SongContainerImplTest extends TestCase {
         servletService = EasyMock.createMock(ExtServletService.class);
         backendService = EasyMock.createMock(BackendService.class);
         xoService = EasyMock.createMock(XoService.class);
+        resourcesAccessorService = EasyMock.createMock(ResourcesAccessorService.class);
         xoObject = EasyMock.createMock(XoObject.class);
         transportLoggerService = EasyMock.createMock(TransportLoggerService.class);
         containerEndpointContext = EasyMock.createMock(EndpointContext.class);
@@ -132,9 +135,10 @@ public class SongContainerImplTest extends TestCase {
         address = InetAddress.getLocalHost();
         // facade = new SongContainerFacade(songContainer, containerEndpointContext, servletEndpointContext, servletContext);
 
-        mocks = new Object[] { servletService, backendService, xoService, xoObject, transportLoggerService,
-                containerEndpointContext, servletEndpointContext, endpointNode, deliveryChannel, messageExchangeFactory,
-                exchange, inMessage, outMessage, request, uri, servletContext, songServlet, bindingNode, bundleContext, bundle };
+        mocks = new Object[] { servletService, backendService, xoService, resourcesAccessorService, xoObject,
+                transportLoggerService, containerEndpointContext, servletEndpointContext, endpointNode, deliveryChannel,
+                messageExchangeFactory, exchange, inMessage, outMessage, request, uri, servletContext, songServlet,
+                bindingNode, bundleContext, bundle };
     }
 
     private void replay() {
@@ -231,8 +235,9 @@ public class SongContainerImplTest extends TestCase {
 
         replay();
         try {
-            songContainer = new SongContainer(servletService, backendService, xoService, transportLoggerService,
-                    new RouteConfiguration[] { new RouteConfiguration("0.0.0.0", 0, false) }, "test", "localdomain", 100L);
+            songContainer = new SongContainer(servletService, backendService, xoService, resourcesAccessorService,
+                    transportLoggerService, new RouteConfiguration[] { new RouteConfiguration("0.0.0.0", 0, false) }, "test",
+                    "localdomain", 100L);
             verify();
             reset();
         } catch (UnknownHostException e) {
@@ -514,7 +519,7 @@ public class SongContainerImplTest extends TestCase {
             EasyMock.expect(exchange.getOutMessage()).andReturn(null);
             EasyMock.expect(exchange.getInMessage()).andReturn(inMessage);
             EasyMock.expect(inMessage.getContent()).andReturn(concreteRequest);
-            EasyMock.expect(uri.toURI()).andReturn(URI.create("http://localhost:8080/context/mock"));
+            EasyMock.expect(uri.toURI()).andReturn(URI.create("song://localhost/context/mock"));
             // EasyMock.expect(bindingNode.getAddress()).andReturn(address);
             EasyMock.expect(Integer.valueOf(servletEndpointContext.getEndpointId())).andReturn(Integer.valueOf(5));
             exchange.setDestination(5);

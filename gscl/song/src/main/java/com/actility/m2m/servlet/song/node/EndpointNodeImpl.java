@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: EndpointNodeImpl.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: EndpointNodeImpl.java 9481 2014-09-06 09:37:01Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9481 $
+ * lastrevision $Date: 2014-09-06 11:37:01 +0200 (Sat, 06 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-09-06 11:37:01 +0200 (Sat, 06 Sep 2014) $
  */
 
 package com.actility.m2m.servlet.song.node;
@@ -46,6 +46,7 @@ import com.actility.m2m.be.messaging.InOut;
 import com.actility.m2m.be.messaging.MessageExchange;
 import com.actility.m2m.be.messaging.MessageExchangeFactory;
 import com.actility.m2m.be.messaging.MessagingException;
+import com.actility.m2m.framework.resources.BackupClassLoader;
 import com.actility.m2m.servlet.ext.ExtProtocolContainer;
 import com.actility.m2m.servlet.ext.ExtServletContext;
 import com.actility.m2m.servlet.log.BundleLogger;
@@ -111,11 +112,9 @@ public abstract class EndpointNodeImpl implements EndpointNode {
         if (now >= expirationTime) {
             statusCode = SongServletResponse.SC_GATEWAY_TIMEOUT;
         } else {
-            // PORTAGE chgt de classLoader pour le currentThread
-            // ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+            BackupClassLoader backup = null;
             try {
-                // ClassLoader cl = servlet.getClass().getClassLoader();
-                // Thread.currentThread().setContextClassLoader(cl);
+                backup = container.getResourcesAccessorService().setThreadClassLoader(servlet.getClass());
                 servletContext.setCurrentRequestHandler(container, this);
                 servlet.service(request, null);
             } catch (ServletException se) {
@@ -129,7 +128,9 @@ public abstract class EndpointNodeImpl implements EndpointNode {
                 statusCode = SongServletResponse.SC_INTERNAL_SERVER_ERROR;
             } finally {
                 servletContext.setCurrentRequestHandler(container, null);
-                // Thread.currentThread().setContextClassLoader(oldClassLoader);
+                if (backup != null) {
+                    backup.restoreThreadClassLoader();
+                }
             }
         }
 
@@ -170,11 +171,9 @@ public abstract class EndpointNodeImpl implements EndpointNode {
                 }
             }
         } else {
-            // PORTAGE chgt de classLoader pour le currentThread
-            // ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+            BackupClassLoader backup = null;
             try {
-                // ClassLoader cl = servlet.getClass().getClassLoader();
-                // Thread.currentThread().setContextClassLoader(cl);
+                backup = container.getResourcesAccessorService().setThreadClassLoader(servlet.getClass());
                 servletContext.setCurrentRequestHandler(container, this);
                 if (request.getClass() == LocalForwardedRequest.class) {
                     container.receivedForwardResponse(response, ((InternalRequest) request).getSentTime(),
@@ -195,7 +194,7 @@ public abstract class EndpointNodeImpl implements EndpointNode {
                 LOG.error(response.getId() + ": An unexpected exception happened in the service method", e);
             } finally {
                 servletContext.setCurrentRequestHandler(container, null);
-                // Thread.currentThread().setContextClassLoader(oldClassLoader);
+                backup.restoreThreadClassLoader();
             }
         }
     }
@@ -228,8 +227,8 @@ public abstract class EndpointNodeImpl implements EndpointNode {
 
     public final void process(InOut exchange) {
         // long processExt = -System.currentTimeMillis();
-        if (LOG.isInfoEnabled()) {
-            LOG.info(exchange.getExchangeId() + ": " + getTarget() + " process InOut exchange");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(exchange.getExchangeId() + ": " + getTarget() + " process InOut exchange");
         }
 
         if (exchange.getOutMessage() != null) {

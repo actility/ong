@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: ApplicationSessionImpl.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: ApplicationSessionImpl.java 9309 2014-08-21 10:13:58Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9309 $
+ * lastrevision $Date: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  */
 
 package com.actility.m2m.servlet.impl;
@@ -44,6 +44,7 @@ import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.framework.resources.BackupClassLoader;
 import com.actility.m2m.servlet.ApplicationSession;
 import com.actility.m2m.servlet.ApplicationSessionAttributeListener;
 import com.actility.m2m.servlet.ApplicationSessionBindingEvent;
@@ -391,6 +392,10 @@ public final class ApplicationSessionImpl implements ExtApplicationSession, Seri
         this.invalidateWhenReady = invalidateWhenReady;
     }
 
+    public ServletContextImpl getInternalServletContext() {
+        return context;
+    }
+
     public ExtServletContext getServletContext() {
         return context;
     }
@@ -591,9 +596,8 @@ public final class ApplicationSessionImpl implements ExtApplicationSession, Seri
     }
 
     private void notifyApplicationSessionListeners(int eventType) {
-        // PORTAGE IS2T
-        // ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-        // java.lang.Thread.currentThread().setContextClassLoader(context.getClass().getClassLoader());
+        BackupClassLoader backup = context.getServletContainer().getResourcesAccessorService()
+                .setThreadClassLoader(context.getClass());
         ApplicationSessionEvent event = new ApplicationSessionEvent(this);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Notifying application session listeners of context " + context.getServletContextName()
@@ -626,8 +630,7 @@ public final class ApplicationSessionImpl implements ExtApplicationSession, Seri
                 LOG.error("ApplicationSessionListener threw exception", e);
             }
         }
-        // PORTAGE IS2T
-        // java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+        backup.restoreThreadClassLoader();
     }
 
     private void setState(int state) {

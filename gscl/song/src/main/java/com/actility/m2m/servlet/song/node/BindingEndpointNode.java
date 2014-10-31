@@ -21,29 +21,26 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: BindingEndpointNode.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: BindingEndpointNode.java 9044 2014-07-03 15:50:18Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.servlet.song.node;
 
 import java.net.InetAddress;
 
-import org.apache.log4j.Logger;
-
 import com.actility.m2m.be.messaging.InOut;
 import com.actility.m2m.be.messaging.MessagingException;
 import com.actility.m2m.servlet.ext.ExtApplicationSession;
 import com.actility.m2m.servlet.ext.ExtServletContext;
-import com.actility.m2m.servlet.log.BundleLogger;
-import com.actility.m2m.servlet.song.SongBindingFacade;
 import com.actility.m2m.servlet.song.SongServlet;
 import com.actility.m2m.servlet.song.SongServletRequest;
 import com.actility.m2m.servlet.song.SongServletResponse;
+import com.actility.m2m.servlet.song.binding.SongBindingFacade;
 import com.actility.m2m.servlet.song.internal.BindingNode;
 import com.actility.m2m.servlet.song.internal.SongContainerFacade;
 import com.actility.m2m.servlet.song.message.InternalMessage;
@@ -55,11 +52,8 @@ import com.actility.m2m.servlet.song.message.LocalWrappedRequest;
 import com.actility.m2m.servlet.song.message.LocalWrappedResponse;
 import com.actility.m2m.servlet.song.message.OutgoingRequest;
 import com.actility.m2m.servlet.song.message.RemoteWrappedRequest;
-import com.actility.m2m.util.log.OSGiLogger;
 
 public final class BindingEndpointNode extends EndpointNodeImpl implements BindingNode {
-
-    private static final Logger LOG = OSGiLogger.getLogger(BindingEndpointNode.class, BundleLogger.getStaticLogger());
     private final SongBindingFacade songBindingFacade;
     private final String serverScheme;
     private final String[] managedSchemes;
@@ -67,14 +61,16 @@ public final class BindingEndpointNode extends EndpointNodeImpl implements Bindi
     private final String defaultProtocol;
     private final InetAddress address;
     private final int port;
+    private final int serverPort;
 
     public BindingEndpointNode(SongContainerFacade container, SongServlet servlet, ExtServletContext servletContext,
-            String servletName, int priority, SongBindingFacade songBindingFacade, String serverScheme,
+            String servletName, int priority, SongBindingFacade songBindingFacade, String serverScheme, int serverPort,
             String[] managedSchemes, boolean longPollSupported, String defaultProtocol, InetAddress address, int port) {
         super(container, servlet, servletContext, servletName, priority);
         this.defaultProtocol = defaultProtocol;
         this.serverScheme = serverScheme;
         this.managedSchemes = managedSchemes;
+        this.serverPort = serverPort;
         this.longPollSupported = longPollSupported;
         this.songBindingFacade = songBindingFacade;
         this.address = address;
@@ -89,8 +85,12 @@ public final class BindingEndpointNode extends EndpointNodeImpl implements Bindi
         return defaultProtocol;
     }
 
-    public String getServerScheme() {
+    public String getServerURIScheme() {
         return serverScheme;
+    }
+
+    public int getServerURIPort() {
+        return serverPort;
     }
 
     public SongBindingFacade getSongBindingFacade() {

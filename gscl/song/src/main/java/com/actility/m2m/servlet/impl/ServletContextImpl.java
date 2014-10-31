@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: ServletContextImpl.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: ServletContextImpl.java 9309 2014-08-21 10:13:58Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9309 $
+ * lastrevision $Date: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  */
 
 package com.actility.m2m.servlet.impl;
@@ -56,6 +56,7 @@ import javax.servlet.ServletRequestListener;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.framework.resources.BackupClassLoader;
 import com.actility.m2m.servlet.ApplicationSessionAttributeListener;
 import com.actility.m2m.servlet.ApplicationSessionListener;
 import com.actility.m2m.servlet.ProtocolSessionAttributeListener;
@@ -105,10 +106,6 @@ public class ServletContextImpl implements ExtServletContext {
     private final Map attributes;
     private final Map applicationSessions;
 
-    // PORTAGE ThreadLocal
-    // public ServletContextImpl(ServletContainer servletContainer, ThreadLocal currentRequestHandler, String contextPath,
-    // String applicationName, Map initParameters, TimerListener timerListener, int applicationTimeout,
-    // Object[] listeners, Timer timerService) {
     public ServletContextImpl(ServletContainer servletContainer, Map currentRequestHandler, String contextPath,
             String applicationName, Map initParameters, TimerListener timerListener, int applicationTimeout,
             Object[] listeners, Timer timerService) {
@@ -177,10 +174,8 @@ public class ServletContextImpl implements ExtServletContext {
     }
 
     private void notifyServletContextListeners(int eventType) {
-        // PORTAGE chgt de classLoader pour le currentThread
-        // ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
         ServletContextEvent event = new ServletContextEvent(this);
-        // java.lang.Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+        BackupClassLoader backup = servletContainer.getResourcesAccessorService().setThreadClassLoader(this.getClass());
         if (LOG.isDebugEnabled()) {
             LOG.debug("Notifying servlet context listeners of context " + applicationName + " of following event "
                     + EV_ID_TO_NAME[eventType]);
@@ -203,7 +198,7 @@ public class ServletContextImpl implements ExtServletContext {
                 LOG.error("ServletContextListener threw exception", e);
             }
         }
-        // java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+        backup.restoreThreadClassLoader();
     }
 
     private List buildListIfNull(List list) {
@@ -606,5 +601,9 @@ public class ServletContextImpl implements ExtServletContext {
 
     public ServletConfig buildServletConfig(String name, Map initParams) {
         return new ServletConfigImpl(name, this, initParams);
+    }
+
+    public ServletContainer getServletContainer() {
+        return servletContainer;
     }
 }

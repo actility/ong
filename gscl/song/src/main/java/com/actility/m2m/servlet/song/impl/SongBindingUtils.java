@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongBindingUtils.java 6085 2013-10-15 14:08:29Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6085 $
- * lastrevision $Date: 2013-10-15 16:08:29 +0200 (Tue, 15 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-15 16:08:29 +0200 (Tue, 15 Oct 2013) $
+ * id $Id: SongBindingUtils.java 9834 2014-10-31 16:26:14Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9834 $
+ * lastrevision $Date: 2014-10-31 17:26:14 +0100 (Fri, 31 Oct 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-10-31 17:26:14 +0100 (Fri, 31 Oct 2014) $
  */
 
 package com.actility.m2m.servlet.song.impl;
@@ -34,10 +34,10 @@ package com.actility.m2m.servlet.song.impl;
 import java.net.InetAddress;
 
 import com.actility.m2m.servlet.ext.ExtServletContext;
-import com.actility.m2m.servlet.song.SongBindingFactory;
 import com.actility.m2m.servlet.song.SongServletRequest;
 import com.actility.m2m.servlet.song.SongServletResponse;
 import com.actility.m2m.servlet.song.SongURI;
+import com.actility.m2m.servlet.song.binding.SongBindingFactory;
 import com.actility.m2m.servlet.song.message.LocalWrappedRequest;
 import com.actility.m2m.servlet.song.message.RemoteRequest;
 import com.actility.m2m.servlet.song.node.BindingEndpointNode;

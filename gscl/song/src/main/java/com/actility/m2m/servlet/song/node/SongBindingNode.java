@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongBindingNode.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: SongBindingNode.java 9044 2014-07-03 15:50:18Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.servlet.song.node;
@@ -39,8 +39,8 @@ import com.actility.m2m.be.messaging.InOut;
 import com.actility.m2m.be.messaging.MessagingException;
 import com.actility.m2m.servlet.ext.ExtApplicationSession;
 import com.actility.m2m.servlet.log.BundleLogger;
-import com.actility.m2m.servlet.song.SongBindingFacade;
 import com.actility.m2m.servlet.song.SongServletRequest;
+import com.actility.m2m.servlet.song.binding.SongBindingFacade;
 import com.actility.m2m.servlet.song.internal.BindingNode;
 import com.actility.m2m.util.log.OSGiLogger;
 
@@ -71,8 +71,12 @@ public final class SongBindingNode implements BindingNode {
         return null;
     }
 
-    public String getServerScheme() {
+    public String getServerURIScheme() {
         return "song";
+    }
+
+    public int getServerURIPort() {
+        return -1;
     }
 
     public String[] getManagedSchemes() {

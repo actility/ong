@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongServletUtils.java 6085 2013-10-15 14:08:29Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6085 $
- * lastrevision $Date: 2013-10-15 16:08:29 +0200 (Tue, 15 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-15 16:08:29 +0200 (Tue, 15 Oct 2013) $
+ * id $Id: SongServletUtils.java 9044 2014-07-03 15:50:18Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.servlet.song.impl;
@@ -41,7 +41,9 @@ import com.actility.m2m.servlet.ApplicationSession;
 import com.actility.m2m.servlet.NamespaceException;
 import com.actility.m2m.servlet.ext.ExtApplicationSession;
 import com.actility.m2m.servlet.ext.ExtServletContext;
-import com.actility.m2m.servlet.song.LongPollURIs;
+import com.actility.m2m.servlet.song.ChannelClientListener;
+import com.actility.m2m.servlet.song.ChannelServerListener;
+import com.actility.m2m.servlet.song.LongPollingURIs;
 import com.actility.m2m.servlet.song.SongDynamicRouter;
 import com.actility.m2m.servlet.song.SongFactory;
 import com.actility.m2m.servlet.song.SongServletRequest;
@@ -122,8 +124,8 @@ public class SongServletUtils implements SongFactory, SongDynamicRouter {
     public SongServletResponse createResponseFrom(SongServletRequest request, SongServletResponse response, int statusCode,
             String reasonPhrase) {
         if (!(response instanceof InternalMessage)) {
-        throw new IllegalArgumentException("Cannot create a response from a response not created by the SONG container: "
-                + request.getClass());
+            throw new IllegalArgumentException("Cannot create a response from a response not created by the SONG container: "
+                    + request.getClass());
         }
         InternalMessage internal = (InternalMessage) response;
         if (request.getClass() == RemoteWrappedRequest.class) {
@@ -218,62 +220,140 @@ public class SongServletUtils implements SongFactory, SongDynamicRouter {
         container.removePath(servletContext.getContextPath(), path);
     }
 
-    public LongPollURIs createServerLongPoll(SongURI serverURI) throws ServletException {
-        return container.createServerLongPoll(serverURI);
+    public LongPollingURIs createServerNotificationChannel(SongURI serverURI, ChannelServerListener listener)
+            throws ServletException {
+        return container.createServerNotificationChannel(serverURI, listener);
     }
 
-    public void createServerLongPoll(SongURI contactURI, SongURI longPollURI) throws ServletException {
-        container.createServerLongPoll(contactURI, longPollURI);
+    public void createServerNotificationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException {
+        container.createServerNotificationChannel(contactURI, longPollingURI, listener);
     }
 
-    public void deleteServerLongPoll(SongURI contactURI, SongURI longPollURI) {
-        container.deleteServerLongPoll(contactURI, longPollURI);
+    public void deleteServerNotificationChannel(SongURI contactURI, SongURI longPollingURI) {
+        container.deleteServerNotificationChannel(contactURI, longPollingURI);
     }
 
-    public void createClientLongPoll(SongURI contactURI, SongURI longPollURI) throws ServletException {
-        container.createClientLongPoll(contactURI, longPollURI, servletContext.getContextPath());
+    public void createClientNotificationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            SongURI relatedRequestingEntity, SongURI relatedTargetID, ChannelClientListener listener) throws ServletException {
+        container.createClientNotificationChannel(contactURI, longPollingURI, requestingEntity, relatedRequestingEntity,
+                relatedTargetID, servletContext.getContextPath(), listener);
     }
 
-    public void deleteClientLongPoll(SongURI contactURI, SongURI longPollURI) {
-        container.deleteClientLongPoll(contactURI, longPollURI);
+    public void deleteClientNotificationChannel(SongURI contactURI, SongURI longPollingURI) {
+        container.deleteClientNotificationChannel(contactURI, longPollingURI);
     }
 
     public boolean canBeServerFrom(SongURI targetedURI) throws ServletException {
         return container.canBeServerFrom(targetedURI);
     }
 
-    public LongPollURIs createServerLongPoll(String serverURI) throws URISyntaxException, ServletException {
+    public LongPollingURIs createServerNotificationChannel(String serverURI, ChannelServerListener listener)
+            throws URISyntaxException, ServletException {
         SongURI realServerURI = createURI(serverURI);
-        return container.createServerLongPoll(realServerURI);
+        return container.createServerNotificationChannel(realServerURI, listener);
     }
 
-    public void createServerLongPoll(String contactURI, String longPollURI) throws URISyntaxException, ServletException {
+    public void createServerNotificationChannel(String contactURI, String longPollingURI, ChannelServerListener listener)
+            throws URISyntaxException, ServletException {
         SongURI realContactURI = createURI(contactURI);
-        SongURI realLongPollURI = createURI(longPollURI);
-        container.createServerLongPoll(realContactURI, realLongPollURI);
+        SongURI realLongPollURI = createURI(longPollingURI);
+        container.createServerNotificationChannel(realContactURI, realLongPollURI, listener);
     }
 
-    public void deleteServerLongPoll(String contactURI, String longPollURI) {
+    public void deleteServerNotificationChannel(String contactURI, String longPollingURI) {
         try {
             SongURI realContactURI = createURI(contactURI);
-            SongURI realLongPollURI = createURI(longPollURI);
-            container.deleteServerLongPoll(realContactURI, realLongPollURI);
+            SongURI realLongPollingURI = createURI(longPollingURI);
+            container.deleteServerNotificationChannel(realContactURI, realLongPollingURI);
         } catch (URISyntaxException e) {
             // Ignore
         }
     }
 
-    public void createClientLongPoll(String contactURI, String longPollURI) throws URISyntaxException, ServletException {
+    public void createClientNotificationChannel(String contactURI, String longPollingURI, String requestingEntity,
+            String relatedRequestingEntity, String relatedTargetID, ChannelClientListener listener) throws URISyntaxException,
+            ServletException {
         SongURI realContactURI = createURI(contactURI);
-        SongURI realLongPollURI = createURI(longPollURI);
-        container.createClientLongPoll(realContactURI, realLongPollURI, servletContext.getContextPath());
+        SongURI realLongPollURI = createURI(longPollingURI);
+        SongURI realRequestingEntity = createURI(requestingEntity);
+        SongURI realRelatedRequestingEntity = createURI(relatedRequestingEntity);
+        SongURI realRelatedTargetID = createURI(relatedTargetID);
+        container.createClientNotificationChannel(realContactURI, realLongPollURI, realRequestingEntity,
+                realRelatedRequestingEntity, realRelatedTargetID, servletContext.getContextPath(), listener);
     }
 
-    public void deleteClientLongPoll(String contactURI, String longPollURI) {
+    public void deleteClientNotificationChannel(String contactURI, String longPollingURI) {
         try {
             SongURI realContactURI = createURI(contactURI);
-            SongURI realLongPollURI = createURI(longPollURI);
-            container.deleteClientLongPoll(realContactURI, realLongPollURI);
+            SongURI realLongPollingURI = createURI(longPollingURI);
+            container.deleteClientNotificationChannel(realContactURI, realLongPollingURI);
+        } catch (URISyntaxException e) {
+            // Ignore
+        }
+    }
+
+    public LongPollingURIs createServerCommunicationChannel(SongURI serverURI, ChannelServerListener listener)
+            throws ServletException {
+        return container.createServerCommunicationChannel(serverURI, listener);
+    }
+
+    public void createServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException {
+        container.createServerCommunicationChannel(contactURI, longPollingURI, listener);
+    }
+
+    public void deleteServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI) {
+        container.deleteServerCommunicationChannel(contactURI, longPollingURI);
+    }
+
+    public void createClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            ChannelClientListener listener) throws ServletException {
+        container.createClientCommunicationChannel(contactURI, longPollingURI, requestingEntity,
+                servletContext.getContextPath(), listener);
+    }
+
+    public void deleteClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI) {
+        container.deleteClientCommunicationChannel(contactURI, longPollingURI);
+    }
+
+    public LongPollingURIs createServerCommunicationChannel(String serverURI, ChannelServerListener listener)
+            throws URISyntaxException, ServletException {
+        SongURI realServerURI = createURI(serverURI);
+        return container.createServerCommunicationChannel(realServerURI, listener);
+    }
+
+    public void createServerCommunicationChannel(String contactURI, String longPollingURI, ChannelServerListener listener)
+            throws URISyntaxException, ServletException {
+        SongURI realContactURI = createURI(contactURI);
+        SongURI realLongPollURI = createURI(longPollingURI);
+        container.createServerCommunicationChannel(realContactURI, realLongPollURI, listener);
+    }
+
+    public void deleteServerCommunicationChannel(String contactURI, String longPollingURI) {
+        try {
+            SongURI realContactURI = createURI(contactURI);
+            SongURI realLongPollingURI = createURI(longPollingURI);
+            container.deleteServerCommunicationChannel(realContactURI, realLongPollingURI);
+        } catch (URISyntaxException e) {
+            // Ignore
+        }
+    }
+
+    public void createClientCommunicationChannel(String contactURI, String longPollingURI, String requestingEntity,
+            ChannelClientListener listener) throws URISyntaxException, ServletException {
+        SongURI realContactURI = createURI(contactURI);
+        SongURI realLongPollURI = createURI(longPollingURI);
+        SongURI realRequestingEntity = createURI(requestingEntity);
+        container.createClientCommunicationChannel(realContactURI, realLongPollURI, realRequestingEntity,
+                servletContext.getContextPath(), listener);
+    }
+
+    public void deleteClientCommunicationChannel(String contactURI, String longPollingURI) {
+        try {
+            SongURI realContactURI = createURI(contactURI);
+            SongURI realLongPollingURI = createURI(longPollingURI);
+            container.deleteClientCommunicationChannel(realContactURI, realLongPollingURI);
         } catch (URISyntaxException e) {
             // Ignore
         }
@@ -287,12 +367,13 @@ public class SongServletUtils implements SongFactory, SongDynamicRouter {
     public SongURI createLocalURIFrom(URI reference, String path) throws ServletException {
         BindingNode binding = container.getBindingNode(reference.isAbsolute() ? reference.getScheme() : "song");
         if (binding != null) {
-            String scheme = binding.getServerScheme();
+            String scheme = binding.getServerURIScheme();
             String realPath = servletContext.getContextPath();
             if (path != null) {
                 realPath += path;
             }
-            return new SongURIImpl(scheme, scheme.endsWith("s"), container.getLocalHostName(), binding.getPort(), realPath);
+            return new SongURIImpl(scheme, scheme.endsWith("s"), container.getLocalHostName(), binding.getServerURIPort(),
+                    realPath);
         }
         throw new ServletException("Unknown scheme");
     }
@@ -307,12 +388,13 @@ public class SongServletUtils implements SongFactory, SongDynamicRouter {
     public SongURI createLocalURIFrom(SongURI reference, String path) throws ServletException {
         BindingNode binding = container.getBindingNode(reference.getScheme());
         if (binding != null) {
-            String scheme = binding.getServerScheme();
+            String scheme = binding.getServerURIScheme();
             String realPath = servletContext.getContextPath();
             if (path != null) {
                 realPath += path;
             }
-            return new SongURIImpl(scheme, scheme.endsWith("s"), container.getLocalHostName(), binding.getPort(), realPath);
+            return new SongURIImpl(scheme, scheme.endsWith("s"), container.getLocalHostName(), binding.getServerURIPort(),
+                    realPath);
         }
         throw new ServletException("Unknown scheme");
     }

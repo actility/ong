@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: ServletServiceImpl.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: ServletServiceImpl.java 9309 2014-08-21 10:13:58Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9309 $
+ * lastrevision $Date: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  */
 
 package com.actility.m2m.servlet.service.impl;
@@ -40,6 +40,7 @@ import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.framework.resources.ResourcesAccessorService;
 import com.actility.m2m.servlet.TimerListener;
 import com.actility.m2m.servlet.ext.ExtProtocolContainer;
 import com.actility.m2m.servlet.impl.ServletContainer;
@@ -53,8 +54,8 @@ public final class ServletServiceImpl implements ExtServletService {
 
     private ServletContainer servletContainer;
 
-    public ServletServiceImpl(String serverInfo) {
-        servletContainer = new ServletContainer(serverInfo);
+    public ServletServiceImpl(ResourcesAccessorService resourcesAccessorService, String serverInfo) {
+        servletContainer = new ServletContainer(resourcesAccessorService, serverInfo);
     }
 
     // add a method to stop clearly
