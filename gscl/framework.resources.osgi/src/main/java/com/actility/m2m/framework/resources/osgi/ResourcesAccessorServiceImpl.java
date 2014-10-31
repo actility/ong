@@ -38,9 +38,10 @@ import java.io.InputStream;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
+import com.actility.m2m.framework.resources.BackupClassLoader;
 import com.actility.m2m.framework.resources.ResourcesAccessorService;
 
-public class ResourcesAccessorServiceImpl implements ResourcesAccessorService {
+public final class ResourcesAccessorServiceImpl implements ResourcesAccessorService {
     public InputStream getResourceAsStream(Bundle bundle, String path) throws IOException {
         if ((bundle.getEntry(path) != null)) {
             return bundle.getEntry(path).openStream();
@@ -51,5 +52,11 @@ public class ResourcesAccessorServiceImpl implements ResourcesAccessorService {
 
     public String getProperty(BundleContext context, String propertyName) {
         return context.getProperty(propertyName);
+    }
+
+    public BackupClassLoader setThreadClassLoader(Class clazz) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(clazz.getClassLoader());
+        return new BackupClassLoaderImpl(classLoader);
     }
 }

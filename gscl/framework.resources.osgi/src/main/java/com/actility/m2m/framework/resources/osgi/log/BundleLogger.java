@@ -34,6 +34,6 @@ package com.actility.m2m.framework.resources.osgi.log;
 import com.actility.m2m.util.log.BundleStaticLogger;
 
 
-public class BundleLogger {
+public final class BundleLogger {
     public static final BundleStaticLogger LOG = new BundleStaticLogger();
 }
