@@ -1,6 +1,18 @@
 -------------------------------------------------------------------------------
 JXo native Service implementation for JNI - changelog
 -------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2014-10-31
+
+New Features:
+-------------
+ - Implemented jxo.api-3.2.0
+
+Bug Fixes:
+----------
+ - Ensure file is either XML or oBIX when reading document
+
+-------------------------------------------------------------------------------
 Version: 1.2.1
 Date: 2014-06-10
 

@@ -225,6 +225,14 @@ JNIEXPORT jbyteArray JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoSaveMem
 
 /*
  * Class:     com_actility_m2m_xo_jni_JniXo
+ * Method:    xoNmContainsAttr
+ * Signature: (ILjava/lang/String;)I
+ */
+JNIEXPORT jboolean JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmContainsAttr
+  (JNIEnv *, jclass, jint, jstring);
+
+/*
+ * Class:     com_actility_m2m_xo_jni_JniXo
  * Method:    xoObjectNmGetAttr
  * Signature: (ILjava/lang/String;)I
  */
@@ -534,6 +542,14 @@ JNIEXPORT jbyteArray JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoWritePartialEx
  */
 JNIEXPORT jbyteArray JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoSaveMem64
   (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_actility_m2m_xo_jni_JniXo
+ * Method:    xoNmContainsAttr64
+ * Signature: (JLjava/lang/String;)J
+ */
+JNIEXPORT jboolean JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmContainsAttr64
+  (JNIEnv *, jclass, jlong, jstring);
 
 /*
  * Class:     com_actility_m2m_xo_jni_JniXo

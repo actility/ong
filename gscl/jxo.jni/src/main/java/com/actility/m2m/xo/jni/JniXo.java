@@ -112,6 +112,8 @@ public final class JniXo {
 
     public static native byte[] xoSaveMem(int xoHandle);
 
+    public static native boolean xoNmContainsAttr(int xoHandle, String attributeName);
+
     public static native int xoObjectNmGetAttr(int xoHandle, String attributeName);
 
     public static native String xoStringNmGetAttr(int xoHandle, String attributeName);
@@ -190,6 +192,8 @@ public final class JniXo {
     public static native byte[] xoWritePartialExiMem64(long xoHandle, String attributeName) throws XoException;
 
     public static native byte[] xoSaveMem64(long xoHandle);
+
+    public static native boolean xoNmContainsAttr64(long xoHandle, String attributeName);
 
     public static native long xoObjectNmGetAttr64(long xoHandle, String attributeName);
 
