@@ -39,7 +39,7 @@
     <version>3.0.0</version>
   </parent>
   <artifactId>log</artifactId>
-  <version>1.0.1</version>
+  <version>1.2.0</version>
   <packaging>bundle</packaging>
 
   <name>[Bnd] Log Service</name>
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>util</artifactId>
-      <version>[4.0.0,5)</version>
+      <version>4.0.0</version>
     </dependency>
   </dependencies>
 

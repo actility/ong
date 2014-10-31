@@ -52,6 +52,8 @@ public final class FileLog implements LogListener {
     private static final String FILE_PREFIX = "osgi_";
     /** Suffix for old log files. */
     private static final String LOG_FILE_SUFFIX = ".log";
+    /** Init file name. */
+    private static final String FILE_START_NAME = FILE_PREFIX + "start" + LOG_FILE_SUFFIX;
     /** Suffix for old log files. */
     private static final String OLD_FILE_SUFFIX = ".old";
 
@@ -188,9 +190,14 @@ public final class FileLog implements LogListener {
         if (maxNbOfFiles != this.maxNbOfFiles) {
             resetMaxNbOfFiles(maxNbOfFiles, this.maxNbOfFiles);
         }
+        File startFile = new File(FILE_START_NAME);
+        if (!startFile.exists()) {
+            File src = new File(logDir, FILE_PREFIX + "0" + LOG_FILE_SUFFIX);
+            src.renameTo(startFile);
+        }
         for (int i = maxNbOfFiles - 1; i > 0; i--) {
-            File dst = new File(logDir, FILE_PREFIX + i + ".log");
-            File src = new File(logDir, FILE_PREFIX + (i - 1) + ".log");
+            File dst = new File(logDir, FILE_PREFIX + i + LOG_FILE_SUFFIX);
+            File src = new File(logDir, FILE_PREFIX + (i - 1) + LOG_FILE_SUFFIX);
             if (dst.exists()) {
                 dst.delete();
             }
@@ -207,7 +214,7 @@ public final class FileLog implements LogListener {
         // Delete old logs
         boolean done = false;
         for (int i = maxNbOfFiles; !done; i++) {
-            File src = new File(logDir, FILE_PREFIX + i + ".log");
+            File src = new File(logDir, FILE_PREFIX + i + LOG_FILE_SUFFIX);
             if (src.exists()) {
                 src.delete();
             } else {
