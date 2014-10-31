@@ -51,7 +51,7 @@ public class JniSongBindingCoapServiceImpl implements NiSongBindingCoapService {
 
     public void diaStart() throws InterruptedException {
         synchronized (diaJni) {
-            diaThread = new Thread(diaJni);
+            diaThread = new Thread(diaJni, "Dia");
             diaThread.start();
             diaJni.wait();
         }
