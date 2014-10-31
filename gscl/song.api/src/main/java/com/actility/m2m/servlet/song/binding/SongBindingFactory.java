@@ -21,17 +21,22 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongBindingFactory.java 6084 2013-10-15 13:54:23Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6084 $
- * lastrevision $Date: 2013-10-15 15:54:23 +0200 (Tue, 15 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-15 15:54:23 +0200 (Tue, 15 Oct 2013) $
+ * id $Id: SongBindingFactory.java 9044 2014-07-03 15:50:18Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
-package com.actility.m2m.servlet.song;
+package com.actility.m2m.servlet.song.binding;
 
 import java.net.InetAddress;
+
+import com.actility.m2m.servlet.song.SongFactory;
+import com.actility.m2m.servlet.song.SongServletRequest;
+import com.actility.m2m.servlet.song.SongServletResponse;
+import com.actility.m2m.servlet.song.SongURI;
 
 /**
  * A {@link SongFactory} for a SONG binding.

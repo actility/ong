@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  * 
- * id $Id: LongPollURIs.java 6081 2013-10-15 13:33:50Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6081 $
- * lastrevision $Date: 2013-10-15 15:33:50 +0200 (Tue, 15 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-15 15:33:50 +0200 (Tue, 15 Oct 2013) $
+ * id $Id: LongPollingURIs.java 9044 2014-07-03 15:50:18Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.servlet.song;
@@ -38,17 +38,17 @@ package com.actility.m2m.servlet.song;
  * URI used between the client and server.
  *
  */
-public class LongPollURIs {
+public class LongPollingURIs {
     private SongURI contactURI;
     private SongURI longPollURI;
 
     /**
-     * Builds a {@link LongPollURIs} from the given contact and long poll URI
+     * Builds a {@link LongPollingURIs} from the given contact and long poll URI
      *
      * @param contactURI The contact URI of the long poll connection
      * @param longPollURI The long poll URI of the long poll connection
      */
-    public LongPollURIs(SongURI contactURI, SongURI longPollURI) {
+    public LongPollingURIs(SongURI contactURI, SongURI longPollURI) {
         this.contactURI = contactURI;
         this.longPollURI = longPollURI;
     }
@@ -67,7 +67,7 @@ public class LongPollURIs {
      *
      * @return The long poll URI
      */
-    public SongURI getLongPollURI() {
+    public SongURI getLongPollingURI() {
         return longPollURI;
     }
 }

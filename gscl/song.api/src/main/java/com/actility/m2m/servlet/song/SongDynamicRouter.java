@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongDynamicRouter.java 6081 2013-10-15 13:33:50Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6081 $
- * lastrevision $Date: 2013-10-15 15:33:50 +0200 (Tue, 15 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-15 15:33:50 +0200 (Tue, 15 Oct 2013) $
+ * id $Id: SongDynamicRouter.java 9044 2014-07-03 15:50:18Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.servlet.song;
@@ -40,7 +40,7 @@ import com.actility.m2m.servlet.ApplicationSession;
 import com.actility.m2m.servlet.NamespaceException;
 
 /**
- * Utility class that allows to dynamically add paths to a SONG application. Thsi also allows to manage long poll connections
+ * Utility class that allows to dynamically add paths to a SONG application. This also allows to manage long polling connections
  * creation and deletion.
  * <p>
  * SONG servlet containers are required to make a SongDynamicRouter instance available to applications through a ServletContext
@@ -88,111 +88,229 @@ public interface SongDynamicRouter {
     void removePath(String path);
 
     /**
-     * Creates a server long poll connection with the given URI.
+     * Creates a server <notificationChannel> connection with the given URI.
      * <p>
-     * The method is in charge to generate a contact and long poll URI for the created connection.
+     * The method is in charge to generate a contact and long polling URI for the created connection.
      *
-     * @param serverURI The URI that is the base to build the server long poll connection and which allows to build the
-     *            {@link LongPollURIs}
-     * @return The contact and long poll URI of the long poll connection
+     * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
+     *            {@link LongPollingURIs}
+     * @return The contact and long polling URI of the long polling connection
      * @throws ServletException If no binding exists for the given URI scheme
      */
-    LongPollURIs createServerLongPoll(SongURI serverURI) throws ServletException;
+    LongPollingURIs createServerNotificationChannel(SongURI serverURI, ChannelServerListener listener) throws ServletException;
 
     /**
-     * Creates a server long poll connection on the given URI.
+     * Creates a server <notificationChannel> connection on the given URI.
      * <p>
-     * The method is in charge to generate a contact and long poll URI for the created connection.
+     * The method is in charge to generate a contact and long polling URI for the created connection.
      *
-     * @param serverURI The URI that is the base to build the server long poll connection and which allows to build the
-     *            {@link LongPollURIs}
-     * @return The contact and long poll URI of the long poll connection
+     * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
+     *            {@link LongPollingURIs}
+     * @return The contact and long polling URI of the long polling connection
      * @throws URISyntaxException If the given server URI has an incorrect syntax
      * @throws ServletException If no binding exists for the given URI scheme
      */
-    LongPollURIs createServerLongPoll(String serverURI) throws URISyntaxException, ServletException;
+    LongPollingURIs createServerNotificationChannel(String serverURI, ChannelServerListener listener)
+            throws URISyntaxException, ServletException;
 
     /**
-     * Creates a server long poll connection with the given contact and long poll URIs.
+     * Creates a server <notificationChannel> connection with the given contact and long polling URIs.
      * <p>
      * The container is allowed to reject the given URIs if it cannot managed them.
      *
-     * @param contactURI The contact URI to use in the long poll connection
-     * @param longPollURI The long poll URI to use in the long poll connection
+     * @param contactURI The contact URI to use in the long polling connection
+     * @param longPollingURI The long polling URI to use in the long polling connection
      * @throws ServletException If no binding exists for the given URIs scheme or the container rejects the given URIs
      */
-    void createServerLongPoll(SongURI contactURI, SongURI longPollURI) throws ServletException;
+    void createServerNotificationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException;
 
     /**
-     * Creates a server long poll connection with the given contact and long poll URIs.
+     * Creates a server <notificationChannel> connection with the given contact and long polling URIs.
      * <p>
      * The container is allowed to reject the given URIs if it cannot managed them.
      *
-     * @param contactURI The contact URI to use in the long poll connection
-     * @param longPollURI The long poll URI to use in the long poll connection
+     * @param contactURI The contact URI to use in the long polling connection
+     * @param longPollingURI The long polling URI to use in the long polling connection
      * @throws URISyntaxException If the given server URI has an incorrect syntax
      * @throws ServletException If no binding exists for the given URIs scheme or the container rejects the given URIs
      */
-    void createServerLongPoll(String contactURI, String longPollURI) throws URISyntaxException, ServletException;
+    void createServerNotificationChannel(String contactURI, String longPollingURI, ChannelServerListener listener)
+            throws URISyntaxException, ServletException;
 
     /**
-     * Deletes a server long poll connection given its contact and long poll URI.
+     * Deletes a server <notificationChannel> connection given its contact and long polling URI.
      *
-     * @param contactURI The contact URI of the long poll connection
-     * @param longPollURI The long poll URI of the long poll connection
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
      */
-    void deleteServerLongPoll(SongURI contactURI, SongURI longPollURI);
+    void deleteServerNotificationChannel(SongURI contactURI, SongURI longPollingURI);
 
     /**
-     * Deletes a server long poll connection given its contact and long poll URI.
+     * Deletes a server <notificationChannel> connection given its contact and long polling URI.
      *
-     * @param contactURI The contact URI of the long poll connection
-     * @param longPollURI The long poll URI of the long poll connection
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
      */
-    void deleteServerLongPoll(String contactURI, String longPollURI);
+    void deleteServerNotificationChannel(String contactURI, String longPollingURI);
 
     /**
-     * Creates a client long poll connection from the given contact and long poll URIs.
+     * Creates a client <notificationChannel> connection from the given contact and long polling URIs.
      * <p>
-     * This will trigger the connection creation on the long poll URI. An entry will also be added to the container external
+     * This will trigger the connection creation on the long polling URI. An entry will also be added to the container external
      * aliases route table mapping the contact URI to the current application.
      *
-     * @param contactURI The contact URI of the long poll connection
-     * @param longPollURI The long poll URI of the long poll connection
-     * @throws ServletException If no binding exists for the given URIs scheme or if a long poll connection if already opened
-     *             for the given contact and long poll URIs
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
+     * @throws ServletException If no binding exists for the given URIs scheme or if a long polling connection if already opened
+     *             for the given contact and long polling URIs
      */
-    void createClientLongPoll(SongURI contactURI, SongURI longPollURI) throws ServletException;
+    void createClientNotificationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            SongURI relatedRequestingEntity, SongURI relatedTargetID, ChannelClientListener listener) throws ServletException;
 
     /**
-     * Creates a client long poll connection from the given contact and long poll URIs.
+     * Creates a client <notificationChannel> connection from the given contact and long polling URIs.
      * <p>
-     * This will trigger the connection creation on the long poll URI. An entry will also be added to the container external
+     * This will trigger the connection creation on the long polling URI. An entry will also be added to the container external
      * aliases route table mapping the contact URI to the current application.
      *
-     * @param contactURI The contact URI of the long poll connection
-     * @param longPollURI The long poll URI of the long poll connection
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
      * @throws URISyntaxException If the given server URI has an incorrect syntax
-     * @throws ServletException If no binding exists for the given URIs scheme or if a long poll connection if already opened
-     *             for the given contact and long poll URIs
+     * @throws ServletException If no binding exists for the given URIs scheme or if a long polling connection if already opened
+     *             for the given contact and long polling URIs
      */
-    void createClientLongPoll(String contactURI, String longPollURI) throws URISyntaxException, ServletException;
+    void createClientNotificationChannel(String contactURI, String longPollingURI, String requestingEntity,
+            String relatedRequestingEntity, String relatedTargetID, ChannelClientListener listener) throws URISyntaxException,
+            ServletException;
 
     /**
-     * Deletes a client long poll connection given its contact and long poll URI.
+     * Deletes a client <notificationChannel> connection given its contact and long polling URI.
      *
-     * @param contactURI The contact URI of the long poll connection
-     * @param longPollURI The long poll URI of the long poll connection
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
      */
-    void deleteClientLongPoll(SongURI contactURI, SongURI longPollURI);
+    void deleteClientNotificationChannel(SongURI contactURI, SongURI longPollingURI);
 
     /**
-     * Deletes a client long poll connection given its contact and long poll URI.
+     * Deletes a client <notificationChannel> connection given its contact and long polling URI.
      *
-     * @param contactURI The contact URI of the long poll connection
-     * @param longPollURI The long poll URI of the long poll connection
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
      */
-    void deleteClientLongPoll(String contactURI, String longPollURI);
+    void deleteClientNotificationChannel(String contactURI, String longPollingURI);
+
+    /**
+     * Creates a server <communicationChannel> connection with the given URI.
+     * <p>
+     * The method is in charge to generate a contact and long polling URI for the created connection.
+     *
+     * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
+     *            {@link LongPollingURIs}
+     * @return The contact and long polling URI of the long polling connection
+     * @throws ServletException If no binding exists for the given URI scheme
+     */
+    LongPollingURIs createServerCommunicationChannel(SongURI serverURI, ChannelServerListener listener) throws ServletException;
+
+    /**
+     * Creates a server <communicationChannel> connection on the given URI.
+     * <p>
+     * The method is in charge to generate a contact and long polling URI for the created connection.
+     *
+     * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
+     *            {@link LongPollingURIs}
+     * @return The contact and long polling URI of the long polling connection
+     * @throws URISyntaxException If the given server URI has an incorrect syntax
+     * @throws ServletException If no binding exists for the given URI scheme
+     */
+    LongPollingURIs createServerCommunicationChannel(String serverURI, ChannelServerListener listener)
+            throws URISyntaxException, ServletException;
+
+    /**
+     * Creates a server <communicationChannel> connection with the given contact and long polling URIs.
+     * <p>
+     * The container is allowed to reject the given URIs if it cannot managed them.
+     *
+     * @param contactURI The contact URI to use in the long polling connection
+     * @param longPollingURI The long polling URI to use in the long polling connection
+     * @throws ServletException If no binding exists for the given URIs scheme or the container rejects the given URIs
+     */
+    void createServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException;
+
+    /**
+     * Creates a server <communicationChannel> connection with the given contact and long polling URIs.
+     * <p>
+     * The container is allowed to reject the given URIs if it cannot managed them.
+     *
+     * @param contactURI The contact URI to use in the long polling connection
+     * @param longPollingURI The long polling URI to use in the long polling connection
+     * @throws URISyntaxException If the given server URI has an incorrect syntax
+     * @throws ServletException If no binding exists for the given URIs scheme or the container rejects the given URIs
+     */
+    void createServerCommunicationChannel(String contactURI, String longPollingURI, ChannelServerListener listener)
+            throws URISyntaxException, ServletException;
+
+    /**
+     * Deletes a server <communicationChannel> connection given its contact and long polling URI.
+     *
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
+     */
+    void deleteServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI);
+
+    /**
+     * Deletes a server <communicationChannel> connection given its contact and long polling URI.
+     *
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
+     */
+    void deleteServerCommunicationChannel(String contactURI, String longPollingURI);
+
+    /**
+     * Creates a client <communicationChannel> connection from the given contact and long polling URIs.
+     * <p>
+     * This will trigger the connection creation on the long polling URI. An entry will also be added to the container external
+     * aliases route table mapping the contact URI to the current application.
+     *
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
+     * @throws ServletException If no binding exists for the given URIs scheme or if a long polling connection if already opened
+     *             for the given contact and long polling URIs
+     */
+    void createClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            ChannelClientListener listener) throws ServletException;
+
+    /**
+     * Creates a client <communicationChannel> connection from the given contact and long polling URIs.
+     * <p>
+     * This will trigger the connection creation on the long polling URI. An entry will also be added to the container external
+     * aliases route table mapping the contact URI to the current application.
+     *
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
+     * @throws URISyntaxException If the given server URI has an incorrect syntax
+     * @throws ServletException If no binding exists for the given URIs scheme or if a long polling connection if already opened
+     *             for the given contact and long polling URIs
+     */
+    void createClientCommunicationChannel(String contactURI, String longPollingURI, String requestingEntity,
+            ChannelClientListener listener) throws URISyntaxException, ServletException;
+
+    /**
+     * Deletes a client <communicationChannel> connection given its contact and long polling URI.
+     *
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
+     */
+    void deleteClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI);
+
+    /**
+     * Deletes a client <communicationChannel> connection given its contact and long polling URI.
+     *
+     * @param contactURI The contact URI of the long polling connection
+     * @param longPollingURI The long polling URI of the long polling connection
+     */
+    void deleteClientCommunicationChannel(String contactURI, String longPollingURI);
 
     /**
      * Check whether the current application can receive incoming connections from the given URI.
