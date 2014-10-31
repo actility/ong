@@ -8,9 +8,9 @@
     <version>3.0.0</version>
   </parent>
   <artifactId>storage.api</artifactId>
-  <version>0.2.0</version>
+  <version>1.0.0</version>
   <packaging>bundle</packaging>
-  
+
   <name>[API] Storage Service</name>
 
   <build>
