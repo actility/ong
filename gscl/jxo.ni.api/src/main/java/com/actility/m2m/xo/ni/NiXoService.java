@@ -82,6 +82,8 @@ public interface NiXoService {
 
     public byte[] xoWritePartialExiMem(long xoHandle, String attributeName, String defaultNamespace) throws XoException;
 
+    public boolean xoNmContainsAttr(long xoHandle, String attributeName);
+
     public long xoObjectNmGetAttr(long xoHandle, String attributeName);
 
     public String xoStringNmGetAttr(long xoHandle, String attributeName);
