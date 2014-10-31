@@ -16,6 +16,8 @@
 			<element ref="tns:aPoC" minOccurs="0" />
 			<element ref="tns:aPoCPaths" minOccurs="0" />
 			<element ref="tns:locRequestor" minOccurs="0" />
+			<element ref="tns:referencePoint" minOccurs="0" />
+			<element ref="tns:poc" minOccurs="0" />
 			<!-- subresources -->
 			<element ref="tns:containersReference" minOccurs="0" />
 			<element ref="tns:groupsReference" minOccurs="0" />
@@ -26,17 +28,17 @@
 		<attribute name="appId" type="anyURI"/>
 	</complexType>
 
-	<element name="applicationStatus" type="tns:ApplicationStatus" />
+	<element name="poc" type="anyURI" />
+	<element name="referencePoint" type="tns:ReferencePoint" />
 	<element name="aPoC" type="anyURI" />
 	<element name="aPoCPaths" type="tns:APoCPaths" />
 	
 	<element name="locRequestor" type="anyType" /> <!-- TODO restrict this -->
 
-	<simpleType name="ApplicationStatus">
+	<simpleType name="ReferencePoint">
 		<restriction base="string">
-			<enumeration value="ONLINE"></enumeration>
-			<enumeration value="OFFLINE"></enumeration>
-			<enumeration value="NOT_REACHABLE"></enumeration>
+			<enumeration value="MIA_REFERENCE_POINT"></enumeration>
+			<enumeration value="DIA_REFERENCE_POINT"></enumeration>
 		</restriction>
 	</simpleType>
 

@@ -37,10 +37,10 @@ alias m2m:ContactInfo with m2m:contactInfo
 
 m2m:M2MPoc from ong:t_xml_obj
 {
-    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:NMTOKEN) 
     m2m:contactInfo    m2m:ContactInfo    { } // (optional) 
     m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
-    m2m:onlineStatus    XoString    { } // (optional) (xmlType: m2m:OnlineStatus) (enum: ONLINE OFFLINE NOT_REACHABLE ) 
+    m2m:onlineStatus    XoString    { shdico } // (optional) (xmlType: m2m:OnlineStatus) (enum: ONLINE OFFLINE NOT_REACHABLE ) 
     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
 }

@@ -30,16 +30,21 @@
 
 m2m:Subscription from ong:t_xml_obj
 {
-    _owner$    XoString    { embattr } // (optional) (xmlType: xsd:string) 
-    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:NMTOKEN) 
     m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:minimalTimeBetweenNotifications    XoString    { } // (xmlType: xsd:long) 
     m2m:delayTolerance    XoString    { } // (xmlType: xsd:dateTime) 
     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:filterCriteria    XoVoidObj    { default=m2m:FilterCriteriaType } // (optional) 
-    m2m:subscriptionType    XoString    { } // (optional) (xmlType: m2m:SubscriptionType) (enum: ASYNCHRONOUS SYNCHRONOUS ) 
+    m2m:subscriptionType    XoString    { shdico } // (optional) (xmlType: m2m:SubscriptionType) (enum: ASYNCHRONOUS SYNCHRONOUS ) 
     m2m:contact    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:aggregateURI    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:timeoutReason    XoString    { } // (optional) (xmlType: xsd:string) 
+    m2m:noRepresentation    XoString    { } // (optional) (xmlType: xsd:boolean) 
+    m2m:subscriberId    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:maxAccuCreates    XoString    { } // (optional) (xmlType: xsd:long) 
+    m2m:currentAccuCreates    XoString    { } // (optional) (xmlType: xsd:long) 
 }
 alias m2m:Subscription with m2m:subscription
 

@@ -34,19 +34,14 @@
 		</sequence>
 	</complexType>
 
-	<complexType name="ContentInstanceFilterCriteriaType">
+	<complexType name="ContentInstancesFilterCriteriaType">
 		<complexContent>
 			<extension base="tns:FilterCriteriaType">
 				<sequence>
-					<element name="creator" type="anyURI" minOccurs="0"/>
-					<element name="searchString" type="string" minOccurs="0" maxOccurs="unbounded"/>
-					<element name="createdSince" type="dateTime" minOccurs="0"/>
-					<element name="createdUntil" type="dateTime" minOccurs="0"/>
-					<element name="sizeFrom" type="int" minOccurs="0"/>
-					<element name="sizeUntil" type="int" minOccurs="0"/>
+					<element name="sizeFrom" type="long" minOccurs="0" maxOccurs="1"/>
+					<element name="sizeUntil" type="long" minOccurs="0" maxOccurs="1"/>
 					<element name="contentType" type="string" minOccurs="0" maxOccurs="unbounded"/>
 					<element name="metaDataOnly" type="boolean" minOccurs="0" maxOccurs="1"/>
-					<element name="attributeAccessor" type="anyURI" minOccurs="0" maxOccurs="1"/>
 				</sequence>
 			</extension>
 		</complexContent>

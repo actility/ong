@@ -54,6 +54,8 @@ m2m:Application from ong:t_xml_obj
     m2m:aPoC    XoString    { } // (optional) (xmlType: xsd:anyURI) 
     m2m:aPoCPaths    m2m:APoCPaths    { } // (optional) 
     m2m:locRequestor    XoString    { } // (optional) (xmlType: xsd:anyType) 
+    m2m:referencePoint    XoString    { shdico } // (optional) (xmlType: m2m:ReferencePoint) (enum: MIA_REFERENCE_POINT DIA_REFERENCE_POINT ) 
+    m2m:poc    XoString    { } // (optional) (xmlType: xsd:anyURI) 
     m2m:containersReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
     m2m:groupsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
     m2m:accessRightsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 

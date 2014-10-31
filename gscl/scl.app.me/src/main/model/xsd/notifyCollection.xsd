@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m"
+	xmlns:xmlmime="http://www.w3.org/2005/05/xmlmime">
+
+	<include schemaLocation="common.xsd" />
+	<include schemaLocation="notify.xsd" />
+	<import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="http://www.w3.org/2005/05/xmlmime.xsd" />
+
+	<element name="notifyCollection" type="tns:NotifyCollection" />
+
+	<complexType name="NotifyCollection">
+		<sequence>
+			<element ref="tns:notify" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+
+</schema>

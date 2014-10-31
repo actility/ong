@@ -11,6 +11,7 @@
 			<element ref="tns:accessRightID" minOccurs="0" />
 			<element ref="tns:searchStrings" minOccurs="0" />
 			<element ref="tns:expirationTime" minOccurs="0" />
+			<element ref="tns:announceTo" minOccurs="0" />
 			<!-- subresources -->
 			<element ref="tns:containersReference" minOccurs="0" />
 			<element ref="tns:groupsReference" minOccurs="0" />

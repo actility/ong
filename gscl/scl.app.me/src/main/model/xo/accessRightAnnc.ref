@@ -30,11 +30,12 @@
 
 m2m:AccessRightAnnc from ong:t_xml_obj
 {
-    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:NMTOKEN) 
     m2m:link    XoString    { } // (xmlType: xsd:anyURI) 
     m2m:accessRightID    XoString    { shdico } // (optional) (xmlType: xsd:anyURI) 
     m2m:searchStrings    m2m:SearchStrings    { } // (optional) 
     m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
+    m2m:announceTo    m2m:AnnounceTo    { } // (optional) 
 }
 alias m2m:AccessRightAnnc with m2m:accessRightAnnc
 

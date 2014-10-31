@@ -49,6 +49,7 @@ import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SubscribedResource;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.FormatUtils;
+import com.actility.m2m.util.UtilConstants;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -124,9 +125,8 @@ public final class SubsManager {
                         } else {
                             resourceHandle = resource.copy(true);
                         }
-
-                        subscribedResource.prepareResourceForResponse(path, manager, subscribedPath, resourceHandle,
-                                subscription.getRequestingEntity(), subscription.getFilterCriteria(), null);
+                        subscribedResource.prepareResourceForResponse(path, manager, subscription.getSubscriber(),
+                                subscribedPath, resourceHandle, subscription.getFilterCriteria(), null);
 
                         // TODO Could be further optimized by backuping and precalculating data into the resourceContext
                         // just the first time and fix the resource in each iteration with this backup.
@@ -295,20 +295,22 @@ public final class SubsManager {
     public void printFilterCriteria(StringBuffer buffer) {
         if (filterCriteria.getCreatedAfter() != null) {
             buffer.append("  createdAfter: ")
-                    .append(FormatUtils.formatDateTime(filterCriteria.getCreatedAfter(), manager.getTimeZone())).append("\n");
+                    .append(FormatUtils.formatDateTime(filterCriteria.getCreatedAfter(), UtilConstants.LOCAL_TIMEZONE))
+                    .append("\n");
         }
         if (filterCriteria.getCreatedBefore() != null) {
             buffer.append("  createdBefore: ")
-                    .append(FormatUtils.formatDateTime(filterCriteria.getCreatedBefore(), manager.getTimeZone())).append("\n");
+                    .append(FormatUtils.formatDateTime(filterCriteria.getCreatedBefore(), UtilConstants.LOCAL_TIMEZONE))
+                    .append("\n");
         }
         if (filterCriteria.getIfModifiedSince() != null) {
             buffer.append("  ifModifiedSince: ")
-                    .append(FormatUtils.formatDateTime(filterCriteria.getIfModifiedSince(), manager.getTimeZone()))
+                    .append(FormatUtils.formatDateTime(filterCriteria.getIfModifiedSince(), UtilConstants.LOCAL_TIMEZONE))
                     .append("\n");
         }
         if (filterCriteria.getIfUnmodifiedSince() != null) {
             buffer.append("  ifUnmodifiedSince: ")
-                    .append(FormatUtils.formatDateTime(filterCriteria.getIfUnmodifiedSince(), manager.getTimeZone()))
+                    .append(FormatUtils.formatDateTime(filterCriteria.getIfUnmodifiedSince(), UtilConstants.LOCAL_TIMEZONE))
                     .append("\n");
         }
         if (filterCriteria.getSearchString() != null) {

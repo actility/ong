@@ -35,6 +35,7 @@ import java.net.URI;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.m2m.ChannelServerListener;
 import com.actility.m2m.m2m.M2MException;
 import com.actility.m2m.scl.log.BundleLogger;
 import com.actility.m2m.scl.model.SclManager;
@@ -48,25 +49,27 @@ public final class NCDeleteOp implements TransientOp {
     private final SclManager manager;
     private final URI contactUri;
     private final URI longPollUri;
+    private final ChannelServerListener channelListener;
     private boolean done;
 
-    public NCDeleteOp(String logId, SclManager manager, URI contactUri, URI longPollUri) {
+    public NCDeleteOp(String logId, SclManager manager, URI contactUri, URI longPollUri, ChannelServerListener channelListener) {
         this.logId = logId;
         this.manager = manager;
         this.contactUri = contactUri;
         this.longPollUri = longPollUri;
+        this.channelListener = channelListener;
     }
 
     public void prepare() {
         // Delete long poll connection
-        manager.getM2MContext().deleteServerLongPoll(contactUri, longPollUri);
+        manager.getM2MContext().deleteServerNotificationChannel(contactUri, longPollUri);
         done = true;
     }
 
     public void rollback() {
         if (done) {
             try {
-                manager.getM2MContext().createServerLongPoll(contactUri, longPollUri);
+                manager.getM2MContext().createServerNotificationChannel(contactUri, longPollUri, channelListener);
             } catch (M2MException e) {
                 LOG.error(logId + ": Unable to rollback notification channel deletion", e);
             }

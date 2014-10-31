@@ -16,10 +16,10 @@
 
 	<element name="securityMasFqdn" type="anyURI" />
 
-	<element name="securityM2MKey">
+	<element name="securityEncryptedM2MKey">
 		<simpleType>
 			<restriction base="hexBinary">
-				<length value="32" />
+				<length value="40" />
 			</restriction>
 		</simpleType>
 	</element>

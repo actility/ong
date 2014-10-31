@@ -30,14 +30,13 @@
 stext xmime:base64Binary from ong:t_xml_obj
 {
     value$    XoBuffer    {  } // xsd:base64Binary
-    xmime:contentType    XoString    { embattr } // (optional) (xmlType: xmime:AnonContentType) (min length: 3) 
+    xmime:contentType    XoString    { embattr } // (optional) (xmlType: xmime:AnonContentType1945038645) (min length: 3) 
 }
-alias xmime:base64Binary with m2m:content
 
 stext xmime:hexBinary from ong:t_xml_obj
 {
     value$    XoString    {  } // xsd:hexBinary
-    xmime:contentType    XoString    { embattr } // (optional) (xmlType: xmime:AnonContentType) (min length: 3) 
+    xmime:contentType    XoString    { embattr } // (optional) (xmlType: xmime:AnonContentType1945038645) (min length: 3) 
 }
 
 #endif // EXTERN_REF

@@ -62,7 +62,6 @@ import com.actility.m2m.m2m.M2MService;
 import com.actility.m2m.scl.impl.SclManagerImpl;
 import com.actility.m2m.scl.log.BundleLogger;
 import com.actility.m2m.scl.model.SclConfig;
-import com.actility.m2m.storage.ConditionBuilder;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.storage.StorageRequestExecutor;
 import com.actility.m2m.util.FileUtils;
@@ -116,9 +115,6 @@ public final class SclActivator implements BundleActivator, ManagedService {
 
     private ServiceTracker storageRequestExecutorTracker = null;
     private StorageRequestExecutor storageContext = null;
-
-    private ServiceTracker conditionBuilderTracker = null;
-    private ConditionBuilder conditionBuilder = null;
 
     private ServiceTracker resourcesAccessorServiceTracker = null;
     private ResourcesAccessorService resourcesAccessorService = null;
@@ -294,11 +290,11 @@ public final class SclActivator implements BundleActivator, ManagedService {
         String defaultStr = FormatUtils.formatDuration(DEFAULT_MIN_MAX_INSTANCE_AGE.longValue());
         String duration = (String) checkWithDefault(config, ".minMaxInstanceAge", String.class, defaultStr);
         try {
-            return FormatUtils.parseDuration(duration) / 1000L;
+            return FormatUtils.parseDuration(duration);
         } catch (ParseException e) {
             LOG.error("Configuration property .minMaxInstanceAge cannot be decoded as a duration, use default value "
                     + defaultStr, e);
-            return DEFAULT_MIN_MAX_INSTANCE_AGE.longValue() / 1000L;
+            return DEFAULT_MIN_MAX_INSTANCE_AGE.longValue();
         }
     }
 
@@ -306,11 +302,11 @@ public final class SclActivator implements BundleActivator, ManagedService {
         String defaultStr = FormatUtils.formatDuration(DEFAULT_MAX_MAX_INSTANCE_AGE.longValue());
         String duration = (String) checkWithDefault(config, ".maxMaxInstanceAge", String.class, defaultStr);
         try {
-            return FormatUtils.parseDuration(duration) / 1000L;
+            return FormatUtils.parseDuration(duration);
         } catch (ParseException e) {
             LOG.error("Configuration property .maxMaxInstanceAge cannot be decoded as a duration, use default value "
                     + defaultStr, e);
-            return DEFAULT_MAX_MAX_INSTANCE_AGE.longValue() / 1000L;
+            return DEFAULT_MAX_MAX_INSTANCE_AGE.longValue();
         }
     }
 
@@ -458,15 +454,6 @@ public final class SclActivator implements BundleActivator, ManagedService {
         storageRequestExecutorTracker.open();
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("Starting tracker for " + ConditionBuilder.class.getName() + " service...");
-        }
-
-        // for ConditionBuilder
-        conditionBuilderTracker = new ServiceTracker(context, ConditionBuilder.class.getName(),
-                new ConditionBuilderCustomizer());
-        conditionBuilderTracker.open();
-
-        if (LOG.isInfoEnabled()) {
             LOG.info("Starting tracker for " + M2MService.class.getName() + " service...");
         }
 
@@ -520,13 +507,6 @@ public final class SclActivator implements BundleActivator, ManagedService {
         storageRequestExecutorTracker = null;
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("Stopping tracker for " + ConditionBuilder.class.getName() + " service...");
-        }
-
-        conditionBuilderTracker.close();
-        conditionBuilderTracker = null;
-
-        if (LOG.isInfoEnabled()) {
             LOG.info("Stopping tracker for " + ResourcesAccessorService.class.getName() + " service...");
         }
 
@@ -547,8 +527,8 @@ public final class SclActivator implements BundleActivator, ManagedService {
     }
 
     private synchronized void startSclApp() {
-        if ((xoService != null) && (storageContext != null) && (conditionBuilder != null) && (m2mService != null)
-                && (resourcesAccessorService != null) && (config != null)) {
+        if ((xoService != null) && (storageContext != null) && (m2mService != null) && (resourcesAccessorService != null)
+                && (config != null)) {
             M2MContext m2mContext = null;
             try {
                 String contextPath = (String) config.get("contextPath");
@@ -576,7 +556,7 @@ public final class SclActivator implements BundleActivator, ManagedService {
                         getReqEntityToIps(config));
 
                 LOG.info("Creating SCL manager...");
-                sclManager = new SclManagerImpl(sclConfig, xoService, storageContext, conditionBuilder);
+                sclManager = new SclManagerImpl(sclConfig, xoService, storageContext);
 
                 LOG.info("Registering SCL to M2M Service...");
                 Map backendConfig = new HashMap();
@@ -775,37 +755,6 @@ public final class SclActivator implements BundleActivator, ManagedService {
             if (service == storageContext) {
                 stopSclApp();
                 storageContext = null;
-            }
-        }
-    }
-
-    // customizer that handles registration/modification/unregistration events for ConditionBuilder
-    private class ConditionBuilderCustomizer implements ServiceTrackerCustomizer {
-
-        public Object addingService(ServiceReference reference) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Adding service " + ConditionBuilder.class.getName() + "...");
-            }
-            if (conditionBuilder != null) {
-                return null;
-            }
-            conditionBuilder = (ConditionBuilder) context.getService(reference);
-
-            startSclApp();
-            // Return the service to track it
-            return conditionBuilder;
-        }
-
-        public void modifiedService(ServiceReference reference, Object service) {
-        }
-
-        public void removedService(ServiceReference reference, Object service) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Removing service " + ConditionBuilder.class.getName() + "...");
-            }
-            if (service == conditionBuilder) {
-                stopSclApp();
-                conditionBuilder = null;
             }
         }
     }

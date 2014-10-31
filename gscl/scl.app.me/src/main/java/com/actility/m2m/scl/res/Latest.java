@@ -32,8 +32,8 @@
 package com.actility.m2m.scl.res;
 
 import java.net.URI;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -45,10 +45,11 @@ import com.actility.m2m.scl.model.Constants;
 import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SubscribedResource;
 import com.actility.m2m.storage.Condition;
-import com.actility.m2m.storage.ConditionBuilder;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.SearchResult;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.storage.StorageRequestExecutor;
+import com.actility.m2m.util.EmptyUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -82,9 +83,9 @@ public final class Latest implements SubscribedResource {
         return ContentInstances.getInstance().mergeFilterCriteria(mergedFilterCriteria, filterCriteria);
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws XoException {
-        ContentInstance.getInstance().prepareResourceForResponse(logId, manager, path, resource, requestingEntity,
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path,
+            XoObject resource, FilterCriteria filterCriteria, Set supported) throws XoException {
+        ContentInstance.getInstance().prepareResourceForResponse(logId, manager, requestingEntity, path, resource,
                 filterCriteria, supported);
     }
 
@@ -96,23 +97,22 @@ public final class Latest implements SubscribedResource {
         // TODO
     }
 
-    public byte[] getResponseRepresentation(String logId, SclManager manager, String path, URI requestingEntity,
+    public byte[] getResponseRepresentation(String logId, SclManager manager, URI requestingEntity, String path,
             FilterCriteria filterCriteria, Set supported, String mediaType) throws StorageException, XoException {
-        ConditionBuilder conditionBuilder = manager.getConditionBuilder();
-        Condition condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                Constants.TYPE_CONTENT_INSTANCE);
-        SearchResult searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, condition,
-                StorageRequestExecutor.ORDER_DESC, 1);
-        Map children = searchResult.getResults();
-        if (children.size() == 1) {
-            Entry entry = (Entry) children.entrySet().iterator().next();
-            String subPath = (String) entry.getKey();
-            byte[] contentInstance = (byte[]) entry.getValue();
+        Condition condition = manager.getStorageContext().getStorageFactory()
+                .createStringCondition(Constants.ATTR_TYPE, Condition.ATTR_OP_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
+        SearchResult searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                condition, StorageRequestExecutor.ORDER_DESC, 1, true, EmptyUtils.EMPTY_LIST);
+        Iterator children = searchResult.getResults();
+        if (children.hasNext()) {
+            Document document = (Document) children.next();
+            String subPath = document.getPath();
+            byte[] contentInstance = document.getContent();
             XoObject latest = null;
             try {
                 latest = manager.getXoService().readBinaryXmlXoObject(contentInstance);
                 if (ContentInstance.getInstance().filterMatches(latest, filterCriteria)) {
-                    ContentInstance.getInstance().prepareResourceForResponse(logId, manager, subPath, latest, requestingEntity,
+                    ContentInstance.getInstance().prepareResourceForResponse(logId, manager, requestingEntity, subPath, latest,
                             filterCriteria, supported);
                     if (M2MConstants.MT_APPLICATION_EXI.equals(mediaType)) {
                         return latest.saveExi();

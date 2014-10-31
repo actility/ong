@@ -19,6 +19,7 @@
 			<!--  not defined yet element ref="tns:containerType" minOccurs="0"  -->
 			<!-- subresources -->
 			<element ref="tns:contentInstancesReference" minOccurs="0" />
+			<element ref="tns:subcontainersReference" minOccurs="0" />
 			<element ref="tns:subscriptionsReference" minOccurs="0" />
 		</sequence>
 		<attribute ref="tns:id"/>
@@ -26,5 +27,5 @@
 
 	<element name="maxNrOfInstances" type="long"/>
 	<element name="maxByteSize" type="long"/>
-	<element name="maxInstanceAge" type="long"/>
+	<element name="maxInstanceAge" type="duration"/>
 </schema>

@@ -35,6 +35,7 @@ m2m:ApplicationAnnc from ong:t_xml_obj
     m2m:accessRightID    XoString    { shdico } // (optional) (xmlType: xsd:anyURI) 
     m2m:searchStrings    m2m:SearchStrings    { } // (optional) 
     m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
+    m2m:announceTo    m2m:AnnounceTo    { } // (optional) 
     m2m:containersReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
     m2m:groupsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
     m2m:accessRightsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 

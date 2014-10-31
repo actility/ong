@@ -37,7 +37,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -64,9 +63,9 @@ import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.SubscribedResource;
 import com.actility.m2m.scl.model.VolatileResource;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.FormatUtils;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
@@ -77,6 +76,30 @@ import com.actility.m2m.xo.XoObject;
  * service...
  * <p>
  * This resource can be subscribed.
+ *
+ * <pre>
+ * m2m:Application from ong:t_xml_obj
+ * {
+ *     appId    XoString    { embattr } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:accessRightID    XoString    { shdico } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:searchStrings    m2m:SearchStrings    { } // (optional)
+ *     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:announceTo    m2m:AnnounceTo    { } // (optional)
+ *     m2m:aPoC    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:aPoCPaths    m2m:APoCPaths    { } // (optional)
+ *     m2m:locRequestor    XoString    { } // (optional) (xmlType: xsd:anyType)
+ *     m2m:referencePoint    XoString    { } // (optional) (xmlType: m2m:ReferencePoint) (enum: MIA_REFERENCE_POINT DIA_REFERENCE_POINT )
+ *     m2m:poc    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:containersReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:groupsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:accessRightsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:subscriptionsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:notificationChannelsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ * }
+ * alias m2m:Application with m2m:application
+ * </pre>
  */
 public final class Application extends SclResource implements VolatileResource, SubscribedResource {
     private static final Logger LOG = OSGiLogger.getLogger(Application.class, BundleLogger.getStaticLogger());
@@ -105,6 +128,8 @@ public final class Application extends SclResource implements VolatileResource, 
         reservedKeywords.add(M2MConstants.ATTR_A_PO_C);
         reservedKeywords.add(M2MConstants.ATTR_A_PO_C_PATHS);
         reservedKeywords.add(M2MConstants.ATTR_LOC_REQUESTOR);
+        reservedKeywords.add(M2MConstants.ATTR_REFERENCE_POINT);
+        reservedKeywords.add(M2MConstants.ATTR_POC);
         reservedKeywords.add(M2MConstants.ATTR_CONTAINERS_REFERENCE);
         reservedKeywords.add(M2MConstants.RES_CONTAINERS);
         reservedKeywords.add(M2MConstants.ATTR_GROUPS_REFERENCE);
@@ -116,26 +141,6 @@ public final class Application extends SclResource implements VolatileResource, 
         reservedKeywords.add(M2MConstants.ATTR_NOTIFICATION_CHANNELS_REFERENCE);
         reservedKeywords.add(M2MConstants.RES_NOTIFICATION_CHANNELS);
     }
-
-    // m2m:Application from ong:t_xml_obj
-    // {
-    // appId XoString { embattr } // (optional) (xmlType: xsd:anyURI)
-    // m2m:expirationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:accessRightID XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:searchStrings m2m:SearchStrings { } // (optional)
-    // m2m:creationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:lastModifiedTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:announceTo m2m:AnnounceTo { } // (optional)
-    // m2m:aPoC XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:aPoCPaths m2m:APoCPaths { } // (optional)
-    // m2m:locindicationor XoString { } // (optional) (xmlType: xsd:anyType)
-    // m2m:containersReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:groupsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:accessRightsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:subscriptionsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:notificationChannelsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // }
-    // alias m2m:Application with m2m:application
 
     public void reload(SclManager manager, String path, XoObject resource, SclTransaction transaction) throws IOException,
             M2MException, StorageException, XoException {
@@ -287,6 +292,8 @@ public final class Application extends SclResource implements VolatileResource, 
         getAndCheckURI(representation, M2MConstants.TAG_M2M_A_PO_C, Constants.ID_MODE_OPTIONAL);
         Set subPaths = getAndCheckAPoCPaths(manager, path, representation, M2MConstants.TAG_M2M_A_PO_C_PATHS,
                 Constants.ID_MODE_OPTIONAL, path + M2MConstants.URI_SEP);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_REFERENCE_POINT, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_POC, Constants.ID_MODE_OPTIONAL);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_CONTAINERS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_GROUPS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_ACCESS_RIGHTS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
@@ -316,12 +323,15 @@ public final class Application extends SclResource implements VolatileResource, 
         createXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_SEARCH_STRINGS);
         resource.setStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME, creationTime);
         resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
-        if (resource.getStringAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO) != null) {
+        if (resource.containsAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO)) {
             modified = true;
         }
+        resource.setXoObjectAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO,
+                manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_ANNOUNCE_TO));
         createStringOptional(resource, representation, M2MConstants.TAG_M2M_A_PO_C);
         createXoObjectOptional(resource, representation, M2MConstants.TAG_M2M_A_PO_C_PATHS);
         createStringOptional(resource, representation, M2MConstants.TAG_M2M_LOC_REQUESTOR);
+        resource.setStringAttribute(M2MConstants.TAG_M2M_REFERENCE_POINT, M2MConstants.REFERENCE_POINT_DIA);
 
         // Create sub-resources
         Containers.getInstance().createResource(manager, path + M2MConstants.URI_SEP + M2MConstants.RES_CONTAINERS,
@@ -334,17 +344,15 @@ public final class Application extends SclResource implements VolatileResource, 
                 path + M2MConstants.URI_SEP + M2MConstants.RES_NOTIFICATION_CHANNELS, creationDate, creationTime, transaction);
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_APPLICATION));
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_APPLICATION);
         XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
         List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-        Iterator it = searchStringList.iterator();
-        while (it.hasNext()) {
-            searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-        }
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-        transaction.createResource(path, resource, searchAttributes);
+        document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+        document.setContent(resource.saveBinary());
+        transaction.createResource(document);
 
         transaction.addTransientOp(new ExpirationTimerUpdateOp(manager, path, Constants.ID_RES_APPLICATION, expirationTime
                 .getTime() - creationDate.getTime()));
@@ -408,7 +416,7 @@ public final class Application extends SclResource implements VolatileResource, 
         updateStringOptional(resource, representation, M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D);
         updateXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_SEARCH_STRINGS);
         updateLastModifiedTime(manager, resource, now);
-        if (representation.getXoObjectAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO) != null) {
+        if (representation.containsAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO)) {
             modified = true;
         }
         updateStringOptional(resource, representation, M2MConstants.TAG_M2M_A_PO_C);
@@ -416,18 +424,16 @@ public final class Application extends SclResource implements VolatileResource, 
         updateStringOptional(resource, representation, M2MConstants.TAG_M2M_LOC_REQUESTOR);
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_APPLICATION));
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_APPLICATION);
         XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
         List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-        Iterator it = searchStringList.iterator();
-        while (it.hasNext()) {
-            searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-        }
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        manager.getStorageContext().update(path, resource.saveBinary(), searchAttributes);
+        document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
+                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setContent(resource.saveBinary());
+        manager.getStorageContext().update(null, document, null);
 
         new ExpirationTimerUpdateOp(manager, path, Constants.ID_RES_APPLICATION, expirationTime.getTime() - now.getTime())
                 .postCommit();
@@ -463,8 +469,8 @@ public final class Application extends SclResource implements VolatileResource, 
         throw new UnsupportedOperationException();
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) {
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path, XoObject resource,
+            FilterCriteria filterCriteria, Set supported) throws M2MException {
         String appPath = manager.getM2MContext().getApplicationPath();
         String accessRight = resource.getStringAttribute(M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D);
         if (accessRight != null) {
@@ -472,6 +478,23 @@ public final class Application extends SclResource implements VolatileResource, 
                     + M2MConstants.URI_SEP);
         }
         getAndFixAPoCPaths(manager, path, resource, M2MConstants.TAG_M2M_A_PO_C_PATHS);
+
+        // APoc
+        String requestingEntityStr = requestingEntity.toString();
+        String localSclBase = null;
+        if (requestingEntityStr.charAt(requestingEntityStr.length() - 1) == '/') {
+            localSclBase = manager.getM2MContext().createLocalUri(requestingEntity, M2MConstants.URI_SEP).toString();
+        } else {
+            localSclBase = manager.getM2MContext().createLocalUri(requestingEntity, Constants.PATH_ROOT).toString();
+        }
+        if (!localSclBase.equals(requestingEntityStr)) {
+            String localResourceUri = manager.getM2MContext().createLocalUri(requestingEntity, path).toString();
+            if (!localResourceUri.equals(requestingEntityStr)) {
+                // Remove aPoc
+                resource.setStringAttribute(M2MConstants.TAG_M2M_A_PO_C, null);
+            }
+        }
+
         String encodedPath = URIUtils.encodePath(path);
         resource.setStringAttribute(M2MConstants.TAG_M2M_CONTAINERS_REFERENCE, appPath + encodedPath + M2MConstants.URI_SEP
                 + M2MConstants.RES_CONTAINERS + M2MConstants.URI_SEP);
@@ -491,7 +514,7 @@ public final class Application extends SclResource implements VolatileResource, 
             super.doCreateIndication(manager, path, resource, indication, partialAccessor);
         } else {
             // Re-targetting
-            SclLogger.logRequestIndication(Constants.PT_APPLICATION_UPDATE_REQUEST, Constants.PT_APPLICATION_UPDATE_RESPONSE,
+            SclLogger.logRequestIndication("applicationUpdateRequestIndication", "applicationUpdateResponseConfirm",
                     indication, null, Constants.ID_LOG_RAW_REPRESENTATION);
             retargetIndication(manager, path, resource, indication, M2MConstants.FLAG_WRITE);
         }
@@ -503,8 +526,8 @@ public final class Application extends SclResource implements VolatileResource, 
             super.doRetrieveIndication(manager, path, resource, indication, partialAccessor);
         } else {
             // Re-targetting
-            SclLogger.logRequestIndication(Constants.PT_APPLICATION_RETRIEVE_REQUEST,
-                    Constants.PT_APPLICATION_RETRIEVE_RESPONSE, indication, null, 0);
+            SclLogger.logRequestIndication("applicationRetrieveRequestIndication", "applicationRetrieveResponseConfirm",
+                    indication, null, 0);
             retargetIndication(manager, path, resource, indication, M2MConstants.FLAG_READ);
         }
     }
@@ -515,7 +538,7 @@ public final class Application extends SclResource implements VolatileResource, 
             super.doUpdateIndication(manager, path, resource, indication, partialAccessor);
         } else {
             // Re-targetting
-            SclLogger.logRequestIndication(Constants.PT_APPLICATION_UPDATE_REQUEST, Constants.PT_APPLICATION_UPDATE_RESPONSE,
+            SclLogger.logRequestIndication("applicationUpdateRequestIndication", "applicationUpdateResponseConfirm",
                     indication, null, Constants.ID_LOG_RAW_REPRESENTATION);
             retargetIndication(manager, path, resource, indication, M2MConstants.FLAG_WRITE);
         }
@@ -527,7 +550,7 @@ public final class Application extends SclResource implements VolatileResource, 
             super.doDeleteIndication(manager, path, resource, indication, partialAccessor);
         } else {
             // Re-targetting
-            SclLogger.logRequestIndication(Constants.PT_APPLICATION_UPDATE_REQUEST, Constants.PT_APPLICATION_UPDATE_RESPONSE,
+            SclLogger.logRequestIndication("applicationUpdateRequestIndication", "applicationUpdateResponseConfirm",
                     indication, null, Constants.ID_LOG_RAW_REPRESENTATION);
             retargetIndication(manager, path, resource, indication, M2MConstants.FLAG_WRITE);
         }

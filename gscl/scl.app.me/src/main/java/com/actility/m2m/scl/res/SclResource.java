@@ -40,7 +40,6 @@ import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,7 +47,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -70,13 +68,15 @@ import com.actility.m2m.scl.model.SclConfig;
 import com.actility.m2m.scl.model.SclLogger;
 import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.StorageException;
+import com.actility.m2m.util.CharacterUtils;
 import com.actility.m2m.util.FormatUtils;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.Profiler;
 import com.actility.m2m.util.StringReader;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.UUID;
+import com.actility.m2m.util.UtilConstants;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -84,6 +84,9 @@ import com.actility.m2m.xo.XoService;
 
 public abstract class SclResource implements ResourceController {
     private static final Logger LOG = OSGiLogger.getLogger(SclResource.class, BundleLogger.getStaticLogger());
+
+    private static final long L_NM_TOKEN = CharacterUtils.lowMask(":_-.") | CharacterUtils.L_ALPHANUM;
+    private static final long H_NM_TOKEN = CharacterUtils.highMask(":_-.") | CharacterUtils.H_ALPHANUM;
 
     private final boolean collection;
     private final String retrieveRequestIndication;
@@ -277,8 +280,8 @@ public abstract class SclResource implements ResourceController {
         return result;
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException,
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path,
+            XoObject resource, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException,
             StorageException, XoException, M2MException {
         // Must be overidden if needed
     }
@@ -291,14 +294,14 @@ public abstract class SclResource implements ResourceController {
         // Nothing to do
     }
 
-    public byte[] getResponseRepresentation(String logId, SclManager manager, String path, URI requestingEntity,
+    public byte[] getResponseRepresentation(String logId, SclManager manager, URI requestingEntity, String path,
             FilterCriteria filterCriteria, Set supported, String mediaType) throws UnsupportedEncodingException,
             StorageException, XoException, M2MException {
         XoObject localResource = null;
         try {
             localResource = manager.getXoResource(path);
             if (filterMatches(localResource, filterCriteria)) {
-                prepareResourceForResponse(logId, manager, path, localResource, requestingEntity, filterCriteria, supported);
+                prepareResourceForResponse(logId, manager, requestingEntity, path, localResource, filterCriteria, supported);
                 if (M2MConstants.MT_APPLICATION_EXI.equals(mediaType)) {
                     return localResource.saveExi();
                 }
@@ -324,8 +327,8 @@ public abstract class SclResource implements ResourceController {
                     supported.add(it.next());
                 }
             }
-            prepareResourceForResponse(indication.getTransactionId(), manager, path, resource,
-                    indication.getRequestingEntity(), getFilterCriteria(indication), supported);
+            prepareResourceForResponse(indication.getTransactionId(), manager, indication.getRequestingEntity(), path,
+                    resource, getFilterCriteria(indication), supported);
         }
         URI resourceURI = manager.getM2MContext().createLocalUri(indication.getTargetID(), path);
         Response response = indication.createSuccessResponse(statusCode);
@@ -612,78 +615,60 @@ public abstract class SclResource implements ResourceController {
         createXoObjectMandatory(manager, resource, representation, tagName);
     }
 
-    public boolean setMaxNrOfInstances(SclManager manager, XoObject resource, long maxNrOfInstances, boolean useDefault) {
+    public boolean setMaxNrOfInstances(SclManager manager, XoObject resource, long maxNrOfInstances) {
         SclConfig config = manager.getSclConfig();
         long computedMaxNrOfInstances = maxNrOfInstances;
         if (computedMaxNrOfInstances == -1L) {
             if (config.getDefaultMaxNrOfInstances() > 0L) {
-                if (useDefault) {
-                    computedMaxNrOfInstances = config.getDefaultMaxNrOfInstances();
-                } else {
-                    computedMaxNrOfInstances = config.getMaxMaxNrOfInstances();
-                }
+                computedMaxNrOfInstances = config.getDefaultMaxNrOfInstances();
+            } else {
+                computedMaxNrOfInstances = Long.MAX_VALUE;
             }
         } else if (computedMaxNrOfInstances < config.getMinMaxNrOfInstances()) {
             computedMaxNrOfInstances = config.getMinMaxNrOfInstances();
         } else if (computedMaxNrOfInstances > config.getMaxMaxNrOfInstances()) {
             computedMaxNrOfInstances = config.getMaxMaxNrOfInstances();
         }
-        if (computedMaxNrOfInstances != -1L) {
-            resource.setStringAttribute(M2MConstants.TAG_M2M_MAX_NR_OF_INSTANCES, String.valueOf(computedMaxNrOfInstances));
-        } else {
-            resource.setStringAttribute(M2MConstants.TAG_M2M_MAX_NR_OF_INSTANCES, null);
-        }
+        resource.setStringAttribute(M2MConstants.TAG_M2M_MAX_NR_OF_INSTANCES, String.valueOf(computedMaxNrOfInstances));
 
         return computedMaxNrOfInstances != maxNrOfInstances;
     }
 
-    public boolean setMaxByteSize(SclManager manager, XoObject resource, long maxByteSize, boolean useDefault) {
+    public boolean setMaxByteSize(SclManager manager, XoObject resource, long maxByteSize) {
         SclConfig config = manager.getSclConfig();
         long computedMaxByteSize = maxByteSize;
 
         if (computedMaxByteSize == -1L) {
             if (config.getDefaultMaxByteSize() > 0L) {
-                if (useDefault) {
-                    computedMaxByteSize = config.getDefaultMaxByteSize();
-                } else {
-                    computedMaxByteSize = config.getMaxMaxByteSize();
-                }
+                computedMaxByteSize = config.getDefaultMaxByteSize();
+            } else {
+                computedMaxByteSize = Long.MAX_VALUE;
             }
         } else if (computedMaxByteSize < config.getMinMaxByteSize()) {
             computedMaxByteSize = config.getMinMaxByteSize();
         } else if (computedMaxByteSize > config.getMaxMaxByteSize()) {
             computedMaxByteSize = config.getMaxMaxByteSize();
         }
-        if (computedMaxByteSize != -1L) {
-            resource.setStringAttribute(M2MConstants.TAG_M2M_MAX_BYTE_SIZE, String.valueOf(computedMaxByteSize));
-        } else {
-            resource.setStringAttribute(M2MConstants.TAG_M2M_MAX_BYTE_SIZE, null);
-        }
+        resource.setStringAttribute(M2MConstants.TAG_M2M_MAX_BYTE_SIZE, String.valueOf(computedMaxByteSize));
 
         return computedMaxByteSize != maxByteSize;
     }
 
-    public boolean setMaxInstanceAge(SclManager manager, XoObject resource, long maxInstanceAge, boolean useDefault) {
+    public boolean setMaxInstanceAge(SclManager manager, XoObject resource, long maxInstanceAge) {
         SclConfig config = manager.getSclConfig();
         long computedMaxInstanceAge = maxInstanceAge;
         if (computedMaxInstanceAge == -1L) {
             if (config.getDefaultMaxInstanceAge() > 0L) {
-                if (useDefault) {
-                    computedMaxInstanceAge = config.getDefaultMaxInstanceAge();
-                } else {
-                    computedMaxInstanceAge = config.getMaxMaxInstanceAge();
-                }
+                computedMaxInstanceAge = config.getDefaultMaxInstanceAge();
+            } else {
+                computedMaxInstanceAge = Constants.MAX_MAX_INSTANCE_AGE;
             }
         } else if (computedMaxInstanceAge < config.getMinMaxInstanceAge()) {
             computedMaxInstanceAge = config.getMinMaxInstanceAge();
         } else if (computedMaxInstanceAge > config.getMaxMaxInstanceAge()) {
             computedMaxInstanceAge = config.getMaxMaxInstanceAge();
         }
-        if (computedMaxInstanceAge != -1L) {
-            resource.setStringAttribute(M2MConstants.TAG_M2M_MAX_INSTANCE_AGE, String.valueOf(computedMaxInstanceAge));
-        } else {
-            resource.setStringAttribute(M2MConstants.TAG_M2M_MAX_INSTANCE_AGE, null);
-        }
+        resource.setStringAttribute(M2MConstants.TAG_M2M_MAX_INSTANCE_AGE, FormatUtils.formatDuration(computedMaxInstanceAge));
 
         return computedMaxInstanceAge != maxInstanceAge;
     }
@@ -703,39 +688,36 @@ public abstract class SclResource implements ResourceController {
             computedExpirationTime = new Date(now + config.getMaxExpirationDuration());
         }
         resource.setStringAttribute(M2MConstants.TAG_M2M_EXPIRATION_TIME,
-                FormatUtils.formatDateTime(computedExpirationTime, manager.getTimeZone()));
+                FormatUtils.formatDateTime(computedExpirationTime, UtilConstants.LOCAL_TIMEZONE));
         return computedExpirationTime;
     }
 
     public void updateLastModifiedTime(SclManager manager, XoObject resource, Date now) {
         resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME,
-                FormatUtils.formatDateTime(now, manager.getTimeZone()));
+                FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE));
     }
 
     public XoObject generateNamedReferenceCollection(String logId, SclManager manager, SclResource controller,
-            URI requestingEntity, String path, XoObject resource, Map children, String tagName)
+            URI requestingEntity, String path, XoObject resource, Iterator/* <Document> */children, String tagName)
             throws UnsupportedEncodingException, XoException {
-        Iterator it = children.entrySet().iterator();
+        Iterator it = children;
         XoService xoService = manager.getXoService();
         XoObject namedReferenceCollection = xoService.newXmlXoObject(tagName);
         resource.setXoObjectAttribute(tagName, namedReferenceCollection);
         List namedReferenceCollectionList = namedReferenceCollection
                 .getXoObjectListAttribute(M2MConstants.TAG_M2M_NAMED_REFERENCE);
         int pathLength = path.length();
+        Document document = null;
         String subPath = null;
         XoObject referenceToNamedResource = null;
-        Entry entry = null;
-        byte[] rawXoObject = null;
         XoObject xoObject = null;
         while (it.hasNext()) {
-            entry = (Entry) it.next();
-            subPath = ((String) entry.getKey());
-            rawXoObject = (byte[]) entry.getValue();
-            xoObject = manager.getXoService().readBinaryXmlXoObject(rawXoObject);
+            document = ((Document) it.next());
+            subPath = document.getPath();
+            xoObject = manager.getXoService().readBinaryXmlXoObject(document.getContent());
             try {
                 controller.checkRights(logId, manager, subPath, xoObject, requestingEntity, M2MConstants.FLAG_DISCOVER);
                 subPath = subPath.substring(pathLength + 1, subPath.length());
-
                 referenceToNamedResource = xoService.newXmlXoObject(M2MConstants.TAG_M2M_NAMED_REFERENCE);
                 referenceToNamedResource.setStringAttribute(XoObject.ATTR_VALUE, URIUtils.encodePath(subPath)
                         + M2MConstants.URI_SEP);
@@ -1199,7 +1181,7 @@ public abstract class SclResource implements ResourceController {
                 try {
                     parentResource = manager.getXoResource(parentPath);
                     // parentResource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME,
-                    // FormatUtils.formatDateTime(now, manager.getTimeZone()));
+                    // FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE));
                     // transaction.updateResource(parentPath, parentResource, null);
                     parentResourceController.deleteChildResource(indication.getTransactionId(), manager, parentPath,
                             parentResource, resource, now, transaction);
@@ -1318,11 +1300,12 @@ public abstract class SclResource implements ResourceController {
 
                     // Save resource
                     // TODO should be done by resource as this is specific
-                    Collection searchAttributes = new ArrayList();
-                    searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                            .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-                    searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-                    manager.getStorageContext().update(path, resource.saveBinary(), searchAttributes);
+                    Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+                    document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                            FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+                    document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+                    document.setContent(resource.saveBinary());
+                    manager.getStorageContext().update(null, document, null);
                     sendSuccessResponse(manager, path, resource, indication, StatusCode.STATUS_OK, false, eTag, lastModified);
                     break;
                 default:
@@ -1443,19 +1426,17 @@ public abstract class SclResource implements ResourceController {
 
                             // Save resource
                             // TODO should be done by resource as this is specific (here it is specific to <accessRight>)
-                            Collection searchAttributes = new ArrayList();
-                            searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_ACCESS_RIGHT));
+                            Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+                            document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_ACCESS_RIGHT);
                             XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
                             List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-                            Iterator it = searchStringList.iterator();
-                            while (it.hasNext()) {
-                                searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-                            }
-                            searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                                    .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-                            searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
+                            document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+                            document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                                    FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+                            document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+                            document.setContent(resource.saveBinary());
 
-                            manager.getStorageContext().update(path, resource.saveBinary(), searchAttributes);
+                            manager.getStorageContext().update(null, document, null);
                         } finally {
                             representation.free(true);
                         }
@@ -1631,10 +1612,11 @@ public abstract class SclResource implements ResourceController {
     public static void checkPermissionType(XoObject permission, String tagName) throws M2MException {
         // m2m:PermissionType from ong:t_xml_obj
         // {
-        // m2m:id XoString { embattr } // (optional) (xmlType: xsd:anyURI)
+        // m2m:id XoString { embattr } // (optional) (xmlType: xsd:NMTOKEN)
         // m2m:permissionFlags m2m:PermissionFlagListType { }
         // m2m:permissionHolders m2m:PermissionHolderType { }
         // }
+        getAndCheckNmToken(permission, M2MConstants.ATTR_M2M_ID, Constants.ID_MODE_REQUIRED);
         getAndCheckPermissionFlagListType(permission, M2MConstants.TAG_M2M_PERMISSION_FLAGS, Constants.ID_MODE_REQUIRED);
         getAndCheckPermissionHolderType(permission, M2MConstants.TAG_M2M_PERMISSION_HOLDERS, Constants.ID_MODE_REQUIRED);
     }
@@ -1642,11 +1624,22 @@ public abstract class SclResource implements ResourceController {
     public static void checkFilterCriteriaType(XoObject filterCriteria, String tagName, FilterCriteria fc) throws M2MException {
         // m2m:FilterCriteriaType from ong:t_xml_obj
         // {
+        // xsi:type XoString { embattr } // (optional) (xmlType: xsd:QName)
         // ifModifiedSince XoString { } // (optional) (xmlType: xsd:dateTime)
         // ifUnmodifiedSince XoString { } // (optional) (xmlType: xsd:dateTime)
-        // ifMatch XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
         // ifNoneMatch XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
+        // attributeAccessor XoString { } // (xmlType: xsd:anyURI)
+        // searchString XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
+        // createdAfter XoString { } // (optional) (xmlType: xsd:dateTime)
+        // createdBefore XoString { } // (optional) (xmlType: xsd:dateTime)
+        // maxSize XoString { } // (optional) (xmlType: xsd:long)
+        // searchPrefix XoString { } // (optional) (xmlType: xsd:anyURI)
+        // inType XoString { list } // (xmlType: m2m:ResourceType) (list size: [0, infinity[) (enum: CS RS AN CI CT AP SB SL AR
+        // MT GP PM )
+        // outType XoString { list } // (xmlType: m2m:ResourceType) (list size: [0, infinity[) (enum: CS RS AN CI CT AP SB SL AR
+        // MT GP PM )
         // }
+        // alias m2m:FilterCriteriaType with m2m:filterCriteria
         Date dateValue = getAndCheckDateTime(filterCriteria, M2MConstants.TAG_IF_MODIFIED_SINCE, Constants.ID_MODE_OPTIONAL,
                 -1L);
         if (dateValue != null) {
@@ -1656,15 +1649,6 @@ public abstract class SclResource implements ResourceController {
         if (dateValue != null) {
             fc.setIfUnmodifiedSince(dateValue);
         }
-        // TODO stage 2 and 3 does not match on this definition
-        // List listValue = getAndCheckStringList(filterCriteria, M2MConstants.TAG_IF_MATCH);
-        // if (listValue != null) {
-        // String[] arrayValue = null;
-        // arrayValue = new String[listValue.size()];
-        // listValue.toArray(arrayValue);
-        // Arrays.sort(arrayValue);
-        // fc.setIfMatch(arrayValue);
-        // }
         List listValue = getAndCheckStringList(filterCriteria, M2MConstants.TAG_IF_NONE_MATCH);
         if (listValue != null) {
             String[] arrayValue = null;
@@ -1672,6 +1656,51 @@ public abstract class SclResource implements ResourceController {
             listValue.toArray(arrayValue);
             Arrays.sort(arrayValue);
             fc.setIfNoneMatch(arrayValue);
+        }
+        String stringValue = getAndCheckStringMode(filterCriteria, M2MConstants.TAG_ATTRIBUTE_ACCESSOR,
+                Constants.ID_MODE_OPTIONAL);
+        if (stringValue != null) {
+            fc.setAttributeAccessor(stringValue);
+        }
+        listValue = getAndCheckStringList(filterCriteria, M2MConstants.TAG_SEARCH_STRING);
+        if (listValue != null) {
+            String[] arrayValue = null;
+            arrayValue = new String[listValue.size()];
+            listValue.toArray(arrayValue);
+            Arrays.sort(arrayValue);
+            fc.setSearchString(arrayValue);
+        }
+        dateValue = getAndCheckDateTime(filterCriteria, M2MConstants.TAG_CREATED_AFTER, Constants.ID_MODE_OPTIONAL, -1L);
+        if (dateValue != null) {
+            fc.setCreatedAfter(dateValue);
+        }
+        dateValue = getAndCheckDateTime(filterCriteria, M2MConstants.TAG_CREATED_BEFORE, Constants.ID_MODE_OPTIONAL, -1L);
+        if (dateValue != null) {
+            fc.setCreatedBefore(dateValue);
+        }
+        long longValue = getAndCheckLong(filterCriteria, M2MConstants.TAG_MAX_SIZE, Constants.ID_MODE_OPTIONAL);
+        if (longValue != -1L) {
+            fc.setMaxSize(longValue);
+        }
+        stringValue = getAndCheckStringMode(filterCriteria, M2MConstants.TAG_SEARCH_PREFIX, Constants.ID_MODE_OPTIONAL);
+        if (stringValue != null) {
+            fc.setSearchPrefix(stringValue);
+        }
+        listValue = getAndCheckStringList(filterCriteria, M2MConstants.TAG_IN_TYPE);
+        if (listValue != null) {
+            String[] arrayValue = null;
+            arrayValue = new String[listValue.size()];
+            listValue.toArray(arrayValue);
+            Arrays.sort(arrayValue);
+            fc.setInType(arrayValue);
+        }
+        listValue = getAndCheckStringList(filterCriteria, M2MConstants.TAG_OUT_TYPE);
+        if (listValue != null) {
+            String[] arrayValue = null;
+            arrayValue = new String[listValue.size()];
+            listValue.toArray(arrayValue);
+            Arrays.sort(arrayValue);
+            fc.setOutType(arrayValue);
         }
     }
 
@@ -1708,8 +1737,10 @@ public abstract class SclResource implements ResourceController {
         }
     }
 
-    public static void getAndCheckStringMode(XoObject representation, String tagName, int mode) throws M2MException {
-        checkMode(representation.getStringAttribute(tagName), tagName, mode);
+    public static String getAndCheckStringMode(XoObject representation, String tagName, int mode) throws M2MException {
+        String value = representation.getStringAttribute(tagName);
+        checkMode(value, tagName, mode);
+        return value;
     }
 
     public static String getAndCheckRelativePath(XoObject representation, String tagName, int mode) throws M2MException {
@@ -1776,6 +1807,21 @@ public abstract class SclResource implements ResourceController {
                 value = Long.parseLong(attribute);
             } catch (NumberFormatException e) {
                 throw new M2MException(tagName + " attribute is not a valid xsd:long: " + attribute,
+                        StatusCode.STATUS_BAD_REQUEST, e);
+            }
+        }
+        return value;
+    }
+
+    public static long getAndCheckDuration(XoObject representation, String tagName, int mode) throws M2MException {
+        String attribute = representation.getStringAttribute(tagName);
+        checkMode(attribute, tagName, mode);
+        long value = -1L;
+        if (attribute != null) {
+            try {
+                value = FormatUtils.parseDuration(attribute);
+            } catch (ParseException e) {
+                throw new M2MException(tagName + " attribute is not a valid xsd:duration: " + attribute,
                         StatusCode.STATUS_BAD_REQUEST, e);
             }
         }
@@ -1984,6 +2030,20 @@ public abstract class SclResource implements ResourceController {
         return Constants.ID_ENUM_UNDEFINED_VALUE;
     }
 
+    public static int getAndCheckLocationContainerType(XoObject representation, String tagName, int mode) throws M2MException {
+        String locationContainerType = representation.getStringAttribute(tagName);
+        checkMode(locationContainerType, tagName, mode);
+        if (locationContainerType != null) {
+            if (M2MConstants.LOCATION_CONTAINER_TYPE_LOCATION_SERVER_BASED.equals(locationContainerType)) {
+                return Constants.ID_LOCATION_CONTAINER_TYPE_LOCATION_SERVER_BASED;
+            } else if (M2MConstants.LOCATION_CONTAINER_TYPE_APPLICATION_GENERATED.equals(locationContainerType)) {
+                return Constants.ID_LOCATION_CONTAINER_TYPE_APPLICATION_GENERATED;
+            }
+            throw new M2MException("Invalid " + tagName + " value: " + locationContainerType, StatusCode.STATUS_BAD_REQUEST);
+        }
+        return Constants.ID_ENUM_UNDEFINED_VALUE;
+    }
+
     public static int getAndCheckChannelType(XoObject representation, String tagName, int mode) throws M2MException {
         String channelType = representation.getStringAttribute(tagName);
         checkMode(channelType, tagName, mode);
@@ -2020,10 +2080,8 @@ public abstract class SclResource implements ResourceController {
         if (mgmtProtocolType != null) {
             if (M2MConstants.MGMT_PROTOCOL_TYPE_OMA_DM.equals(mgmtProtocolType)) {
                 return Constants.ID_MGMT_PROTOCOL_TYPE_OMA_DM;
-            } else if (M2MConstants.MGMT_PROTOCOL_TYPE_BBF.equals(mgmtProtocolType)) {
-                return Constants.ID_MGMT_PROTOCOL_TYPE_BBF;
-            } else if (M2MConstants.MGMT_PROTOCOL_TYPE_TR_069.equals(mgmtProtocolType)) {
-                return Constants.ID_MGMT_PROTOCOL_TYPE_TR_069;
+            } else if (M2MConstants.MGMT_PROTOCOL_TYPE_BBF_TR069.equals(mgmtProtocolType)) {
+                return Constants.ID_MGMT_PROTOCOL_TYPE_BBF_TR069;
             }
             throw new M2MException("Invalid " + tagName + " value: " + mgmtProtocolType, StatusCode.STATUS_BAD_REQUEST);
         }
@@ -2060,17 +2118,12 @@ public abstract class SclResource implements ResourceController {
 
     public static ContentInstanceFilterCriteria getAndCheckContentInstanceFilterCriteriaType(XoObject representation,
             String tagName, int mode) throws M2MException {
-        // m2m:ContentInstanceFilterCriteriaType from m2m:FilterCriteriaType
+        // m2m:ContentInstancesFilterCriteriaType from m2m:FilterCriteriaType
         // {
-        // creator XoString { } // (optional) (xmlType: xsd:anyURI)
-        // searchString XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
-        // createdSince XoString { } // (optional) (xmlType: xsd:dateTime)
-        // createdUntil XoString { } // (optional) (xmlType: xsd:dateTime)
-        // sizeFrom XoString { } // (optional) (xmlType: xsd:int)
-        // sizeUntil XoString { } // (optional) (xmlType: xsd:int)
+        // sizeFrom XoString { } // (optional) (xmlType: xsd:long)
+        // sizeUntil XoString { } // (optional) (xmlType: xsd:long)
         // contentType XoString { list } // (xmlType: xsd:string) (list size: [0, infinity[)
         // metaDataOnly XoString { } // (optional) (xmlType: xsd:boolean)
-        // attributeAccessor XoString { } // (optional) (xmlType: xsd:anyURI)
         // }
         ContentInstanceFilterCriteria fc = null;
         XoObject contentInstanceFilterCriteria = representation.getXoObjectAttribute(tagName);
@@ -2083,30 +2136,6 @@ public abstract class SclResource implements ResourceController {
                         + M2MConstants.TYPE_M2M_CONTENT_INSTANCE_FILTER_CRITERIA_TYPE, StatusCode.STATUS_BAD_REQUEST);
             }
             checkFilterCriteriaType(contentInstanceFilterCriteria, tagName, fc);
-            // TODO stage 2 and 3 have not the same definition for filter criteria
-            // URI creator = getAndCheckURI(contentInstanceFilterCriteria, M2MConstants.TAG_CREATOR,
-            // Constants.ID_MODE_OPTIONAL);
-            // if (creator != null) {
-            // fc.put(M2MConstants.TAG_CREATOR, creator);
-            // }
-            List listValue = getAndCheckStringList(contentInstanceFilterCriteria, M2MConstants.TAG_SEARCH_STRING);
-            String[] arrayValue = null;
-            if (listValue != null) {
-                arrayValue = new String[listValue.size()];
-                listValue.toArray(arrayValue);
-                Arrays.sort(arrayValue);
-                fc.setSearchString(arrayValue);
-            }
-            Date dateValue = getAndCheckDateTime(contentInstanceFilterCriteria, M2MConstants.TAG_CREATED_SINCE,
-                    Constants.ID_MODE_OPTIONAL, -1L);
-            if (dateValue != null) {
-                fc.setCreatedAfter(dateValue);
-            }
-            dateValue = getAndCheckDateTime(contentInstanceFilterCriteria, M2MConstants.TAG_CREATED_UNTIL,
-                    Constants.ID_MODE_OPTIONAL, -1L);
-            if (dateValue != null) {
-                fc.setCreatedBefore(dateValue);
-            }
             Integer intValue = getAndCheckInt(contentInstanceFilterCriteria, M2MConstants.TAG_SIZE_FROM,
                     Constants.ID_MODE_OPTIONAL);
             if (intValue != null) {
@@ -2116,8 +2145,8 @@ public abstract class SclResource implements ResourceController {
             if (intValue != null) {
                 fc.setSizeUntil(intValue);
             }
-            listValue = getAndCheckStringList(contentInstanceFilterCriteria, M2MConstants.TAG_CONTENT_TYPE);
-            arrayValue = null;
+            List listValue = getAndCheckStringList(contentInstanceFilterCriteria, M2MConstants.TAG_CONTENT_TYPE);
+            String[] arrayValue = null;
             if (listValue != null) {
                 arrayValue = new String[listValue.size()];
                 listValue.toArray(arrayValue);
@@ -2128,11 +2157,6 @@ public abstract class SclResource implements ResourceController {
                     Constants.ID_MODE_OPTIONAL);
             if (metaDataOnly != null) {
                 fc.setMetaDataOnly(metaDataOnly);
-            }
-            String attributeAccessor = getAndCheckRelativePath(contentInstanceFilterCriteria,
-                    M2MConstants.TAG_ATTRIBUTE_ACCESSOR, Constants.ID_MODE_OPTIONAL);
-            if (attributeAccessor != null) {
-                fc.setAttributeAccessor(attributeAccessor);
             }
         }
         return fc;
@@ -2191,5 +2215,95 @@ public abstract class SclResource implements ResourceController {
                 getAndCheckStringMode(param, M2MConstants.ATTR_VAL, Constants.ID_MODE_REQUIRED);
             }
         }
+    }
+
+    public static void checkNmToken(String value, String tagName) throws M2MException {
+        if ("".equals(value)) {
+            throw new M2MException("Received representation declares a " + tagName + " attribute which has an empty value",
+                    StatusCode.STATUS_BAD_REQUEST);
+        }
+        int n = value.length();
+        for (int i = 0; i < n; i++) {
+            char c = value.charAt(i);
+            if (c < '\u0080') {
+                if (!CharacterUtils.match(c, L_NM_TOKEN, H_NM_TOKEN)) {
+                    throw new M2MException("Received representation declares a " + tagName
+                            + " attribute which is not a valid NmToken: " + value, StatusCode.STATUS_BAD_REQUEST);
+                }
+            } else if (c < '\u2000') {
+                if (c < '\u00F7') {
+                    if (c < '\u00D7') {
+                        if (c < '\u00C0') {
+                            throw new M2MException("Received representation declares a " + tagName
+                                    + " attribute which is not a valid NmToken: " + value, StatusCode.STATUS_BAD_REQUEST);
+                        }
+                    } else if (c < '\u00D8' || c > '\u00F6') {
+                        throw new M2MException("Received representation declares a " + tagName
+                                + " attribute which is not a valid NmToken: " + value, StatusCode.STATUS_BAD_REQUEST);
+                    }
+                } else if (c == '\u00D7' || c == '\u037E') {
+                    throw new M2MException("Received representation declares a " + tagName
+                            + " attribute which is not a valid NmToken: " + value, StatusCode.STATUS_BAD_REQUEST);
+                }
+            } else if (c < '\u2041') {
+                if (c < '\u200E') {
+                    if (c < '\u200C') {
+                        throw new M2MException("Received representation declares a " + tagName
+                                + " attribute which is not a valid NmToken: " + value, StatusCode.STATUS_BAD_REQUEST);
+                    }
+                } else if (c < '\u203F') {
+                    throw new M2MException("Received representation declares a " + tagName
+                            + " attribute which is not a valid NmToken: " + value, StatusCode.STATUS_BAD_REQUEST);
+                }
+            } else if (c < '\u2190') {
+                if (c < '\u2070') {
+                    throw new M2MException("Received representation declares a " + tagName
+                            + " attribute which is not a valid NmToken: " + value, StatusCode.STATUS_BAD_REQUEST);
+                }
+            } else if (c < '\u2FF0') {
+                if (c < '\u2C00') {
+                    throw new M2MException("Received representation declares a " + tagName
+                            + " attribute which is not a valid NmToken: " + value, StatusCode.STATUS_BAD_REQUEST);
+                }
+            } else if (c < '\u3001' || c > '\uD7FF') {
+                throw new M2MException("Received representation declares a " + tagName
+                        + " attribute which is not a valid NmToken: " + value, StatusCode.STATUS_BAD_REQUEST);
+            }
+        }
+    }
+
+    public static String getAndCheckNmToken(XoObject representation, String tagName, int mode) throws M2MException {
+        String value = representation.getStringAttribute(tagName);
+        checkMode(value, tagName, mode);
+        if (value != null) {
+            checkNmToken(value, tagName);
+        }
+        return value;
+    }
+
+    public static int getAndCheckContent(XoObject representation, String tagName, int mode) throws M2MException {
+        XoObject content = representation.getXoObjectAttribute(tagName);
+        int size = -1;
+        SclResource.checkMode(content, tagName, mode);
+        if (content != null) {
+            getAndCheckStringNonEmpty(content, M2MConstants.TAG_XMIME_CONTENT_TYPE, Constants.ID_MODE_REQUIRED);
+            int binaryContentLength = getAndCheckBuffer(content, M2MConstants.TAG_M2M_BINARY_CONTENT,
+                    Constants.ID_MODE_OPTIONAL);
+            String textContent = getAndCheckStringMode(content, M2MConstants.TAG_M2M_TEXT_CONTENT, Constants.ID_MODE_OPTIONAL);
+            if (binaryContentLength == -1 && textContent == null) {
+                throw new M2MException(
+                        "Received representation does not declare a content either in m2m:binaryContent or m2m:textContent",
+                        StatusCode.STATUS_BAD_REQUEST);
+            } else if (binaryContentLength >= 0 && textContent != null) {
+                throw new M2MException(
+                        "Received representation declares both m2m:binaryContent and m2m:textContent which is forbidden",
+                        StatusCode.STATUS_BAD_REQUEST);
+            } else if (binaryContentLength >= 0) {
+                size = binaryContentLength;
+            } else {
+                size = textContent.getBytes().length;
+            }
+        }
+        return size;
     }
 }

@@ -36,7 +36,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -57,9 +56,9 @@ import com.actility.m2m.scl.model.PartialAccessor;
 import com.actility.m2m.scl.model.SclLogger;
 import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.FormatUtils;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.Profiler;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.log.OSGiLogger;
@@ -69,6 +68,22 @@ import com.actility.m2m.xo.XoObject;
 /**
  * M2M Content Instance. Defines a place to store a value like a temperature measurement, a device state, an applicative
  * value...
+ *
+ * <pre>
+ * m2m:ContentInstance from ong:t_xml_obj
+ * {
+ *     m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:NMTOKEN)
+ *     href    XoString    { embattr } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:delayTolerance    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:searchStrings    m2m:SearchStrings    { } // (optional)
+ *     m2m:contentTypes    m2m:ContentTypes    { } // (optional)
+ *     m2m:contentSize    XoString    { } // (optional) (xmlType: xsd:long)
+ *     m2m:content    m2m:Content    { } // (optional)
+ * }
+ * alias m2m:ContentInstance with m2m:contentInstance
+ * </pre>
  */
 public final class ContentInstance extends SclResource {
     private static final Logger LOG = OSGiLogger.getLogger(ContentInstance.class, BundleLogger.getStaticLogger());
@@ -86,19 +101,6 @@ public final class ContentInstance extends SclResource {
                 Constants.ID_NO_FILTER_CRITERIA_MODE, true, false, ContentInstances.getInstance(), false, false);
     }
 
-    // m2m:ContentInstance from ong:t_xml_obj
-    // {
-    // m2m:id XoString { embattr } // (optional) (xmlType: xsd:anyURI)
-    // href XoString { embattr } // (optional) (xmlType: xsd:anyURI)
-    // m2m:creationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:lastModifiedTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:delayTolerance XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:contentTypes m2m:ContentTypes { } // (optional)
-    // m2m:contentSize XoString { } // (optional) (xmlType: xsd:long)
-    // m2m:content xmime:base64Binary { } // (optional)
-    // }
-    // alias m2m:ContentInstance with m2m:contentInstance
-
     public void checkRights(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity, String flag)
             throws UnsupportedEncodingException, StorageException, XoException, M2MException {
         String containerPath = getGrandParentPath(path);
@@ -113,25 +115,31 @@ public final class ContentInstance extends SclResource {
         }
     }
 
+    /**
+     * <pre>
+     * id:                0  (response M*)
+     * href:              NP (response O)
+     * contentTypes:      NP (response M)
+     * contentSize:       NP (response M)
+     * creationTime:      NP (response M)
+     * lastModifiedTime:  NP (response M)
+     * delayTolerance:    O  (response O)
+     * searchStrings:     O  (response O)
+     * content:           M  (response M)
+     * </pre>
+     */
     public boolean createResource(SclManager manager, String path, XoObject resource, Map config, String id, String href,
             Date creationDate, String creationTime, XoObject representation, SclTransaction transaction) throws XoException,
             M2MException {
-        // id: 0 (reponse M*)
-        // href: NP (response O)
-        // contentTypes: O (response O)
-        // contentSize: NP (response M)
-        // creationTime: NP (response M)
-        // lastModifiedTime: NP (response M)
-        // delayTolerance: O (response O)
-        // content: M (response M)
-
         // Check representation
         checkRepresentation(representation, M2MConstants.TAG_M2M_CONTENT_INSTANCE);
         getAndCheckStringMode(representation, M2MConstants.ATTR_HREF, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_CONTENT_TYPES, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_CONTENT_SIZE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_CREATION_TIME, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, Constants.ID_MODE_FORBIDDEN);
         getAndCheckDateTime(representation, M2MConstants.TAG_M2M_DELAY_TOLERANCE, Constants.ID_MODE_OPTIONAL, -1L);
-        int contentSize = getAndCheckXmimeBase64(representation, M2MConstants.TAG_M2M_CONTENT, Constants.ID_MODE_REQUIRED);
+        int contentSize = getAndCheckContent(representation, M2MConstants.TAG_M2M_CONTENT, Constants.ID_MODE_REQUIRED);
         if (contentSize <= 0) {
             throw new M2MException(M2MConstants.TAG_M2M_CONTENT + " cannot be empty", StatusCode.STATUS_BAD_REQUEST);
         }
@@ -141,50 +149,69 @@ public final class ContentInstance extends SclResource {
         resource.setNameSpace(M2MConstants.PREFIX_XMIME);
         resource.setStringAttribute(M2MConstants.ATTR_M2M_ID, id);
         resource.setStringAttribute(M2MConstants.ATTR_HREF, href);
+        XoObject contentTypes = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_CONTENT_TYPES);
+        resource.setXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT_TYPES, contentTypes);
+        resource.setStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE, String.valueOf(contentSize));
         resource.setStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME, creationTime);
         resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
         createStringOptional(resource, representation, M2MConstants.TAG_M2M_DELAY_TOLERANCE);
-        createXoObjectOptional(resource, representation, M2MConstants.TAG_M2M_CONTENT_TYPES);
-        resource.setStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE, String.valueOf(contentSize));
+        createXoObjectOptional(resource, representation, M2MConstants.TAG_M2M_SEARCH_STRINGS);
         createXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_CONTENT);
 
         // Compress oBIX content if any
-        XoObject contentBase64 = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT);
-        String contentType = contentBase64.getStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE);
+        XoObject contentElem = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT);
+        String contentType = contentElem.getStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE);
+        contentTypes.getStringListAttribute(M2MConstants.TAG_M2M_CONTENT_TYPE).add(contentType);
+        if (contentElem.containsAttribute(M2MConstants.TAG_M2M_TEXT_CONTENT)) {
+            contentElem.setBufferAttribute(M2MConstants.TAG_M2M_BINARY_CONTENT,
+                    contentElem.getStringAttribute(M2MConstants.TAG_M2M_TEXT_CONTENT).getBytes());
+            contentElem.setStringAttribute(M2MConstants.TAG_M2M_TEXT_CONTENT, null);
+        }
         if (contentType.startsWith(M2MConstants.MT_APPLICATION_XML_OBIX) && manager.getXoService().isXmlSupported()) {
-            contentBase64.xoBufferXmlToBinary(XoObject.ATTR_VALUE, true);
-        } else if (contentType.startsWith(M2MConstants.MT_APPLICATION_EXI_OBIX) && manager.getXoService().isXmlSupported()
-                && manager.getXoService().isExiSupported()) {
-            contentBase64.xoBufferExiToBinary(XoObject.ATTR_VALUE, true);
+            contentElem.xoBufferXmlToBinary(M2MConstants.TAG_M2M_BINARY_CONTENT, true);
+        } else if (contentType.startsWith(M2MConstants.MT_APPLICATION_EXI_OBIX) && manager.getXoService().isExiSupported()) {
+            contentElem.xoBufferExiToBinary(M2MConstants.TAG_M2M_BINARY_CONTENT, true);
         }
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCE));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-        transaction.createResource(config, path, resource, searchAttributes);
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCE);
+        XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
+        if (searchStrings != null) {
+            List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
+            document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        }
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+        document.setContent(resource.saveBinary());
+
+        transaction.createResource(config, document);
 
         return false;
     }
 
+    /**
+     * <pre>
+     * id:                (response M*)
+     * href:              (response O)
+     * contentTypes:      (response M)
+     * contentSize:       (response M)
+     * creationTime:      (response M)
+     * lastModifiedTime:  (response M)
+     * delayTolerance:    (response O)
+     * searchStrings:     (response O)
+     * content:           (response M)
+     * </pre>
+     */
     public void createResourceFromBytes(SclManager manager, String path, XoObject resource, Map config, String id, String href,
-            Date creationDate, String creationTime, String contentType, byte[] content, SclTransaction transaction)
-            throws M2MException, XoException {
-        // id: 0 (reponse M*)
-        // href: NP (response O)
-        // contentTypes: O (response O)
-        // contentSize: NP (response M)
-        // creationTime: NP (response M)
-        // lastModifiedTime: NP (response M)
-        // delayTolerance: O (response O)
-        // content: M (response M)
-
+            Date creationDate, String creationTime, String contentType, String characterEncoding, byte[] content,
+            SclTransaction transaction) throws M2MException, XoException {
         // Check representation
         if (content.length == 0) {
             throw new M2MException("<contentInstance> content cannot be empty", StatusCode.STATUS_BAD_REQUEST);
-        } else if (contentType == null) {
-            throw new M2MException("<contentInstance> content type cannot be empty", StatusCode.STATUS_BAD_REQUEST);
+        }
+        if (contentType == null) {
+            throw new M2MException("<contentInstance> must thave a content-type", StatusCode.STATUS_BAD_REQUEST);
         }
 
         // Update resource
@@ -192,45 +219,69 @@ public final class ContentInstance extends SclResource {
         resource.setNameSpace(M2MConstants.PREFIX_XMIME);
         resource.setStringAttribute(M2MConstants.ATTR_M2M_ID, id);
         resource.setStringAttribute(M2MConstants.ATTR_HREF, href);
-        resource.setStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME, creationTime);
-        resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
         XoObject contentTypes = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_CONTENT_TYPES);
         resource.setXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT_TYPES, contentTypes);
-        List contentTypeList = contentTypes.getStringListAttribute(M2MConstants.TAG_M2M_CONTENT_TYPE);
-        contentTypeList.add(contentType);
+        contentTypes.getStringListAttribute(M2MConstants.TAG_M2M_CONTENT_TYPE).add(contentType);
+
+        int semiColonIndex = contentType.indexOf(';');
+        String mediaTypeStr = contentType;
+        if (semiColonIndex != -1) {
+            mediaTypeStr = contentType.substring(0, semiColonIndex);
+        }
+        if (mediaTypeStr.equals("text/plain")
+                || mediaTypeStr.equals("application/xml")
+                || mediaTypeStr.equals("application/json")
+                || (mediaTypeStr.startsWith("application/vnd") && (mediaTypeStr.endsWith("+xml") || mediaTypeStr
+                        .endsWith("+json")))) {
+            // textContent
+            try {
+                content = new String(content, characterEncoding).getBytes();
+            } catch (UnsupportedEncodingException e) {
+                throw new M2MException("Cannot build a string from raw content and encoding " + characterEncoding,
+                        StatusCode.STATUS_BAD_REQUEST);
+            }
+        }
         resource.setStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE, String.valueOf(content.length));
-        XoObject contentBase64 = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_CONTENT);
-        contentBase64.setBufferAttribute(XoObject.ATTR_VALUE, content);
-        contentBase64.setStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE, contentType);
-        resource.setXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT, contentBase64);
+        resource.setStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME, creationTime);
+        resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
+
+        XoObject contentElem = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_CONTENT);
+        resource.setXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT, contentElem);
+        contentElem.setStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE, contentType);
+        contentElem.setBufferAttribute(M2MConstants.TAG_M2M_BINARY_CONTENT, content);
 
         // Compress oBIX content if any
         if (contentType.startsWith(M2MConstants.MT_APPLICATION_XML_OBIX) && manager.getXoService().isXmlSupported()) {
-            contentBase64.xoBufferXmlToBinary(XoObject.ATTR_VALUE, true);
+            contentElem.xoBufferXmlToBinary(M2MConstants.TAG_M2M_BINARY_CONTENT, true);
         } else if (contentType.startsWith(M2MConstants.MT_APPLICATION_EXI_OBIX) && manager.getXoService().isXmlSupported()
                 && manager.getXoService().isExiSupported()) {
-            contentBase64.xoBufferExiToBinary(XoObject.ATTR_VALUE, true);
+            contentElem.xoBufferExiToBinary(M2MConstants.TAG_M2M_BINARY_CONTENT, true);
         }
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCE));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-        transaction.createResource(config, path, resource, searchAttributes);
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCE);
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+        document.setContent(resource.saveBinary());
+        transaction.createResource(config, document);
     }
 
+    /**
+     * <pre>
+     * id:                M  (response M*)
+     * href:              O  (response O)
+     * contentTypes:      M  (response M)
+     * contentSize:       M  (response M)
+     * creationTime:      M  (response M)
+     * lastModifiedTime:  M  (response M)
+     * delayTolerance:    O  (response O)
+     * searchStrings:     O  (response O)
+     * content:           M  (response M)
+     * </pre>
+     */
     public boolean createResourceFromExternalContentInstance(SclManager manager, String path, XoObject resource, Map config,
             String id, String href, XoObject representation, SclTransaction transaction) throws XoException, M2MException {
-        // id: M*
-        // href: O
-        // contentTypes: O
-        // contentSize: M
-        // creationTime: M
-        // lastModifiedTime: M
-        // delayTolerance: O
-        // content: M
-
         // Check representation
         checkRepresentation(representation, M2MConstants.TAG_M2M_CONTENT_INSTANCE);
         getAndCheckStringMode(representation, M2MConstants.ATTR_HREF, Constants.ID_MODE_OPTIONAL);
@@ -239,8 +290,9 @@ public final class ContentInstance extends SclResource {
         Date creationDate = getAndCheckDateTime(representation, M2MConstants.TAG_M2M_CREATION_TIME, Constants.ID_MODE_REQUIRED,
                 -1L);
         getAndCheckDateTime(representation, M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, Constants.ID_MODE_REQUIRED, -1L);
+        getAndCheckXoObjectMode(representation, M2MConstants.TAG_M2M_SEARCH_STRINGS, Constants.ID_MODE_OPTIONAL);
         getAndCheckDateTime(representation, M2MConstants.TAG_M2M_DELAY_TOLERANCE, Constants.ID_MODE_OPTIONAL, -1L);
-        int contentSize = getAndCheckXmimeBase64(representation, M2MConstants.TAG_M2M_CONTENT, Constants.ID_MODE_REQUIRED);
+        int contentSize = getAndCheckContent(representation, M2MConstants.TAG_M2M_CONTENT, Constants.ID_MODE_REQUIRED);
         if (contentSize <= 0) {
             throw new M2MException(M2MConstants.TAG_M2M_CONTENT + " cannot be empty", StatusCode.STATUS_BAD_REQUEST);
         }
@@ -250,29 +302,41 @@ public final class ContentInstance extends SclResource {
         resource.setNameSpace(M2MConstants.PREFIX_XMIME);
         resource.setStringAttribute(M2MConstants.ATTR_M2M_ID, id);
         resource.setStringAttribute(M2MConstants.ATTR_HREF, href);
+        createXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_CONTENT_TYPES);
+        createStringMandatory(resource, representation, M2MConstants.TAG_M2M_CONTENT_SIZE, null);
         createStringMandatory(resource, representation, M2MConstants.TAG_M2M_CREATION_TIME, null);
         createStringMandatory(resource, representation, M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, null);
-        createXoObjectOptional(resource, representation, M2MConstants.TAG_M2M_CONTENT_TYPES);
-        createStringMandatory(resource, representation, M2MConstants.TAG_M2M_CONTENT_SIZE, null);
         createStringOptional(resource, representation, M2MConstants.TAG_M2M_DELAY_TOLERANCE);
+        createXoObjectOptional(resource, representation, M2MConstants.TAG_M2M_SEARCH_STRINGS);
         createXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_CONTENT);
 
         // Compress oBIX content if any
-        XoObject contentBase64 = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT);
-        String contentType = contentBase64.getStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE);
+        XoObject contentElem = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT);
+        String contentType = contentElem.getStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE);
+        if (contentElem.containsAttribute(M2MConstants.TAG_M2M_TEXT_CONTENT)) {
+            contentElem.setBufferAttribute(M2MConstants.TAG_M2M_BINARY_CONTENT,
+                    contentElem.getStringAttribute(M2MConstants.TAG_M2M_TEXT_CONTENT).getBytes());
+            contentElem.setStringAttribute(M2MConstants.TAG_M2M_TEXT_CONTENT, null);
+        }
         if (contentType.startsWith(M2MConstants.MT_APPLICATION_XML_OBIX) && manager.getXoService().isXmlSupported()) {
-            contentBase64.xoBufferXmlToBinary(XoObject.ATTR_VALUE, true);
+            contentElem.xoBufferXmlToBinary(M2MConstants.TAG_M2M_BINARY_CONTENT, true);
         } else if (contentType.startsWith(M2MConstants.MT_APPLICATION_EXI_OBIX) && manager.getXoService().isXmlSupported()
                 && manager.getXoService().isExiSupported()) {
-            contentBase64.xoBufferExiToBinary(XoObject.ATTR_VALUE, true);
+            contentElem.xoBufferExiToBinary(M2MConstants.TAG_M2M_BINARY_CONTENT, true);
         }
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCE));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-        transaction.createResource(config, path, resource, searchAttributes);
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCE);
+        XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
+        if (searchStrings != null) {
+            List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
+            document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        }
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+        document.setContent(resource.saveBinary());
+        transaction.createResource(config, document);
 
         return false;
     }
@@ -313,19 +377,36 @@ public final class ContentInstance extends SclResource {
         throw new UnsupportedOperationException();
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws XoException {
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path,
+            XoObject resource, FilterCriteria filterCriteria, Set supported) throws XoException {
         // TODO prepare according to contentType
         ContentInstanceFilterCriteria cifc = (ContentInstanceFilterCriteria) filterCriteria;
         XoObject content = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT);
         String contentType = content.getStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE);
         if (cifc != null && cifc.getMetaDataOnly() != null && cifc.getMetaDataOnly() == Boolean.TRUE) {
-            content.setBufferAttribute(XoObject.ATTR_VALUE, null);
-        } else if (contentType.startsWith(M2MConstants.MT_APPLICATION_XML_OBIX) && manager.getXoService().isXmlSupported()) {
-            content.xoBufferBinaryToXml(XoObject.ATTR_VALUE, true);
-        } else if (contentType.startsWith(M2MConstants.MT_APPLICATION_EXI_OBIX) && manager.getXoService().isXmlSupported()
-                && manager.getXoService().isExiSupported()) {
-            content.xoBufferBinaryToExi(XoObject.ATTR_VALUE, true);
+            content.setBufferAttribute(M2MConstants.TAG_M2M_BINARY_CONTENT, null);
+        } else {
+            if (contentType.startsWith(M2MConstants.MT_APPLICATION_XML_OBIX) && manager.getXoService().isXmlSupported()) {
+                content.xoBufferBinaryToXml(M2MConstants.TAG_M2M_BINARY_CONTENT, true);
+            } else if (contentType.startsWith(M2MConstants.MT_APPLICATION_EXI_OBIX) && manager.getXoService().isXmlSupported()
+                    && manager.getXoService().isExiSupported()) {
+                content.xoBufferBinaryToExi(M2MConstants.TAG_M2M_BINARY_CONTENT, true);
+            }
+            int semiColonIndex = contentType.indexOf(';');
+            String mediaTypeStr = contentType;
+            if (semiColonIndex != -1) {
+                mediaTypeStr = contentType.substring(0, semiColonIndex);
+            }
+            if (mediaTypeStr.equals("text/plain")
+                    || mediaTypeStr.equals("application/xml")
+                    || mediaTypeStr.equals("application/json")
+                    || (mediaTypeStr.startsWith("application/vnd") && (mediaTypeStr.endsWith("+xml") || mediaTypeStr
+                            .endsWith("+json")))) {
+                // textContent
+                content.setStringAttribute(M2MConstants.TAG_M2M_TEXT_CONTENT,
+                        new String(content.getBufferAttribute(M2MConstants.TAG_M2M_BINARY_CONTENT)));
+                content.setBufferAttribute(M2MConstants.TAG_M2M_BINARY_CONTENT, null);
+            }
         }
     }
 
@@ -384,15 +465,17 @@ public final class ContentInstance extends SclResource {
             M2MException, XoException {
         XoObject contentBase64 = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT);
         String contentType = contentBase64.getStringAttribute(M2MConstants.TAG_XMIME_CONTENT_TYPE);
+        byte[] rawBytes = null;
+
         if (contentType.startsWith(M2MConstants.MT_APPLICATION_XML_OBIX) && manager.getXoService().isXmlSupported()) {
-            contentBase64.xoBufferBinaryToXml(XoObject.ATTR_VALUE, true);
+            contentBase64.xoBufferBinaryToXml(M2MConstants.TAG_M2M_BINARY_CONTENT, true);
         } else if (contentType.startsWith(M2MConstants.MT_APPLICATION_EXI_OBIX) && manager.getXoService().isXmlSupported()
                 && manager.getXoService().isExiSupported()) {
-            contentBase64.xoBufferBinaryToExi(XoObject.ATTR_VALUE, true);
+            contentBase64.xoBufferBinaryToExi(M2MConstants.TAG_M2M_BINARY_CONTENT, true);
         }
-        byte[] rawBytes = contentBase64.getBufferAttribute(XoObject.ATTR_VALUE);
+        rawBytes = contentBase64.getBufferAttribute(M2MConstants.TAG_M2M_BINARY_CONTENT);
         String lastModifiedTimeStr = resource.getStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME);
-        URI resourceURI = manager.getM2MContext().createLocalUri(indication.getTargetID(), path);
+        URI resourceURI = manager.getM2MContext().createLocalUri(indication.getTargetID(), path + "/content");
         Response response = indication.createSuccessResponse(StatusCode.STATUS_OK);
         response.setResouceURI(resourceURI);
         if (lastModifiedTimeStr != null) {
@@ -413,8 +496,8 @@ public final class ContentInstance extends SclResource {
     public void doRetrieveIndication(SclManager manager, String path, XoObject resource, Indication indication,
             PartialAccessor partialAccessor) throws ParseException, IOException, StorageException, XoException, M2MException {
         if (partialAccessor.getAttributeId() == Constants.ID_ATTR_CONTENT && partialAccessor.getSubPath() == null) {
-            SclLogger.logRequestIndication(Constants.PT_CONTENT_INSTANCE_RETRIEVE_REQUEST,
-                    Constants.PT_CONTENT_INSTANCE_RETRIEVE_RESPONSE, indication, null, 0);
+            SclLogger.logRequestIndication("contentInstanceRetrieveRequestIndication",
+                    "contentInstanceRetrieveResponseConfirm", indication, null, 0);
 
             if (Profiler.getInstance().isTraceEnabled()) {
                 Profiler.getInstance().trace(

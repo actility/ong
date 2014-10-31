@@ -31,9 +31,10 @@
 
 package com.actility.m2m.scl.mem;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 import com.actility.m2m.m2m.M2MConstants;
 import com.actility.m2m.m2m.M2MException;
@@ -42,10 +43,12 @@ import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.TransientOp;
 import com.actility.m2m.scl.res.SclResource;
 import com.actility.m2m.storage.Condition;
-import com.actility.m2m.storage.ConditionBuilder;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.SearchResult;
 import com.actility.m2m.storage.StorageException;
+import com.actility.m2m.storage.StorageFactory;
 import com.actility.m2m.storage.StorageRequestExecutor;
+import com.actility.m2m.util.EmptyUtils;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
 
@@ -73,27 +76,29 @@ public class CisChildDeleteOp implements TransientOp {
                     Constants.ID_MODE_REQUIRED, -1L);
             XoObject parentResource = null;
             XoObject lastCi = null;
-            Condition ciCondition = manager.getConditionBuilder().createStringCondition(Constants.ATTR_TYPE,
-                    ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
-            Condition lastCiToDeleteCondition = manager.getConditionBuilder().createDateCondition(
-                    M2MConstants.ATTR_CREATION_TIME, ConditionBuilder.OPERATOR_GREATER, childCreationTime);
-            Condition condition = manager.getConditionBuilder().createConjunction(ciCondition, lastCiToDeleteCondition);
-            SearchResult searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, condition,
-                    StorageRequestExecutor.ORDER_ASC, 1);
-            Map result = searchResult.getResults();
-            Iterator it = result.values().iterator();
+            StorageFactory storageFactory = manager.getStorageContext().getStorageFactory();
+            List/* <Condition> */conditions = new ArrayList/* <Condition> */(2);
+            conditions.add(storageFactory.createStringCondition(Constants.ATTR_TYPE, Condition.ATTR_OP_EQUAL,
+                    Constants.TYPE_CONTENT_INSTANCE));
+            conditions.add(storageFactory.createDateCondition(M2MConstants.ATTR_CREATION_TIME,
+                    Condition.ATTR_OP_STRICTLY_GREATER, childCreationTime));
+            Condition condition = storageFactory.createConjunction(Condition.COND_OP_AND, conditions);
+            SearchResult searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                    condition, StorageRequestExecutor.ORDER_ASC, 1, true, EmptyUtils.EMPTY_LIST);
+            Iterator it = searchResult.getResults();
+            Document document = null;
             if (it.hasNext()) {
                 try {
-                    lastCi = manager.getXoService().readBinaryXmlXoObject((byte[]) it.next());
+                    document = (Document) it.next();
+                    lastCi = manager.getXoService().readBinaryXmlXoObject(document.getContent());
                     parentResource = manager.getXoResource(SclResource.getParentPath(path));
 
                     // Check conditions
-                    long maxInstanceAge = SclResource.getAndCheckLong(parentResource, M2MConstants.TAG_M2M_MAX_INSTANCE_AGE,
-                            Constants.ID_MODE_OPTIONAL);
+                    long maxInstanceAge = SclResource.getAndCheckDuration(parentResource,
+                            M2MConstants.TAG_M2M_MAX_INSTANCE_AGE, Constants.ID_MODE_OPTIONAL);
                     Date lastCiCreationTime = SclResource.getAndCheckDateTime(lastCi, M2MConstants.TAG_M2M_CREATION_TIME,
                             Constants.ID_MODE_REQUIRED, -1L);
-                    timerId = manager.startResourceTimer(
-                            lastCiCreationTime.getTime() + (maxInstanceAge * 1000L) - now.getTime(), path,
+                    timerId = manager.startResourceTimer(lastCiCreationTime.getTime() + maxInstanceAge - now.getTime(), path,
                             Constants.ID_RES_CONTENT_INSTANCES, null);
                     manager.getM2MContext().setAttribute(path + "/instanceAgeTimer", timerId);
                     manager.getM2MContext().setAttribute(path + "/instanceAgeId",

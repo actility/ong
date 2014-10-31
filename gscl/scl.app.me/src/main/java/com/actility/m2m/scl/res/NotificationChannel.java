@@ -34,8 +34,6 @@ package com.actility.m2m.scl.res;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -47,12 +45,13 @@ import com.actility.m2m.m2m.M2MException;
 import com.actility.m2m.scl.log.BundleLogger;
 import com.actility.m2m.scl.mem.NCCreateOp;
 import com.actility.m2m.scl.mem.NCDeleteOp;
+import com.actility.m2m.scl.mem.NcChannelServerListener;
 import com.actility.m2m.scl.model.Constants;
 import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.VolatileResource;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.StorageException;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
@@ -61,6 +60,19 @@ import com.actility.m2m.xo.XoObject;
 /**
  * M2M Channel. Defines a specific channels used in the communication between to points. This is used for example to represent a
  * long poll connection between two Service Capability Layers.
+ *
+ * <pre>
+ * m2m:NotificationChannel from ong:t_xml_obj
+ * {
+ *     m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:NMTOKEN)
+ *     m2m:channelType    XoString    { } // (optional) (xmlType: m2m:ChannelType) (enum: LONG_POLLING )
+ *     m2m:contactURI    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:channelData    XoVoidObj    { default=m2m:ChannelData } // (optional)
+ *     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ * }
+ * alias m2m:NotificationChannel with m2m:notificationChannel
+ * </pre>
  */
 public final class NotificationChannel extends SclResource implements VolatileResource {
     private static final Logger LOG = OSGiLogger.getLogger(NotificationChannel.class, BundleLogger.getStaticLogger());
@@ -78,17 +90,6 @@ public final class NotificationChannel extends SclResource implements VolatileRe
                 Constants.ID_NO_FILTER_CRITERIA_MODE, true, false, NotificationChannels.getInstance(), false, false);
     }
 
-    // m2m:NotificationChannel from ong:t_xml_obj
-    // {
-    // m2m:id XoString { embattr } // (optional) (xmlType: xsd:anyURI)
-    // m2m:channelType XoString { } // (optional) (xmlType: m2m:ChannelType) (enum: LONG_POLLING )
-    // m2m:contactURI XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:channelData m2m:ChannelData { } // (optional)
-    // m2m:creationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:lastModifiedTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // }
-    // alias m2m:NotificationChannel with m2m:notificationChannel
-
     public void reload(SclManager manager, String path, XoObject resource, SclTransaction transaction) throws M2MException {
         if (LOG.isInfoEnabled()) {
             LOG.info("Reload volatile <notificationChannel>: " + path);
@@ -97,7 +98,7 @@ public final class NotificationChannel extends SclResource implements VolatileRe
             URI contactUri = URI.create(resource.getStringAttribute(M2MConstants.TAG_M2M_CONTACT_U_R_I));
             XoObject channelData = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_CHANNEL_DATA);
             URI longPollingUri = URI.create(channelData.getStringAttribute(M2MConstants.TAG_M2M_LONG_POLLING_U_R_I));
-            manager.getM2MContext().createServerLongPoll(contactUri, longPollingUri);
+            manager.getM2MContext().createServerNotificationChannel(contactUri, longPollingUri, new NcChannelServerListener());
         }
     }
 
@@ -138,11 +139,12 @@ public final class NotificationChannel extends SclResource implements VolatileRe
         resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
 
         // Warning: Do not save resource, this will be done by NCCreateOp
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_NOTIFICATION_CHANNEL));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-        transaction.addTransientOp(new NCCreateOp(manager, path, resource, targetID, searchAttributes, transaction));
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_NOTIFICATION_CHANNEL);
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+        transaction.addTransientOp(new NCCreateOp(manager, document, resource, targetID, new NcChannelServerListener(),
+                transaction));
 
         return true;
     }
@@ -173,7 +175,7 @@ public final class NotificationChannel extends SclResource implements VolatileRe
         URI contactUri = getAndCheckURI(resource, M2MConstants.TAG_M2M_CONTACT_U_R_I, Constants.ID_MODE_REQUIRED);
         URI longPollUri = getAndCheckLongPollingChannelData(resource, M2MConstants.TAG_M2M_CHANNEL_DATA,
                 Constants.ID_MODE_REQUIRED);
-        transaction.addTransientOp(new NCDeleteOp(logId, manager, contactUri, longPollUri));
+        transaction.addTransientOp(new NCDeleteOp(logId, manager, contactUri, longPollUri, new NcChannelServerListener()));
     }
 
     public void deleteChildResource(String logId, SclManager manager, String path, XoObject resource, XoObject childResource,
@@ -182,8 +184,8 @@ public final class NotificationChannel extends SclResource implements VolatileRe
     }
 
     public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
-            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs)
-            throws IOException, StorageException, XoException {
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs) throws IOException,
+            StorageException, XoException {
         int urisCount = remainingURIs;
         try {
             checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);

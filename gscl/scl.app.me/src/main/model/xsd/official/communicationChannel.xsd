@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
+
+	<include schemaLocation="common.xsd" />
+
+	<element name="communicationChannel" type="tns:CommunicationChannel" />
+
+	<complexType name="CommunicationChannel">
+		<sequence>
+			<element ref="tns:channelType" minOccurs="0" />
+			<element ref="tns:contactURI" minOccurs="0" />
+			<element ref="tns:channelData" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0" />
+			<element ref="tns:lastModifiedTime" minOccurs="0" />
+			<!-- subresources -->
+		</sequence>
+		<attribute ref="tns:id"/>
+	</complexType>
+</schema>

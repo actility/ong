@@ -56,6 +56,7 @@ import com.actility.m2m.scl.model.SubscribedResource;
 import com.actility.m2m.scl.res.Subscription;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.FormatUtils;
+import com.actility.m2m.util.UtilConstants;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -96,6 +97,7 @@ public final class SubManager implements Serializable {
     private final String path;
     private final String id;
     private final String subscribedPath;
+    private final URI subscriber;
     private final SclManager manager;
 
     private int nbRetry;
@@ -111,7 +113,6 @@ public final class SubManager implements Serializable {
     private URI contactUri;
     private long expirationTime;
 
-    private final URI requestingEntity;
     private FilterCriteria filterCriteria;
     private String mediaType;
 
@@ -124,7 +125,7 @@ public final class SubManager implements Serializable {
     // private String attributeAccessor;
 
     public SubManager(SubsManager subsManager, SclManager manager, String path, String id,
-            SubscribedResource subscribeResource, String subscribedToPath, XoObject subscription, URI requestingEntity,
+            SubscribedResource subscribeResource, String subscribedToPath, XoObject subscription,
             FilterCriteria filterCriteria, String mediaType) {
         this.subsManager = subsManager;
         this.manager = manager;
@@ -132,8 +133,8 @@ public final class SubManager implements Serializable {
         this.id = id;
         this.subscribeResource = subscribeResource;
         this.subscribedPath = subscribedToPath;
+        this.subscriber = URI.create(subscription.getStringAttribute(M2MConstants.TAG_M2M_SUBSCRIBER_ID));
         this.lastSuccessConfirmTime = 0;
-        this.requestingEntity = requestingEntity;
         this.filterCriteria = filterCriteria;
         this.mediaType = mediaType;
         subscriptionUpdated(subscription);
@@ -283,7 +284,7 @@ public final class SubManager implements Serializable {
             if (M2MConstants.MT_APPLICATION_EXI.equals(mediaType)) {
                 contentType = M2MConstants.MT_APPLICATION_EXI;
             }
-            byte[] notify = subscribeResource.getResponseRepresentation(path, manager, subscribedPath, requestingEntity,
+            byte[] notify = subscribeResource.getResponseRepresentation(path, manager, subscriber, subscribedPath,
                     filterCriteria, null, mediaType);
             if (notify != null) {
                 state = ST_PENDING_NOTIFY;
@@ -389,7 +390,8 @@ public final class SubManager implements Serializable {
             case ST_WAITING_NOTIFICATION:
                 state = ST_EXPIRING;
                 subsManager.removeSubscription(id);
-                manager.getStorageContext().delete(path);
+                manager.getStorageContext().delete(null, manager.getStorageContext().getStorageFactory().createDocument(path),
+                        null);
                 sendErrorNotify(StatusCode.STATUS_EXPIRED, "Subscription has expired");
                 break;
             case ST_PENDING_NOTIFY:
@@ -397,7 +399,8 @@ public final class SubManager implements Serializable {
                 nbRetry = 0;
                 state = ST_EXPIRING_PENDING_NOTIFY;
                 subsManager.removeSubscription(id);
-                manager.getStorageContext().delete(path);
+                manager.getStorageContext().delete(null, manager.getStorageContext().getStorageFactory().createDocument(path),
+                        null);
                 sendErrorNotify(StatusCode.STATUS_EXPIRED, "Subscription has expired");
                 break;
             case ST_WAITING_MINT:
@@ -406,7 +409,8 @@ public final class SubManager implements Serializable {
                 state = ST_EXPIRING;
                 subsManager.removeSubscription(id);
                 manager.getM2MContext().cancelTimer(timerId);
-                manager.getStorageContext().delete(path);
+                manager.getStorageContext().delete(null, manager.getStorageContext().getStorageFactory().createDocument(path),
+                        null);
                 sendErrorNotify(StatusCode.STATUS_EXPIRED, "Subscription has expired");
                 break;
             case ST_EXPIRING_PENDING_NOTIFY_WAITING_RETRY:
@@ -574,7 +578,8 @@ public final class SubManager implements Serializable {
                     LOG.error(path + ": Received a timeout in state " + ST_NAMES[state]);
                 } else {
                     state = ST_EXPIRING_PENDING_NOTIFY;
-                    manager.getStorageContext().delete(path);
+                    manager.getStorageContext().delete(null,
+                            manager.getStorageContext().getStorageFactory().createDocument(path), null);
                     sendErrorNotify(StatusCode.STATUS_EXPIRED, "Subscription has expired");
                 }
                 break;
@@ -591,7 +596,8 @@ public final class SubManager implements Serializable {
                     LOG.error(path + ": Received a timeout in state " + ST_NAMES[state]);
                 } else {
                     state = ST_EXPIRING;
-                    manager.getStorageContext().delete(path);
+                    manager.getStorageContext().delete(null,
+                            manager.getStorageContext().getStorageFactory().createDocument(path), null);
                     sendErrorNotify(StatusCode.STATUS_EXPIRED, "Subscription has expired");
                 }
                 break;
@@ -843,20 +849,22 @@ public final class SubManager implements Serializable {
     public void printFilterCriteria(StringBuffer buffer) {
         if (filterCriteria.getCreatedAfter() != null) {
             buffer.append("      createdAfter: ")
-                    .append(FormatUtils.formatDateTime(filterCriteria.getCreatedAfter(), manager.getTimeZone())).append("\n");
+                    .append(FormatUtils.formatDateTime(filterCriteria.getCreatedAfter(), UtilConstants.LOCAL_TIMEZONE))
+                    .append("\n");
         }
         if (filterCriteria.getCreatedBefore() != null) {
             buffer.append("      createdBefore: ")
-                    .append(FormatUtils.formatDateTime(filterCriteria.getCreatedBefore(), manager.getTimeZone())).append("\n");
+                    .append(FormatUtils.formatDateTime(filterCriteria.getCreatedBefore(), UtilConstants.LOCAL_TIMEZONE))
+                    .append("\n");
         }
         if (filterCriteria.getIfModifiedSince() != null) {
             buffer.append("      ifModifiedSince: ")
-                    .append(FormatUtils.formatDateTime(filterCriteria.getIfModifiedSince(), manager.getTimeZone()))
+                    .append(FormatUtils.formatDateTime(filterCriteria.getIfModifiedSince(), UtilConstants.LOCAL_TIMEZONE))
                     .append("\n");
         }
         if (filterCriteria.getIfUnmodifiedSince() != null) {
             buffer.append("      ifUnmodifiedSince: ")
-                    .append(FormatUtils.formatDateTime(filterCriteria.getIfUnmodifiedSince(), manager.getTimeZone()))
+                    .append(FormatUtils.formatDateTime(filterCriteria.getIfUnmodifiedSince(), UtilConstants.LOCAL_TIMEZONE))
                     .append("\n");
         }
         if (filterCriteria.getSearchString() != null) {
@@ -895,15 +903,15 @@ public final class SubManager implements Serializable {
         }
     }
 
-    public URI getRequestingEntity() {
-        return requestingEntity;
-    }
-
     public String getMediaType() {
         return mediaType;
     }
 
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
+    }
+
+    public URI getSubscriber() {
+        return subscriber;
     }
 }

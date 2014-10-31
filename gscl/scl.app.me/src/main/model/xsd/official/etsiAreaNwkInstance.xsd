@@ -9,10 +9,10 @@
 		<complexContent>
 			<extension base="tns:Parameters">
 				<sequence>
-					<element ref="tns:areaNwkType"/>
-					<element ref="tns:mtu"/>
-					<element ref="tns:listOfDevices"/>
+					<element ref="tns:areaNwkType"/>					
+					<element ref="tns:addressType"/>					
 					<element ref="tns:areaNwkTypeInfo"/>
+					<element ref="tns:listOfDevices"/>
 				</sequence>
 			</extension>
 		</complexContent>
@@ -33,9 +33,9 @@
 			<enumeration value="ZIGBEE"/>				
 		</restriction>
 	</simpleType>	
-
-	<element name="mtu" type="long"/>
-	<element name="listOfDevices" type="tns:Group"/>
-	<element name="areaNwkTypeInfo" type="tns:Parameters"/>	
 	
+	<element name="listOfDevices" type="tns:Group"/>
+	<element name="addressType" type="string"/>
+	<element name="areaNwkTypeInfo" type="tns:AreaNwkTypeInfoSet"/>	
+
 </schema>

@@ -1,70 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" 
-targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
-	<include schemaLocation="mgmtObj.xsd"/>
-	<include schemaLocation="parameters.xsd"/>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m"
+	xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd" />
+	<include schemaLocation="parameters.xsd" />
 
 	<!-- m2mAnpPolicy resource type -->
-	<complexType name="AnpSafPolicySet">
+	<complexType name="AnpPolicy">
 		<complexContent>
 			<extension base="tns:Parameters">
 				<sequence>
-					<element ref="tns:anName" minOccurs="0" />
-					<element ref="tns:rcatSchedule" minOccurs="0" />
-					<element ref="tns:blockPeriods" minOccurs="0" />
-
+					<element ref="tns:anName" minOccurs="1" maxOccurs="1" />
+					<element ref="tns:rcatSchedList" minOccurs="1" maxOccurs="1" />
+					<element ref="tns:blockPeriods" minOccurs="0" maxOccurs="1" />
 				</sequence>
-				<!-- attribute ref="tns:id" use="required"/-->
 			</extension>
 		</complexContent>
 	</complexType>
-
-	<element name="anName" type="token"/>
-	<element name="rcatSchedule" type="tns:RcatSchedList"/>
-	<element name="blockPeriods" type="tns:BlockList"/>
+	<element name="anName" type="token" />
+	<element name="rcatSchedList" type="tns:RcatSchedList" />
+	<element name="blockPeriods" type="tns:BlockList" />
 
 	<complexType name="RcatSchedList">
 		<sequence>
-			<element ref="tns:rcatSchedItem" minOccurs="1" maxOccurs="unbounded"/>
+			<element ref="tns:rcatSchedule" minOccurs="1" maxOccurs="8" />
 		</sequence>
+		<attribute ref="tns:id" use="required" />
 	</complexType>
-	
-	<element name="rcatSchedItem" type="tns:RcatSchedItem"/>
-	
-	<complexType name="RcatSchedItem">
+	<element name="rcatSchedule" type="tns:RcatSchedule" />
+
+	<complexType name="RcatSchedule">
 		<sequence>
-			<element ref="tns:rcatList" minOccurs="0" />
-			<element ref="tns:absTimeSpans" minOccurs="0" maxOccurs="unbounded"/>
-			<element ref="tns:schedules" minOccurs="0" maxOccurs="unbounded"/>
+			<element ref="tns:rcatValue" minOccurs="1" maxOccurs="1" />
+			<element ref="tns:schedItem" minOccurs="1" maxOccurs="unbounded" />
 		</sequence>
-	</complexType>	
-	
-  <element name="absTimeSpans" type="tns:AbsTimeSpan"/>
-  <element name="schedules" type="tns:Schedule"/>
-  
-   <complexType name="AbsTimeSpan">
-		<sequence>
-			<element ref="tns:startTime" />
-			<element ref="tns:endTime" />
-		</sequence>
+		<attribute ref="tns:id" use="required" />
 	</complexType>
-	<element name="startTime" type="dateTime"/>
-	<element name="endTime" type="dateTime"/>
-	
+	<element name="schedItem" type="tns:SchedItem" />
+
+	<complexType name="SchedItem">
+		<sequence>
+			<element ref="tns:absTimeSpan" minOccurs="0" maxOccurs="unbounded" />
+			<element ref="tns:schedule" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+		<attribute ref="tns:id" use="required" />
+	</complexType>
+	<element name="absTimeSpan" type="tns:AbsTimeSpan" />
+	<element name="schedule" type="tns:Schedule" />
+
+	<complexType name="AbsTimeSpan">
+		<sequence>
+			<element ref="tns:startTime" minOccurs="1" maxOccurs="1" />
+			<element ref="tns:endTime" minOccurs="1" maxOccurs="1" />
+		</sequence>
+		<attribute ref="tns:id" use="required" />
+	</complexType>
+	<element name="startTime" type="dateTime" />
+	<element name="endTime" type="dateTime" />
+
 	<complexType name="BlockList">
 		<sequence>
-			<element ref="tns:blockItem" minOccurs="1" maxOccurs="unbounded"/>
+			<element ref="tns:blockItem" minOccurs="1" maxOccurs="unbounded" />
 		</sequence>
+		<attribute ref="tns:id" use="required" />
 	</complexType>
-	<element name="blockItem" type="tns:BlockItem"/>
-	
+	<element name="blockItem" type="tns:BlockItem" />
+
 	<complexType name="BlockItem">
 		<sequence>
 			<element ref="tns:failedAttempts" />
 			<element ref="tns:blockDuration" />
 		</sequence>
+		<attribute ref="tns:id" use="required" />
 	</complexType>
-	<element name="failedAttempts" type="long"/>
-	<element name="blockDuration" type="duration"/>
+	<element name="failedAttempts" type="long" />
+	<element name="blockDuration" type="duration" />
 
 </schema>

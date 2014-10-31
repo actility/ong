@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m"
-	xmlns:xmlmime="http://www.w3.org/2005/05/xmlmime">
-
-	<include schemaLocation="common.xsd" />
-	<import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="http://www.w3.org/2005/05/xmlmime.xsd" />
-
-	<element name="notify" type="tns:Notify" />
-
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://uri.etsi.org/m2m" xmlns:xmlmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://uri.etsi.org/m2m">
+	<include schemaLocation="common.xsd"/>
+	<import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="http://www.w3.org/2005/05/xmlmime.xsd"/>
+	<element name="notify" type="tns:Notify"/>
 	<complexType name="Notify">
 		<sequence>
 			<element ref="tns:statusCode"/>
-			<element name="representation" type="xmlmime:base64Binary" minOccurs="0" />
-			<element name="subscriptionReference" type="anyURI" />
+			<choice minOccurs="1">
+				<element name="representation" type="xmlmime:base64Binary" minOccurs="0" />
+				<element name="timeoutReason" type="string" minOccurs="0" />
+			</choice>
+			<element name="subscriptionReference" type="anyURI"/>
+			<element name="requestingEntity" type="anyURI" minOccurs="0"/>
+			<element name="contact" type="anyURI" minOccurs="0"/>
 		</sequence>
 	</complexType>
-
 </schema>

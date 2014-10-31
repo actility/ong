@@ -3,7 +3,7 @@
 	<include schemaLocation="common.xsd" />
 	<include schemaLocation="commonDM.xsd" />
 	<!-- generic mgmtObj type resource -->
-	<element name="mgmtObj" type="tns:MgmtObj" />
+	<!-- element name="mgmtObj" type="tns:MgmtObj" / -->
 	<complexType name="MgmtObj">
 		<sequence>
 			<!-- common attributes -->
@@ -22,6 +22,6 @@
 			<!-- MO specific attributes; but for ETSI defined models these are specified explicitly by extension -->
 			<any minOccurs="0" maxOccurs="unbounded" namespace="##other" processContents="lax"/> <!-- so extension is done for extensions in the same namespace or local but ANY can be used for 'external'/non-ETSI -->
 		</sequence>
-		<attribute ref="tns:id"/>
+		<attribute ref="tns:id" use="required"/>
 	</complexType>
 </schema>

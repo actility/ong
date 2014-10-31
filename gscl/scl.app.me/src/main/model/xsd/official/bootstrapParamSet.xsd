@@ -13,7 +13,7 @@
 			<element ref="tns:securityKmrIndex" />
 			<element ref="tns:securityLifetime" />
 			<element ref="tns:securityMasFqdn" minOccurs="0" />
-			<element ref="tns:securityM2MKey" minOccurs="0" />
+			<element ref="tns:securityEncryptedM2MKey" minOccurs="0" />
 			<element ref="tns:sclId" minOccurs="0" />
 			<element ref="tns:sclIdList" minOccurs="0" />
 		</sequence>

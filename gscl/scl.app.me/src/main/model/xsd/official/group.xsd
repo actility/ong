@@ -7,6 +7,8 @@
 	<import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="http://www.w3.org/2005/05/xmlmime.xsd" />
 
 	<element name="group" type="tns:Group" />
+	
+	<element name="membersContentAccessRightID" type="anyURI" />
 
 	<complexType name="Group">
 		<sequence>
@@ -20,6 +22,9 @@
 			<element ref="tns:currentNrOfMembers" minOccurs="0" />
 			<element ref="tns:maxNrOfMembers" minOccurs="0" />
 			<element ref="tns:members" minOccurs="0" />
+			<element ref="tns:membersContentAccessRightID" minOccurs="0" />
+			<element ref="tns:memberTypeValidated" minOccurs="0"/>
+			<element ref="tns:consistencyStrategy" minOccurs="0"/>
 			<!-- subresources -->
 			<element ref="tns:membersContentReference" minOccurs="0" />
 			<element ref="tns:subscriptionsReference" minOccurs="0" />
@@ -31,6 +36,8 @@
 	<element name="currentNrOfMembers" type="long" />
 	<element name="maxNrOfMembers" type="long" />
 	<element name="members" type="tns:AnyURIList" />
+	<element name="memberTypeValidated" type="boolean"/>
+	<element name="consistencyStrategy" type="tns:ConsistencyStrategy"/>
 
 	<element name="membersContentReference" type="anyURI"/>
 
@@ -39,10 +46,22 @@
 			<enumeration value="APPLICATION" />
 			<enumeration value="CONTAINER" />
 			<enumeration value="ACCESS_RIGHT" />
-			<enumeration value="SERVER_CAPABILITY_LAYER" />
+			<enumeration value="SCL_BASE" />
 			<enumeration value="SCL" />
+			<enumeration value="LOCATION_CONTAINER" />
+			<enumeration value="MGMT_OBJ" />
+			<enumeration value="MGMT_CMD" />
+			<enumeration value="ATTACHED_DEVICE" />
+			<enumeration value="MIXED" />
 		</restriction>
 	</simpleType>
-
-
+	
+	<simpleType name="ConsistencyStrategy">
+	        <restriction base="string">
+	                <enumeration value="ABANDON_GROUP"/>
+	                <enumeration value="ABANDON_MEMBER"/>
+	                <enumeration value="MODIFY_TYPE"/>
+	        </restriction>
+        </simpleType>
+        
 </schema>

@@ -37,9 +37,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -58,9 +56,9 @@ import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.SubscribedResource;
 import com.actility.m2m.scl.model.VolatileResource;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.FormatUtils;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
@@ -69,6 +67,43 @@ import com.actility.m2m.xo.XoService;
 
 /**
  * M2M Remote Service Capability Layer. Represents a remote Service Capability Layer on the current Service Capability Layer.
+ *
+ * <pre>
+ * m2m:Scl from ong:t_xml_obj
+ * {
+ *     sclId    XoString    { embattr } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:pocs    m2m:AnyURIList    { } // (optional)
+ *     m2m:remTriggerAddr    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:onlineStatus    XoString    { } // (optional) (xmlType: m2m:OnlineStatus) (enum: ONLINE OFFLINE NOT_REACHABLE )
+ *     m2m:serverCapability    XoString    { } // (optional) (xmlType: xsd:boolean)
+ *     m2m:link    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:schedule    m2m:Schedule    { } // (optional)
+ *     m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:accessRightID    XoString    { shdico } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:searchStrings    m2m:SearchStrings    { } // (optional)
+ *     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:locTargetDevice    XoString    { } // (optional) (xmlType: xsd:string)
+ *     m2m:mgmtProtocolType    XoString    { } // (optional) (xmlType: m2m:MgmtProtocolType) (enum: OMA_DM BBF_TR069 )
+ *     m2m:integrityValResults    m2m:IntegrityValResults    { } // (optional)
+ *     m2m:aPocHandling    XoString    { } // (optional) (xmlType: m2m:APocHandling) (enum: SHALLOW DEEP )
+ *     m2m:sclType    XoString    { } // (optional) (xmlType: m2m:SclType) (enum: NSCL GSCL DSCL )
+ *     m2m:announceTo    m2m:AnnounceTo    { } // (optional)
+ *     m2m:publicDomain    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:containersReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:groupsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:applicationsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:accessRightsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:subscriptionsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:mgmtObjsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:notificationChannelsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:communicationChannelsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:m2mPocsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:attachedDevicesReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:sclAnncsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ * }
+ * alias m2m:Scl with m2m:scl
+ * </pre>
  */
 public final class Scl extends SclResource implements VolatileResource, SubscribedResource {
     private static final Logger LOG = OSGiLogger.getLogger(NotificationChannel.class, BundleLogger.getStaticLogger());
@@ -85,36 +120,6 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
                 "sclUpdateResponseConfirm", "sclDeleteRequestIndication", "sclDeleteResponseConfirm",
                 Constants.ID_NO_FILTER_CRITERIA_MODE, true, true, Scls.getInstance(), true, false);
     }
-
-    // m2m:Scl from ong:t_xml_obj
-    // {
-    // sclId XoString { embattr } // (optional) (xmlType: xsd:anyURI)
-    // m2m:pocs m2m:AnyURIList { } // (optional)
-    // m2m:remTriggerAddr XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:onlineStatus XoString { } // (optional) (xmlType: m2m:OnlineStatus) (enum: ONLINE OFFLINE NOT_REACHABLE )
-    // m2m:serverCapability XoString { } // (optional) (xmlType: xsd:boolean)
-    // m2m:link XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:schedule m2m:Schedule { } // (optional)
-    // m2m:expirationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:accessRightID XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:searchStrings m2m:SearchStrings { } // (optional)
-    // m2m:creationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:lastModifiedTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:locTargetDevice XoString { } // (optional) (xmlType: xsd:anyType)
-    // m2m:mgmtProtocolType XoString { } // (optional) (xmlType: m2m:MgmtProtocolType) (enum: OMA DM BBF TR 069 )
-    // m2m:integrityValResults m2m:IntegrityValResults { } // (optional)
-    // m2m:aPocHandling XoString { } // (optional) (xmlType: m2m:APocHandling) (enum: SHALLOW DEEP )
-    // m2m:containersReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:groupsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:applicationsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:accessRightsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:subscriptionsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:mgmtObjsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:notificationChannelsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:m2mPocsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:attachedDevicesReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // }
-    // alias m2m:Scl with m2m:scl
 
     public void reload(SclManager manager, String path, XoObject resource, SclTransaction transaction) throws IOException,
             M2MException, StorageException, XoException {
@@ -189,7 +194,8 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
                     xoService.newXmlXoObject(M2MConstants.TAG_M2M_SEARCH_STRINGS));
             resource.setStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME, creationTime);
             resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
-            resource.setStringAttribute(M2MConstants.TAG_M2M_MGMT_PROTOCOL_TYPE, M2MConstants.MGMT_PROTOCOL_TYPE_TR_069);
+            resource.setStringAttribute(M2MConstants.TAG_M2M_MGMT_PROTOCOL_TYPE, M2MConstants.MGMT_PROTOCOL_TYPE_BBF_TR069);
+            resource.setStringAttribute(M2MConstants.TAG_M2M_SCL_TYPE, M2MConstants.SCL_TYPE_NSCL);
 
             // Create sub-resources
             Containers.getInstance().createResource(manager, path + M2MConstants.URI_SEP + M2MConstants.RES_CONTAINERS,
@@ -203,22 +209,23 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
             NotificationChannels.getInstance().createResource(manager,
                     path + M2MConstants.URI_SEP + M2MConstants.RES_NOTIFICATION_CHANNELS, creationDate, creationTime,
                     transaction);
+            CommunicationChannels.getInstance().createResource(manager,
+                    path + M2MConstants.URI_SEP + M2MConstants.RES_COMMUNICATION_CHANNELS, creationDate, creationTime,
+                    transaction);
             M2MPocs.getInstance().createResource(manager, path + M2MConstants.URI_SEP + M2MConstants.RES_M2M_POCS,
                     creationDate, creationTime, transaction);
 
             // Save resource
-            Collection searchAttributes = new ArrayList();
-            searchAttributes.add(new Pair(M2MConstants.ATTR_LINK, linkStr));
-            searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_SCL));
+            Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+            document.setAttribute(M2MConstants.ATTR_LINK, linkStr);
+            document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_SCL);
             XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
             List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-            Iterator it = searchStringList.iterator();
-            while (it.hasNext()) {
-                searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-            }
-            searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-            searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-            transaction.createResource(path, resource, searchAttributes);
+            document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+            document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+            document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+            document.setContent(resource.saveBinary());
+            transaction.createResource(document);
         } finally {
             if (resource != null) {
                 resource.free(true);
@@ -228,6 +235,8 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
 
     public boolean createResource(SclManager manager, String path, XoObject resource, String targetPath, Date creationDate,
             String creationTime, XoObject representation, SclTransaction transaction) throws XoException, M2MException {
+        boolean modified = false;
+
         // sclId: M (response M)
         // pocs: O (response M)
         // remTriggerAddr: O (response O)
@@ -269,6 +278,8 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
         getAndCheckMgmtProtocolType(representation, M2MConstants.TAG_M2M_MGMT_PROTOCOL_TYPE, Constants.ID_MODE_REQUIRED);
         getAndCheckIntegrityValResults(representation, M2MConstants.TAG_M2M_INTEGRITY_VAL_RESULTS, Constants.ID_MODE_OPTIONAL);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_A_POC_HANDLING, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_SCL_TYPE, Constants.ID_MODE_REQUIRED);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_PUBLIC_DOMAIN, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_CONTAINERS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_GROUPS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_APPLICATIONS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
@@ -276,8 +287,11 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_SUBSCRIPTIONS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_MGMT_OBJS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_NOTIFICATION_CHANNELS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_COMMUNICATION_CHANNELS_REFERENCE,
+                Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_M2M_POCS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_ATTACHED_DEVICES_REFERENCE, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_SCL_ANNCS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
 
         // Update resource
         resource.setNameSpace(M2MConstants.PREFIX_M2M);
@@ -298,6 +312,10 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
         createStringMandatory(resource, representation, M2MConstants.TAG_M2M_MGMT_PROTOCOL_TYPE, null);
         createXoObjectOptional(resource, representation, M2MConstants.TAG_M2M_INTEGRITY_VAL_RESULTS);
         // TODO aPoCHandling ?
+        createStringMandatory(resource, representation, M2MConstants.TAG_M2M_SCL_TYPE, null);
+        if (resource.containsAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO)) {
+            modified = true;
+        }
 
         // Create sub-resources
         Containers.getInstance().createResource(manager, path + M2MConstants.URI_SEP + M2MConstants.RES_CONTAINERS,
@@ -310,31 +328,33 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
                 transaction);
         NotificationChannels.getInstance().createResource(manager,
                 path + M2MConstants.URI_SEP + M2MConstants.RES_NOTIFICATION_CHANNELS, creationDate, creationTime, transaction);
+        CommunicationChannels.getInstance().createResource(manager,
+                path + M2MConstants.URI_SEP + M2MConstants.RES_COMMUNICATION_CHANNELS, creationDate, creationTime, transaction);
         M2MPocs.getInstance().createResource(manager, path + M2MConstants.URI_SEP + M2MConstants.RES_M2M_POCS, creationDate,
                 creationTime, transaction);
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LINK, link.toString()));
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_SCL));
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_LINK, link.toString());
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_SCL);
         XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
         List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-        Iterator it = searchStringList.iterator();
-        while (it.hasNext()) {
-            searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-        }
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-        transaction.createResource(path, resource, searchAttributes);
+        document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+        document.setContent(resource.saveBinary());
+        transaction.createResource(document);
 
         transaction.addTransientOp(new ExpirationTimerUpdateOp(manager, path, Constants.ID_RES_SCL, expirationTime.getTime()
                 - creationDate.getTime()));
 
-        return false;
+        return modified;
     }
 
     public boolean updateResource(String logId, SclManager manager, String path, XoObject resource, Indication indication,
             XoObject representation, Date now) throws ParseException, XoException, StorageException, M2MException {
+        boolean modified = false;
+
         // sclId: NP (response M)
         // pocs: O (response M)
         // remTriggerAddr: O (response O)
@@ -377,6 +397,8 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
         getAndCheckMgmtProtocolType(representation, M2MConstants.TAG_M2M_MGMT_PROTOCOL_TYPE, Constants.ID_MODE_REQUIRED);
         getAndCheckIntegrityValResults(representation, M2MConstants.TAG_M2M_INTEGRITY_VAL_RESULTS, Constants.ID_MODE_OPTIONAL);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_A_POC_HANDLING, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_SCL_TYPE, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_PUBLIC_DOMAIN, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_CONTAINERS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_GROUPS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_APPLICATIONS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
@@ -384,8 +406,11 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_SUBSCRIPTIONS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_MGMT_OBJS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_NOTIFICATION_CHANNELS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_COMMUNICATION_CHANNELS_REFERENCE,
+                Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_M2M_POCS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_ATTACHED_DEVICES_REFERENCE, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_SCL_ANNCS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
 
         // Update resource
         updateXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_POCS);
@@ -400,25 +425,26 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
         updateStringMandatory(resource, representation, M2MConstants.TAG_M2M_MGMT_PROTOCOL_TYPE, null);
         updateXoObjectOptional(resource, representation, M2MConstants.TAG_M2M_INTEGRITY_VAL_RESULTS);
         // TODO aPoCHandling ??
+        if (resource.containsAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO)) {
+            modified = true;
+        }
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LINK, resource.getStringAttribute(M2MConstants.TAG_M2M_LINK)));
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_SCL));
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_LINK, resource.getStringAttribute(M2MConstants.TAG_M2M_LINK));
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_SCL);
         XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
         List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-        Iterator it = searchStringList.iterator();
-        while (it.hasNext()) {
-            searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-        }
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        manager.getStorageContext().update(path, resource.saveBinary(), searchAttributes);
+        document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setContent(resource.saveBinary());
+        manager.getStorageContext().update(null, document, null);
 
         new ExpirationTimerUpdateOp(manager, path, Constants.ID_RES_SCL, expirationTime.getTime() - now.getTime()).postCommit();
 
-        return false;
+        return modified;
     }
 
     public void updateFromSclBase(SclManager manager, String path, XoObject resource, XoObject representation)
@@ -439,19 +465,17 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
         updateStringOptional(resource, representation, M2MConstants.TAG_M2M_A_POC_HANDLING);
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LINK, resource.getStringAttribute(M2MConstants.TAG_M2M_LINK)));
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_SCL));
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_LINK, resource.getStringAttribute(M2MConstants.TAG_M2M_LINK));
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_SCL);
         XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
         List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-        Iterator it = searchStringList.iterator();
-        while (it.hasNext()) {
-            searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-        }
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        manager.getStorageContext().update(path, resource.saveBinary(), searchAttributes);
+        document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setContent(resource.saveBinary());
+        manager.getStorageContext().update(null, document, null);
     }
 
     public void updateFromM2MPocs(SclManager manager, String path, XoObject resource, String onlineStatus,
@@ -464,19 +488,17 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
         updateLastModifiedTime(manager, resource, now);
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LINK, resource.getStringAttribute(M2MConstants.TAG_M2M_LINK)));
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_SCL));
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_LINK, resource.getStringAttribute(M2MConstants.TAG_M2M_LINK));
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_SCL);
         XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
         List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-        Iterator it = searchStringList.iterator();
-        while (it.hasNext()) {
-            searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-        }
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        transaction.updateResource(path, resource, searchAttributes);
+        document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, searchStringList);
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setContent(resource.saveBinary());
+        transaction.updateResource(document);
     }
 
     public void deleteResource(String logId, SclManager manager, String path, SclTransaction transaction)
@@ -494,6 +516,8 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
                 path + M2MConstants.URI_SEP + M2MConstants.RES_SUBSCRIPTIONS, transaction);
         NotificationChannels.getInstance().deleteResource(logId, manager,
                 path + M2MConstants.URI_SEP + M2MConstants.RES_NOTIFICATION_CHANNELS, transaction);
+        CommunicationChannels.getInstance().deleteResource(logId, manager,
+                path + M2MConstants.URI_SEP + M2MConstants.RES_COMMUNICATION_CHANNELS, transaction);
         M2MPocs.getInstance().deleteResource(logId, manager, path + M2MConstants.URI_SEP + M2MConstants.RES_M2M_POCS,
                 transaction);
 
@@ -511,8 +535,8 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
         throw new UnsupportedOperationException();
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) {
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path,
+            XoObject resource, FilterCriteria filterCriteria, Set supported) {
         String appPath = manager.getM2MContext().getApplicationPath();
         String accessRight = resource.getStringAttribute(M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D);
         if (accessRight != null) {
@@ -534,10 +558,14 @@ public final class Scl extends SclResource implements VolatileResource, Subscrib
                 + M2MConstants.RES_MGMT_OBJS + M2MConstants.URI_SEP);
         resource.setStringAttribute(M2MConstants.TAG_M2M_NOTIFICATION_CHANNELS_REFERENCE, appPath + encodedPath
                 + M2MConstants.URI_SEP + M2MConstants.RES_NOTIFICATION_CHANNELS + M2MConstants.URI_SEP);
+        resource.setStringAttribute(M2MConstants.TAG_M2M_COMMUNICATION_CHANNELS_REFERENCE, appPath + encodedPath
+                + M2MConstants.URI_SEP + M2MConstants.RES_COMMUNICATION_CHANNELS + M2MConstants.URI_SEP);
         resource.setStringAttribute(M2MConstants.TAG_M2M_M2M_POCS_REFERENCE, appPath + encodedPath + M2MConstants.URI_SEP
                 + M2MConstants.RES_M2M_POCS + M2MConstants.URI_SEP);
         resource.setStringAttribute(M2MConstants.TAG_M2M_ATTACHED_DEVICES_REFERENCE, appPath + encodedPath
                 + M2MConstants.URI_SEP + M2MConstants.RES_ATTACHED_DEVICES + M2MConstants.URI_SEP);
+        resource.setStringAttribute(M2MConstants.TAG_M2M_SCL_ANNCS_REFERENCE, appPath + encodedPath + M2MConstants.URI_SEP
+                + M2MConstants.RES_SCL_ANNCS + M2MConstants.URI_SEP);
     }
 
     public void timeout(SclManager manager, String path, String timerId, M2MSession session, Serializable info)

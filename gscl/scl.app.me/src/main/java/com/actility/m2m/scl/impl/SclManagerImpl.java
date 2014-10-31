@@ -37,13 +37,12 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
@@ -73,11 +72,14 @@ import com.actility.m2m.scl.res.AccessRight;
 import com.actility.m2m.scl.res.AccessRights;
 import com.actility.m2m.scl.res.Application;
 import com.actility.m2m.scl.res.Applications;
+import com.actility.m2m.scl.res.CommunicationChannel;
+import com.actility.m2m.scl.res.CommunicationChannels;
 import com.actility.m2m.scl.res.Container;
 import com.actility.m2m.scl.res.Containers;
 import com.actility.m2m.scl.res.ContentInstance;
 import com.actility.m2m.scl.res.ContentInstances;
 import com.actility.m2m.scl.res.Discovery;
+import com.actility.m2m.scl.res.LocationContainer;
 import com.actility.m2m.scl.res.M2MPoc;
 import com.actility.m2m.scl.res.M2MPocs;
 import com.actility.m2m.scl.res.NotificationChannel;
@@ -86,13 +88,15 @@ import com.actility.m2m.scl.res.Scl;
 import com.actility.m2m.scl.res.SclBase;
 import com.actility.m2m.scl.res.SclResource;
 import com.actility.m2m.scl.res.Scls;
+import com.actility.m2m.scl.res.Subcontainers;
 import com.actility.m2m.scl.res.Subscription;
 import com.actility.m2m.scl.res.Subscriptions;
 import com.actility.m2m.storage.Condition;
-import com.actility.m2m.storage.ConditionBuilder;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.SearchResult;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.storage.StorageRequestExecutor;
+import com.actility.m2m.util.EmptyUtils;
 import com.actility.m2m.util.Profiler;
 import com.actility.m2m.util.StringReader;
 import com.actility.m2m.util.log.OSGiLogger;
@@ -118,8 +122,6 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
     private final XoService xoService;
     private final SclConfig sclConfig;
     private final StorageRequestExecutor storageContext;
-    private final ConditionBuilder conditionBuilder;
-    private final TimeZone timezone;
     private final StatsManager statsManager;
     private final ResourcePathLayout sclPathLayout;
 
@@ -129,13 +131,11 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
 
     // private List pathsToReload;
 
-    public SclManagerImpl(SclConfig sclConfig, XoService xoService, StorageRequestExecutor storageContext,
-            ConditionBuilder conditionBuilder) throws UnsupportedEncodingException {
+    public SclManagerImpl(SclConfig sclConfig, XoService xoService, StorageRequestExecutor storageContext)
+            throws UnsupportedEncodingException {
         this.sclConfig = sclConfig;
-        this.timezone = Calendar.getInstance().getTimeZone();
         this.xoService = xoService;
         this.storageContext = storageContext;
-        this.conditionBuilder = conditionBuilder;
         this.statsManager = new StatsManager();
 
         sclPathLayout = buildSclPathLayout();
@@ -190,6 +190,15 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         contentInstancesLayout.addSubResourceLayout(M2MConstants.ATTR_OLDEST, oldestLayout);
         contentInstancesLayout.addSubResourceLayout(M2MConstants.RES_SUBSCRIPTIONS, subscriptionsLayout);
 
+        ResourcePathLayout subcontainersLayout = new ResourcePathLayout(Constants.ID_RES_SUBCONTAINERS, RM_STORAGE_RETRIEVE,
+                null, false, true);
+        subcontainersLayout.addAttribute(M2MConstants.ATTR_ACCESS_RIGHT_I_D, Constants.ID_ATTR_ACCESS_RIGHT_I_D);
+        subcontainersLayout.addAttribute(M2MConstants.ATTR_CREATION_TIME, Constants.ID_ATTR_CREATION_TIME);
+        subcontainersLayout.addAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, Constants.ID_ATTR_LAST_MODIFIED_TIME);
+        subcontainersLayout.addAttribute(M2MConstants.ATTR_CONTAINER_COLLECTION, Constants.ID_ATTR_CONTAINER_COLLECTION);
+        subcontainersLayout.addAttribute(M2MConstants.ATTR_SUBSCRIPTIONS_REFERENCE, Constants.ID_ATTR_SUBSCRIPTIONS_REFERENCE);
+        subcontainersLayout.addSubResourceLayout(M2MConstants.RES_SUBSCRIPTIONS, subscriptionsLayout);
+
         ResourcePathLayout containerLayout = new ResourcePathLayout(Constants.ID_RES_CONTAINER, RM_STORAGE_RETRIEVE, null,
                 false, true);
         containerLayout.addAttribute(M2MConstants.ATTR_ID, Constants.ID_ATTR_ID);
@@ -204,8 +213,10 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         containerLayout.addAttribute(M2MConstants.ATTR_MAX_INSTANCE_AGE, Constants.ID_ATTR_MAX_INSTANCE_AGE);
         containerLayout.addAttribute(M2MConstants.ATTR_CONTENT_INSTANCES_REFERENCE,
                 Constants.ID_ATTR_CONTENT_INSTANCES_REFERENCE);
+        containerLayout.addAttribute(M2MConstants.ATTR_SUBCONTAINERS_REFERENCE, Constants.ID_ATTR_SUBCONTAINERS_REFERENCE);
         containerLayout.addAttribute(M2MConstants.ATTR_SUBSCRIPTIONS_REFERENCE, Constants.ID_ATTR_SUBSCRIPTIONS_REFERENCE);
         containerLayout.addSubResourceLayout(M2MConstants.RES_CONTENT_INSTANCES, contentInstancesLayout);
+        containerLayout.addSubResourceLayout(M2MConstants.RES_SUBCONTAINERS, subcontainersLayout);
         containerLayout.addSubResourceLayout(M2MConstants.RES_SUBSCRIPTIONS, subscriptionsLayout);
 
         ResourcePathLayout containerAnncLayout = new ResourcePathLayout(Constants.ID_RES_CONTAINER_ANNC, RM_STORAGE_RETRIEVE,
@@ -217,7 +228,7 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         containerAnncLayout.addAttribute(M2MConstants.ATTR_EXPIRATION_TIME, Constants.ID_ATTR_EXPIRATION_TIME);
 
         ResourcePathLayout locationContainerLayout = new ResourcePathLayout(Constants.ID_RES_LOCATION_CONTAINER,
-                RM_STORAGE_RETRIEVE, null, false, false);
+                RM_STORAGE_RETRIEVE, null, false, true);
         locationContainerLayout.addAttribute(M2MConstants.ATTR_ID, Constants.ID_ATTR_ID);
         locationContainerLayout.addAttribute(M2MConstants.ATTR_EXPIRATION_TIME, Constants.ID_ATTR_EXPIRATION_TIME);
         locationContainerLayout.addAttribute(M2MConstants.ATTR_ACCESS_RIGHT_I_D, Constants.ID_ATTR_ACCESS_RIGHT_I_D);
@@ -228,13 +239,16 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         locationContainerLayout.addAttribute(M2MConstants.ATTR_MAX_NR_OF_INSTANCES, Constants.ID_ATTR_MAX_NR_OF_INSTANCES);
         locationContainerLayout.addAttribute(M2MConstants.ATTR_MAX_BYTE_SIZE, Constants.ID_ATTR_MAX_BYTE_SIZE);
         locationContainerLayout.addAttribute(M2MConstants.ATTR_MAX_INSTANCE_AGE, Constants.ID_ATTR_MAX_INSTANCE_AGE);
+        locationContainerLayout.addAttribute(M2MConstants.ATTR_LOCATION_CONTAINER_TYPE,
+                Constants.ID_ATTR_LOCATION_CONTAINER_TYPE);
         locationContainerLayout.addAttribute(M2MConstants.ATTR_CONTENT_INSTANCES_REFERENCE,
                 Constants.ID_ATTR_CONTENT_INSTANCES_REFERENCE);
         locationContainerLayout.addAttribute(M2MConstants.ATTR_SUBSCRIPTIONS_REFERENCE,
                 Constants.ID_ATTR_SUBSCRIPTIONS_REFERENCE);
-        locationContainerLayout.addAttribute(M2MConstants.ATTR_LOCATION_CONTAINER_TYPE,
-                Constants.ID_ATTR_LOCATION_CONTAINER_TYPE);
+        locationContainerLayout.addAttribute(M2MConstants.ATTR_SUBCONTAINERS_REFERENCE,
+                Constants.ID_ATTR_SUBCONTAINERS_REFERENCE);
         locationContainerLayout.addSubResourceLayout(M2MConstants.RES_CONTENT_INSTANCES, contentInstancesLayout);
+        locationContainerLayout.addSubResourceLayout(M2MConstants.RES_SUBCONTAINERS, subcontainersLayout);
         locationContainerLayout.addSubResourceLayout(M2MConstants.RES_SUBSCRIPTIONS, subscriptionsLayout);
 
         ResourcePathLayout locationContainerAnncLayout = new ResourcePathLayout(Constants.ID_RES_LOCATION_CONTAINER_ANNC,
@@ -336,15 +350,30 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         notificationChannelsLayout.addAttribute(M2MConstants.ATTR_NOTIFICATION_CHANNEL_COLLECTION,
                 Constants.ID_ATTR_NOTIFICATION_CHANNEL_COLLECTION);
 
+        ResourcePathLayout communicationChannelLayout = new ResourcePathLayout(Constants.ID_RES_COMMUNICATION_CHANNEL,
+                RM_STORAGE_RETRIEVE, null, false, true);
+        communicationChannelLayout.addAttribute(M2MConstants.ATTR_ID, Constants.ID_ATTR_ID);
+        communicationChannelLayout.addAttribute(M2MConstants.ATTR_CHANNEL_TYPE, Constants.ID_ATTR_CHANNEL_TYPE);
+        communicationChannelLayout.addAttribute(M2MConstants.ATTR_CONTACT_U_R_I, Constants.ID_ATTR_CONTACT_U_R_I);
+        communicationChannelLayout.addAttribute(M2MConstants.ATTR_CHANNEL_DATA, Constants.ID_ATTR_CHANNEL_DATA);
+        communicationChannelLayout.addAttribute(M2MConstants.ATTR_CREATION_TIME, Constants.ID_ATTR_CREATION_TIME);
+        communicationChannelLayout.addAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, Constants.ID_ATTR_LAST_MODIFIED_TIME);
+
+        ResourcePathLayout communicationChannelsLayout = new ResourcePathLayout(Constants.ID_RES_COMMUNICATION_CHANNELS,
+                RM_STORAGE_RETRIEVE, communicationChannelLayout, false, true);
+        communicationChannelsLayout.addAttribute(M2MConstants.ATTR_CREATION_TIME, Constants.ID_ATTR_CREATION_TIME);
+        communicationChannelsLayout.addAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, Constants.ID_ATTR_LAST_MODIFIED_TIME);
+        communicationChannelsLayout.addAttribute(M2MConstants.ATTR_COMMUNICATION_CHANNEL_COLLECTION,
+                Constants.ID_ATTR_COMMUNICATION_CHANNEL_COLLECTION);
+
         ResourcePathLayout mgmtObjsLayout = new ResourcePathLayout(Constants.ID_RES_MGMT_OBJS, RM_STORAGE_RETRIEVE, null,
                 false, false);
-        notificationChannelsLayout.addAttribute(M2MConstants.ATTR_MGMT_OBJ_COLLECTION, Constants.ID_ATTR_MGMT_OBJ_COLLECTION);
-        notificationChannelsLayout.addAttribute(M2MConstants.ATTR_MGMT_CMD_COLLECTION, Constants.ID_ATTR_MGMT_CMD_COLLECTION);
-        notificationChannelsLayout.addAttribute(M2MConstants.ATTR_SUBSCRIPTIONS_REFERENCE,
-                Constants.ID_ATTR_SUBSCRIPTIONS_REFERENCE);
-        notificationChannelsLayout.addAttribute(M2MConstants.ATTR_CREATION_TIME, Constants.ID_ATTR_CREATION_TIME);
-        notificationChannelsLayout.addAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, Constants.ID_ATTR_LAST_MODIFIED_TIME);
-        notificationChannelsLayout.addSubResourceLayout(M2MConstants.RES_SUBSCRIPTIONS, subscriptionsLayout);
+        mgmtObjsLayout.addAttribute(M2MConstants.ATTR_MGMT_OBJ_COLLECTION, Constants.ID_ATTR_MGMT_OBJ_COLLECTION);
+        mgmtObjsLayout.addAttribute(M2MConstants.ATTR_MGMT_CMD_COLLECTION, Constants.ID_ATTR_MGMT_CMD_COLLECTION);
+        mgmtObjsLayout.addAttribute(M2MConstants.ATTR_SUBSCRIPTIONS_REFERENCE, Constants.ID_ATTR_SUBSCRIPTIONS_REFERENCE);
+        mgmtObjsLayout.addAttribute(M2MConstants.ATTR_CREATION_TIME, Constants.ID_ATTR_CREATION_TIME);
+        mgmtObjsLayout.addAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, Constants.ID_ATTR_LAST_MODIFIED_TIME);
+        mgmtObjsLayout.addSubResourceLayout(M2MConstants.RES_SUBSCRIPTIONS, subscriptionsLayout);
 
         ResourcePathLayout applicationLayout = new ResourcePathLayout(Constants.ID_RES_APPLICATION, RM_STORAGE_RETRIEVE, null,
                 true, true);
@@ -431,6 +460,14 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         attachedDevicesLayout.addAttribute(M2MConstants.ATTR_CREATION_TIME, Constants.ID_ATTR_CREATION_TIME);
         attachedDevicesLayout.addAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, Constants.ID_ATTR_LAST_MODIFIED_TIME);
 
+        ResourcePathLayout sclAnncsLayout = new ResourcePathLayout(Constants.ID_RES_SCL_ANNCS, RM_STORAGE_RETRIEVE, null,
+                false, false);
+        sclAnncsLayout.addAttribute(M2MConstants.ATTR_SCL_ANNC_COLLECTION, Constants.ID_ATTR_SCL_ANNC_COLLECTION);
+        sclAnncsLayout.addAttribute(M2MConstants.ATTR_SUBSCRIPTIONS_REFERENCE, Constants.ID_ATTR_SUBSCRIPTIONS_REFERENCE);
+        sclAnncsLayout.addAttribute(M2MConstants.ATTR_ACCESS_RIGHT_I_D, Constants.ID_ATTR_ACCESS_RIGHT_I_D);
+        sclAnncsLayout.addAttribute(M2MConstants.ATTR_CREATION_TIME, Constants.ID_ATTR_CREATION_TIME);
+        sclAnncsLayout.addAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, Constants.ID_ATTR_LAST_MODIFIED_TIME);
+
         ResourcePathLayout sclLayout = new ResourcePathLayout(Constants.ID_RES_SCL, RM_STORAGE_RETRIEVE, null, false, true);
         sclLayout.addAttribute(M2MConstants.ATTR_SCL_ID, Constants.ID_ATTR_SCL_ID);
         sclLayout.addAttribute(M2MConstants.ATTR_POCS, Constants.ID_ATTR_POCS);
@@ -456,6 +493,8 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         sclLayout.addAttribute(M2MConstants.ATTR_MGMT_OBJS_REFERENCE, Constants.ID_ATTR_MGMT_OBJS_REFERENCE);
         sclLayout.addAttribute(M2MConstants.ATTR_NOTIFICATION_CHANNELS_REFERENCE,
                 Constants.ID_ATTR_NOTIFICATION_CHANNELS_REFERENCE);
+        sclLayout.addAttribute(M2MConstants.ATTR_COMMUNICATION_CHANNELS_REFERENCE,
+                Constants.ID_ATTR_COMMUNICATION_CHANNELS_REFERENCE);
         sclLayout.addAttribute(M2MConstants.ATTR_M2M_POCS_REFERENCE, Constants.ID_ATTR_M2M_POCS_REFERENCE);
         sclLayout.addAttribute(M2MConstants.ATTR_ATTACHED_DEVICES_REFERENCE, Constants.ID_ATTR_ATTACHED_DEVICES_REFERENCE);
         sclLayout.addSubResourceLayout(M2MConstants.RES_CONTAINERS, containersLayout);
@@ -465,8 +504,10 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         sclLayout.addSubResourceLayout(M2MConstants.RES_SUBSCRIPTIONS, subscriptionsLayout);
         sclLayout.addSubResourceLayout(M2MConstants.RES_MGMT_OBJS, mgmtObjsLayout);
         sclLayout.addSubResourceLayout(M2MConstants.RES_NOTIFICATION_CHANNELS, notificationChannelsLayout);
+        sclLayout.addSubResourceLayout(M2MConstants.RES_COMMUNICATION_CHANNELS, communicationChannelsLayout);
         sclLayout.addSubResourceLayout(M2MConstants.RES_M2M_POCS, m2mPocsLayout);
         sclLayout.addSubResourceLayout(M2MConstants.RES_ATTACHED_DEVICES, attachedDevicesLayout);
+        sclLayout.addSubResourceLayout(M2MConstants.RES_SCL_ANNCS, sclAnncsLayout);
 
         ResourcePathLayout sclsLayout = new ResourcePathLayout(Constants.ID_RES_SCLS, RM_STORAGE_RETRIEVE, sclLayout, false,
                 true);
@@ -612,17 +653,16 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
     private XoObject retrieveXoResource(int retrieveMode, String resourcePath) throws StorageException, XoException,
             M2MException {
         int slashIndex = 0;
-        Map result = null;
         Iterator it = null;
-        byte[] rawResource = null;
+        Document document = null;
         switch (retrieveMode) {
         case RM_STORAGE_RETRIEVE:
             if (LOG.isInfoEnabled()) {
                 LOG.info("Search path " + resourcePath + " into storage");
             }
-            rawResource = storageContext.retrieve(resourcePath);
-            if (rawResource != null) {
-                return xoService.readBinaryXmlXoObject(rawResource);
+            document = storageContext.retrieve(null, resourcePath, null);
+            if (document != null) {
+                return xoService.readBinaryXmlXoObject(document.getContent());
             }
             return null;
         case RM_STORAGE_RETRIEVE_WITH_CONFIG:
@@ -637,12 +677,12 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
                         LOG.info("Search path " + resourcePath + " into storage");
                     }
                     if (storageConfig != null) {
-                        rawResource = storageContext.retrieve(storageConfig, resourcePath);
+                        document = storageContext.retrieve(storageConfig, resourcePath, null);
                     } else {
-                        rawResource = storageContext.retrieve(resourcePath);
+                        document = storageContext.retrieve(null, resourcePath, null);
                     }
-                    if (rawResource != null) {
-                        return xoService.readBinaryXmlXoObject(rawResource);
+                    if (document != null) {
+                        return xoService.readBinaryXmlXoObject(document.getContent());
                     }
                 }
             } finally {
@@ -658,19 +698,15 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Search latest contentInstance in " + contentInstancesPath);
                 }
-                XoObject contentInstances = null;
-                try {
-                    contentInstances = retrieveXoResource(RM_STORAGE_RETRIEVE, contentInstancesPath);
-                    if (contentInstances != null) {
-                        String contentInstancePath = contentInstances.getStringAttribute(Constants.ATTR_LATEST);
-                        if (contentInstancePath != null) {
-                            return retrieveXoResource(RM_STORAGE_RETRIEVE_WITH_CONFIG, contentInstancePath);
-                        }
-                    }
-                } finally {
-                    if (contentInstances != null) {
-                        contentInstances.free(true);
-                    }
+                Condition condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
+                SearchResult searchResult = storageContext.search(null, contentInstancesPath,
+                        StorageRequestExecutor.SCOPE_ONE_LEVEL, condition, StorageRequestExecutor.ORDER_DESC, 1, true,
+                        EmptyUtils.EMPTY_LIST);
+                it = searchResult.getResults();
+                if (it.hasNext()) {
+                    document = (Document) it.next();
+                    return xoService.readBinaryXmlXoObject(document.getContent());
                 }
             }
             return null;
@@ -679,16 +715,17 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
             if (slashIndex != -1) {
                 String contentInstancesPath = resourcePath.substring(0, slashIndex);
                 if (LOG.isInfoEnabled()) {
-                    LOG.info("Search latest contentInstance in " + contentInstancesPath);
+                    LOG.info("Search oldest contentInstance in " + contentInstancesPath);
                 }
-                Condition condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE,
-                        ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
-                SearchResult searchResult = storageContext.search(contentInstancesPath, StorageRequestExecutor.SCOPE_EXACT,
-                        condition, StorageRequestExecutor.ORDER_ASC, 1);
-                result = searchResult.getResults();
-                it = result.values().iterator();
+                Condition condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
+                SearchResult searchResult = storageContext.search(null, contentInstancesPath,
+                        StorageRequestExecutor.SCOPE_ONE_LEVEL, condition, StorageRequestExecutor.ORDER_ASC, 1, true,
+                        EmptyUtils.EMPTY_LIST);
+                it = searchResult.getResults();
                 if (it.hasNext()) {
-                    return xoService.readBinaryXmlXoObject((byte[]) it.next());
+                    document = (Document) it.next();
+                    return xoService.readBinaryXmlXoObject(document.getContent());
                 }
             }
             return null;
@@ -717,12 +754,18 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
             return AccessRight.getInstance();
         case Constants.ID_RES_ACCESS_RIGHT_ANNC:
             return null;
+        case Constants.ID_RES_COMMUNICATION_CHANNELS:
+            return CommunicationChannels.getInstance();
+        case Constants.ID_RES_COMMUNICATION_CHANNEL:
+            return CommunicationChannel.getInstance();
         case Constants.ID_RES_CONTAINERS:
             return Containers.getInstance();
         case Constants.ID_RES_CONTAINER:
             return Container.getInstance();
         case Constants.ID_RES_CONTAINER_ANNC:
+            return null;
         case Constants.ID_RES_LOCATION_CONTAINER:
+            return LocationContainer.getInstance();
         case Constants.ID_RES_LOCATION_CONTAINER_ANNC:
             return null;
         case Constants.ID_RES_CONTENT_INSTANCES:
@@ -757,6 +800,10 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
             return NotificationChannel.getInstance();
         case Constants.ID_RES_DISCOVERY:
             return Discovery.getInstance();
+        case Constants.ID_RES_SCL_ANNCS:
+            return null;
+        case Constants.ID_RES_SUBCONTAINERS:
+            return Subcontainers.getInstance();
         }
         return null;
     }
@@ -807,19 +854,20 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         String subPath = null;
         try {
             String partialTargetId = buildUriWithoutPath(targetID);
-            Condition condition1 = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                    Constants.TYPE_SCL);
-            Condition condition2 = conditionBuilder.createStringCondition(M2MConstants.ATTR_LINK,
-                    ConditionBuilder.OPERATOR_STARTS_WITH, partialTargetId);
-            Condition conditionPair = conditionBuilder.createConjunction(condition1, condition2);
-            SearchResult searchResult = storageContext.search(Constants.PATH_SCLS + M2MConstants.URI_SEP,
-                    StorageRequestExecutor.SCOPE_EXACT, conditionPair);
-            Map children = searchResult.getResults();
-            Iterator it = children.entrySet().iterator();
-            Entry entry = null;
+            List conditions = new ArrayList();
+            conditions.add(storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                    Condition.ATTR_OP_EQUAL, Constants.TYPE_SCL));
+            conditions.add(storageContext.getStorageFactory().createStringCondition(M2MConstants.ATTR_LINK,
+                    Condition.ATTR_OP_STARTS_WITH, partialTargetId));
+            Condition conditionPair = storageContext.getStorageFactory().createConjunction(Condition.COND_OP_AND, conditions);
+            SearchResult searchResult = storageContext.search(null, Constants.PATH_SCLS + M2MConstants.URI_SEP,
+                    StorageRequestExecutor.SCOPE_ONE_LEVEL, conditionPair, StorageRequestExecutor.ORDER_UNKNOWN, -1, true,
+                    EmptyUtils.EMPTY_LIST);
+            Iterator it = searchResult.getResults();
             String target = targetID.toString();
             String link = null;
 
+            Document document = null;
             boolean end = false;
             int linkLength = 0;
             int targetLength = target.length();
@@ -827,9 +875,9 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
                 targetLength = target.length() - 1;
             }
             while (!end && it.hasNext()) {
-                entry = (Entry) it.next();
-                subPath = (String) entry.getKey();
-                xoObject = xoService.readBinaryXmlXoObject((byte[]) entry.getValue());
+                document = (Document) it.next();
+                subPath = document.getPath();
+                xoObject = xoService.readBinaryXmlXoObject(document.getContent());
                 try {
                     link = xoObject.getStringAttribute(M2MConstants.TAG_M2M_LINK);
                     linkLength = link.length();
@@ -864,18 +912,18 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
     private XoObject getFirstOnlineM2MPoc(String transactionId, String sclPath) throws M2MException {
         XoObject xoObject = null;
         try {
-            Condition condition1 = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                    Constants.TYPE_M2M_POC);
-            Condition condition2 = conditionBuilder.createIntegerCondition(M2MConstants.ATTR_ONLINE_STATUS,
-                    ConditionBuilder.OPERATOR_EQUAL, new Integer(Constants.ID_ONLINE_STATUS_ONLINE));
-            Condition conditionPair = conditionBuilder.createConjunction(condition1, condition2);
-            SearchResult searchResult = storageContext.search(sclPath + M2MConstants.URI_SEP + M2MConstants.RES_M2M_POCS
-                    + M2MConstants.URI_SEP, StorageRequestExecutor.SCOPE_EXACT, conditionPair,
-                    StorageRequestExecutor.ORDER_UNKNOWN, 1);
-            Map children = searchResult.getResults();
-            Iterator it = children.values().iterator();
+            List conditions = new ArrayList(2);
+            conditions.add(storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                    Condition.ATTR_OP_EQUAL, Constants.TYPE_M2M_POC));
+            conditions.add(storageContext.getStorageFactory().createIntegerCondition(M2MConstants.ATTR_ONLINE_STATUS,
+                    Condition.ATTR_OP_EQUAL, new Integer(Constants.ID_ONLINE_STATUS_ONLINE)));
+            Condition conditionPair = storageContext.getStorageFactory().createConjunction(Condition.COND_OP_AND, conditions);
+            SearchResult searchResult = storageContext.search(null, sclPath + M2MConstants.URI_SEP + M2MConstants.RES_M2M_POCS
+                    + M2MConstants.URI_SEP, StorageRequestExecutor.SCOPE_ONE_LEVEL, conditionPair,
+                    StorageRequestExecutor.ORDER_UNKNOWN, 1, true, EmptyUtils.EMPTY_LIST);
+            Iterator it = searchResult.getResults();
             if (it.hasNext()) {
-                xoObject = xoService.readBinaryXmlXoObject((byte[]) it.next());
+                xoObject = xoService.readBinaryXmlXoObject(((Document) it.next()).getContent());
             }
         } catch (XoException e) {
             throw new M2MException("Cannot decode a server <m2mPoc> resource: " + e.getMessage(),
@@ -981,16 +1029,17 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
 
     private void restoreResources(Condition condition, VolatileResource resourceCtrl, SclTransaction transaction)
             throws ParseException, IOException, StorageException, XoException, M2MException {
-        SearchResult result = storageContext.search(Constants.PATH_ROOT, StorageRequestExecutor.SCOPE_SUBTREE, condition);
-        Iterator it = result.getResults().entrySet().iterator();
-        Entry entry = null;
+        SearchResult result = storageContext.search(null, Constants.PATH_ROOT, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                condition, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
+        Iterator it = result.getResults();
+        Document document = null;
         XoObject resource = null;
         while (it.hasNext()) {
             resource = null;
-            entry = (Entry) it.next();
+            document = (Document) it.next();
             try {
-                resource = xoService.readBinaryXmlXoObject((byte[]) entry.getValue());
-                resourceCtrl.reload(this, (String) entry.getKey(), resource, transaction);
+                resource = xoService.readBinaryXmlXoObject(document.getContent());
+                resourceCtrl.reload(this, document.getPath(), resource, transaction);
             } finally {
                 if (resource != null) {
                     resource.free(true);
@@ -1039,8 +1088,22 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         }
     }
 
+    public URI getNsclUri() {
+        if (sclConfig.isGscl()) {
+            return nsclRegistration.getNsclUri();
+        }
+        return null;
+    }
+
     public URI getLocalSclUri(URI reference) throws M2MException {
         return m2mContext.createLocalUri(reference, Constants.PATH_ROOT);
+    }
+
+    public URI createPocUriFromServerRoot(URI reference, String path) throws M2MException {
+        URI result = m2mContext.createLocalUri(reference, Constants.PATH_ROOT);
+        String resultStr = result.toString();
+        result = URI.create(resultStr.substring(0, resultStr.length() - m2mContext.getApplicationPath().length()) + path);
+        return result;
     }
 
     public SclConfig getSclConfig() {
@@ -1055,16 +1118,8 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         return storageContext;
     }
 
-    public ConditionBuilder getConditionBuilder() {
-        return conditionBuilder;
-    }
-
     public XoService getXoService() {
         return xoService;
-    }
-
-    public TimeZone getTimeZone() {
-        return timezone;
     }
 
     public StatsManager getStatsManager() {
@@ -1123,6 +1178,10 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
             return AccessRight.getInstance();
         } else if (tag.equals(M2MConstants.TAG_M2M_ACCESS_RIGHT_ANNC)) {
             return null;
+        } else if (tag.equals(M2MConstants.TAG_M2M_COMMUNICATION_CHANNELS)) {
+            return CommunicationChannels.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_COMMUNICATION_CHANNEL)) {
+            return CommunicationChannel.getInstance();
         } else if (tag.equals(M2MConstants.TAG_M2M_CONTAINERS)) {
             return Containers.getInstance();
         } else if (tag.equals(M2MConstants.TAG_M2M_CONTAINER)) {
@@ -1130,7 +1189,7 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
         } else if (tag.equals(M2MConstants.TAG_M2M_CONTAINER_ANNC)) {
             return null;
         } else if (tag.equals(M2MConstants.TAG_M2M_LOCATION_CONTAINER)) {
-            return null;
+            return LocationContainer.getInstance();
         } else if (tag.equals(M2MConstants.TAG_M2M_LOCATION_CONTAINER_ANNC)) {
             return null;
         } else if (tag.equals(M2MConstants.TAG_M2M_CONTENT_INSTANCES)) {
@@ -1157,6 +1216,8 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
             return NotificationChannel.getInstance();
         } else if (tag.equals(M2MConstants.TAG_M2M_DISCOVERY)) {
             return Discovery.getInstance();
+        } else if (tag.equals(M2MConstants.TAG_M2M_SUBCONTAINERS)) {
+            return Subcontainers.getInstance();
         }
         return null;
     }
@@ -1170,7 +1231,8 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
     }
 
     public XoObject getXoResource(String path) throws StorageException, XoException {
-        byte[] rawResource = storageContext.retrieve(path);
+        Document document = storageContext.retrieve(null, path, null);
+        byte[] rawResource = document.getContent();
         if (rawResource != null) {
             return xoService.readBinaryXmlXoObject(rawResource);
         }
@@ -1238,36 +1300,40 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
                 // Restore <sclBase>
                 SclBase.getInstance().reload(this, Constants.PATH_ROOT, sclBase, transaction);
                 // Restore <accessRight>
-                Condition condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE,
-                        ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_ACCESS_RIGHT);
+                Condition condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_ACCESS_RIGHT);
                 restoreResources(condition, AccessRight.getInstance(), transaction);
                 // Restore <application>
-                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                        Constants.TYPE_APPLICATION);
+                condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_APPLICATION);
                 restoreResources(condition, Application.getInstance(), transaction);
                 // Restore <container>
-                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                        Constants.TYPE_CONTAINER);
+                condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_CONTAINER);
                 restoreResources(condition, Container.getInstance(), transaction);
+                // Restore <locationContainer>
+                condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_LOCATION_CONTAINER);
+                restoreResources(condition, LocationContainer.getInstance(), transaction);
                 // Restore <scl>
-                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                        Constants.TYPE_SCL);
+                condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_SCL);
                 restoreResources(condition, Scl.getInstance(), transaction);
                 // Restore <notificationChannel>
-                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                        Constants.TYPE_NOTIFICATION_CHANNEL);
+                condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_NOTIFICATION_CHANNEL);
                 restoreResources(condition, NotificationChannel.getInstance(), transaction);
                 // Restore <m2mPocs>
-                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                        Constants.TYPE_M2M_POC);
+                condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_M2M_POC);
                 restoreResources(condition, M2MPoc.getInstance(), transaction);
                 // Restore <subscription>
-                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                        Constants.TYPE_SUBSCRIPTION);
+                condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_SUBSCRIPTION);
                 restoreResources(condition, Subscription.getInstance(), transaction);
                 // Restore contentInstances
-                condition = conditionBuilder.createStringCondition(Constants.ATTR_TYPE, ConditionBuilder.OPERATOR_EQUAL,
-                        Constants.TYPE_CONTENT_INSTANCES);
+                condition = storageContext.getStorageFactory().createStringCondition(Constants.ATTR_TYPE,
+                        Condition.ATTR_OP_EQUAL, Constants.TYPE_CONTENT_INSTANCES);
                 restoreResources(condition, ContentInstances.getInstance(), transaction);
 
                 transaction.execute();
@@ -1680,8 +1746,10 @@ public final class SclManagerImpl implements /* SearchResultHandler, */M2MEventH
             } else if (info.getClass() == TimerData.class) {
                 TimerData timerData = (TimerData) info;
                 XoObject resource = null;
+                Document document = null;
                 try {
-                    resource = xoService.readBinaryXmlXoObject(storageContext.retrieve(timerData.getPath()));
+                    document = storageContext.retrieve(null, timerData.getPath(), null);
+                    resource = xoService.readBinaryXmlXoObject(document.getContent());
                     ResourceController ctrl = getResourceController(timerData.getCtrlId());
                     ctrl.timeout(this, timerData.getPath(), timerId, null, timerData.getInfo());
                 } catch (ParseException e) {

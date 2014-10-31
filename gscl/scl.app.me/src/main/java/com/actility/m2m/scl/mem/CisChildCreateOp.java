@@ -64,7 +64,7 @@ public class CisChildCreateOp implements TransientOp {
         if (oldTimerId != null) {
             manager.getM2MContext().cancelTimer(oldTimerId);
         }
-        timerId = manager.startResourceTimer(lastCiCreationDate.getTime() + (maxInstanceAge * 1000L) - now.getTime(), path,
+        timerId = manager.startResourceTimer(lastCiCreationDate.getTime() + maxInstanceAge - now.getTime(), path,
                 Constants.ID_RES_CONTENT_INSTANCES, null);
         manager.getM2MContext().setAttribute(path + "/instanceAgeTimerId", timerId);
         manager.getM2MContext().setAttribute(path + "/instanceAgeId", lastCiId);

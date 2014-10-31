@@ -30,7 +30,7 @@
 
 m2m:LocationContainer from m2m:Container
 {
-    m2m:locationContainerType    XoString    { } // (xmlType: m2m:LocationContainerType) (enum: LOCATION_SERVER_BASED APPLICATION_GENERATED ) 
+    m2m:locationContainerType    XoString    { shdico } // (xmlType: m2m:LocationContainerType) (enum: LOCATION_SERVER_BASED APPLICATION_GENERATED ) 
 }
 alias m2m:LocationContainer with m2m:locationContainer
 

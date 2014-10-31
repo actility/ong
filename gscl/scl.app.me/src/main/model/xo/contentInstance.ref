@@ -25,7 +25,8 @@
 #define CONTENTINSTANCE_REF
 
 #include "misc.ref"
-#include "extern.ref"
+#include "common.ref"
+#include "xmlmime.ref"
 
 
 m2m:ContentTypes from ong:t_xml_obj
@@ -34,16 +35,25 @@ m2m:ContentTypes from ong:t_xml_obj
 }
 alias m2m:ContentTypes with m2m:contentTypes
 
+m2m:Content from ong:t_xml_obj
+{
+    xmime:contentType    XoString    { embattr } // (optional) (xmlType: xmime:AnonContentType139226406) (min length: 3) 
+    m2m:binaryContent    XoBuffer    { } // (xmlType: xsd:base64Binary) 
+    m2m:textContent    XoString    { } // (xmlType: xsd:string) 
+}
+alias m2m:Content with m2m:content
+
 m2m:ContentInstance from ong:t_xml_obj
 {
-    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:NMTOKEN) 
     href    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:delayTolerance    XoString    { } // (optional) (xmlType: xsd:dateTime) 
+    m2m:searchStrings    m2m:SearchStrings    { } // (optional) 
     m2m:contentTypes    m2m:ContentTypes    { } // (optional) 
     m2m:contentSize    XoString    { } // (optional) (xmlType: xsd:long) 
-    m2m:content    xmime:base64Binary    { } // (optional) 
+    m2m:content    m2m:Content    { } // (optional) 
 }
 alias m2m:ContentInstance with m2m:contentInstance
 

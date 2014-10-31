@@ -31,8 +31,6 @@
 
 package com.actility.m2m.scl.mem;
 
-import java.net.URI;
-
 import com.actility.m2m.m2m.FilterCriteria;
 import com.actility.m2m.m2m.M2MConstants;
 import com.actility.m2m.m2m.M2MException;
@@ -54,7 +52,6 @@ public final class SubCreateOp implements TransientOp {
     private final XoObject subResource;
     private final String subscribedPath;
     private final SubscribedResource subscribedResource;
-    private final URI requestingEntity;
     private final FilterCriteria filterCriteria;
     private final String mediaType;
 
@@ -62,8 +59,7 @@ public final class SubCreateOp implements TransientOp {
     private SubsManager subsManager;
 
     public SubCreateOp(SclManager manager, String subsPath, String subPath, String subId, XoObject subResource,
-            String subscribedPath, SubscribedResource subscribedResource, URI requestingEntity, FilterCriteria filterCriteria,
-            String mediaType) {
+            String subscribedPath, SubscribedResource subscribedResource, FilterCriteria filterCriteria, String mediaType) {
         this.manager = manager;
         String subsPathTmp = subsPath;
         SubscribedResource subscribedResourceTmp = subscribedResource;
@@ -80,7 +76,6 @@ public final class SubCreateOp implements TransientOp {
         this.subResource = subResource;
         this.subscribedPath = subscribedPath;
         this.subscribedResource = subscribedResourceTmp;
-        this.requestingEntity = requestingEntity;
         this.filterCriteria = filterCriteria;
         this.mediaType = mediaType;
     }
@@ -93,7 +88,7 @@ public final class SubCreateOp implements TransientOp {
             manager.getM2MContext().setAttribute(subsPath, subsManager);
         }
         subManager = new SubManager(subsManager, manager, subPath, subId, subscribedResource, subscribedPath, subResource,
-                requestingEntity, filterCriteria, mediaType);
+                filterCriteria, mediaType);
         if (!subsManager.addSubscription(subId, subManager)) {
             throw new M2MException("Too much pending subscriptions", StatusCode.STATUS_SERVICE_UNAVAILABLE);
         }

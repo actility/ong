@@ -33,54 +33,51 @@ package com.actility.m2m.scl.model;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import com.actility.m2m.m2m.M2MException;
-import com.actility.m2m.storage.Modification;
+import com.actility.m2m.storage.Batch;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.storage.StorageRequestExecutor;
 import com.actility.m2m.xo.XoException;
-import com.actility.m2m.xo.XoObject;
 
 public final class SclTransaction {
     private final StorageRequestExecutor storageContext;
-    private final List modifications;
+    private final Batch batch;
     private List transientOps;
 
     public SclTransaction(StorageRequestExecutor storageContext) {
         this.storageContext = storageContext;
-        this.modifications = new ArrayList();
+        this.batch = storageContext.getStorageFactory().createBatch();
     }
 
-    public void createResource(String path, XoObject resource, Collection searchAttributes) throws XoException {
-        modifications.add(storageContext.createModification(Modification.TYPE_CREATE, path, resource.saveBinary(),
-                searchAttributes));
+    public void createResource(Document document) throws XoException {
+        batch.create(null, document);
     }
 
-    public void updateResource(String path, XoObject resource, Collection searchAttributes) throws XoException {
-        modifications.add(storageContext.createModification(Modification.TYPE_UPDATE, path, resource.saveBinary(),
-                searchAttributes));
+    public void updateResource(Document document) throws XoException {
+        batch.update(null, document, null);
     }
 
     public void deleteResource(String path) {
-        modifications.add(storageContext.createModification(Modification.TYPE_DELETE, path, null, null));
+        Document document = storageContext.getStorageFactory().createDocument(path);
+        batch.delete(null, document, null);
     }
 
-    public void createResource(Map config, String path, XoObject resource, Collection searchAttributes) throws XoException {
-        modifications.add(storageContext.createModification(config, Modification.TYPE_CREATE, path, resource.saveBinary(),
-                searchAttributes));
+    public void createResource(Map config, Document document) throws XoException {
+        batch.create(config, document);
     }
 
-    public void updateResource(Map config, String path, XoObject resource, Collection searchAttributes) throws XoException {
-        modifications.add(storageContext.createModification(config, Modification.TYPE_UPDATE, path, resource.saveBinary(),
-                searchAttributes));
+    public void updateResource(Map config, Document document) throws XoException {
+        batch.update(config, document, null);
     }
 
     public void deleteResource(Map config, String path) {
-        modifications.add(storageContext.createModification(config, Modification.TYPE_DELETE, path, null, null));
+        Document document = storageContext.getStorageFactory().createDocument(path);
+        batch.delete(config, document, null);
     }
 
     public void addTransientOp(TransientOp transientOp) {
@@ -102,8 +99,16 @@ public final class SclTransaction {
                 }
             }
 
-            storageContext.batchModify((Modification[]) modifications.toArray(new Modification[modifications.size()]));
-            executed = true;
+            int result = batch.execute();
+            switch (result) {
+            case Batch.BATCH_OK:
+                executed = true;
+                break;
+            case Batch.BATCH_CREATE_FAILED:
+            case Batch.BATCH_UPDATE_FAILED:
+            case Batch.BATCH_DELETE_FAILED:
+                throw new StorageException("Cannot execute batch operation");
+            }
 
             if (transientOps != null) {
                 Iterator it = transientOps.iterator();

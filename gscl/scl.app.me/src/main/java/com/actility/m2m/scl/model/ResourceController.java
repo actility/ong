@@ -91,7 +91,7 @@ public interface ResourceController {
      * @return The remaining number of URIs minus the number of matching URIs (URIs must be counted even if there are not
      *         added). So, if the number is negative it means that this negative number of URIs were not added
      */
-    int appendDiscoveryURIs(String transactionId, SclManager manager, String refPath, XoObject xoObject, URI requestingEntity,
-            URI targetID, String appPath, String[] searchString, List discoveryUriList, int urisCount) throws IOException,
-            StorageException, XoException;
+    int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+            URI targetId, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs)
+            throws IOException, StorageException, XoException;
 }

@@ -35,14 +35,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -58,21 +54,32 @@ import com.actility.m2m.scl.model.SclLogger;
 import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.storage.Condition;
-import com.actility.m2m.storage.ConditionBuilder;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.SearchResult;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.storage.StorageRequestExecutor;
+import com.actility.m2m.util.EmptyUtils;
 import com.actility.m2m.util.FormatUtils;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.Profiler;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.UUID;
+import com.actility.m2m.util.UtilConstants;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
 
 /**
  * Collection of M2M Channels.
+ *
+ * <pre>
+ * m2m:NotificationChannels from ong:t_xml_obj
+ * {
+ *     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:notificationChannelCollection    m2m:NamedReferenceCollection    { } // (optional)
+ * }
+ * alias m2m:NotificationChannels with m2m:notificationChannels
+ * </pre>
  */
 public final class NotificationChannels extends SclResource {
     private static final Logger LOG = OSGiLogger.getLogger(NotificationChannels.class, BundleLogger.getStaticLogger());
@@ -94,14 +101,6 @@ public final class NotificationChannels extends SclResource {
         reservedKeywords.add(M2MConstants.ATTR_NOTIFICATION_CHANNEL_COLLECTION);
     }
 
-    // m2m:NotificationChannels from ong:t_xml_obj
-    // {
-    // m2m:creationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:lastModifiedTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:notificationChannelCollection m2m:NamedReferenceCollection { } // (optional)
-    // }
-    // alias m2m:NotificationChannels with m2m:notificationChannels
-
     public void checkRights(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity, String flag)
             throws M2MException {
         checkDefaultAccessRight(logId, manager, path, requestingEntity);
@@ -119,10 +118,11 @@ public final class NotificationChannels extends SclResource {
             resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
 
             // Save resource
-            Collection searchAttributes = new ArrayList();
-            searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-            searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-            transaction.createResource(path, resource, searchAttributes);
+            Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+            document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+            document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+            document.setContent(resource.saveBinary());
+            transaction.createResource(document);
         } finally {
             if (resource != null) {
                 resource.free(true);
@@ -140,15 +140,15 @@ public final class NotificationChannels extends SclResource {
         if (LOG.isInfoEnabled()) {
             LOG.info("Delete notificationChannels resource on path: " + path);
         }
-        SearchResult searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, null);
-        Map children = searchResult.getResults();
-        Iterator it = children.entrySet().iterator();
-        Entry entry = null;
+        SearchResult searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                null, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
+        Iterator it = searchResult.getResults();
+        Document document = null;
         String subPath = null;
         NotificationChannel notificationChannel = NotificationChannel.getInstance();
         while (it.hasNext()) {
-            entry = (Entry) it.next();
-            subPath = (String) entry.getKey();
+            document = (Document) it.next();
+            subPath = document.getPath();
             if (manager.getDefaultResourceId(subPath) == Constants.ID_RES_NOTIFICATION_CHANNEL) {
                 notificationChannel.deleteResource(logId, manager, subPath, transaction);
             }
@@ -165,22 +165,24 @@ public final class NotificationChannels extends SclResource {
     public void deleteChildResource(String logId, SclManager manager, String path, XoObject resource, XoObject childResource,
             Date now, SclTransaction transaction) throws ParseException, XoException {
         resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME,
-                FormatUtils.formatDateTime(now, manager.getTimeZone()));
+                FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE));
 
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        transaction.updateResource(path, resource, searchAttributes);
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setContent(resource.saveBinary());
+        transaction.updateResource(document);
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException,
-            XoException, StorageException {
-        Condition condition = manager.getConditionBuilder().createStringCondition(Constants.ATTR_TYPE,
-                ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_NOTIFICATION_CHANNEL);
-        SearchResult searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, condition);
-        Map children = searchResult.getResults();
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path,
+            XoObject resource, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException, XoException,
+            StorageException {
+        Condition condition = manager.getStorageContext().getStorageFactory()
+                .createStringCondition(Constants.ATTR_TYPE, Condition.ATTR_OP_EQUAL, Constants.TYPE_NOTIFICATION_CHANNEL);
+        SearchResult searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                condition, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
+        Iterator children = searchResult.getResults();
         generateNamedReferenceCollection(logId, manager, NotificationChannel.getInstance(), requestingEntity, path, resource,
                 children, M2MConstants.TAG_M2M_NOTIFICATION_CHANNEL_COLLECTION);
     }
@@ -206,33 +208,30 @@ public final class NotificationChannels extends SclResource {
             checkRepresentationNotNull(representation);
 
             // Check id
-            String id = (representation != null) ? representation.getStringAttribute(M2MConstants.ATTR_M2M_ID) : null;
+            String id = (representation != null) ? getAndCheckNmToken(representation, M2MConstants.ATTR_M2M_ID,
+                    Constants.ID_MODE_OPTIONAL) : null;
             if (id == null) {
                 sendRepresentation = true;
                 id = UUID.randomUUID(16);
             }
             String childPath = path + M2MConstants.URI_SEP + id;
 
-            SclLogger.logRequestIndication(Constants.PT_NOTIFICATION_CHANNEL_CREATE_REQUEST,
-                    Constants.PT_NOTIFICATION_CHANNEL_CREATE_RESPONSE, indication, null, Constants.ID_LOG_REPRESENTATION);
+            SclLogger.logRequestIndication("notificationChannelCreateRequestIndication",
+                    "notificationChannelCreateResponseConfirm", indication, null, Constants.ID_LOG_REPRESENTATION);
 
-            if (id.length() == 0) {
-                throw new M2MException("id cannot be empty", StatusCode.STATUS_BAD_REQUEST);
-            } else if (reservedKeywords.contains(id)) {
+            if (reservedKeywords.contains(id)) {
                 throw new M2MException(id + " is a reserved keywork in notificationChannels resource",
                         StatusCode.STATUS_BAD_REQUEST);
-            } else if (id.indexOf('/') != -1) {
-                throw new M2MException("id cannot contains a '/' character: " + id, StatusCode.STATUS_BAD_REQUEST);
             }
 
-            byte[] testChildPath = manager.getStorageContext().retrieve(childPath);
-            if (testChildPath != null) {
+            Document testChildDocument = manager.getStorageContext().retrieve(null, childPath, null);
+            if (testChildDocument != null) {
                 sendUnsuccessResponse(manager, indication, StatusCode.STATUS_CONFLICT,
                         "A Notification Channel resource already exists with the id " + id);
             } else {
                 NotificationChannel childController = NotificationChannel.getInstance();
                 Date now = new Date();
-                String creationTime = FormatUtils.formatDateTime(now, manager.getTimeZone());
+                String creationTime = FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE);
                 SclTransaction transaction = new SclTransaction(manager.getStorageContext());
                 childResource = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_NOTIFICATION_CHANNEL);
                 sendRepresentation = childController.createResource(indication.getTransactionId(), manager, childPath,
@@ -241,11 +240,12 @@ public final class NotificationChannels extends SclResource {
 
                 resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
 
-                Collection searchAttributes = new ArrayList();
-                searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                        .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-                searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-                transaction.updateResource(path, resource, searchAttributes);
+                Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+                document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                        FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+                document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+                document.setContent(resource.saveBinary());
+                transaction.updateResource(document);
                 transaction.execute();
 
                 childController.sendCreatedSuccessResponse(manager, childPath, childResource, indication, sendRepresentation);

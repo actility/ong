@@ -1,55 +1,22 @@
 -------------------------------------------------------------------------------
 SCL App for Micro Edition changelog
 -------------------------------------------------------------------------------
-Version: 2.0.8
-Date: 2014-10-22
+Version: 3.0.0
+Date: 2014-10-31
 
 New Features:
 -------------
- - N/A
-
-Bug Fixes:
-----------
- - Fixed AccessRight is never granted when checking for DISCOVER permission
-
--------------------------------------------------------------------------------
-Version: 2.0.7
-Date: 2014-10-20
-
-New Features:
--------------
- - N/A
-
-Bug Fixes:
-----------
- - Fixed do not show unauthorized URIs in discovery response and
-   collections representation
-
--------------------------------------------------------------------------------
-Version: 2.0.6
-Date: 2014-10-01
-
-New Features:
--------------
- - N/A
-
-Bug Fixes:
-----------
- - Fixed reloading of contentInstances with a maxInstanceAge was deleting all
-   <contentInstance>
-
--------------------------------------------------------------------------------
-Version: 2.0.5
-Date: 2014-09-23
-
-New Features:
--------------
- - N/A
+ - Implemented ETSI v2
 
 Bug Fixes:
 ----------
  - Fixed #0001390. Subscription state machine is blocked when reaching the
    maximum number of retransmissions for a <notify>
+ - Fixed reloading of contentInstances with a maxInstanceAge was deleting all
+   <contentInstance>
+ - Fixed do not show unauthorized URIs in discovery response and
+   collections representation
+ - Fixed AccessRight is never granted when checking for DISCOVER permission
 
 -------------------------------------------------------------------------------
 Version: 2.0.4
