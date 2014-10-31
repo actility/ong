@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: XoObjectImpl.java 7355 2014-01-23 22:42:06Z JReich $
+ * id $Id: XoObjectImpl.java 9044 2014-07-03 15:50:18Z JReich $
  * author $Author: JReich $
- * version $Revision: 7355 $
- * lastrevision $Date: 2014-01-23 23:42:06 +0100 (Thu, 23 Jan 2014) $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-01-23 23:42:06 +0100 (Thu, 23 Jan 2014) $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.xo.impl;
@@ -78,6 +78,10 @@ public final class XoObjectImpl implements XoObject {
 
     public void clearNameSpaces() {
         xoNativeService.xoUnSetNameSpace(handle, null);
+    }
+
+    public boolean containsAttribute(String path) {
+        return xoNativeService.xoNmContainsAttr(handle, path);
     }
 
     public XoObject getXoObjectAttribute(String path) {

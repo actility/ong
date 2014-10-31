@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: Activator.java 8759 2014-05-21 15:29:12Z JReich $
+ * id $Id: Activator.java 8758 2014-05-21 15:28:56Z JReich $
  * author $Author: JReich $
- * version $Revision: 8759 $
- * lastrevision $Date: 2014-05-21 17:29:12 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 8758 $
+ * lastrevision $Date: 2014-05-21 17:28:56 +0200 (Wed, 21 May 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:29:12 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-05-21 17:28:56 +0200 (Wed, 21 May 2014) $
  */
 
 package com.actility.m2m.xo.osgi;
