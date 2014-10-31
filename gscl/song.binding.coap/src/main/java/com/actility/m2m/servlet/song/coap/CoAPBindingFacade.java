@@ -21,21 +21,23 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: CoAPBindingFacade.java 6101 2013-10-15 15:07:25Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6101 $
- * lastrevision $Date: 2013-10-15 17:07:25 +0200 (Tue, 15 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-15 17:07:25 +0200 (Tue, 15 Oct 2013) $
+ * id $Id: CoAPBindingFacade.java 9044 2014-07-03 15:50:18Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.servlet.song.coap;
 
 import javax.servlet.ServletException;
 
-import com.actility.m2m.servlet.song.LongPollURIs;
-import com.actility.m2m.servlet.song.SongBindingFacade;
+import com.actility.m2m.servlet.song.ChannelClientListener;
+import com.actility.m2m.servlet.song.ChannelServerListener;
+import com.actility.m2m.servlet.song.LongPollingURIs;
 import com.actility.m2m.servlet.song.SongURI;
+import com.actility.m2m.servlet.song.binding.SongBindingFacade;
 
 /**
  * Implementation for this binding of the {@link SongBindingFacade} needed to register a SONG binding in the SONG container.
@@ -45,23 +47,47 @@ import com.actility.m2m.servlet.song.SongURI;
  */
 public final class CoAPBindingFacade implements SongBindingFacade {
 
-    public LongPollURIs createServerLongPoll(SongURI serverURI) {
+    public LongPollingURIs createServerNotificationChannel(SongURI serverURI, ChannelServerListener listener) {
         throw new UnsupportedOperationException();
     }
 
-    public void createServerLongPoll(SongURI contactURI, SongURI longPollURI) throws ServletException {
+    public void createServerNotificationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException {
         throw new UnsupportedOperationException();
     }
 
-    public void deleteServerLongPoll(SongURI contactURI, SongURI longPollURI) {
+    public void deleteServerNotificationChannel(SongURI contactURI, SongURI longPollingURI) {
         throw new UnsupportedOperationException();
     }
 
-    public void createClientLongPoll(SongURI contactURI, SongURI longPollURI) throws ServletException {
+    public void createClientNotificationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            SongURI relatedRequestingEntity, SongURI relatedTargetID, ChannelClientListener listener) throws ServletException {
         throw new UnsupportedOperationException();
     }
 
-    public void deleteClientLongPoll(SongURI contactURI, SongURI longPollURI) {
+    public void deleteClientNotificationChannel(SongURI contactURI, SongURI longPollingURI) {
+        throw new UnsupportedOperationException();
+    }
+
+    public LongPollingURIs createServerCommunicationChannel(SongURI serverURI, ChannelServerListener listener) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void createServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException {
+        throw new UnsupportedOperationException();
+    }
+
+    public void deleteServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void createClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            ChannelClientListener listener) throws ServletException {
+        throw new UnsupportedOperationException();
+    }
+
+    public void deleteClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI) {
         throw new UnsupportedOperationException();
     }
 
