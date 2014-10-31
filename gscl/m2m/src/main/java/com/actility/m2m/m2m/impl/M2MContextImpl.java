@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: M2MContextImpl.java 8761 2014-05-21 15:31:37Z JReich $
+ * id $Id: M2MContextImpl.java 9598 2014-09-23 09:54:45Z JReich $
  * author $Author: JReich $
- * version $Revision: 8761 $
- * lastrevision $Date: 2014-05-21 17:31:37 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9598 $
+ * lastrevision $Date: 2014-09-23 11:54:45 +0200 (Tue, 23 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:31:37 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-09-23 11:54:45 +0200 (Tue, 23 Sep 2014) $
  */
 
 package com.actility.m2m.m2m.impl;
@@ -40,6 +40,8 @@ import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.m2m.ChannelClientListener;
+import com.actility.m2m.m2m.ChannelServerListener;
 import com.actility.m2m.m2m.M2MConstants;
 import com.actility.m2m.m2m.M2MContext;
 import com.actility.m2m.m2m.M2MEventHandler;
@@ -56,7 +58,7 @@ import com.actility.m2m.servlet.ApplicationSessionListener;
 import com.actility.m2m.servlet.ServletTimer;
 import com.actility.m2m.servlet.TimerListener;
 import com.actility.m2m.servlet.TimerService;
-import com.actility.m2m.servlet.song.LongPollURIs;
+import com.actility.m2m.servlet.song.LongPollingURIs;
 import com.actility.m2m.servlet.song.SongDynamicRouter;
 import com.actility.m2m.servlet.song.SongFactory;
 import com.actility.m2m.servlet.song.SongServlet;
@@ -79,6 +81,7 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
     public static final String AT_REQUEST = M2M_PREFIX + "Request";
     private static final String AT_M2M_SESSION = M2M_PREFIX + "M2MSession";
 
+    private ServletContext servletContext;
     private ApplicationSession appSession;
     private final XoService xoService;
     private final M2MUtils m2mUtils;
@@ -144,7 +147,7 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
     }
 
     public void init() {
-        ServletContext servletContext = getServletContext();
+        this.servletContext = getServletContext();
         this.songFactory = (SongFactory) servletContext.getAttribute(SONG_FACTORY);
         this.songDynamicRouter = (SongDynamicRouter) servletContext.getAttribute(SONG_DYNAMIC_ROUTER);
         this.timerService = (TimerService) servletContext.getAttribute(TIMER_SERVICE);
@@ -233,37 +236,87 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
         }
     }
 
-    public URI[] createServerLongPoll(URI remoteTarget) throws M2MException {
+    public URI[] createServerNotificationChannel(URI remoteTarget, ChannelServerListener listener) throws M2MException {
         try {
-            LongPollURIs uris = songDynamicRouter.createServerLongPoll(songFactory.createURI(remoteTarget));
-            return new URI[] { uris.getContactURI().toURI(), uris.getLongPollURI().toURI() };
+            LongPollingURIs uris = songDynamicRouter.createServerNotificationChannel(songFactory.createURI(remoteTarget),
+                    new ChannelServerListenerImpl(listener));
+            return new URI[] { uris.getContactURI().toURI(), uris.getLongPollingURI().toURI() };
         } catch (ServletException e) {
             throw new M2MException("Cannot create a server long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         }
     }
 
-    public void createServerLongPoll(URI contactUri, URI longPollUri) throws M2MException {
+    public void createServerNotificationChannel(URI contactUri, URI longPollingUri, ChannelServerListener listener)
+            throws M2MException {
         try {
-            songDynamicRouter.createServerLongPoll(songFactory.createURI(contactUri), songFactory.createURI(longPollUri));
+            songDynamicRouter.createServerNotificationChannel(songFactory.createURI(contactUri),
+                    songFactory.createURI(longPollingUri), new ChannelServerListenerImpl(listener));
         } catch (ServletException e) {
             throw new M2MException("Cannot create a server long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         }
     }
 
-    public void deleteServerLongPoll(URI contactUri, URI longPollUri) {
-        songDynamicRouter.deleteServerLongPoll(songFactory.createURI(contactUri), songFactory.createURI(longPollUri));
+    public void deleteServerNotificationChannel(URI contactUri, URI longPollingUri) {
+        songDynamicRouter.deleteServerNotificationChannel(songFactory.createURI(contactUri),
+                songFactory.createURI(longPollingUri));
     }
 
-    public void createClientLongPoll(URI contactUri, URI longPollUri) throws M2MException {
+    public void createClientNotificationChannel(URI contactUri, URI longPollingUri, URI requestingEntity,
+            URI relatedRequestingEntity, URI relatedTargetID, ChannelClientListener listener) throws M2MException {
         try {
-            songDynamicRouter.createClientLongPoll(songFactory.createURI(contactUri), songFactory.createURI(longPollUri));
+            songDynamicRouter.createClientNotificationChannel(songFactory.createURI(contactUri),
+                    songFactory.createURI(longPollingUri), songFactory.createURI(requestingEntity),
+                    songFactory.createURI(relatedRequestingEntity), songFactory.createURI(relatedTargetID),
+                    new ChannelClientListenerImpl(listener));
         } catch (ServletException e) {
             throw new M2MException("Cannot create a client long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         }
     }
 
-    public void deleteClientLongPoll(URI contactUri, URI longPollUri) {
-        songDynamicRouter.deleteClientLongPoll(songFactory.createURI(contactUri), songFactory.createURI(longPollUri));
+    public void deleteClientNotificationChannel(URI contactUri, URI longPollingUri) {
+        songDynamicRouter.deleteClientNotificationChannel(songFactory.createURI(contactUri),
+                songFactory.createURI(longPollingUri));
+    }
+
+    public URI[] createServerCommunicationChannel(URI remoteTarget, ChannelServerListener listener) throws M2MException {
+        try {
+            LongPollingURIs uris = songDynamicRouter.createServerCommunicationChannel(songFactory.createURI(remoteTarget),
+                    new ChannelServerListenerImpl(listener));
+            return new URI[] { uris.getContactURI().toURI(), uris.getLongPollingURI().toURI() };
+        } catch (ServletException e) {
+            throw new M2MException("Cannot create a server long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    public void createServerCommunicationChannel(URI contactUri, URI longPollingUri, ChannelServerListener listener)
+            throws M2MException {
+        try {
+            songDynamicRouter.createServerCommunicationChannel(songFactory.createURI(contactUri),
+                    songFactory.createURI(longPollingUri), new ChannelServerListenerImpl(listener));
+        } catch (ServletException e) {
+            throw new M2MException("Cannot create a server long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    public void deleteServerCommunicationChannel(URI contactUri, URI longPollingUri) {
+        songDynamicRouter.deleteServerCommunicationChannel(songFactory.createURI(contactUri),
+                songFactory.createURI(longPollingUri));
+    }
+
+    public void createClientCommunicationChannel(URI contactUri, URI longPollingUri, URI requestingEntity,
+            ChannelClientListener listener) throws M2MException {
+        try {
+            songDynamicRouter.createClientCommunicationChannel(songFactory.createURI(contactUri),
+                    songFactory.createURI(longPollingUri), songFactory.createURI(requestingEntity),
+                    new ChannelClientListenerImpl(listener));
+        } catch (ServletException e) {
+            throw new M2MException("Cannot create a client long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    public void deleteClientCommunicationChannel(URI contactUri, URI longPollingUri) {
+        songDynamicRouter.deleteClientCommunicationChannel(songFactory.createURI(contactUri),
+                songFactory.createURI(longPollingUri));
     }
 
     public String startTimer(long timeout, Serializable info) {
@@ -420,5 +473,9 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
 
     public M2MUtils getM2MUtils() {
         return m2mUtils;
+    }
+
+    public String getContextPath() {
+        return servletContext.getContextPath();
     }
 }

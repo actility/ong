@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: M2MServiceImpl.java 8761 2014-05-21 15:31:37Z JReich $
+ * id $Id: M2MServiceImpl.java 8760 2014-05-21 15:31:19Z JReich $
  * author $Author: JReich $
- * version $Revision: 8761 $
- * lastrevision $Date: 2014-05-21 17:31:37 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 8760 $
+ * lastrevision $Date: 2014-05-21 17:31:19 +0200 (Wed, 21 May 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:31:37 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-05-21 17:31:19 +0200 (Wed, 21 May 2014) $
  */
 
 package com.actility.m2m.m2m.impl;

@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: ConfirmImpl.java 8761 2014-05-21 15:31:37Z JReich $
+ * id $Id: ConfirmImpl.java 9290 2014-08-20 09:33:59Z JReich $
  * author $Author: JReich $
- * version $Revision: 8761 $
- * lastrevision $Date: 2014-05-21 17:31:37 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9290 $
+ * lastrevision $Date: 2014-08-20 11:33:59 +0200 (Wed, 20 Aug 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:31:37 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-08-20 11:33:59 +0200 (Wed, 20 Aug 2014) $
  */
 
 package com.actility.m2m.m2m.impl;
@@ -60,7 +60,7 @@ public final class ConfirmImpl implements Confirm {
 
     private static final Logger LOG = OSGiLogger.getLogger(ConfirmImpl.class, BundleLogger.getStaticLogger());
 
-    private static final StatusCode[][] SONG_STATUS_TO_M2M_STATUS = new StatusCode[3][];
+    private static final StatusCode[][] SONG_STATUS_TO_M2M_STATUS = new StatusCode[4][];
 
     static {
         // 2xx responses
@@ -71,32 +71,40 @@ public final class ConfirmImpl implements Confirm {
         SONG_STATUS_TO_M2M_STATUS[0][3] = StatusCode.STATUS_OK;
         SONG_STATUS_TO_M2M_STATUS[0][4] = StatusCode.STATUS_OK;
 
+        // 3xx responses
+        SONG_STATUS_TO_M2M_STATUS[1] = new StatusCode[5];
+        SONG_STATUS_TO_M2M_STATUS[1][0] = null;
+        SONG_STATUS_TO_M2M_STATUS[1][1] = null;
+        SONG_STATUS_TO_M2M_STATUS[1][2] = null;
+        SONG_STATUS_TO_M2M_STATUS[1][3] = null;
+        SONG_STATUS_TO_M2M_STATUS[1][4] = StatusCode.STATUS_OK;
+
         // 4xx responses
-        SONG_STATUS_TO_M2M_STATUS[1] = new StatusCode[16];
-        SONG_STATUS_TO_M2M_STATUS[1][0] = StatusCode.STATUS_BAD_REQUEST;
-        SONG_STATUS_TO_M2M_STATUS[1][1] = StatusCode.STATUS_PERMISSION_DENIED;
-        SONG_STATUS_TO_M2M_STATUS[1][2] = StatusCode.STATUS_BAD_REQUEST;
-        SONG_STATUS_TO_M2M_STATUS[1][3] = StatusCode.STATUS_FORBIDDEN;
-        SONG_STATUS_TO_M2M_STATUS[1][4] = StatusCode.STATUS_NOT_FOUND;
-        SONG_STATUS_TO_M2M_STATUS[1][5] = StatusCode.STATUS_METHOD_NOT_ALLOWED;
-        SONG_STATUS_TO_M2M_STATUS[1][6] = StatusCode.STATUS_NOT_ACCEPTABLE;
-        SONG_STATUS_TO_M2M_STATUS[1][7] = StatusCode.STATUS_NOT_IMPLEMENTED;
-        SONG_STATUS_TO_M2M_STATUS[1][8] = StatusCode.STATUS_REQUEST_TIMEOUT;
-        SONG_STATUS_TO_M2M_STATUS[1][9] = StatusCode.STATUS_CONFLICT;
-        SONG_STATUS_TO_M2M_STATUS[1][10] = StatusCode.STATUS_DELETED;
-        SONG_STATUS_TO_M2M_STATUS[1][11] = StatusCode.STATUS_BAD_REQUEST;
-        SONG_STATUS_TO_M2M_STATUS[1][12] = StatusCode.STATUS_BAD_REQUEST;
-        SONG_STATUS_TO_M2M_STATUS[1][13] = StatusCode.STATUS_BAD_REQUEST;
-        SONG_STATUS_TO_M2M_STATUS[1][14] = StatusCode.STATUS_BAD_REQUEST;
-        SONG_STATUS_TO_M2M_STATUS[1][15] = StatusCode.STATUS_UNSUPPORTED_MEDIA_TYPE;
+        SONG_STATUS_TO_M2M_STATUS[2] = new StatusCode[16];
+        SONG_STATUS_TO_M2M_STATUS[2][0] = StatusCode.STATUS_BAD_REQUEST;
+        SONG_STATUS_TO_M2M_STATUS[2][1] = StatusCode.STATUS_PERMISSION_DENIED;
+        SONG_STATUS_TO_M2M_STATUS[2][2] = StatusCode.STATUS_BAD_REQUEST;
+        SONG_STATUS_TO_M2M_STATUS[2][3] = StatusCode.STATUS_FORBIDDEN;
+        SONG_STATUS_TO_M2M_STATUS[2][4] = StatusCode.STATUS_NOT_FOUND;
+        SONG_STATUS_TO_M2M_STATUS[2][5] = StatusCode.STATUS_METHOD_NOT_ALLOWED;
+        SONG_STATUS_TO_M2M_STATUS[2][6] = StatusCode.STATUS_NOT_ACCEPTABLE;
+        SONG_STATUS_TO_M2M_STATUS[2][7] = StatusCode.STATUS_NOT_IMPLEMENTED;
+        SONG_STATUS_TO_M2M_STATUS[2][8] = StatusCode.STATUS_REQUEST_TIMEOUT;
+        SONG_STATUS_TO_M2M_STATUS[2][9] = StatusCode.STATUS_CONFLICT;
+        SONG_STATUS_TO_M2M_STATUS[2][10] = StatusCode.STATUS_DELETED;
+        SONG_STATUS_TO_M2M_STATUS[2][11] = null;
+        SONG_STATUS_TO_M2M_STATUS[2][12] = StatusCode.STATUS_BAD_REQUEST;
+        SONG_STATUS_TO_M2M_STATUS[2][13] = null;
+        SONG_STATUS_TO_M2M_STATUS[2][14] = null;
+        SONG_STATUS_TO_M2M_STATUS[2][15] = StatusCode.STATUS_UNSUPPORTED_MEDIA_TYPE;
 
         // 5xx responses
-        SONG_STATUS_TO_M2M_STATUS[2] = new StatusCode[5];
-        SONG_STATUS_TO_M2M_STATUS[2][0] = StatusCode.STATUS_INTERNAL_SERVER_ERROR;
-        SONG_STATUS_TO_M2M_STATUS[2][1] = StatusCode.STATUS_NOT_IMPLEMENTED;
-        SONG_STATUS_TO_M2M_STATUS[2][2] = StatusCode.STATUS_BAD_GATEWAY;
-        SONG_STATUS_TO_M2M_STATUS[2][3] = StatusCode.STATUS_SERVICE_UNAVAILABLE;
-        SONG_STATUS_TO_M2M_STATUS[2][4] = StatusCode.STATUS_GATEWAY_TIMEOUT;
+        SONG_STATUS_TO_M2M_STATUS[3] = new StatusCode[5];
+        SONG_STATUS_TO_M2M_STATUS[3][0] = StatusCode.STATUS_INTERNAL_SERVER_ERROR;
+        SONG_STATUS_TO_M2M_STATUS[3][1] = StatusCode.STATUS_NOT_IMPLEMENTED;
+        SONG_STATUS_TO_M2M_STATUS[3][2] = StatusCode.STATUS_BAD_GATEWAY;
+        SONG_STATUS_TO_M2M_STATUS[3][3] = StatusCode.STATUS_SERVICE_UNAVAILABLE;
+        SONG_STATUS_TO_M2M_STATUS[3][4] = StatusCode.STATUS_GATEWAY_TIMEOUT;
     }
 
     private final XoService xoService;
@@ -110,39 +118,29 @@ public final class ConfirmImpl implements Confirm {
         int status = response.getStatus();
         int statusClass = status / 100;
         int statusValue = status % 100;
-        StatusCode m2mStatus = StatusCode.STATUS_INTERNAL_SERVER_ERROR;
-        boolean error = false;
+        StatusCode m2mStatus = null;
         if (statusClass == 2) {
             if (statusValue < SONG_STATUS_TO_M2M_STATUS[0].length) {
                 m2mStatus = SONG_STATUS_TO_M2M_STATUS[0][statusValue];
-            } else {
-                m2mStatus = StatusCode.STATUS_OK;
-                LOG.error("Received an unknown SONG success status code: " + status);
-                error = true;
             }
-        } else if (statusClass == 4) {
+        } else if (statusClass == 3) {
             if (statusValue < SONG_STATUS_TO_M2M_STATUS[1].length) {
                 m2mStatus = SONG_STATUS_TO_M2M_STATUS[1][statusValue];
-                error = (m2mStatus == StatusCode.STATUS_BAD_REQUEST) && status != SongServletResponse.SC_BAD_REQUEST;
-            } else {
-                m2mStatus = StatusCode.STATUS_BAD_REQUEST;
-                LOG.error("Received an unknown SONG success status code: " + status);
-                error = true;
             }
-
-        } else if (statusClass == 5) {
+        } else if (statusClass == 4) {
             if (statusValue < SONG_STATUS_TO_M2M_STATUS[2].length) {
                 m2mStatus = SONG_STATUS_TO_M2M_STATUS[2][statusValue];
-                error = (m2mStatus == StatusCode.STATUS_INTERNAL_SERVER_ERROR)
-                        && status != SongServletResponse.SC_INTERNAL_SERVER_ERROR;
-            } else {
-                m2mStatus = StatusCode.STATUS_INTERNAL_SERVER_ERROR;
-                error = true;
+            }
+        } else if (statusClass == 5) {
+            if (statusValue < SONG_STATUS_TO_M2M_STATUS[3].length) {
+                m2mStatus = SONG_STATUS_TO_M2M_STATUS[3][statusValue];
             }
         }
-        this.statusCode = m2mStatus;
-        if (error) {
-            LOG.info("Received an unknown SONG status code: " + status);
+        if (m2mStatus == null) {
+            LOG.error("Received an unknown SONG status code: " + status);
+            this.statusCode = StatusCode.STATUS_INTERNAL_SERVER_ERROR;
+        } else {
+            this.statusCode = m2mStatus;
         }
     }
 
