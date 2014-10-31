@@ -1,6 +1,42 @@
 -------------------------------------------------------------------------------
 System version changelog
 -------------------------------------------------------------------------------
+Version: 4.4.4
+Date: 2014-xx-xx
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Code cleanup
+ - Fixed re-using of already deleted XO objects
+ - Removed ERRORs which occurs regularly on some architectures
+
+-------------------------------------------------------------------------------
+Version: 4.4.3  
+Date: 2014-07-03
+
+New Features:
+-------------
+ - N/A 
+Bug Fixes:
+----------
+ - Problem when $ROOTACT path not ends with a slash
+
+-------------------------------------------------------------------------------
+Version: 4.4.2  
+Date: 2014-06-25
+
+New Features:
+-------------
+ - N/A 
+Bug Fixes:
+----------
+ - Fixing problem where numbers parsed are too long
+
+-------------------------------------------------------------------------------
 Version: 4.4.1  
 Date: 2014-06-18
 

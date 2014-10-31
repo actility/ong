@@ -41,7 +41,7 @@ import com.actility.m2m.system.config.Configuration;
 import com.actility.m2m.system.log.BundleLogger;
 import com.actility.m2m.util.log.OSGiLogger;
 
-public class Alarm {
+public final class Alarm {
     private static final Logger LOG = OSGiLogger.getLogger(Alarm.class, BundleLogger.LOG);
 
     private static final int ALARM_STATE_UNSET = 0;
@@ -52,21 +52,20 @@ public class Alarm {
     public static final int ALARM_STATE_MAJOR = 5;
     public static final int ALARM_STATE_CRITICAL = 6;
 
-    private String[] targetedIndicator;
-    private String name;
-    private String varInfo;
-    private AlarmExecution execution;
-    private int refreshInterval;
-    private int raisedInterval;
-    
+    private final String[] targetedIndicator;
+    private final String name;
+    private final String varInfo;
+    private final AlarmExecution execution;
+    private final int refreshInterval;
+    private final int raisedInterval;
+    private final int raised;
     private int refreshPosition;
-    
-    private List/*<Integer>*/ states;
-    private List/*<Integer*/ lastAlarmPositions;
-    private int raised;
-    
+    private List/* <Integer> */states;
+    private List/* <Integer */lastAlarmPositions;
+
     /**
      * Constructor
+     *
      * @param name
      * @param targetedIndicators
      * @param varInfo
@@ -74,7 +73,8 @@ public class Alarm {
      * @param refreshInterval
      * @param raisedInterval
      */
-    public Alarm(String name, String[] targetedIndicators, String varInfo, AlarmExecution execution, int refreshInterval, int raisedInterval) {
+    public Alarm(String name, String[] targetedIndicators, String varInfo, AlarmExecution execution, int refreshInterval,
+            int raisedInterval) {
         this.name = name;
         this.targetedIndicator = targetedIndicators;
         this.varInfo = varInfo;
@@ -86,8 +86,10 @@ public class Alarm {
         this.lastAlarmPositions = new ArrayList();
         this.raised = ALARM_STATE_CLEAR;
     }
+
     /**
      * Constructor
+     *
      * @param name
      * @param targetedIndicators
      * @param execution
@@ -106,8 +108,10 @@ public class Alarm {
         this.lastAlarmPositions = new ArrayList();
         this.raised = ALARM_STATE_CLEAR;
     }
+
     /**
      * Constructor
+     *
      * @param name
      * @param targetedIndicators
      * @param varInfo
@@ -116,7 +120,8 @@ public class Alarm {
      * @param raisedInterval
      * @param alarmAtBoot
      */
-    public Alarm(String name, String[] targetedIndicators, String varInfo, AlarmExecution execution, int refreshInterval, int raisedInterval, boolean alarmAtBoot) {
+    public Alarm(String name, String[] targetedIndicators, String varInfo, AlarmExecution execution, int refreshInterval,
+            int raisedInterval, boolean alarmAtBoot) {
         this.name = name;
         this.targetedIndicator = targetedIndicators;
         this.varInfo = varInfo;
@@ -126,14 +131,16 @@ public class Alarm {
         this.refreshPosition = -1;
         this.states = new ArrayList();
         this.lastAlarmPositions = new ArrayList();
-        if(alarmAtBoot){
+        if (alarmAtBoot) {
             this.raised = ALARM_STATE_UNSET;
-        }else{
+        } else {
             this.raised = ALARM_STATE_CLEAR;
         }
     }
+
     /**
      * Constructor
+     *
      * @param name
      * @param targetedIndicators
      * @param execution
@@ -141,7 +148,8 @@ public class Alarm {
      * @param raisedInterval
      * @param alarmAtBoot
      */
-    public Alarm(String name, String[] targetedIndicators, AlarmExecution execution, int refreshInterval, int raisedInterval, boolean alarmAtBoot) {
+    public Alarm(String name, String[] targetedIndicators, AlarmExecution execution, int refreshInterval, int raisedInterval,
+            boolean alarmAtBoot) {
         this.name = name;
         this.targetedIndicator = targetedIndicators;
         this.varInfo = null;
@@ -151,51 +159,54 @@ public class Alarm {
         this.refreshPosition = -1;
         this.states = new ArrayList();
         this.lastAlarmPositions = new ArrayList();
-        if(alarmAtBoot){
+        if (alarmAtBoot) {
             this.raised = ALARM_STATE_UNSET;
-        }else{
+        } else {
             this.raised = ALARM_STATE_CLEAR;
         }
     }
+
     /**
-     * Executes the system monitoring 
+     * Executes the system monitoring
+     *
      * @param configuration
      * @param indicators
      * @return
      */
-    public List/*<AlarmResult>*/ executeMonitoring(Configuration configuration, Map/*<Indicator>*/ indicators){
-        List results =  new ArrayList();
+    public List/* <AlarmResult> */executeMonitoring(Configuration configuration, Map/* <Indicator> */indicators) {
+        List results = new ArrayList();
         try {
-            List/*<AlarmExecutionResult>*/ executionResults = this.execution.execute(configuration, indicators);
-            if(executionResults.size()!=states.size()){
-                if(states.size()!=0){
-                    LOG.warn("Length of states list in alarm "+name+"has changed (old:"+states.size()+"/new:"+executionResults.size()+")");
+            List/* <AlarmExecutionResult> */executionResults = this.execution.execute(configuration, indicators);
+            if (executionResults.size() != states.size()) {
+                if (states.size() != 0) {
+                    LOG.warn("Length of states list in alarm " + name + "has changed (old:" + states.size() + "/new:"
+                            + executionResults.size() + ")");
                     states = new ArrayList();
                 }
-                for(int i=0; i<executionResults.size();i++){
+                for (int i = 0; i < executionResults.size(); i++) {
                     states.add(new Integer(raised));
                 }
             }
-            if(executionResults.size()!=lastAlarmPositions.size()){
-                if(lastAlarmPositions.size()!=0){
+            if (executionResults.size() != lastAlarmPositions.size()) {
+                if (lastAlarmPositions.size() != 0) {
                     lastAlarmPositions = new ArrayList();
                 }
-                for(int i=0; i<executionResults.size();i++){
+                for (int i = 0; i < executionResults.size(); i++) {
                     lastAlarmPositions.add(null);
                 }
             }
-            for(int i=0; i < executionResults.size(); i++){
+            for (int i = 0; i < executionResults.size(); i++) {
                 AlarmExecutionResult result = (AlarmExecutionResult) executionResults.get(i);
-                String varInfo = result.getInfo()==null?this.varInfo:result.getInfo();
-                if(result.getState()!=((Integer)states.get(i)).intValue()){
+                String varInfo = result.getInfo() == null ? this.varInfo : result.getInfo();
+                if (result.getState() != ((Integer) states.get(i)).intValue()) {
                     results.add(new AlarmResult(name, varInfo, result.getIndex(), result.getState()));
                     states.set(i, new Integer(result.getState()));
                     lastAlarmPositions.set(i, new Integer(0));
-                }else{
+                } else {
                     Integer lastAlarm = (Integer) lastAlarmPositions.get(i);
-                    if(lastAlarm!=null){
-                        if(lastAlarm.intValue()>=raisedInterval){
-                            if(result.getState()!=ALARM_STATE_CLEAR){
+                    if (lastAlarm != null) {
+                        if (lastAlarm.intValue() >= raisedInterval) {
+                            if (result.getState() != ALARM_STATE_CLEAR) {
                                 results.add(new AlarmResult(name, varInfo, result.getIndex(), result.getState()));
                                 states.set(i, new Integer(result.getState()));
                                 lastAlarmPositions.set(i, new Integer(0));
@@ -205,47 +216,54 @@ public class Alarm {
                 }
             }
         } catch (AlarmExecutionException e) {
-            if(e.getLevel()==AlarmExecutionException.LEVEL_CLEAR){
-                LOG.info("Alarm "+name+" cannot be executed :"+e.getMessage());
-            }else{
-                LOG.error("An exception occured during alarm "+name+" execution: "+e.getMessage());
+            if (e.getLevel() == AlarmExecutionException.LEVEL_CLEAR) {
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Alarm " + name + " cannot be executed :" + e.getMessage());
+                }
+            } else {
+                LOG.error("An exception occured during alarm " + name + " execution: " + e.getMessage());
             }
         }
         return results;
     }
+
     /**
      * Updates the position between each refresh and return true if the alarm monitoring script should be reload
+     *
      * @return
      */
-    public boolean updateRefreshPosition(){
+    public boolean updateRefreshPosition() {
         refreshPosition++;
-        for(int i=0; i< lastAlarmPositions.size();i++){
+        for (int i = 0; i < lastAlarmPositions.size(); i++) {
             Integer lastAlarm = (Integer) lastAlarmPositions.get(i);
-            if(lastAlarm!=null){
-                if(lastAlarm.intValue()<raisedInterval){
-                    lastAlarmPositions.set(i, new Integer(lastAlarm.intValue()+1));
+            if (lastAlarm != null) {
+                if (lastAlarm.intValue() < raisedInterval) {
+                    lastAlarmPositions.set(i, new Integer(lastAlarm.intValue() + 1));
                 }
             }
         }
-        if(refreshPosition==0 && raised==ALARM_STATE_UNSET){
+        if (refreshPosition == 0 && raised == ALARM_STATE_UNSET) {
             return true;
         }
-        if(refreshPosition==refreshInterval){
-            refreshPosition=0;
+        if (refreshPosition == refreshInterval) {
+            refreshPosition = 0;
             return true;
         }
         return false;
     }
+
     /**
      * Gets indicators alarm necessary to execute his monitoring script
+     *
      * @return
      */
-    public String[] getTargetedIndicators(){
+    public String[] getTargetedIndicators() {
         return targetedIndicator;
     }
-    
+
     /**
      * This class describes the authorized alarm names
+     *
      * @author qdesrame
      *
      */

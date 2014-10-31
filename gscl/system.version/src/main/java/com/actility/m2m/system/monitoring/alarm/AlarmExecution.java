@@ -39,10 +39,12 @@ import com.actility.m2m.system.config.Configuration;
 public interface AlarmExecution {
     /**
      * It's the monitoring script of an alarm
+     * 
      * @param configuration
      * @param indicators
      * @return
      * @throws AlarmExecutionException
      */
-    public List/*<AlarmExecutionResult>*/ execute(Configuration configuration, Map/*<Indicator>*/ indicators) throws AlarmExecutionException;
+    public List/* <AlarmExecutionResult> */execute(Configuration configuration, Map/* <Indicator> */indicators)
+            throws AlarmExecutionException;
 }

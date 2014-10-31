@@ -31,17 +31,16 @@
 
 package com.actility.m2m.system.monitoring;
 
-public class Indicator {
-//    private static final Logger LOG = OSGiLogger.getLogger(Indicator.class, BundleLogger.LOG);
-
-    private String name;
+public final class Indicator {
+    private final String name;
+    private final String type;
     private Object value;
-    private String type;
     private int refreshInterval;
     private int refreshPosition;
-    
+
     /**
      * Constructor
+     *
      * @param name the name of the indicator
      * @param value the value of the indicator
      * @param type the type of the indicator
@@ -52,11 +51,12 @@ public class Indicator {
         this.value = value;
         this.type = type;
         this.refreshInterval = refreshInterval;
-        this.refreshPosition=-1;
+        this.refreshPosition = -1;
     }
-    
+
     /**
      * Constructor
+     *
      * @param name the name of the indicator
      * @param type the type of the indicator
      * @param refreshInterval the interval (in seconds) between each refresh
@@ -67,25 +67,30 @@ public class Indicator {
         this.value = null;
         this.type = type;
         this.refreshInterval = refreshInterval;
-        this.refreshPosition=-1;
+        this.refreshPosition = -1;
     }
+
     /**
      * Gets the values of the indicator
+     *
      * @return
      */
     public Object getValue() {
         return value;
     }
+
     /**
      * Sets the value of the indicator
+     *
      * @param value
      */
     public void setValue(Object value) {
         this.value = value;
     }
-    
+
     /**
-     * Gives the interval (in  seconds) between each refresh
+     * Gives the interval (in seconds) between each refresh
+     *
      * @return
      */
     public int getRefreshInterval() {
@@ -94,35 +99,39 @@ public class Indicator {
 
     /**
      * Sets the interval (in seconds) between each refresh
+     *
      * @param refreshInterval
      */
     public void setRefreshInterval(int refreshInterval) {
         this.refreshInterval = refreshInterval;
     }
-    
+
     /**
      * This method is called each minutes and return true if it's the time to update the value
+     *
      * @return
      */
-    public boolean updateRefreshPosition(){
-        if(refreshInterval>0){
+    public boolean updateRefreshPosition() {
+        if (refreshInterval > 0) {
             refreshPosition++;
-            if(refreshPosition==refreshInterval){
-                refreshPosition=0;
+            if (refreshPosition == refreshInterval) {
+                refreshPosition = 0;
                 return true;
             }
-        }else{
-            if(refreshInterval==-1){
-                if(refreshPosition==-1){
-                    refreshPosition=-2;
+        } else {
+            if (refreshInterval == -1) {
+                if (refreshPosition == -1) {
+                    refreshPosition = -2;
                     return true;
                 }
             }
         }
         return false;
     }
+
     /**
      * Gets the name of the indicator
+     *
      * @return
      */
     public String getName() {
@@ -131,12 +140,13 @@ public class Indicator {
 
     /**
      * Get the type of the indicator
+     *
      * @return
      */
     public String getType() {
         return type;
     }
-    
+
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -166,11 +176,12 @@ public class Indicator {
     }
 
     public String toString() {
-        return "["+name+"<"+type+">:"+value+"]";
+        return "[" + name + "<" + type + ">:" + value + "]";
     }
 
     /**
-     * This class describes all allowed indicator names 
+     * This class describes all allowed indicator names
+     *
      * @author qdesrame
      *
      */

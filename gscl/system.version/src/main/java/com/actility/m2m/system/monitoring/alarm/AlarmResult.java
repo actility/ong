@@ -33,15 +33,17 @@ package com.actility.m2m.system.monitoring.alarm;
 
 /**
  * This object is the result of an alarm execution
+ *
  * @author qdesrame
  *
  */
-public class AlarmResult {
-    private long timestamp;
-    private String name;
-    private String info;
-    private int index;
-    private int state;
+public final class AlarmResult {
+    private final long timestamp;
+    private final String name;
+    private final String info;
+    private final int index;
+    private final int state;
+
     public AlarmResult(String name, String info, int index, int state) {
         this.timestamp = System.currentTimeMillis();
         this.name = name;
@@ -49,6 +51,7 @@ public class AlarmResult {
         this.index = index;
         this.state = state;
     }
+
     public AlarmResult(String name, String info, int state) {
         this.timestamp = System.currentTimeMillis();
         this.name = name;
@@ -56,6 +59,7 @@ public class AlarmResult {
         this.index = -1;
         this.state = state;
     }
+
     public AlarmResult(String name, int index, int state) {
         this.timestamp = System.currentTimeMillis();
         this.name = name;
@@ -63,6 +67,7 @@ public class AlarmResult {
         this.index = index;
         this.state = state;
     }
+
     public AlarmResult(String name, int state) {
         this.timestamp = System.currentTimeMillis();
         this.name = name;
@@ -70,18 +75,23 @@ public class AlarmResult {
         this.index = -1;
         this.state = state;
     }
+
     public long getTimestamp() {
         return timestamp;
     }
+
     public String getName() {
         return name;
     }
+
     public String getInfo() {
         return info;
     }
+
     public int getIndex() {
         return index;
     }
+
     public int getState() {
         return state;
     }

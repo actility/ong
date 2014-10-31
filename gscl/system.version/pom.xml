@@ -8,7 +8,7 @@
     <version>3.0.0</version>
   </parent>
   <artifactId>system.version</artifactId>
-  <version>4.4.1</version>
+  <version>4.4.4</version>
   <packaging>bundle</packaging>
 
   <name>[Bnd] M2M Application - System version</name>
@@ -32,7 +32,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>util</artifactId>
-      <version>[4.0.0,5)</version>
+      <version>4.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -69,9 +69,7 @@
             <Bundle-Activator>
               com.actility.m2m.system.osgi.Activator
             </Bundle-Activator>
-            <Private-Package>
-              com.actility.m2m.system
-            </Private-Package>
+            <Export-Package />
             <Import-Package>
               javax.servlet;version="[2.5,3)",
               *
