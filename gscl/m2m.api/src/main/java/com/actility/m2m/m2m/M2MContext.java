@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: M2MContext.java 7982 2014-03-07 14:49:04Z JReich $
+ * id $Id: M2MContext.java 9599 2014-09-23 09:54:57Z JReich $
  * author $Author: JReich $
- * version $Revision: 7982 $
- * lastrevision $Date: 2014-03-07 15:49:04 +0100 (Fri, 07 Mar 2014) $
+ * version $Revision: 9599 $
+ * lastrevision $Date: 2014-09-23 11:54:57 +0200 (Tue, 23 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-03-07 15:49:04 +0100 (Fri, 07 Mar 2014) $
+ * lastmodified $LastChangedDate: 2014-09-23 11:54:57 +0200 (Tue, 23 Sep 2014) $
  */
 
 package com.actility.m2m.m2m;
@@ -56,15 +56,29 @@ public interface M2MContext {
 
     boolean canBeServer(URI reference) throws M2MException;
 
-    URI[] createServerLongPoll(URI reference) throws M2MException;
+    URI[] createServerNotificationChannel(URI reference, ChannelServerListener listener) throws M2MException;
 
-    void createServerLongPoll(URI contactUri, URI longPollUri) throws M2MException;
+    void createServerNotificationChannel(URI contactUri, URI longPollingUri, ChannelServerListener listener)
+            throws M2MException;
 
-    void deleteServerLongPoll(URI contactUri, URI longpollUri);
+    void deleteServerNotificationChannel(URI contactUri, URI longpollingUri);
 
-    void createClientLongPoll(URI contactUri, URI longPollUri) throws M2MException;
+    void createClientNotificationChannel(URI contactUri, URI longPollingUri, URI requestingEntity, URI relatedRequestingEntity,
+            URI relatedTargetID, ChannelClientListener listener) throws M2MException;
 
-    void deleteClientLongPoll(URI contactUri, URI longpollUri);
+    void deleteClientNotificationChannel(URI contactUri, URI longpollingUri);
+
+    URI[] createServerCommunicationChannel(URI reference, ChannelServerListener listener) throws M2MException;
+
+    void createServerCommunicationChannel(URI contactUri, URI longPollingUri, ChannelServerListener listener)
+            throws M2MException;
+
+    void deleteServerCommunicationChannel(URI contactUri, URI longpollingUri);
+
+    void createClientCommunicationChannel(URI contactUri, URI longPollingUri, URI requestingEntity,
+            ChannelClientListener listener) throws M2MException;
+
+    void deleteClientCommunicationChannel(URI contactUri, URI longpollingUri);
 
     M2MSession createSession(int timeout);
 
@@ -77,4 +91,6 @@ public interface M2MContext {
     void setBacktrackableErrorCodes(int[] backtrackableErrors);
 
     M2MUtils getM2MUtils();
+
+    String getContextPath();
 }
