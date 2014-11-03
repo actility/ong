@@ -68,7 +68,6 @@ public class TransportLoggerServiceImpl implements TransportLoggerService {
             buffer.append("  Method: ").append(request.getMethod()).append("\n");
             buffer.append("  Target-ID: ").append(request.getTargetID().absoluteURI()).append("\n");
             buffer.append("  Requesting-Entity: ").append(request.getRequestingEntity().absoluteURI()).append("\n");
-            buffer.append("  Method: ").append(request.getMethod()).append("\n");
             buffer.append("  Headers:\n");
             Iterator headers = request.getHeaderNames();
             while (headers.hasNext()) {
