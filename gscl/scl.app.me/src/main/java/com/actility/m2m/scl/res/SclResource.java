@@ -1514,7 +1514,7 @@ public abstract class SclResource implements ResourceController {
                 tmpPath = reader.readUntil('/');
                 if (tmpPath.length() > 0 && !".".equals(tmpPath)) {
                     if ("..".equals(tmpPath)) {
-                        // TODO fix IS2T
+                        // TODO fix
                         // lastSlash = normalizedPath.lastIndexOf(M2MConstants.URI_SEP, normalizedPath.length() - 2);
                         lastSlash = normalizedPath.length() - 2;
                         while (lastSlash >= 0) {

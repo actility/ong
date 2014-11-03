@@ -586,15 +586,6 @@ public interface SongServletMessage {
     java.lang.String getTransport();
 
     /**
-     * Returns a java.security.Principal object containing the name of the authenticated user agent sending this message. If the
-     * user agent has not been authenticated, the method returns null.
-     *
-     * @return The Principal Object related to the authenticated user
-     */
-    // PORTAGE java.security.Principal
-    // java.security.Principal getUserPrincipal();
-
-    /**
      * Returns true if this message is committed, that is, if one of the following conditions is true: This message is an
      * incoming request for which a final response has already been generated. This message is an outgoing request which has
      * already been sent. This message is an incoming response received by a servlet acting as a UAC. This message is a response

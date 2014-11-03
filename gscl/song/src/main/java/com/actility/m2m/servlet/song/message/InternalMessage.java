@@ -366,11 +366,6 @@ public abstract class InternalMessage implements SongServletMessage {
         return null;
     }
 
-    // PORTAGE java.security.Principal
-    // public final Principal getUserPrincipal() {
-    // return null;
-    // }
-
     public final boolean isCommitted() {
         return committed;
     }

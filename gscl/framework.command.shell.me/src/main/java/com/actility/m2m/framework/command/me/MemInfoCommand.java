@@ -77,10 +77,6 @@ public final class MemInfoCommand implements Command {
         }
 
         Runtime r = Runtime.getRuntime();
-        // PORTAGE Runtime.maxMemory unavailable
-        // out.println("Total: " + (r.totalMemory() + unit / 2) / unit + unitStr + "  Free: " + (r.freeMemory() + unit / 2) /
-        // unit
-        // + unitStr + "  Max: " + (r.maxMemory() + unit / 2) / unit + unitStr);
         out.println("Total: " + (r.totalMemory() + unit / 2) / unit + unitStr + "  Free: " + (r.freeMemory() + unit / 2) / unit
                 + unitStr);
     }
