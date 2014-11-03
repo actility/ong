@@ -63,14 +63,14 @@ buildProject()
       echo "OK"
       ;;
     cov2)
-        COMPILE_DIR=$BUILD_DIR/phoneme_advanced_mr2_b167/cdc/build/linux-arm-generic
-        echo -n "Apply patch to linux-arm-generic GNUmakefile..."
-        sed -i "s|^CC_ARCH_FLAGS[ \t]*=.*$|CC_ARCH_FLAGS = -mcpu=arm920t|" $COMPILE_DIR/GNUmakefile
-        sed -i "s|^ASM_ARCH_FLAGS[ \t]*=.*$|ASM_ARCH_FLAGS = -mcpu=arm920t|" $COMPILE_DIR/GNUmakefile
-        sed -i "s|^LINK_ARCH_FLAGS[ \t]*=.*$|LINK_ARCH_FLAGS = -mcpu=arm920t|" $COMPILE_DIR/GNUmakefile
-        sed -i "s|^USE_AAPCS[ \t]*?=.*$|USE_AAPCS ?= true|" $COMPILE_DIR/GNUmakefile
-        sed -i "s|^CVM_TARGET_TOOLS_PREFIX[ \t]*=.*$|CVM_TARGET_TOOLS_PREFIX = arm-none-linux-gnueabi-|" $COMPILE_DIR/GNUmakefile
-        echo "OK"
+      COMPILE_DIR=$BUILD_DIR/phoneme_advanced_mr2_b167/cdc/build/linux-arm-generic
+      echo -n "Apply patch to linux-arm-generic GNUmakefile..."
+      sed -i "s|^CC_ARCH_FLAGS[ \t]*=.*$|CC_ARCH_FLAGS = -mcpu=arm920t|" $COMPILE_DIR/GNUmakefile
+      sed -i "s|^ASM_ARCH_FLAGS[ \t]*=.*$|ASM_ARCH_FLAGS = -mcpu=arm920t|" $COMPILE_DIR/GNUmakefile
+      sed -i "s|^LINK_ARCH_FLAGS[ \t]*=.*$|LINK_ARCH_FLAGS = -mcpu=arm920t|" $COMPILE_DIR/GNUmakefile
+      sed -i "s|^USE_AAPCS[ \t]*?=.*$|USE_AAPCS ?= true|" $COMPILE_DIR/GNUmakefile
+      sed -i "s|^CVM_TARGET_TOOLS_PREFIX[ \t]*=.*$|CVM_TARGET_TOOLS_PREFIX = arm-none-linux-gnueabi-|" $COMPILE_DIR/GNUmakefile
+      echo "OK"
       ;;
     lpv3)
       applyPatch $ROOTACT/phoneme-advanced-mr2/patches/remove-backtrace.patch
@@ -79,6 +79,16 @@ buildProject()
       COMPILE_DIR=$BUILD_DIR/phoneme_advanced_mr2_b167/cdc/build/linux-mips-openwrt
       echo -n "Apply patch to linux-mips-openwrt GNUmakefile..."
       sed -i "s|^\t/opt/OpenWRT/toolchain-mipsel_gcc4.1.2/bin/mipsel-linux-uclibc-.*$|mips-openwrt-linux-uclibc-|" $COMPILE_DIR/GNUmakefile
+      echo "OK"
+      ;;
+    angstrom_panrouter)
+      COMPILE_DIR=$BUILD_DIR/phoneme_advanced_mr2_b167/cdc/build/linux-arm-generic
+      echo -n "Apply patch to linux-arm-generic GNUmakefile..."
+      sed -i "s|^CC_ARCH_FLAGS[ \t]*=.*$|CC_ARCH_FLAGS = -mcpu=cortex-a8|" $COMPILE_DIR/GNUmakefile
+      sed -i "s|^ASM_ARCH_FLAGS[ \t]*=.*$|ASM_ARCH_FLAGS = -mcpu=cortex-a8|" $COMPILE_DIR/GNUmakefile
+      sed -i "s|^LINK_ARCH_FLAGS[ \t]*=.*$|LINK_ARCH_FLAGS = -mcpu=cortex-a8|" $COMPILE_DIR/GNUmakefile
+      sed -i "s|^USE_AAPCS[ \t]*?=.*$|USE_AAPCS ?= true|" $COMPILE_DIR/GNUmakefile
+      sed -i "s|^CVM_TARGET_TOOLS_PREFIX[ \t]*=.*$|CVM_TARGET_TOOLS_PREFIX = arm-none-linux-gnueabi-|" $COMPILE_DIR/GNUmakefile
       echo "OK"
       ;;
     android_panrouter)
