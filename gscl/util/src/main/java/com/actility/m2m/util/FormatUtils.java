@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: FormatUtils.java 7655 2014-02-07 14:43:04Z JReich $
+ * id $Id: FormatUtils.java 9600 2014-09-23 10:01:51Z JReich $
  * author $Author: JReich $
- * version $Revision: 7655 $
- * lastrevision $Date: 2014-02-07 15:43:04 +0100 (Fri, 07 Feb 2014) $
+ * version $Revision: 9600 $
+ * lastrevision $Date: 2014-09-23 12:01:51 +0200 (Tue, 23 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-02-07 15:43:04 +0100 (Fri, 07 Feb 2014) $
+ * lastmodified $LastChangedDate: 2014-09-23 12:01:51 +0200 (Tue, 23 Sep 2014) $
  */
 
 package com.actility.m2m.util;
@@ -169,8 +169,27 @@ public final class FormatUtils {
                 reader.skipOffset(1);
                 int offset = reader.getOffset();
                 millis = reader.readInt();
-                if ((reader.getOffset() - offset) < 1 || (reader.getOffset() - offset) > 3) {
+                if ((reader.getOffset() - offset) < 1 || (reader.getOffset() - offset) > 6) {
                     throw new ParseException(dateTime, reader.getOffset());
+                }
+                switch (reader.getOffset() - offset) {
+                case 1:
+                    millis *= 100;
+                    break;
+                case 2:
+                    millis *= 10;
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    millis /= 10;
+                    break;
+                case 5:
+                    millis /= 100;
+                    break;
+                case 6:
+                    millis /= 1000;
+                    break;
                 }
             }
         }
@@ -790,7 +809,7 @@ public final class FormatUtils {
             String format = (String) formatIter.next();
             if (dateParser == null) {
                 dateParser = new SimpleDateFormat(format, Locale.US);
-                dateParser.setTimeZone(TimeZone.getTimeZone("GMT"));
+                dateParser.setTimeZone(UtilConstants.GMT_TIMEZONE);
                 dateParser.set2DigitYearStart(startDate);
             } else {
                 dateParser.applyPattern(format);

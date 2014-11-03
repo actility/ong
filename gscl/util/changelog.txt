@@ -1,6 +1,19 @@
 -------------------------------------------------------------------------------
 Actility Util changelog
 -------------------------------------------------------------------------------
+Version: 4.0.2
+Date: 2014-10-31
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed use of TimeZone.getTimeZone instead of constant in UtilConstants
+ - Fixed parse correctly date-times strings with nanoseconds
+
+-------------------------------------------------------------------------------
 Version: 4.0.1
 Date: 2014-05-21
 
