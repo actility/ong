@@ -7,32 +7,27 @@
     <artifactId>java.cdc.pom</artifactId>
     <version>3.0.0</version>
   </parent>
-  <artifactId>storage</artifactId>
-  <version>0.2.1</version>
+  <artifactId>storage.me</artifactId>
+  <version>1.0.0</version>
   <packaging>bundle</packaging>
 
-  <name>[Bnd] Storage Service</name>
+  <name>[API] Storage Service (ME)</name>
 
   <dependencies>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.api</artifactId>
-      <version>0.2.0</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.api</artifactId>
-      <version>0.2.0</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>util</artifactId>
-      <version>[4.0.0,5)</version>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>framework.resources.api</artifactId>
-      <version>1.0.0</version>
+      <version>4.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
