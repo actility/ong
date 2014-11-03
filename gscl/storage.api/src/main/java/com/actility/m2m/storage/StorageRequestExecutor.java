@@ -40,7 +40,7 @@ public interface StorageRequestExecutor {
     /**
      * Storage configuration attribute to set the driver that will handle the operation
      */
-    String CONFIG_DRIVER_NAME = "com.actility.storage.config.driverName";
+    String CONFIG_DRIVER_NAME = "com.actility.m2m.storage.config.driverName";
 
     /**
      * Storage configuration attribute to tell whether the current document must support transactional updates
