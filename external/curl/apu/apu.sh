@@ -6,7 +6,7 @@ projectGroupId()
 
 projectVersion()
 {
-  echo "7.36.0"
+  cat curl/Version
 }
 
 projectApuRev()
