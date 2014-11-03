@@ -38,7 +38,7 @@
     <version>3.0.0</version>
   </parent>
   <artifactId>song.trace.command.shell</artifactId>
-  <version>3.0.0</version>
+  <version>3.2.0</version>
   <packaging>bundle</packaging>
 
   <name>[Bnd] Felix Shell SONG Trace commands</name>
@@ -48,7 +48,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>song.api</artifactId>
-      <version>4.0.0</version>
+      <version>5.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
