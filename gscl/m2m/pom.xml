@@ -68,6 +68,14 @@
       <artifactId>util</artifactId>
       <version>[4.0.0,5)</version>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

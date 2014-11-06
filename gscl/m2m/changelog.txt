@@ -10,7 +10,7 @@ New Features:
 
 Bug Fixes:
 ----------
- - N/A
+ - Fixed infinite loop for some HTTP Accept headers
 
 -------------------------------------------------------------------------------
 Version: 3.0.3
