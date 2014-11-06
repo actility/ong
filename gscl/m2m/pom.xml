@@ -39,7 +39,7 @@
     <version>3.0.0</version>
   </parent>
   <artifactId>m2m</artifactId>
-  <version>3.0.3</version>
+  <version>3.0.4</version>
   <packaging>bundle</packaging>
 
   <name>[Bnd] M2M Service</name>
@@ -67,6 +67,14 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>util</artifactId>
       <version>[4.0.0,5)</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
     </dependency>
   </dependencies>
 
