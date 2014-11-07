@@ -4,7 +4,7 @@ then
   exit 1
 fi
 mkdir -p $ROOTACT/bin/
-if [ -f azbspv.x ]
+if [ -f zigbee.x ]
 then
-  cp -vf azbspv.x $ROOTACT/bin/
+  cp -vf zigbee.x $ROOTACT/bin/
 fi

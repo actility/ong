@@ -24,7 +24,7 @@ buildApuImage()
   cp zigbee/config/modelconfig.xml apu/data/etc/zigbee/ && \
   cp zigbee/config/spvconfig.xml apu/data/etc/zigbee/ && \
   cp -r zigbee/diatemplates apu/data/etc/zigbee/ && \
-  cp zigbee/driver/azbspv.x apu/data/bin/ && \
+  cp zigbee/driver/zigbee.x apu/data/bin/ && \
   cp zigbee/xoref/zigbee.xns apu/data/etc/zigbee/ && \
   cp zigbee/xoref/*.xor apu/data/etc/zigbee/ && \
   cp zigbee/apu/$1/postinst apu/control/postinst && \

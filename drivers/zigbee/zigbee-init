@@ -26,16 +26,16 @@ preStart() {
 }
 
 serviceCommand() {
-  echo "azbspv.x "$OPTIONS
+  echo "zigbee.x "$OPTIONS
 }
 
 stopService() {
-  AZBSPV_PIDS=$(pidof azbspv.x)
+  AZBSPV_PIDS=$(pidof zigbee.x)
   [ -n "$AZBSPV_PIDS" ] && kill -TERM $AZBSPV_PIDS
 }
 
 abortService() {
-  AZBSPV_PIDS=$(pidof azbspv.x)
+  AZBSPV_PIDS=$(pidof zigbee.x)
   [ -n "$AZBSPV_PIDS" ] && kill -KILL $AZBSPV_PIDS
 }
 

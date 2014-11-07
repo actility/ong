@@ -3,7 +3,7 @@ sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/init.d/zigbee
 mkdir -p $ROOTACT/etc/rc.d
 cd $ROOTACT/etc/rc.d
 ln -fs ../init.d/zigbee S07zigbee
-chmod 755 $ROOTACT/bin/azbspv.x
+chmod 755 $ROOTACT/bin/zigbee.x
 mkdir -p $ROOTACT/usr/etc/zigbee/
 [ -f $ROOTACT/usr/etc/zigbee/modelconfig.xml ] || \
 cp $ROOTACT/etc/zigbee/modelconfig.xml $ROOTACT/usr/etc/zigbee/

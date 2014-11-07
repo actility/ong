@@ -860,7 +860,7 @@ int main(int argc, char *argv[])
 
   MainLoop();
 
-  RTL_TRDBG(TRACE_ERROR, "end !!! azbspv.x/main th=%lx\n", (long)pthread_self());
+  RTL_TRDBG(TRACE_ERROR, "end !!! zigbee.x/main th=%lx\n", (long)pthread_self());
   exit(1);
 }
 
