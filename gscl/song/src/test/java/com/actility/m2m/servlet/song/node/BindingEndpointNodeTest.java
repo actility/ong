@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: BindingEndpointNodeTest.java 6085 2013-10-15 14:08:29Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6085 $
- * lastrevision $Date: 2013-10-15 16:08:29 +0200 (Tue, 15 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-15 16:08:29 +0200 (Tue, 15 Oct 2013) $
+ * id $Id: BindingEndpointNodeTest.java 9044 2014-07-03 15:50:18Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.servlet.song.node;
@@ -77,7 +77,7 @@ public class BindingEndpointNodeTest extends TestCase {
         container = EasyMock.createMock(SongContainerFacade.class);
 
         address = InetAddress.getLocalHost();
-        bindingEndpoint = new BindingEndpointNode(container, null, servletContext, "TestServlet", 0, null, "http",
+        bindingEndpoint = new BindingEndpointNode(container, null, servletContext, "TestServlet", 0, null, "http", -1,
                 new String[] { "http", "https" }, true, "HTTP/1.1", address, 80);
 
         mocks = new Object[] { bindingEndpointContext, externalEndpoint, servletContext, exchange, inMessage, uri, target,

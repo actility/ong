@@ -36,8 +36,6 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -56,14 +54,28 @@ import com.actility.m2m.scl.model.Constants;
 import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.VolatileResource;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.FormatUtils;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
 
+/**
+ * <pre>
+ * m2m:M2MPoc from ong:t_xml_obj
+ * {
+ *     m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:NMTOKEN)
+ *     m2m:contactInfo    m2m:ContactInfo    { } // (optional)
+ *     m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:onlineStatus    XoString    { } // (optional) (xmlType: m2m:OnlineStatus) (enum: ONLINE OFFLINE NOT_REACHABLE )
+ *     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ * }
+ * alias m2m:M2MPoc with m2m:m2mPoc
+ * </pre>
+ */
 public final class M2MPoc extends SclResource implements VolatileResource {
     private static final Logger LOG = OSGiLogger.getLogger(M2MPoc.class, BundleLogger.getStaticLogger());
 
@@ -79,17 +91,6 @@ public final class M2MPoc extends SclResource implements VolatileResource {
                 "m2mPocUpdateResponseConfirm", "m2mPocDeleteRequestIndication", "m2mPocDeleteResponseConfirm",
                 Constants.ID_NO_FILTER_CRITERIA_MODE, true, false, M2MPocs.getInstance(), false, false);
     }
-
-    // m2m:M2MPoc from ong:t_xml_obj
-    // {
-    // m2m:id XoString { embattr } // (optional) (xmlType: xsd:anyURI)
-    // m2m:contactInfo m2m:ContactInfo { } // (optional)
-    // m2m:expirationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:onlineStatus XoString { } // (optional) (xmlType: m2m:OnlineStatus) (enum: ONLINE OFFLINE NOT_REACHABLE )
-    // m2m:creationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:lastModifiedTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // }
-    // alias m2m:M2MPoc with m2m:m2mPoc
 
     public void reload(SclManager manager, String path, XoObject resource, SclTransaction transaction) throws IOException,
             ParseException, StorageException, XoException, M2MException {
@@ -167,12 +168,13 @@ public final class M2MPoc extends SclResource implements VolatileResource {
         resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_ONLINE_STATUS, new Integer(newOnlineStatus)));
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_M2M_POC));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-        transaction.createResource(path, resource, searchAttributes);
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_ONLINE_STATUS, new Integer(newOnlineStatus));
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_M2M_POC);
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+        document.setContent(resource.saveBinary());
+        transaction.createResource(document);
         transaction.addTransientOp(new M2MPocOp(indication.getTransactionId(), manager, parentPath,
                 Constants.ID_ENUM_UNDEFINED_VALUE, newOnlineStatus, transaction));
         transaction.addTransientOp(new ExpirationTimerUpdateOp(manager, path, Constants.ID_RES_M2M_POC, expirationTime
@@ -218,10 +220,11 @@ public final class M2MPoc extends SclResource implements VolatileResource {
 
         // Save resource
         SclTransaction transaction = new SclTransaction(manager.getStorageContext());
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_ONLINE_STATUS, new Integer(newOnlineStatus)));
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_M2M_POC));
-        transaction.updateResource(path, resource, searchAttributes);
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_ONLINE_STATUS, new Integer(newOnlineStatus));
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_M2M_POC);
+        document.setContent(resource.saveBinary());
+        transaction.updateResource(document);
         transaction.addTransientOp(new M2MPocOp(indication.getTransactionId(), manager, getParentPath(path), oldOnlineStatus,
                 newOnlineStatus, transaction));
         transaction.addTransientOp(new ExpirationTimerUpdateOp(manager, path, Constants.ID_RES_M2M_POC, expirationTime
@@ -271,8 +274,8 @@ public final class M2MPoc extends SclResource implements VolatileResource {
     }
 
     public int appendDiscoveryURIs(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
-            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs)
-            throws IOException, StorageException, XoException {
+            URI targetID, String appPath, String[] searchStrings, List discoveryURIs, int remainingURIs) throws IOException,
+            StorageException, XoException {
         int urisCount = remainingURIs;
         try {
             checkRights(logId, manager, path, resource, requestingEntity, M2MConstants.FLAG_DISCOVER);

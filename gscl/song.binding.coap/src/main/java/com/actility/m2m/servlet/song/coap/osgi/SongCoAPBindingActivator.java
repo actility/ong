@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongCoAPBindingActivator.java 8769 2014-05-21 15:43:39Z JReich $
+ * id $Id: SongCoAPBindingActivator.java 9044 2014-07-03 15:50:18Z JReich $
  * author $Author: JReich $
- * version $Revision: 8769 $
- * lastrevision $Date: 2014-05-21 17:43:39 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:43:39 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.servlet.song.coap.osgi;
@@ -45,11 +45,11 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import com.actility.m2m.servlet.NamespaceException;
-import com.actility.m2m.servlet.song.SongBindingFacade;
+import com.actility.m2m.servlet.song.binding.SongBindingFacade;
+import com.actility.m2m.servlet.song.binding.service.SongBindingService;
 import com.actility.m2m.servlet.song.coap.CoAPBindingFacade;
 import com.actility.m2m.servlet.song.coap.SongCoAPBinding;
 import com.actility.m2m.servlet.song.coap.log.BundleLogger;
-import com.actility.m2m.servlet.song.service.SongBindingService;
 import com.actility.m2m.song.binding.coap.ni.api.NiSongBindingCoapService;
 import com.actility.m2m.util.log.OSGiLogger;
 
@@ -167,8 +167,8 @@ public final class SongCoAPBindingActivator implements BundleActivator {
                 // TODO bug IPv6 not supported
                 InetAddress serverInetAddress = InetAddress.getLocalHost();
                 songBindingService.registerBindingServlet(applicationContext, "SONGBinding", songCoAPBinding, null,
-                        bindingFacade, "coap", PROTOCOLS, true, SongCoAPBinding.DEFAULT_PROTOCOL,
-                        serverInetAddress, serverPort, null);
+                        bindingFacade, "coap", (serverPort == 5683) ? -1 : serverPort, PROTOCOLS, true,
+                        SongCoAPBinding.DEFAULT_PROTOCOL, serverInetAddress, serverPort, null);
 
                 songCoAPBinding.startDia();
             } catch (UnknownHostException e) {

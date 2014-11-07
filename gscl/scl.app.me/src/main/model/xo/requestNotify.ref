@@ -1,0 +1,55 @@
+/*
+ * Copyright (C) Actility, SA. All Rights Reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details (a copy is
+ * included at /legal/license.txt).
+ *
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA
+ *
+ * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+ * or visit www.actility.com if you need additional
+ * information or have any questions.
+ */
+#ifndef REQUESTNOTIFY_REF
+#define REQUESTNOTIFY_REF
+
+#include "misc.ref"
+#include "common.ref"
+#include "extern.ref"
+
+
+m2m:RequestNotify from ong:t_xml_obj
+{
+    requestingEntity    XoString    { } // (xmlType: xsd:anyURI) 
+    targetID    XoString    { } // (xmlType: xsd:anyURI) 
+    method    XoString    { shdico } // (xmlType: m2m:MethodType) (enum: CREATE RETRIEVE UPDATE DELETE EXECUTE NOTIFY ) 
+    filterCriteria    XoVoidObj    { default=m2m:FilterCriteriaType } // (optional) 
+    maxSize    XoString    { } // (optional) (xmlType: xsd:long) 
+    searchPrefix    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    groupRequestIdentifier    XoString    { } // (optional) (xmlType: xsd:hexBinary) 
+    TRPDT    m2m:TrpdtType    { } // (optional) 
+    RCAT    XoString    { shdico } // (optional) (xmlType: m2m:RcatType) (enum: RCAT_0 RCAT_1 RCAT_2 RCAT_3 RCAT_4 RCAT_5 RCAT_6 RCAT_7 ) 
+    contentTypeHeader    XoString    { } // (optional) (xmlType: xsd:string) 
+    acceptHeader    XoString    { } // (optional) (xmlType: xsd:string) 
+    ifModifiedSinceHeader    XoString    { } // (optional) (xmlType: xsd:string) 
+    ifUnmodifiedSinceHeader    XoString    { } // (optional) (xmlType: xsd:string) 
+    ifMatchHeader    XoString    { } // (optional) (xmlType: xsd:string) 
+    ifNoneMatchHeader    XoString    { } // (optional) (xmlType: xsd:string) 
+    xEtsiContactUriHeader    XoString    { } // (xmlType: xsd:string) 
+    xEtsiCorrelationIDHeader    XoString    { } // (xmlType: xsd:string) 
+    representation    xmime:base64Binary    { } // (optional) 
+}
+alias m2m:RequestNotify with m2m:requestNotify
+
+#endif // REQUESTNOTIFY_REF

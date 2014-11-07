@@ -1,4 +1,3 @@
-
 #ifndef _COMMON__H_
 #define _COMMON__H_
 
@@ -34,12 +33,7 @@
 // trace levels
 enum
 {
-  TRACE_FATAL = 0,
-  TRACE_ERROR = 1,
-  TRACE_WARN = 2,
-  TRACE_INFO = 3,
-  TRACE_DEBUG = 4,
-  TRACE_TRACE = 5,
+  TRACE_FATAL = 0, TRACE_ERROR = 1, TRACE_WARN = 2, TRACE_INFO = 3, TRACE_DEBUG = 4, TRACE_TRACE = 5,
 };
 
 void trace(int level, char *file, int line, char *msg, ...);

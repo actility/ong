@@ -31,7 +31,7 @@
 
 m2m:Container from ong:t_xml_obj
 {
-    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:NMTOKEN) 
     m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:accessRightID    XoString    { shdico } // (optional) (xmlType: xsd:anyURI) 
     m2m:searchStrings    m2m:SearchStrings    { } // (optional) 
@@ -40,9 +40,10 @@ m2m:Container from ong:t_xml_obj
     m2m:announceTo    m2m:AnnounceTo    { } // (optional) 
     m2m:maxNrOfInstances    XoString    { } // (optional) (xmlType: xsd:long) 
     m2m:maxByteSize    XoString    { } // (optional) (xmlType: xsd:long) 
-    m2m:maxInstanceAge    XoString    { } // (optional) (xmlType: xsd:long) 
+    m2m:maxInstanceAge    XoString    { } // (optional) (xmlType: xsd:duration) 
     acy:storageConfiguration    acy:StorageConfiguration    { } // (optional) 
     m2m:contentInstancesReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:subcontainersReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
     m2m:subscriptionsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
 }
 alias m2m:Container with m2m:container

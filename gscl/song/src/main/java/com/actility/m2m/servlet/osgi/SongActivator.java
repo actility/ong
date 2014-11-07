@@ -55,9 +55,9 @@ import com.actility.m2m.servlet.log.BundleLogger;
 import com.actility.m2m.servlet.service.ServletService;
 import com.actility.m2m.servlet.service.ext.ExtServletService;
 import com.actility.m2m.servlet.service.impl.ServletServiceImpl;
-import com.actility.m2m.servlet.song.service.SongBindingService;
+import com.actility.m2m.servlet.song.binding.service.SongBindingService;
+import com.actility.m2m.servlet.song.binding.service.ext.ExtSongBindingService;
 import com.actility.m2m.servlet.song.service.SongService;
-import com.actility.m2m.servlet.song.service.ext.ExtSongBindingService;
 import com.actility.m2m.servlet.song.service.ext.ExtSongService;
 import com.actility.m2m.servlet.song.service.impl.SongServiceImpl;
 import com.actility.m2m.transport.logger.TransportLoggerService;
@@ -247,7 +247,7 @@ public final class SongActivator implements BundleActivator, ManagedService {
             String domainName = resourcesAccessorService.getProperty(context, context.getBundle().getSymbolicName()
                     + ".config.domainName");
 
-            servletServiceImpl = new ServletServiceImpl(getServerInfo(context, config));
+            servletServiceImpl = new ServletServiceImpl(resourcesAccessorService, getServerInfo(context, config));
 
             if (LOG.isInfoEnabled()) {
                 LOG.info("Registering service [" + ExtServletService.class.getName() + ", " + ServletService.class.getName()
@@ -258,7 +258,7 @@ public final class SongActivator implements BundleActivator, ManagedService {
 
             try {
                 songService = new SongServiceImpl(getRoutesConfiguration(config), servletServiceImpl, backendService,
-                        xoService, transportLoggerService, hostName, domainName,
+                        xoService, resourcesAccessorService, transportLoggerService, hostName, domainName,
                         getMaxRemoteRequests(config));
 
                 if (LOG.isInfoEnabled()) {

@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -66,7 +65,7 @@ transactionsList_t *new_transactionsList_t()
 void transactionsList_t_newFree(transactionsList_t *This)
 {
   LOG(TRACE_DEBUG, "transactionsList_t::newFree (This:0x%.8x)", This);
-  while ( ! list_empty(&(This->transactions)))
+  while (!list_empty(&(This->transactions)))
   {
     transaction_t * trans = list_entry(This->transactions.next, transaction_t, chainLink);
     list_del(&trans->chainLink);
@@ -85,7 +84,7 @@ transaction_t *transactionsList_t_get(transactionsList_t *This, char *transId)
 {
   transaction_t *res = NULL;
   struct list_head *link;
-  list_for_each (link, &(This->transactions))
+  list_for_each(link, &(This->transactions))
   {
     transaction_t *trans = list_entry(link, transaction_t, chainLink);
     if (!strcmp(transId, trans->transId))
@@ -107,7 +106,7 @@ transaction_t *transactionsList_t_getNth(transactionsList_t *This, int index)
 {
   transaction_t *res = NULL;
   struct list_head *link;
-  list_for_each (link, &(This->transactions))
+  list_for_each(link, &(This->transactions))
   {
     transaction_t *trans = list_entry(link, transaction_t, chainLink);
     if (0 == index)
@@ -115,7 +114,7 @@ transaction_t *transactionsList_t_getNth(transactionsList_t *This, int index)
       res = trans;
       break;
     }
-    index --;
+    index--;
   }
   return res;
 }
@@ -145,6 +144,4 @@ transaction_t *transactionsList_t_remove(transactionsList_t *This, char *transId
   }
   return toRemove;
 }
-
-
 

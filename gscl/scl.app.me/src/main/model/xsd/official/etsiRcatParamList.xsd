@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m"
+	xmlns:tns="http://uri.etsi.org/m2m">
+	<include schemaLocation="mgmtObj.xsd" />
+	<include schemaLocation="parameters.xsd" />
+
+	<!-- RcatParamList resource type -->
+	<complexType name="RcatParamList">
+		<complexContent>
+			<extension base="tns:Parameters">
+				<sequence>
+					<element ref="tns:rcatValue" minOccurs="1" maxOccurs="1" />
+					<element ref="tns:defaultTrpdtValue" minOccurs="1" maxOccurs="1" />
+					<element ref="tns:maxPendReqs" minOccurs="0" maxOccurs="1" />
+					<element ref="tns:maxPendData" minOccurs="0" maxOccurs="1" />
+					<element ref="tns:rankedAnList" minOccurs="1" maxOccurs="1" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="defaultTrpdtValue" type="tns:TrpdtType" />
+	<element name="maxPendReqs" type="long" />
+	<element name="maxPendData" type="tns:MemorySize" />
+	<element name="rankedAnList" type="tns:RankedAnList" />
+
+	<complexType name="RankedAnList">
+		<sequence>
+			<element ref="tns:accessNetwork" minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
+		<attribute ref="tns:id" use="required" />
+	</complexType>
+	<element name="accessNetwork" type="token" />
+
+</schema>

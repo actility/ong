@@ -13,9 +13,9 @@
 					<element ref="tns:sleepInterval"/>
 					<element ref="tns:sleepDuration"/>
 					<element ref="tns:status"/>
+					<element ref="tns:areaNwkTypeInfoOfDevice"/>
 					
 					<!-- sub resources -->
-					<element ref="tns:areaNwkTypeInfoOfDevice" minOccurs="0"/>
 					<element ref="tns:groupsReference" minOccurs="0"/>
 				</sequence>
 			</extension>
@@ -32,5 +32,5 @@
 	</simpleType>
 	<element name="sleepInterval" type="long"/>
 	<element name="sleepDuration" type="long"/>
-	<element name="areaNwkTypeInfoOfDevice" type="tns:Parameters"/>	
+	<element name="areaNwkTypeInfoOfDevice" type="tns:AreaNwkTypeInfoSet"/>	
 </schema>

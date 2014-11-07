@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m"
-	xmlns:xmlmime="http://www.w3.org/2005/05/xmlmime">
-
-	<include schemaLocation="common.xsd" />
-	<import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="http://www.w3.org/2005/05/xmlmime.xsd" />
-
-
-
-	<element name="subscription" type="tns:Subscription" />
-
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://uri.etsi.org/m2m" xmlns:xmlmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://uri.etsi.org/m2m">
+	<include schemaLocation="common.xsd"/>
+	<import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="http://www.w3.org/2005/05/xmlmime.xsd"/>
+	<element name="subscription" type="tns:Subscription"/>
 	<complexType name="Subscription">
 		<sequence>
-			<element ref="tns:expirationTime" minOccurs="0" />
+			<element ref="tns:expirationTime" minOccurs="0"/>
 			<choice minOccurs="0">
-				<element ref="tns:minimalTimeBetweenNotifications" />
-				<element ref="tns:delayTolerance" />
+				<element ref="tns:minimalTimeBetweenNotifications"/>
+				<element ref="tns:delayTolerance"/>
 			</choice>
-			<element ref="tns:creationTime" minOccurs="0" />
-			<element ref="tns:lastModifiedTime" minOccurs="0" />
-			<element ref="tns:filterCriteria" minOccurs="0" />
-			<element ref="tns:subscriptionType" minOccurs="0" />
-			<element ref="tns:contact" minOccurs="0" />
+			<element ref="tns:creationTime" minOccurs="0"/>
+			<element ref="tns:lastModifiedTime" minOccurs="0"/>
+			<element ref="tns:filterCriteria" minOccurs="0"/>
+			<element ref="tns:subscriptionType" minOccurs="0"/>
+			<element ref="tns:contact" minOccurs="0"/>
+			<element ref="tns:aggregateURI" minOccurs="0" />
+			<element ref="tns:timeoutReason" minOccurs="0" />
+			<element ref="tns:noRepresentation" minOccurs="0"/>
+			<element ref="tns:subscriberId" minOccurs="0" />
+			<element ref="tns:maxAccuCreates" minOccurs="0" />
+			<element ref="tns:currentAccuCreates" minOccurs="0" />
 			<!-- subresources -->
 		</sequence>
 		<attribute ref="tns:id"/>
 	</complexType>
-
 	<element name="minimalTimeBetweenNotifications" type="long">
 		<annotation>
 			<documentation>
@@ -33,15 +32,19 @@
 			</documentation>
 		</annotation>
 	</element>
-
-	<element name="subscriptionType" type="tns:SubscriptionType" />
-	<element name="contact" type="anyURI" />
-
+	<element name="subscriptionType" type="tns:SubscriptionType"/>
+	<element name="contact" type="anyURI"/>
+	<element name="aggregateURI" type="anyURI" />
+	<element name="timeoutReason" type="string" />
+	<element name="noRepresentation" type="boolean"/>
+	<element name="subscriberId" type="anyURI" />
+	<element name="maxAccuCreates" type="long" />
+	<element name="currentAccuCreates" type="long" />
+	
 	<simpleType name="SubscriptionType">
 		<restriction base="string">
-			<enumeration value="ASYNCHRONOUS" />
-			<enumeration value="SYNCHRONOUS" />
+			<enumeration value="ASYNCHRONOUS"/>
+			<enumeration value="SYNCHRONOUS"/>
 		</restriction>
 	</simpleType>
-
 </schema>

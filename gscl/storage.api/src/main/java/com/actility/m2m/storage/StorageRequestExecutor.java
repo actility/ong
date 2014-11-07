@@ -1,374 +1,182 @@
-/*
- * Copyright   Actility, SA. All Rights Reserved.
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version
- * 2 only, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License version 2 for more details (a copy is
- * included at /legal/license.txt).
- *
- * You should have received a copy of the GNU General Public License
- * version 2 along with this work; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA
- *
- * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
- * or visit www.actility.com if you need additional
- * information or have any questions.
- *
- * id $Id: StorageRequestExecutor.java 8030 2014-03-07 17:30:45Z JReich $
- * author $Author: JReich $
- * version $Revision: 8030 $
- * lastrevision $Date: 2014-03-07 18:30:45 +0100 (Fri, 07 Mar 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-03-07 18:30:45 +0100 (Fri, 07 Mar 2014) $
- */
-
 package com.actility.m2m.storage;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
  * It provides all the necessary methods to operate on data
  */
 public interface StorageRequestExecutor {
-    public static final int SCOPE_EXACT = 1;
-    public static final int SCOPE_SUBTREE = 2;
-    public static final int ORDER_ASC = 3;
-    public static final int ORDER_DESC = 4;
-    public static final int ORDER_UNKNOWN = 5;
-    public static final int CASCADING_ONE_LEVEL = 6;
-    public static final int CASCADING_NONE = 7;
-    public static final int CASCADING_SUBTREE = 12;
-    public static final int TYPE_CREATE = 8;
-    public static final int TYPE_UPDATE = 9;
-    public static final int TYPE_DELETE = 10;
-
     /**
-     * Retrieves a complete resource (attributes + references to sub resources)
-     *
-     * @param path the full (absolute) path of the resource (relative to a root)
-     * @return Null if the path is not defined for this context in database. Document as a string.
-     * @throws StorageException
+     * Scopes only documents one level below the given path (this excludes the exact path)
      */
-    public byte[] retrieve(String path) throws StorageException;
+    int SCOPE_ONE_LEVEL = 0;
 
     /**
-     * Retrieves a complete resource (attributes + references to sub resources)
-     *
-     * @param config storage configuration to apply
-     * @param path the full (absolute) path of the resource (relative to a root)
-     * @return Null if the path is not defined for this context in database. Document as a string
-     * @throws StorageException
+     * Scopes all documents reachable from the root document pointed by the given path (this includes the exact path)
      */
-    public byte[] retrieve(Map config, String path) throws StorageException;
+    int SCOPE_SUB_TREE = 1;
 
     /**
-     * Searches for a document in a specified path
-     *
-     * @param basePath node from which search is performed
-     * @param condition condition that filters documents
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * No limit special value when a search request does not define any limit
      */
-    public SearchResult search(String basePath, Condition condition) throws StorageException;
+    int NO_LIMIT = -1;
 
     /**
-     * Searches for a document in a specified path
-     *
-     * @param basePath node from which search is performed
-     * @param condition condition that filters documents
-     * @param order ordering of results (unk, asc, desc)
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * No order defined
      */
-    public SearchResult search(String basePath, Condition condition, int order) throws StorageException;
+    int ORDER_UNKNOWN = 0;
 
     /**
-     * Searches for a document in a specified path
-     *
-     * @param basePath node from which search is performed
-     * @param condition condition that filters documents
-     * @param order ordering of results (unk, asc, desc)
-     * @param limit maximum number of results returned
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * Sorts documents in ascending order against their path
      */
-    public SearchResult search(String basePath, Condition condition, int order, int limit) throws StorageException;
+    int ORDER_ASC = 1;
 
     /**
-     * Searches for a document in a specified path
-     *
-     * @param basePath node from which search is performed
-     * @param scope either one level either full depth
-     * @param condition condition that filters documents
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * Sorts documents in descending order against their path
      */
-    public SearchResult search(String basePath, int scope, Condition condition) throws StorageException;
+    int ORDER_DESC = 2;
 
     /**
-     * Searches for a document in a specified path
-     *
-     * @param basePath node from which search is performed
-     * @param scope either one level either full depth
-     * @param condition condition that filters documents
-     * @param order ordering of results (unk, asc, desc)
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * Storage configuration attribute to set the driver that will handle the operation
      */
-    public SearchResult search(String basePath, int scope, Condition condition, int order) throws StorageException;
+    String CONFIG_DRIVER_NAME = "com.actility.m2m.storage.config.driverName";
 
     /**
-     * Searches for a document in a specified path
-     *
-     * @param basePath node from which search is performed
-     * @param scope either one level either full depth
-     * @param condition condition that filters documents
-     * @param order ordering of results (unk, asc, desc)
-     * @param limit maximum number of results returned
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * Storage configuration attribute to tell whether the current document must support transactional updates
      */
-    public SearchResult search(String basePath, int scope, Condition condition, int order, int limit) throws StorageException;
+    String CONFIG_TRANSACTIONAL_UPDATE = "transacUpdate";
 
     /**
-     * Searches for a document in a specified path
+     * Retrieves a document
      *
      * @param config storage configuration to apply
-     * @param basePath node from which search is performed
-     * @param condition condition that filters documents
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * @param path the full (absolute) path of the document (it must not end with a slash and must be normalized)
+     * @param condition condition that must be fulfilled in order to perform the operation
+     * @return The retrieved document or <code>null</code> if the document does not exist or the condition is not fulfilled
+     * @throws StorageException if any problem occurs while retrieving the document
      */
-    public SearchResult search(Map config, String basePath, Condition condition) throws StorageException;
+    public Document retrieve(Map/* <String, String> */config, String path, Condition condition) throws StorageException;
 
     /**
-     * Searches for a document in a specified path
+     * Retrieves a document
      *
      * @param config storage configuration to apply
-     * @param basePath node from which search is performed
-     * @param condition condition that filters documents
-     * @param order ordering of results (unk, asc, desc)
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * @param id Internal id of the document to retrieve
+     * @param condition condition that must be fulfilled in order to perform the operation
+     * @return The retrieved document or <code>null</code> if the document does not exist or the condition is not fulfilled
+     * @throws StorageException if any problem occurs while retrieving the document
      */
-    public SearchResult search(Map config, String basePath, Condition condition, int order) throws StorageException;
+    public Document retrieve(Map/* <String, String> */config, Object id, Condition condition) throws StorageException;
 
     /**
-     * Searches for a document in a specified path
+     * Updates an existing document.
+     * <p>
+     * Raises an exception if the document does not exist.
      *
      * @param config storage configuration to apply
-     * @param basePath node from which search is performed
-     * @param condition condition that filters documents
-     * @param order ordering of results (unk, asc, desc)
-     * @param limit maximum number of results returned
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * @param document the new representation of the document
+     * @param condition condition that must be fulfilled in order to perform the operation
+     * @return Whether the update has succeeded. If the update fails, it means the document does not exist in the storage or the
+     *         condition is not fulfilled
+     * @throws StorageException if any problem occurs while retrieving the document
      */
-    public SearchResult search(Map config, String basePath, Condition condition, int order, int limit) throws StorageException;
+    public boolean update(Map/* <String, String> */config, Document document, Condition condition) throws StorageException;
 
     /**
-     * Searches for a document in a specified path
+     * Updates partially an existing document.
+     * <p>
+     * Raises an exception if the document does not exist.
      *
      * @param config storage configuration to apply
-     * @param basePath node from which search is performed
-     * @param scope either one level either full depth
-     * @param condition condition that filters documents
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * @param document the document to partially update. Only id or path are used
+     * @param content the new content for the document (if <code>null</code>, do not update the content)
+     * @param attrOps operations to perform on the document attributes (if <code>null</code> or empty, do not update attributes)
+     * @param condition condition that must be fulfilled in order to perform the operation
+     * @return Whether the partial update has succeeded. If the partial update fails, it means the document does not exist or
+     *         the condition is not fulfilled
+     * @throws StorageException if any problem occurs while retrieving the document
      */
-    public SearchResult search(Map config, String basePath, int scope, Condition condition) throws StorageException;
+    public boolean partialUpdate(Map/* <String, String> */config, Document document, byte[] content,
+            List/* <AttributeOperation> */attrOps, Condition condition) throws StorageException;
 
     /**
-     * Searches for a document in a specified path
+     * Creates a new document.
+     * <p>
+     * Raises an exception if the document already exists.
      *
      * @param config storage configuration to apply
-     * @param basePath node from which search is performed
-     * @param scope either one level either full depth
-     * @param condition condition that filters documents
-     * @param order ordering of the results (unk, asc, desc)
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * @param document the representation of the document
+     * @return Whether the create has succeeded. If the create fails, it means the document already exists
+     * @throws StorageException if any problem occurs while retrieving the document
      */
-    public SearchResult search(Map config, String basePath, int scope, Condition condition, int order) throws StorageException;
+    public boolean create(Map/* <String, String> */config, Document document) throws StorageException;
 
     /**
-     * Searches for a document in a specified path
+     * Deletes a document.
+     * <p>
+     * If scope is specified to:
+     * <ul>
+     * <li>{@link #SCOPE_ONE_LEVEL}: deletes documents one level below the given path (this excludes the exact path). Delete do
+     * not manage concurrency and any created document created ONE_LEVEL below the given document during the deletion process
+     * will not be deleted</li>
+     * <li>{@link #SCOPE_SUB_TREE}: deletes documents reachable from the root document pointed by the given path (this includes
+     * the exact path). Delete SUB_TREE deletes the root document at the end to ensure it is not possible to re-create a
+     * sub-tree while deleting it. So after the delete sub-tree operation you are sure there is no documents in that path
+     * anymore</li>
+     * </ul>
+     * <p>
+     * Raises an exception if the document does not exist.
      *
      * @param config storage configuration to apply
-     * @param basePath node from which search is performed
-     * @param scope either one level either full depth
-     * @param condition condition that filters documents
-     * @param order ordering of the results (unk, asc, desc)
-     * @param limit maximum number of results returned
-     * @return a map containing the result of the search key=doc path value=document content
-     * @throws StorageException
+     * @param document The document which serves as a root for the deletion. Only id or path are used
+     * @param scope a constant ({@link #SCOPE_ONE_LEVEL} or {@link #SCOPE_SUB_TREE})
+     * @param condition condition that must be fulfilled in order to perform the operation
+     * @return Whether the delete has succeeded. If the delete fails, it means the document does not exist or the condition is
+     *         not fulfilled
+     * @throws StorageException if any problem occurs while retrieving the document
      */
-    public SearchResult search(Map config, String basePath, int scope, Condition condition, int order, int limit)
+    public boolean delete(Map/* <String, String> */config, Document document, int scope, Condition condition)
             throws StorageException;
 
     /**
-     * Updates a existing resource. Raises an an exception if the document does not exist
-     *
-     * @param path the full path of the resource (relative to a root)
-     * @param rawDocument new value to set in the resource
-     * @throws StorageException if the document does not exist
-     */
-    public void update(String path, byte[] rawDocument) throws StorageException;
-
-    /**
-     * Updates a existing resource. . Raises an an exception if the document does not exist. Replaces all the searchAttributes
-     * unless search Attributes is not specified. In that case, searchAttributes are left untouched
-     *
-     * @param path the full path of the resource (relative to a root)
-     * @param rawDocument new value to set in the resource
-     * @param searchAttributes a collection containing instances of com.actility.util.Pair
-     * @throws StorageException if the document does not exist
-     */
-    public void update(String path, byte[] rawDocument, Collection searchAttributes) throws StorageException;
-
-    /**
-     * Updates a existing resource. Raises an an exception if the document does not exist.
+     * Deletes a document.
+     * <p>
+     * Raises an exception if the document does not exist.
      *
      * @param config storage configuration to apply
-     * @param path the full path of the resource (relative to a root)
-     * @param rawDocument new value to set in the resource
-     * @throws StorageException if the document does not exist.
+     * @param document The document to delete. Only id or path are used
+     * @param condition condition that must be fulfilled in order to perform the operation
+     * @return Whether the delete has succeeded. If the delete fails, it means the document does not exist or the condition is
+     *         not fulfilled
+     * @throws StorageException if any problem occurs while retrieving the document
      */
-    public void update(Map config, String path, byte[] rawDocument) throws StorageException;
+    public boolean delete(Map/* <String, String> */config, Document document, Condition condition) throws StorageException;
 
     /**
-     * Updates a existing resource. Raises an an exception if the document does not exist. Replaces all the searchAttributes
-     * unless search Attributes is not specified. In that case, searchAttributes are left untouched
+     * Searches for a document in a specified path.
+     * <p>
+     * If scope is specified to:
+     * <ul>
+     * <li>{@link #SCOPE_ONE_LEVEL}: searches documents one level below the given path (this excludes the exact path)</li>
+     * <li>{@link #SCOPE_SUB_TREE}: searches documents reachable from the root document pointed by the given path (this includes
+     * the exact path)</li>
+     * </ul>
      *
      * @param config storage configuration to apply
-     * @param path the full path of the resource (relative to a root)
-     * @param rawDocument new value to set in the resource
-     * @param searchAttributes a collection containing instances of com.actility.util.Pair
-     * @throws StorageException (if the doc already exists)
+     * @param path document path from which search is performed (it must not end with a slash and must be normalized)
+     * @param scope a constant ({@link #SCOPE_ONE_LEVEL} or {@link #SCOPE_SUB_TREE})
+     * @param condition condition that filters documents
+     * @param order ordering of the results ({@link #ORDER_UNKNOWN}, {@link #ORDER_ASC}, {@link #ORDER_DESC})
+     * @param limit maximum number of results returned ({@link #NO_LIMIT} means any number of values)
+     * @param withContent whether to return the document content in result set
+     * @param withAttributes List of attributes names. If null, return all document attributes in result set. Else if empty, do
+     *            not return attributes in result set. Else, return only specified attributes in result set
+     * @return a list containing the matching documents
+     * @throws StorageException if any problem occurs while retrieving the document
      */
-    public void update(Map config, String path, byte[] rawDocument, Collection searchAttributes) throws StorageException;
-
-    /**
-     * Creates a new resource (raises an error if it already exists). Raises an exception if the document already exists. The
-     * created document has path/doc for path.
-     *
-     * @param path the full path of the resource (relative to a root)
-     * @param rawDocument value of the new resource
-     * @throws StorageException (if the doc already exists)
-     */
-    public void create(String path, byte[] rawDocument) throws StorageException;
-
-    /**
-     * Creates a new resource (raises an error if it already exists). Raises an exception if the document already exists The
-     * created document has path/doc for path.
-     *
-     * @param path the full path of the resource (relative to a root)
-     * @param rawDocument value of the new resource
-     * @param searchAttributes a collection containing instances of com.actility.util.Pair
-     * @throws StorageException (if the doc already exists)
-     */
-    public void create(String path, byte[] rawDocument, Collection searchAttributes) throws StorageException;
-
-    /**
-     * Creates a new resource (raises an error if it already exists). Raises an exception if the document already exists. The
-     * created document has path/doc for path.
-     *
-     * @param config storage configuration to apply
-     * @param path the full path of the resource (relative to a root)
-     * @param rawDocument value of the new resource
-     * @throws StorageException (if the doc already exists)
-     */
-    public void create(Map config, String path, byte[] rawDocument) throws StorageException;
-
-    /**
-     * Creates a new resource (raises an error if it already exists). Raises an exception if the document already exists. The
-     * created document has path/doc for path.
-     *
-     * @param config storage configuration to apply
-     * @param path the full path of the resource (relative to a root)
-     * @param rawDocument value of the new resource
-     * @param searchAttributes a collection containing instances of com.actility.util.Pair
-     * @throws StorageException (if the doc already exists)
-     */
-    public void create(Map config, String path, byte[] rawDocument, Collection searchAttributes) throws StorageException;
-
-    /**
-     * Erases a resource. Raises an exception if the document does not exist.
-     *
-     * @param path the path of the resource (relative to a root)
-     * @throws StorageException (if the doc already exists)
-     */
-    public void delete(String path) throws StorageException;
-
-    /**
-     * Erases a resource. If cascading is specified to oneLevel, a resource and all its subresources are deleted. Raises an
-     * exception if the document does not exist.
-     *
-     * @param path the path of the resource (relative to a root)
-     * @param cascade a constant ONE_LEVEL, NONE or SUBTREE
-     * @throws StorageException (if the doc already exists)
-     */
-    public void delete(String path, int cascade) throws StorageException;
-
-    /**
-     * Erases a resource. Raises an exception if the document does not exist.
-     *
-     * @param config storage configuration to apply
-     * @param path the path of the resource (relative to a root)
-     * @throws StorageException
-     */
-    public void delete(Map config, String path) throws StorageException;
-
-    /**
-     * Erases a resource. If cascading is specified to oneLevel, a resource and all its subresources are deleted. Raises an
-     * exception if the document does not exist.
-     *
-     * @param config storage configuration to apply
-     * @param path the path of the resource (relative to a root)
-     * @param cascade a constant ONE_LEVEL, NONE or SUBTREE
-     * @throws StorageException if the document does not exist
-     */
-    public void delete(Map config, String path, int cascade) throws StorageException;
-
-    /**
-     * Performs a batch of modifications to the database in a single transaction
-     *
-     * @param tabModif array of modifications to perform
-     * @throws StorageException
-     */
-    public void batchModify(Modification[] tabModif) throws StorageException;
-
-    /**
-     * Creates a modification object. Does not modify the database.
-     *
-     * @param type a constant UPDATE, DELETE or CREATE
-     * @param fullpath full path of the document impacted by the modification
-     * @param rawDocument value of the new resource
-     * @param searchAttributes a collection containing instances of com.actility.util.Pair
-     * @return
-     */
-    public Modification createModification(int type, String fullpath, byte[] rawDocument, Collection searchAttributes);
-
-    /**
-     * Creates a modification object. Does not modify the database.
-     *
-     * @param config storage configuration to apply
-     * @param type a constant UPDATE, DELETE or CREATE
-     * @param fullpath full path of the document impacted by the modification
-     * @param rawDocument value of the new resource
-     * @param searchAttributes a collection containing instances of com.actility.util.Pair
-     * @return
-     */
-    public Modification createModification(Map config, int type, String fullpath, byte[] rawDocument,
-            Collection searchAttributes);
+    public SearchResult search(Map/* <String, String> */config, String path, int scope, Condition condition, int order,
+            int limit, boolean withContent, List/* <String> */withAttributes) throws StorageException;
 
     /**
      * Reserves space for the creation of future documents
@@ -378,6 +186,15 @@ public interface StorageRequestExecutor {
      * @param docNumber maximum number of documents that can be created in reserved space
      * @param docSize maximum size of documents that can be created in reserved space
      * @return A reservation code
+     * @throws StorageException if any problem occurs while reserving space
      */
-    public String reserveSpace(Map config, String path, String docNumber, double docSize);
+    public String reserveSpace(Map/* <String, String> */config, String path, String docNumber, double docSize)
+            throws StorageException;
+
+    /**
+     * Gets the storage factory that allows applications to build storage objects.
+     *
+     * @return The storage factory
+     */
+    public StorageFactory getStorageFactory();
 }

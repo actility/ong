@@ -4,14 +4,16 @@ targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m">
 	<include schemaLocation="mgmtObj.xsd"/>
 	<include schemaLocation="parameters.xsd"/>
 
+	<element name="safPolicySet" type="tns:SafPolicySet"/>
+
 	<!-- safPolicySet resource type -->
 	<complexType name="SafPolicySet">
 		<complexContent>
 			<extension base="tns:Parameters">
 				<sequence>
-					<element ref="tns:policyScope" minOccurs="0" />
+                    <!-- attributes -->
+					<element ref="tns:policyScope" minOccurs="1"  maxOccurs="1"/>
 				</sequence>
-				<!-- attribute ref="tns:id" use="required"/-->
 			</extension>
 		</complexContent>
 	</complexType>

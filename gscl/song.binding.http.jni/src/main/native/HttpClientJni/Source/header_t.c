@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,7 +8,6 @@
 
 #include "common.h"
 #include "header_t.h"
-
 
 static void header_t_init(header_t *This);
 
@@ -68,14 +66,13 @@ void header_t_newFree(header_t *This)
  * @param This the object-like instance.
  * @param value the value to add to the header.
  */
-void header_t_addValue (header_t *This, char *value)
+void header_t_addValue(header_t *This, char *value)
 {
-  LOG(TRACE_DEBUG, "header_t::addHeader (name:%s) (value:%s)",
-    This->name, value);
+  LOG(TRACE_DEBUG, "header_t::addHeader (name:%s) (value:%s)", This->name, value);
   if ((!value) || (!*value))
   {
     LOG(TRACE_ERROR, "header_t::addHeader: error - no value provided"
-      " (name:%s)", This->name);
+        " (name:%s)", This->name);
     return;
   }
 
@@ -85,12 +82,11 @@ void header_t_addValue (header_t *This, char *value)
   }
   else
   {
-    size_t valuesSize = strlen(This->values) + strlen(value) + 2 /* ", " */ + 1;
+    size_t valuesSize = strlen(This->values) + strlen(value) + 2 /* ", " */+ 1;
     char *newValues = malloc(valuesSize * sizeof(char));
     sprintf(newValues, "%s, %s", This->values, value);
     free(This->values);
     This->values = newValues;
-  } 
+  }
 }
-
 

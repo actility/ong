@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -71,7 +70,7 @@ freeTransactionsList_t *new_freeTransactionsList_t(httpClient_t *client, int max
 void freeTransactionsList_t_newFree(freeTransactionsList_t *This)
 {
   LOG(TRACE_DEBUG, "freeTransactionsList_t::newFree (This:0x%.8x)", This);
-  while ( ! list_empty(&(This->transactions)))
+  while (!list_empty(&(This->transactions)))
   {
     transaction_t * t = list_entry(This->transactions.next, transaction_t, chainLink);
     list_del(&t->chainLink);
@@ -113,7 +112,7 @@ transaction_t *freeTransactionsList_t_recycle(freeTransactionsList_t *This)
   struct list_head *link = (&(This->transactions))->next;
   transaction_t *toRemove = NULL;
 //  if (link != (&(This->transactions))) // list is not empty
-  if (This->size > (This->maxSize/2))
+  if (This->size > (This->maxSize / 2))
   {
     toRemove = list_entry(link, transaction_t, chainLink);
     list_del(&(toRemove->chainLink));
@@ -131,5 +130,4 @@ transaction_t *freeTransactionsList_t_recycle(freeTransactionsList_t *This)
   }
   return toRemove;
 }
-
 

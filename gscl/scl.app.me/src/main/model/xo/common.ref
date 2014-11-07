@@ -40,20 +40,22 @@ m2m:NamedReferenceCollection from ong:t_xml_obj
 {
     m2m:namedReference    m2m:ReferenceToNamedResource    { list wraphidden } // (list size: [0, infinity[) 
 }
+alias m2m:NamedReferenceCollection with m2m:groupCollection
+alias m2m:NamedReferenceCollection with m2m:groupAnncCollection
+alias m2m:NamedReferenceCollection with m2m:containerCollection
+alias m2m:NamedReferenceCollection with m2m:sclCollection
+alias m2m:NamedReferenceCollection with m2m:applicationCollection
+alias m2m:NamedReferenceCollection with m2m:applicationAnncCollection
+alias m2m:NamedReferenceCollection with m2m:communicationChannelCollection
+alias m2m:NamedReferenceCollection with m2m:subscriptionCollection
 alias m2m:NamedReferenceCollection with m2m:accessRightCollection
 alias m2m:NamedReferenceCollection with m2m:accessRightAnncCollection
-alias m2m:NamedReferenceCollection with m2m:containerCollection
+alias m2m:NamedReferenceCollection with m2m:notificationChannelCollection
 alias m2m:NamedReferenceCollection with m2m:containerAnncCollection
 alias m2m:NamedReferenceCollection with m2m:locationContainerCollection
 alias m2m:NamedReferenceCollection with m2m:locationContainerAnncCollection
-alias m2m:NamedReferenceCollection with m2m:subscriptionCollection
-alias m2m:NamedReferenceCollection with m2m:groupCollection
-alias m2m:NamedReferenceCollection with m2m:groupAnncCollection
-alias m2m:NamedReferenceCollection with m2m:notificationChannelCollection
-alias m2m:NamedReferenceCollection with m2m:sclCollection
 alias m2m:NamedReferenceCollection with m2m:m2mPocCollection
-alias m2m:NamedReferenceCollection with m2m:applicationCollection
-alias m2m:NamedReferenceCollection with m2m:applicationAnncCollection
+alias m2m:NamedReferenceCollection with m2m:sclAnncCollection
 
 m2m:SearchStrings from ong:t_xml_obj
 {
@@ -67,8 +69,8 @@ m2m:AnyURIList from ong:t_xml_obj
 }
 alias m2m:AnyURIList with m2m:sclList
 alias m2m:AnyURIList with m2m:discoveryURI
-alias m2m:AnyURIList with m2m:pocs
 alias m2m:AnyURIList with m2m:members
+alias m2m:AnyURIList with m2m:pocs
 
 m2m:AnnounceTo from ong:t_xml_obj
 {
@@ -83,14 +85,39 @@ m2m:FilterCriteriaType from ong:t_xml_obj
     xsi:type    XoString    { embattr } // (optional) (xmlType: xsd:QName)
     ifModifiedSince    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     ifUnmodifiedSince    XoString    { } // (optional) (xmlType: xsd:dateTime) 
-    ifMatch    XoString    { list } // (xmlType: xsd:string) (list size: [0, infinity[) 
     ifNoneMatch    XoString    { list } // (xmlType: xsd:string) (list size: [0, infinity[) 
+    attributeAccessor    XoString    { } // (xmlType: xsd:anyURI) 
+    searchString    XoString    { list } // (xmlType: xsd:string) (list size: [0, infinity[) 
+    createdAfter    XoString    { } // (optional) (xmlType: xsd:dateTime) 
+    createdBefore    XoString    { } // (optional) (xmlType: xsd:dateTime) 
+    maxSize    XoString    { } // (optional) (xmlType: xsd:long) 
+    searchPrefix    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    inType    XoString    { list shdico } // (xmlType: m2m:ResourceType) (list size: [0, infinity[) (enum: CS RS AN CI CT AP SB SL AR MT GP PM ) 
+    outType    XoString    { list shdico } // (xmlType: m2m:ResourceType) (list size: [0, infinity[) (enum: CS RS AN CI CT AP SB SL AR MT GP PM ) 
 }
 alias m2m:FilterCriteriaType with m2m:filterCriteria
 
+m2m:ChannelData from ong:t_xml_obj
+{
+    xsi:type    XoString    { embattr } // (optional) (xmlType: xsd:QName)
+}
+alias m2m:ChannelData with m2m:channelData
+
+m2m:LongPollingChannelData from m2m:ChannelData
+{
+    m2m:longPollingURI    XoString    { } // (xmlType: xsd:anyURI) 
+}
+
+stext m2m:ScheduleString from ong:t_xml_obj
+{
+    value$    XoString    {  } // xsd:string
+    id    XoString    { embattr } // (xmlType: xsd:anySimpleType) 
+}
+alias m2m:ScheduleString with m2m:scheduleString
+
 m2m:Schedule from ong:t_xml_obj
 {
-    scheduleString    XoString    { list } // (xmlType: xsd:string) (list size: [0, infinity[) 
+    m2m:scheduleString    m2m:ScheduleString    { list wraphidden } // (list size: [0, infinity[) 
 }
 alias m2m:Schedule with m2m:schedule
 

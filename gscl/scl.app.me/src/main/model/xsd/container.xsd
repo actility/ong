@@ -2,7 +2,7 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m" xmlns:acy="http://uri.actility.com/m2m">
 
 	<include schemaLocation="common.xsd" />
-  
+
     <import namespace="http://uri.actility.com/m2m" schemaLocation="actility.xsd" />
 
 	<element name="container" type="tns:Container" />
@@ -22,6 +22,7 @@
 			<!--  not defined yet element ref="tns:containerType" minOccurs="0"  -->
 			<!-- subresources -->
 			<element ref="tns:contentInstancesReference" minOccurs="0" />
+			<element ref="tns:subcontainersReference" minOccurs="0" />
 			<element ref="tns:subscriptionsReference" minOccurs="0" />
 		</sequence>
 		<attribute ref="tns:id"/>
@@ -29,5 +30,5 @@
 
 	<element name="maxNrOfInstances" type="long"/>
 	<element name="maxByteSize" type="long"/>
-	<element name="maxInstanceAge" type="long"/>
+	<element name="maxInstanceAge" type="duration"/>
 </schema>

@@ -22,12 +22,12 @@
   or visit www.actility.com if you need additional
   information or have any questions.
   
-  id $Id: pom.xml 7968 2014-03-07 14:34:08Z JReich $
+  id $Id: pom.xml 9044 2014-07-03 15:50:18Z JReich $
   author $Author: JReich $
-  version $Revision: 7968 $
-  lastrevision $Date: 2014-03-07 15:34:08 +0100 (Fri, 07 Mar 2014) $
+  version $Revision: 9044 $
+  lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
   modifiedby $LastChangedBy: JReich $
-  lastmodified $LastChangedDate: 2014-03-07 15:34:08 +0100 (Fri, 07 Mar 2014) $
+  lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -39,7 +39,7 @@
     <version>3.0.0</version>
   </parent>
   <artifactId>jxo.api</artifactId>
-  <version>3.0.0</version>
+  <version>3.2.0</version>
   <packaging>bundle</packaging>
 
   <name>[API] JXO Service</name>

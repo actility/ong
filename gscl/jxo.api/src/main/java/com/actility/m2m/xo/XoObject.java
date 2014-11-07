@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: XoObject.java 7483 2014-02-03 17:19:04Z JReich $
+ * id $Id: XoObject.java 9044 2014-07-03 15:50:18Z JReich $
  * author $Author: JReich $
- * version $Revision: 7483 $
- * lastrevision $Date: 2014-02-03 18:19:04 +0100 (Mon, 03 Feb 2014) $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-02-03 18:19:04 +0100 (Mon, 03 Feb 2014) $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.xo;
@@ -94,6 +94,14 @@ public interface XoObject {
      * Only relevant for Xo objects which represents XML
      */
     void clearNameSpaces();
+
+    /**
+     * Checks whether the given attribute exists and has a value.
+     *
+     * @param path The path to the attribute
+     * @return Whether the attribute exists and has a value
+     */
+    boolean containsAttribute(String path);
 
     /**
      * Gets an attribute of an Xo object which is known to be an Xo object.

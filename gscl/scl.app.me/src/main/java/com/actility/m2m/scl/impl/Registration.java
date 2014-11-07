@@ -38,9 +38,11 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.m2m.ChannelClientListener;
 import com.actility.m2m.m2m.Confirm;
 import com.actility.m2m.m2m.M2MConstants;
 import com.actility.m2m.m2m.M2MException;
@@ -61,7 +63,7 @@ import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
 import com.actility.m2m.xo.XoService;
 
-public final class Registration implements Serializable {
+public final class Registration implements Serializable, ChannelClientListener {
 
     /**
      *
@@ -80,26 +82,29 @@ public final class Registration implements Serializable {
     private static final int ST_RETRIEVE_SCL = 7;
     private static final int ST_UPDATE_M2M_POC = 8;
     private static final int ST_CREATE_M2M_POC = 9;
-    private static final int ST_RETRIEVE_NC = 10;
-    private static final int ST_CREATE_NC = 11;
+    private static final int ST_RETRIEVE_CC = 10;
+    private static final int ST_CREATE_CC = 11;
     private static final int ST_REFRESH_SCL = 12;
     private static final int ST_REFRESH_UPDATE_SCL = 13;
     private static final int ST_RETRY_INIT = 14;
     private static final int ST_FINISHED = 15;
 
+    private static final long RANDOM_RETRY_TIMER = 20000L;
+
     private static final String[] ST_NAMES = { "ST_INIT_RETRIEVE_SCL_BASE", "ST_UPDATE_ACCESS_RIGHT", "ST_CREATE_ACCESS_RIGHT",
             "ST_UPDATE_SCL", "ST_CREATE_SCL", "ST_RETRIEVE_SCL_BASE", "ST_RETRIEVE_SCL_BASE_AND_RETRIEVE_SCL",
-            "ST_RETRIEVE_SCL", "ST_UPDATE_M2M_POC", "ST_CREATE_M2M_POC", "ST_RETRIEVE_NC", "ST_CREATE_NC", "ST_REFRESH_SCL",
+            "ST_RETRIEVE_SCL", "ST_UPDATE_M2M_POC", "ST_CREATE_M2M_POC", "ST_RETRIEVE_CC", "ST_CREATE_CC", "ST_REFRESH_SCL",
             "ST_REFRESH_UPDATE_SCL", "ST_RETRY_INIT", "ST_FINISHED" };
 
     private String timerId;
     private boolean localNsclCreated;
     private URI poc;
-    private URI data;
+    private URI longPollingUri;
     private String accessRightID;
     private boolean serverCapable;
     private long nextExpiration;
     private int state;
+    private boolean ccOk;
 
     private final String name;
     private final SclManager manager;
@@ -111,8 +116,8 @@ public final class Registration implements Serializable {
     private final URI accessRightUri;
     private final URI m2mPocsUri;
     private final URI m2mPocUri;
-    private final URI notificationChannelsUri;
-    private final URI notificationChannelUri;
+    private final URI communicationChannelsUri;
+    private final URI communicationChannelUri;
     private final String systemHolderRef;
     private final String supportHolderRef;
     private final String gsclHolderRef;
@@ -130,9 +135,9 @@ public final class Registration implements Serializable {
         this.accessRightUri = URI.create(accessRightsUri.toString() + M2MConstants.URI_SEP + URIUtils.encodePath(name));
         this.m2mPocsUri = URI.create(sclUri.toString() + M2MConstants.URI_SEP + M2MConstants.RES_M2M_POCS);
         this.m2mPocUri = URI.create(m2mPocsUri.toString() + M2MConstants.URI_SEP + "m2mPoc1");
-        this.notificationChannelsUri = URI.create(sclUri.toString() + M2MConstants.URI_SEP
-                + M2MConstants.RES_NOTIFICATION_CHANNELS);
-        this.notificationChannelUri = URI.create(notificationChannelsUri.toString() + M2MConstants.URI_SEP + "nc1");
+        this.communicationChannelsUri = URI.create(sclUri.toString() + M2MConstants.URI_SEP
+                + M2MConstants.RES_COMMUNICATION_CHANNELS);
+        this.communicationChannelUri = URI.create(communicationChannelsUri.toString() + M2MConstants.URI_SEP + "cc1");
         this.systemHolderRef = nsclUri.toString() + M2MConstants.URI_SEP + M2MConstants.RES_APPLICATIONS + M2MConstants.URI_SEP
                 + "SYSTEM";
         this.supportHolderRef = nsclUri.toString() + M2MConstants.URI_SEP + M2MConstants.RES_APPLICATIONS
@@ -180,12 +185,12 @@ public final class Registration implements Serializable {
         XoObject sclBase = getSclBase();
         try {
             scl = SclBase.getInstance().createSclRepresentation(manager, sclBase);
-            scl.setStringAttribute(M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D, accessRightID);
         } finally {
             sclBase.free(true);
         }
         nextExpiration = Long.MAX_VALUE;
-        scl.setStringAttribute(M2MConstants.TAG_M2M_MGMT_PROTOCOL_TYPE, M2MConstants.MGMT_PROTOCOL_TYPE_TR_069);
+        scl.setStringAttribute(M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D, accessRightID);
+        scl.setStringAttribute(M2MConstants.TAG_M2M_MGMT_PROTOCOL_TYPE, M2MConstants.MGMT_PROTOCOL_TYPE_BBF_TR069);
         return scl;
     }
 
@@ -196,6 +201,7 @@ public final class Registration implements Serializable {
 
         scl.setStringAttribute(M2MConstants.ATTR_SCL_ID, name);
         scl.setStringAttribute(M2MConstants.TAG_M2M_LINK, getLocalSclUri().toString());
+        scl.setStringAttribute(M2MConstants.TAG_M2M_SCL_TYPE, M2MConstants.SCL_TYPE_GSCL);
         return scl;
     }
 
@@ -210,6 +216,7 @@ public final class Registration implements Serializable {
 
         XoObject pOwnerPermission = xoService.newXmlXoObject(M2MConstants.TAG_M2M_PERMISSION);
         permissionsList.add(pOwnerPermission);
+        pOwnerPermission.setStringAttribute(M2MConstants.ATTR_M2M_ID, "OWNER");
         XoObject pOwnerPermissionFlags = xoService.newXmlXoObject(M2MConstants.TAG_M2M_PERMISSION_FLAGS);
         pOwnerPermission.setXoObjectAttribute(M2MConstants.TAG_M2M_PERMISSION_FLAGS, pOwnerPermissionFlags);
         List pOwnerPermissionFlagsList = pOwnerPermissionFlags.getStringListAttribute(M2MConstants.TAG_M2M_FLAG);
@@ -228,6 +235,7 @@ public final class Registration implements Serializable {
 
         XoObject pSupportPermission = xoService.newXmlXoObject(M2MConstants.TAG_M2M_PERMISSION);
         permissionsList.add(pSupportPermission);
+        pSupportPermission.setStringAttribute(M2MConstants.ATTR_M2M_ID, "SUPPORT");
         XoObject pSupportPermissionFlags = xoService.newXmlXoObject(M2MConstants.TAG_M2M_PERMISSION_FLAGS);
         pSupportPermission.setXoObjectAttribute(M2MConstants.TAG_M2M_PERMISSION_FLAGS, pSupportPermissionFlags);
         List pSupportPermissionFlagsList = pSupportPermissionFlags.getStringListAttribute(M2MConstants.TAG_M2M_FLAG);
@@ -245,6 +253,7 @@ public final class Registration implements Serializable {
 
         XoObject pGsclPermission = xoService.newXmlXoObject(M2MConstants.TAG_M2M_PERMISSION);
         permissionsList.add(pGsclPermission);
+        pGsclPermission.setStringAttribute(M2MConstants.ATTR_M2M_ID, "GSCL");
         XoObject pGsclPermissionFlags = xoService.newXmlXoObject(M2MConstants.TAG_M2M_PERMISSION_FLAGS);
         pGsclPermission.setXoObjectAttribute(M2MConstants.TAG_M2M_PERMISSION_FLAGS, pGsclPermissionFlags);
         List pGsclPermissionFlagsList = pGsclPermissionFlags.getStringListAttribute(M2MConstants.TAG_M2M_FLAG);
@@ -282,9 +291,10 @@ public final class Registration implements Serializable {
         XoObject contactInfo = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_CONTACT_INFO);
         m2mPoc.setXoObjectAttribute(M2MConstants.TAG_M2M_CONTACT_INFO, contactInfo);
         contactInfo.setStringAttribute(M2MConstants.TAG_M2M_CONTACT_U_R_I, poc.toString());
-        // TODO remove this
         contactInfo.setStringAttribute(M2MConstants.TAG_M2M_OTHER, "x");
-        m2mPoc.setStringAttribute(M2MConstants.TAG_M2M_ONLINE_STATUS, M2MConstants.ONLINE_STATUS_ONLINE);
+        if (serverCapable) {
+            m2mPoc.setStringAttribute(M2MConstants.TAG_M2M_ONLINE_STATUS, M2MConstants.ONLINE_STATUS_ONLINE);
+        }
         return m2mPoc;
     }
 
@@ -295,42 +305,49 @@ public final class Registration implements Serializable {
         return m2mPoc;
     }
 
-    private XoObject getCreateNotificationChannelRepresentation() throws XoException {
+    private XoObject getCreateCommunicationChannelRepresentation() throws XoException {
         // TODO this could leak
-        XoObject nc = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_NOTIFICATION_CHANNEL);
-        nc.setNameSpace(M2MConstants.PREFIX_M2M);
-        nc.setStringAttribute(M2MConstants.ATTR_M2M_ID, "nc1");
-        nc.setStringAttribute(M2MConstants.TAG_M2M_CHANNEL_TYPE, M2MConstants.CHANNEL_TYPE_LONG_POLLING);
-        return nc;
+        XoObject cc = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_COMMUNICATION_CHANNEL);
+        cc.setNameSpace(M2MConstants.PREFIX_M2M);
+        cc.setStringAttribute(M2MConstants.ATTR_M2M_ID, "cc1");
+        cc.setStringAttribute(M2MConstants.TAG_M2M_CHANNEL_TYPE, M2MConstants.CHANNEL_TYPE_LONG_POLLING);
+        return cc;
     }
 
-    private void createLongPoll(URI context, XoObject representation) throws M2MException {
-        // TODO should check it is a valid <notificationChannel>
-        SclResource.checkRepresentation(representation, M2MConstants.TAG_M2M_NOTIFICATION_CHANNEL);
+    private void createCommunicationChannel(URI context, XoObject representation) throws M2MException {
+        // TODO should check it is a valid <communicationChannel>
+        SclResource.checkRepresentation(representation, M2MConstants.TAG_M2M_COMMUNICATION_CHANNEL);
         if (context == null) {
             throw new M2MException("Request does not declare a resource URI", StatusCode.STATUS_BAD_REQUEST);
         }
         URI newPoc = SclResource.getAndCheckURI(representation, M2MConstants.TAG_M2M_CONTACT_U_R_I, Constants.ID_MODE_REQUIRED);
-        URI newData = SclResource.getAndCheckLongPollingChannelData(representation, M2MConstants.TAG_M2M_CHANNEL_DATA,
-                Constants.ID_MODE_REQUIRED);
+        URI newLongPollingUri = SclResource.getAndCheckLongPollingChannelData(representation,
+                M2MConstants.TAG_M2M_CHANNEL_DATA, Constants.ID_MODE_REQUIRED);
         newPoc = context.resolve(newPoc);
-        newData = context.resolve(newData);
+        newLongPollingUri = context.resolve(newLongPollingUri);
         if (LOG.isInfoEnabled()) {
-            LOG.info(nsclUri + ": Create client long poll connection " + newPoc + " " + newData);
+            LOG.info(nsclUri + ": Create client long polling connection " + newPoc + " " + newLongPollingUri);
         }
-        manager.getM2MContext().createClientLongPoll(newPoc, newData);
+        if (poc != null && longPollingUri != null) {
+            if (!poc.equals(newPoc) || !longPollingUri.equals(newLongPollingUri)) {
+                deleteCommunicationChannel();
+                manager.getM2MContext().createClientCommunicationChannel(newPoc, newLongPollingUri, sclUri, this);
+            }
+        } else {
+            manager.getM2MContext().createClientCommunicationChannel(newPoc, newLongPollingUri, sclUri, this);
+        }
         this.poc = newPoc;
-        this.data = newData;
+        this.longPollingUri = newLongPollingUri;
     }
 
-    private void deleteLongPoll() {
+    private void deleteCommunicationChannel() {
         if (poc != null && !serverCapable) {
             if (LOG.isInfoEnabled()) {
-                LOG.info(nsclUri + ": Delete client long poll connection " + poc + " " + data);
+                LOG.info(nsclUri + ": Delete client long polling connection " + poc + " " + longPollingUri);
             }
-            manager.getM2MContext().deleteClientLongPoll(poc, data);
+            manager.getM2MContext().deleteClientCommunicationChannel(poc, longPollingUri);
             poc = null;
-            data = null;
+            longPollingUri = null;
         }
     }
 
@@ -456,8 +473,8 @@ public final class Registration implements Serializable {
     private void sendCreateNc() throws IOException, XoException {
         XoObject representation = null;
         try {
-            representation = getCreateNotificationChannelRepresentation();
-            sendRequest(M2MConstants.MD_CREATE, notificationChannelsUri, representation);
+            representation = getCreateCommunicationChannelRepresentation();
+            sendRequest(M2MConstants.MD_CREATE, communicationChannelsUri, representation);
         } finally {
             if (representation != null) {
                 representation.free(true);
@@ -465,49 +482,42 @@ public final class Registration implements Serializable {
         }
     }
 
-    private void sendRetrieveNc() throws IOException, XoException {
-        sendRequest(M2MConstants.MD_RETRIEVE, notificationChannelUri, null);
+    private void sendRetrieveCc() throws IOException, XoException {
+        sendRequest(M2MConstants.MD_RETRIEVE, communicationChannelUri, null);
     }
 
     private void cleanupData() throws ParseException, UnsupportedEncodingException, StorageException, XoException, M2MException {
         accessRightID = null;
-        deleteLongPoll();
+        deleteCommunicationChannel();
         deleteLocalNscl();
     }
 
     private void startRefreshSclTimer() {
-        long expiration = nextExpiration - System.currentTimeMillis();
-        if (expiration > 0) {
-            expiration = (expiration >> 1);
-            long maxRefresh = manager.getSclConfig().getRegistrationExpirationDuration();
-            if (expiration > maxRefresh) {
-                expiration = maxRefresh;
-            }
-            if (LOG.isInfoEnabled()) {
-                LOG.info(nsclUri + ": Start registration expiration timer for " + expiration + "ms");
-            }
-            timerId = manager.getM2MContext().startTimer(expiration, this);
+        if (poc != null && !serverCapable && !ccOk) {
+            LOG.error(nsclUri + ": <communicationChannel> is in error state. Retry connection");
+            switchToState(ST_RETRY_INIT);
+            startRetryInitTimer();
         } else {
-            timeout(timerId);
+            long expiration = nextExpiration - System.currentTimeMillis();
+            if (expiration > 0) {
+                expiration = (expiration >> 1);
+                long maxRefresh = manager.getSclConfig().getRegistrationExpirationDuration();
+                if (expiration > maxRefresh) {
+                    expiration = maxRefresh;
+                }
+                if (LOG.isInfoEnabled()) {
+                    LOG.info(nsclUri + ": Start registration expiration timer for " + expiration + "ms");
+                }
+                timerId = manager.getM2MContext().startTimer(expiration, this);
+            } else {
+                timeout(timerId);
+            }
         }
     }
 
     private void startRetryInitTimer() {
-        deleteLongPoll();
-        try {
-            deleteLocalNscl();
-        } catch (M2MException e) {
-            LOG.error(nsclUri + ": M2MException while deleting local nscl resource", e);
-        } catch (XoException e) {
-            LOG.error(nsclUri + ": XoException while deleting local nscl resource", e);
-        } catch (StorageException e) {
-            LOG.error(nsclUri + ": StorageException while deleting local nscl resource", e);
-        } catch (UnsupportedEncodingException e) {
-            LOG.error(nsclUri + ": UnsupportedEncodingException while deleting local nscl resource", e);
-        } catch (ParseException e) {
-            LOG.error(nsclUri + ": ParseException while deleting local nscl resource", e);
-        }
-        long retryDuration = manager.getSclConfig().getRegistrationRetryDuration();
+        long retryDuration = manager.getSclConfig().getRegistrationRetryDuration()
+                + (Math.abs(new Random().nextLong()) % (RANDOM_RETRY_TIMER + 1000L));
         if (LOG.isInfoEnabled()) {
             LOG.info(nsclUri + ": Start retry timer for " + retryDuration + "ms");
         }
@@ -542,7 +552,7 @@ public final class Registration implements Serializable {
     public synchronized void register() {
         boolean bindingRequested = false;
         try {
-            localNsclCreated = (manager.getStorageContext().retrieve(Constants.PATH_NSCL) != null);
+            localNsclCreated = (manager.getStorageContext().retrieve(null, Constants.PATH_NSCL, null) != null);
             deleteLocalNscl();
             this.serverCapable = manager.getM2MContext().canBeServer(sclsUri);
             bindingRequested = true;
@@ -601,7 +611,7 @@ public final class Registration implements Serializable {
                 if (representation != null) {
                     String id = representation.getStringAttribute(M2MConstants.ATTR_M2M_ID);
                     if (id != null) {
-                        accessRightID = accessRightsUri.getPath() + URIUtils.encodePath(id);
+                        accessRightID = accessRightsUri.getPath() + M2MConstants.URI_SEP + URIUtils.encodePath(id);
                     }
                 }
                 switchToState(ST_UPDATE_SCL);
@@ -636,12 +646,12 @@ public final class Registration implements Serializable {
             case ST_RETRIEVE_SCL_BASE:
                 representation = confirm.getRepresentation();
                 updateLocalNscl(representation);
-                if (poc != null) {
+                if (poc != null && serverCapable) {
                     switchToState(ST_UPDATE_M2M_POC);
                     sendUpdateM2MPoc();
                 } else {
-                    switchToState(ST_RETRIEVE_NC);
-                    sendRetrieveNc();
+                    switchToState(ST_RETRIEVE_CC);
+                    sendRetrieveCc();
                 }
                 break;
             case ST_RETRIEVE_SCL_BASE_AND_RETRIEVE_SCL:
@@ -654,12 +664,12 @@ public final class Registration implements Serializable {
                 representation = confirm.getRepresentation();
                 sclBase = getSclBase();
                 extractAPoCHandling(sclBase, representation);
-                if (poc != null) {
+                if (poc != null && serverCapable) {
                     switchToState(ST_UPDATE_M2M_POC);
                     sendUpdateM2MPoc();
                 } else {
-                    switchToState(ST_RETRIEVE_NC);
-                    sendRetrieveNc();
+                    switchToState(ST_RETRIEVE_CC);
+                    sendRetrieveCc();
                 }
                 break;
             case ST_UPDATE_M2M_POC:
@@ -670,15 +680,17 @@ public final class Registration implements Serializable {
                 switchToState(ST_REFRESH_SCL);
                 startRefreshSclTimer();
                 break;
-            case ST_RETRIEVE_NC:
+            case ST_RETRIEVE_CC:
                 representation = confirm.getRepresentation();
-                createLongPoll(confirm.getResourceURI(), representation);
+                createCommunicationChannel(confirm.getResourceURI(), representation);
+                ccOk = true;
                 switchToState(ST_UPDATE_M2M_POC);
                 sendUpdateM2MPoc();
                 break;
-            case ST_CREATE_NC:
+            case ST_CREATE_CC:
                 representation = confirm.getRepresentation();
-                createLongPoll(confirm.getResourceURI(), representation);
+                createCommunicationChannel(confirm.getResourceURI(), representation);
+                ccOk = true;
                 switchToState(ST_UPDATE_M2M_POC);
                 sendUpdateM2MPoc();
                 break;
@@ -773,12 +785,12 @@ public final class Registration implements Serializable {
                 startRetryInitTimer();
                 break;
             case ST_RETRIEVE_SCL_BASE:
-                if (poc != null) {
+                if (poc != null && serverCapable) {
                     switchToState(ST_UPDATE_M2M_POC);
                     sendUpdateM2MPoc();
                 } else {
-                    switchToState(ST_RETRIEVE_NC);
-                    sendRetrieveNc();
+                    switchToState(ST_RETRIEVE_CC);
+                    sendRetrieveCc();
                 }
                 break;
             case ST_RETRIEVE_SCL_BASE_AND_RETRIEVE_SCL:
@@ -788,12 +800,12 @@ public final class Registration implements Serializable {
             case ST_RETRIEVE_SCL:
                 sclBase = getSclBase();
                 extractAPoCHandling(sclBase, null);
-                if (poc != null) {
+                if (poc != null && serverCapable) {
                     switchToState(ST_UPDATE_M2M_POC);
                     sendUpdateM2MPoc();
                 } else {
-                    switchToState(ST_RETRIEVE_NC);
-                    sendRetrieveNc();
+                    switchToState(ST_RETRIEVE_CC);
+                    sendRetrieveCc();
                 }
                 break;
             case ST_UPDATE_M2M_POC:
@@ -813,19 +825,19 @@ public final class Registration implements Serializable {
                 switchToState(ST_RETRY_INIT);
                 startRetryInitTimer();
                 break;
-            case ST_RETRIEVE_NC:
+            case ST_RETRIEVE_CC:
                 if (confirm.getStatusCode() == StatusCode.STATUS_NOT_FOUND) {
-                    switchToState(ST_CREATE_NC);
+                    switchToState(ST_CREATE_CC);
                     sendCreateNc();
                 } else {
-                    LOG.error(nsclUri + ": Cannot retrieve remote <notificationChannel> on " + notificationChannelUri
+                    LOG.error(nsclUri + ": Cannot retrieve remote <communicationChannel> on " + communicationChannelUri
                             + ". Received " + confirm.getStatusCode());
                     switchToState(ST_RETRY_INIT);
                     startRetryInitTimer();
                 }
                 break;
-            case ST_CREATE_NC:
-                LOG.error(nsclUri + ": Cannot create remote <notificationChannel> on " + notificationChannelsUri
+            case ST_CREATE_CC:
+                LOG.error(nsclUri + ": Cannot create remote <communicationChannel> on " + communicationChannelsUri
                         + ". Received " + confirm.getStatusCode());
                 switchToState(ST_RETRY_INIT);
                 startRetryInitTimer();
@@ -907,10 +919,10 @@ public final class Registration implements Serializable {
             case ST_CREATE_M2M_POC:
                 LOG.error(nsclUri + ": Received timeout in ST_CREATE_M2M_POC");
                 break;
-            case ST_RETRIEVE_NC:
+            case ST_RETRIEVE_CC:
                 LOG.error(nsclUri + ": Received timeout in ST_RETRIEVE_NC");
                 break;
-            case ST_CREATE_NC:
+            case ST_CREATE_CC:
                 LOG.error(nsclUri + ": Received timeout in ST_CREATE_NC");
                 break;
             case ST_REFRESH_SCL:
@@ -987,11 +999,11 @@ public final class Registration implements Serializable {
                 switchToState(ST_FINISHED);
                 cleanupData();
                 break;
-            case ST_RETRIEVE_NC:
+            case ST_RETRIEVE_CC:
                 switchToState(ST_FINISHED);
                 cleanupData();
                 break;
-            case ST_CREATE_NC:
+            case ST_CREATE_CC:
                 switchToState(ST_FINISHED);
                 cleanupData();
                 break;
@@ -1022,5 +1034,43 @@ public final class Registration implements Serializable {
         } catch (M2MException e) {
             LOG.error(nsclUri + ": M2M error while cleaning registration data", e);
         }
+    }
+
+    public void channelError() {
+        if (LOG.isInfoEnabled()) {
+            LOG.info(nsclUri + ": channelError " + ST_NAMES[state]);
+        }
+        ccOk = false;
+        switch (state) {
+        case ST_INIT_RETRIEVE_SCL_BASE:
+        case ST_UPDATE_ACCESS_RIGHT:
+        case ST_CREATE_ACCESS_RIGHT:
+        case ST_UPDATE_SCL:
+        case ST_CREATE_SCL:
+        case ST_RETRIEVE_SCL_BASE:
+        case ST_RETRIEVE_SCL_BASE_AND_RETRIEVE_SCL:
+        case ST_RETRIEVE_SCL:
+        case ST_UPDATE_M2M_POC:
+        case ST_CREATE_M2M_POC:
+        case ST_RETRIEVE_CC:
+        case ST_CREATE_CC:
+            break;
+        case ST_REFRESH_SCL:
+            manager.getM2MContext().cancelTimer(timerId);
+            switchToState(ST_RETRY_INIT);
+            startRetryInitTimer();
+            break;
+        case ST_REFRESH_UPDATE_SCL:
+        case ST_RETRY_INIT:
+        case ST_FINISHED:
+            break;
+        }
+    }
+
+    public void channelOk() {
+        if (LOG.isInfoEnabled()) {
+            LOG.info(nsclUri + ": channelOk " + ST_NAMES[state]);
+        }
+        ccOk = true;
     }
 }

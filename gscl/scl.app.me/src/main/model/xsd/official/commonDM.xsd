@@ -34,6 +34,12 @@
 		</sequence>
 	</complexType>
 
+	<simpleType name="MemorySize">
+	  <restriction base="NMTOKEN">
+		<pattern value="[0-9]{1,15}[BKMGT]" />
+	  </restriction>
+      </simpleType>
+
 
 	<simpleType name="FinalStatus">
 		<restriction base="string">
@@ -42,24 +48,36 @@
 		</restriction>
 	</simpleType>
 
-	<element name="rcatList" type="tns:RcatList" />
-	<complexType name="RcatList">
-		<sequence>
-			<element ref="tns:rcatType" minOccurs="1" maxOccurs="unbounded" />
-		</sequence>
-	</complexType>
-	<element name="rcatType" type="tns:RcatType" />
-
-
+	<element name="rcatValue" type="tns:RcatType" />
 
 	<element name="firmwareVersion" type="string"/>
 	
-		<element name="softwareVersion" type="tns:swVersion"/>
+    <element name="softwareVersion" type="tns:swVersion"/>
 
 	<simpleType name="swVersion">
 		<restriction base="string">
 			<maxLength value="32"/>
 		</restriction>
 	</simpleType>
+
+	<complexType name="AreaNwkTypeInfoSet">
+		<sequence>
+			<element ref="tns:areaNwkTypeItem" minOccurs="0" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<element name="areaNwkTypeItem" type="tns:NameValuePairItem" />
+
+	<complexType name="NameValuePairItem">
+		<sequence>
+			<element ref="tns:name"/>
+			<element ref="tns:value"/>
+		</sequence>
+	</complexType>
+
+	<element name="name" type="string" />
+
+	<element name="value" type="string" />
+
 
 </schema>

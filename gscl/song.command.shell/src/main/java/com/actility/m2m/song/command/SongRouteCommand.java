@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongRouteCommand.java 6134 2013-10-17 07:44:09Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6134 $
- * lastrevision $Date: 2013-10-17 09:44:09 +0200 (Thu, 17 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-17 09:44:09 +0200 (Thu, 17 Oct 2013) $
+ * id $Id: SongRouteCommand.java 9043 2014-07-03 15:49:18Z JReich $
+ * author $Author: JReich $
+ * version $Revision: 9043 $
+ * lastrevision $Date: 2014-07-03 17:49:18 +0200 (Thu, 03 Jul 2014) $
+ * modifiedby $LastChangedBy: JReich $
+ * lastmodified $LastChangedDate: 2014-07-03 17:49:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.song.command;
@@ -39,8 +39,8 @@ import org.apache.felix.shell.Command;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.actility.m2m.servlet.song.binding.service.ext.ExtSongBindingService;
 import com.actility.m2m.servlet.song.ext.SongNode;
-import com.actility.m2m.servlet.song.service.ext.ExtSongBindingService;
 import com.actility.m2m.servlet.song.service.ext.ExtSongService;
 
 public class SongRouteCommand implements Command {

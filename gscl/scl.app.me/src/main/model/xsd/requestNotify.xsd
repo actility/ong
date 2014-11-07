@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m" xmlns:tns="http://uri.etsi.org/m2m"
+	xmlns:xmlmime="http://www.w3.org/2005/05/xmlmime">
+
+	<include schemaLocation="common.xsd" />
+	<import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="http://www.w3.org/2005/05/xmlmime.xsd" />
+
+	<element name="requestNotify" type="tns:RequestNotify" />
+	<complexType name="RequestNotify">
+		<sequence>
+			<element name="requestingEntity" type="anyURI"/>
+			<element name="targetID" type="anyURI"/>
+			<element name="method" type="tns:MethodType"/>
+			<element name="filterCriteria" type="tns:FilterCriteriaType" minOccurs="0"/> 
+			<element name="maxSize" type="long" minOccurs="0"/>
+			<element name="searchPrefix" type="anyURI" minOccurs="0"/>
+			<element name="groupRequestIdentifier" type="hexBinary" minOccurs="0"/>
+			<element name="TRPDT" type="tns:TrpdtType" minOccurs="0"/>
+			<element name="RCAT" type="tns:RcatType" minOccurs="0"/>
+			<element name="contentTypeHeader" type="string" minOccurs="0"/>
+			<element name="acceptHeader" type="string" minOccurs="0"/>
+			<element name="ifModifiedSinceHeader" type="string" minOccurs="0"/>
+			<element name="ifUnmodifiedSinceHeader" type="string" minOccurs="0"/>
+			<element name="ifMatchHeader" type="string" minOccurs="0"/>
+			<element name="ifNoneMatchHeader" type="string" minOccurs="0"/>
+			<element name="xEtsiContactUriHeader" type="string"/>
+			<element name="xEtsiCorrelationIDHeader" type="string"/>
+			<element name="representation" type="xmlmime:base64Binary" minOccurs="0"/>
+		</sequence>
+	</complexType>
+
+	<simpleType name="MethodType">
+		<restriction base="string">
+			<enumeration value="CREATE"></enumeration>
+			<enumeration value="RETRIEVE"></enumeration>
+			<enumeration value="UPDATE"></enumeration>
+			<enumeration value="DELETE"></enumeration>
+			<enumeration value="EXECUTE"></enumeration>
+			<enumeration value="NOTIFY"></enumeration>
+		</restriction>
+	</simpleType>
+</schema>

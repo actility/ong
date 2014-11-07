@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: Logger.java 8775 2014-05-21 15:50:40Z JReich $
+ * id $Id: Logger.java 8774 2014-05-21 15:50:27Z JReich $
  * author $Author: JReich $
- * version $Revision: 8775 $
- * lastrevision $Date: 2014-05-21 17:50:40 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 8774 $
+ * lastrevision $Date: 2014-05-21 17:50:27 +0200 (Wed, 21 May 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:50:40 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-05-21 17:50:27 +0200 (Wed, 21 May 2014) $
  */
 
 package org.apache.log4j;

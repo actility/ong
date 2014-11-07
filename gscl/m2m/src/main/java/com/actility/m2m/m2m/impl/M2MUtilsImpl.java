@@ -77,6 +77,7 @@ public class M2MUtilsImpl implements M2MUtils {
             char current = '0';
             boolean added = false;
             do {
+                current = '0';
                 added = false;
                 reader.skip(' ');
                 String mediaType = reader.readUntil(L_ACCEPT_STOP_1, H_ACCEPT_STOP_1);

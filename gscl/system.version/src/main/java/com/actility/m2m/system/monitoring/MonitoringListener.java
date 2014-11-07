@@ -34,11 +34,12 @@ package com.actility.m2m.system.monitoring;
 /**
  * 
  * @author qdesrame
- *
+ * 
  */
 public interface MonitoringListener {
     /**
      * This method is called when a new monitoring report should be sent
+     * 
      * @param target The target where the report must be sent
      * @param content The content of the report
      */

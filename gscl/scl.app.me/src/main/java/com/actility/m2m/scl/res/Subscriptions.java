@@ -39,8 +39,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -58,20 +56,30 @@ import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.SubscribedResource;
 import com.actility.m2m.storage.Condition;
-import com.actility.m2m.storage.ConditionBuilder;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.SearchResult;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.storage.StorageRequestExecutor;
+import com.actility.m2m.util.EmptyUtils;
 import com.actility.m2m.util.FormatUtils;
 import com.actility.m2m.util.Profiler;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.UUID;
+import com.actility.m2m.util.UtilConstants;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
 
 /**
  * Collection of M2M Subscriptions.
+ *
+ * <pre>
+ * m2m:Subscriptions from ong:t_xml_obj
+ * {
+ *     m2m:subscriptionCollection    m2m:NamedReferenceCollection    { } // (optional)
+ * }
+ * alias m2m:Subscriptions with m2m:subscriptions
+ * </pre>
  */
 public final class Subscriptions extends SclResource {
     private static final Logger LOG = OSGiLogger.getLogger(Subscriptions.class, BundleLogger.getStaticLogger());
@@ -90,12 +98,6 @@ public final class Subscriptions extends SclResource {
                 Constants.ID_NO_FILTER_CRITERIA_MODE, false, false, null, false, false);
         reservedKeywords.add(M2MConstants.ATTR_SUBSCRIPTION_COLLECTION);
     }
-
-    // m2m:Subscriptions from ong:t_xml_obj
-    // {
-    // m2m:subscriptionCollection m2m:NamedReferenceCollection { } // (optional)
-    // }
-    // alias m2m:Subscriptions with m2m:subscriptions
 
     public void checkRights(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity, String flag)
             throws UnsupportedEncodingException, StorageException, XoException, M2MException {
@@ -126,7 +128,9 @@ public final class Subscriptions extends SclResource {
             resource.setNameSpace(M2MConstants.PREFIX_M2M);
 
             // Save resource
-            transaction.createResource(path, resource, null);
+            Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+            document.setContent(resource.saveBinary());
+            transaction.createResource(document);
         } finally {
             if (resource != null) {
                 resource.free(true);
@@ -144,15 +148,15 @@ public final class Subscriptions extends SclResource {
         if (LOG.isInfoEnabled()) {
             LOG.info("Delete subscriptions resource on path: " + path);
         }
-        SearchResult searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, null);
-        Map children = searchResult.getResults();
-        Iterator it = children.entrySet().iterator();
-        Entry entry = null;
+        SearchResult searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                null, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
+        Iterator it = searchResult.getResults();
+        Document document = null;
         String subPath = null;
         Subscription subscription = Subscription.getInstance();
         while (it.hasNext()) {
-            entry = (Entry) it.next();
-            subPath = (String) entry.getKey();
+            document = (Document) it.next();
+            subPath = document.getPath();
             if (manager.getDefaultResourceId(subPath) == Constants.ID_RES_SUBSCRIPTION) {
                 subscription.deleteResource(logId, manager, subPath, transaction);
             }
@@ -173,13 +177,14 @@ public final class Subscriptions extends SclResource {
         throw new UnsupportedOperationException();
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException,
-            XoException, StorageException {
-        Condition condition = manager.getConditionBuilder().createStringCondition(Constants.ATTR_TYPE,
-                ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_SUBSCRIPTION);
-        SearchResult searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, condition);
-        Map children = searchResult.getResults();
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path,
+            XoObject resource, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException, XoException,
+            StorageException {
+        Condition condition = manager.getStorageContext().getStorageFactory()
+                .createStringCondition(Constants.ATTR_TYPE, Condition.ATTR_OP_EQUAL, Constants.TYPE_SUBSCRIPTION);
+        SearchResult searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                condition, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
+        Iterator children = searchResult.getResults();
         generateNamedReferenceCollection(logId, manager, Subscription.getInstance(), requestingEntity, path, resource,
                 children, M2MConstants.TAG_M2M_SUBSCRIPTION_COLLECTION);
     }
@@ -210,33 +215,29 @@ public final class Subscriptions extends SclResource {
             checkRepresentationNotNull(representation);
 
             // Check id
-            String id = representation.getStringAttribute(M2MConstants.ATTR_M2M_ID);
+            String id = getAndCheckNmToken(representation, M2MConstants.ATTR_M2M_ID, Constants.ID_MODE_OPTIONAL);
             if (id == null) {
                 sendRepresentation = true;
                 id = UUID.randomUUID(16);
             }
             String childPath = path + M2MConstants.URI_SEP + id;
 
-            SclLogger.logRequestIndication(Constants.PT_SUBSCRIPTION_CREATE_REQUEST, Constants.PT_SUBSCRIPTION_CREATE_RESPONSE,
+            SclLogger.logRequestIndication("subscriptionCreateRequestIndication", "subscriptionCreateResponseConfirm",
                     indication, null, Constants.ID_LOG_REPRESENTATION);
 
-            if (id.length() == 0) {
-                throw new M2MException("id cannot be empty", StatusCode.STATUS_BAD_REQUEST);
-            } else if (reservedKeywords.contains(id)) {
+            if (reservedKeywords.contains(id)) {
                 throw new M2MException(id + " is a reserved keywork in subscriptions resource", StatusCode.STATUS_BAD_REQUEST);
-            } else if (id.indexOf('/') != -1) {
-                throw new M2MException("id cannot contains a '/' character: " + id, StatusCode.STATUS_BAD_REQUEST);
             }
 
-            byte[] testChildPath = manager.getStorageContext().retrieve(childPath);
-            if (testChildPath != null) {
+            Document testChildDocument = manager.getStorageContext().retrieve(null, childPath, null);
+            if (testChildDocument != null) {
                 sendUnsuccessResponse(manager, indication, StatusCode.STATUS_CONFLICT,
                         "A Subscription resource already exists with the id " + id);
             } else {
                 Subscription childController = Subscription.getInstance();
                 URI requestingEntity = indication.getRequestingEntity();
                 Date now = new Date();
-                String creationTime = FormatUtils.formatDateTime(now, manager.getTimeZone());
+                String creationTime = FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE);
                 SclTransaction transaction = new SclTransaction(manager.getStorageContext());
 
                 childResource = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_SUBSCRIPTION);

@@ -20,9 +20,6 @@ package org.osgi.service.cm;
 
 import java.security.BasicPermission;
 import java.security.Permission;
-import java.security.PermissionCollection;
-import java.util.Enumeration;
-import java.util.NoSuchElementException;
 
 /**
  * Indicates a bundle's authority to configure bundles.
@@ -113,110 +110,110 @@ public final class ConfigurationPermission extends BasicPermission {
         return CONFIGURE;
     }
 
-    /**
-     * Returns a new <code>PermissionCollection</code> object suitable for
-     * storing <code>ConfigurationPermission</code>s.
-     *
-     * @return A new <code>PermissionCollection</code> object.
-     */
-    public PermissionCollection newPermissionCollection() {
-        return new ConfigurationPermissionCollection();
-    }
+//    /**
+//     * Returns a new <code>PermissionCollection</code> object suitable for
+//     * storing <code>ConfigurationPermission</code>s.
+//     *
+//     * @return A new <code>PermissionCollection</code> object.
+//     */
+//    public PermissionCollection newPermissionCollection() {
+//        return new ConfigurationPermissionCollection();
+//    }
 }
-
-/**
- * Stores a set of <code>ConfigurationPermission</code> permissions.
- *
- * @see java.security.Permission
- * @see java.security.Permissions
- * @see java.security.PermissionCollection
- */
-final class ConfigurationPermissionCollection extends PermissionCollection {
-    static final long   serialVersionUID    = -6917638867081695839L;
-    /**
-     * True if collection is non-empty.
-     *
-     * @serial
-     */
-    private boolean     hasElement;
-
-    /**
-     * Creates an empty <tt>ConfigurationPermissionCollection</tt> object.
-     *
-     */
-    public ConfigurationPermissionCollection() {
-        hasElement = false;
-    }
-
-    /**
-     * Adds the specified permission to the
-     * <tt>ConfigurationPermissionCollection</tt>. The key for the hash is
-     * the interface name of the service.
-     *
-     * @param permission The <tt>Permission</tt> object to add.
-     *
-     * @exception IllegalArgumentException If the permission is not an
-     *            <tt>ConfigurationPermission</tt>.
-     *
-     * @exception SecurityException If this ConfigurationPermissionCollection
-     *            object has been marked read-only.
-     */
-
-    public void add(Permission permission) {
-        if (!(permission instanceof ConfigurationPermission)) {
-            throw new IllegalArgumentException("invalid permission: "
-                    + permission);
-        }
-
-        if (isReadOnly()) {
-            throw new SecurityException("attempt to add a Permission to a "
-                    + "readonly PermissionCollection");
-        }
-
-        hasElement = true;
-    }
-
-    /**
-     * Determines if the specified set of permissions implies the permissions
-     * expressed in the parameter <tt>permission</tt>.
-     *
-     * @param p The Permission object to compare.
-     *
-     * @return true if permission is a proper subset of a permission in the set;
-     *         false otherwise.
-     */
-
-    public boolean implies(Permission p) {
-        return hasElement && (p instanceof ConfigurationPermission);
-    }
-
-    /**
-     * Returns an enumeration of an <tt>ConfigurationPermission</tt> object.
-     *
-     * @return Enumeration of an <tt>ConfigurationPermission</tt> object.
-     */
-
-    public Enumeration elements() {
-        final boolean nonEmpty = hasElement;
-        return new Enumeration() {
-            private boolean more = nonEmpty;
-
-            public boolean hasMoreElements() {
-                return more;
-            }
-
-            public Object nextElement() {
-                if (more) {
-                    more = false;
-
-                    return new ConfigurationPermission("*",
-                            ConfigurationPermission.CONFIGURE);
-                }
-                else {
-                    throw new NoSuchElementException();
-                }
-            }
-        };
-    }
-
-}
+//
+///**
+// * Stores a set of <code>ConfigurationPermission</code> permissions.
+// *
+// * @see java.security.Permission
+// * @see java.security.Permissions
+// * @see java.security.PermissionCollection
+// */
+//final class ConfigurationPermissionCollection extends PermissionCollection {
+//    static final long   serialVersionUID    = -6917638867081695839L;
+//    /**
+//     * True if collection is non-empty.
+//     *
+//     * @serial
+//     */
+//    private boolean     hasElement;
+//
+//    /**
+//     * Creates an empty <tt>ConfigurationPermissionCollection</tt> object.
+//     *
+//     */
+//    public ConfigurationPermissionCollection() {
+//        hasElement = false;
+//    }
+//
+//    /**
+//     * Adds the specified permission to the
+//     * <tt>ConfigurationPermissionCollection</tt>. The key for the hash is
+//     * the interface name of the service.
+//     *
+//     * @param permission The <tt>Permission</tt> object to add.
+//     *
+//     * @exception IllegalArgumentException If the permission is not an
+//     *            <tt>ConfigurationPermission</tt>.
+//     *
+//     * @exception SecurityException If this ConfigurationPermissionCollection
+//     *            object has been marked read-only.
+//     */
+//
+//    public void add(Permission permission) {
+//        if (!(permission instanceof ConfigurationPermission)) {
+//            throw new IllegalArgumentException("invalid permission: "
+//                    + permission);
+//        }
+//
+//        if (isReadOnly()) {
+//            throw new SecurityException("attempt to add a Permission to a "
+//                    + "readonly PermissionCollection");
+//        }
+//
+//        hasElement = true;
+//    }
+//
+//    /**
+//     * Determines if the specified set of permissions implies the permissions
+//     * expressed in the parameter <tt>permission</tt>.
+//     *
+//     * @param p The Permission object to compare.
+//     *
+//     * @return true if permission is a proper subset of a permission in the set;
+//     *         false otherwise.
+//     */
+//
+//    public boolean implies(Permission p) {
+//        return hasElement && (p instanceof ConfigurationPermission);
+//    }
+//
+//    /**
+//     * Returns an enumeration of an <tt>ConfigurationPermission</tt> object.
+//     *
+//     * @return Enumeration of an <tt>ConfigurationPermission</tt> object.
+//     */
+//
+//    public Enumeration elements() {
+//        final boolean nonEmpty = hasElement;
+//        return new Enumeration() {
+//            private boolean more = nonEmpty;
+//
+//            public boolean hasMoreElements() {
+//                return more;
+//            }
+//
+//            public Object nextElement() {
+//                if (more) {
+//                    more = false;
+//
+//                    return new ConfigurationPermission("*",
+//                            ConfigurationPermission.CONFIGURE);
+//                }
+//                else {
+//                    throw new NoSuchElementException();
+//                }
+//            }
+//        };
+//    }
+//
+//}

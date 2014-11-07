@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: IndicationImpl.java 8761 2014-05-21 15:31:37Z JReich $
+ * id $Id: IndicationImpl.java 9044 2014-07-03 15:50:18Z JReich $
  * author $Author: JReich $
- * version $Revision: 8761 $
- * lastrevision $Date: 2014-05-21 17:31:37 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9044 $
+ * lastrevision $Date: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:31:37 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-07-03 17:50:18 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.m2m.impl;
@@ -224,6 +224,8 @@ public final class IndicationImpl implements ProxyIndication {
         SongURI targetID = songRequest.getTargetID();
         List ifNoneMatch = new ArrayList();
         List searchString = new ArrayList();
+        List inType = new ArrayList();
+        List outType = new ArrayList();
         Iterator it = targetID.getQueryParameters();
         try {
             Entry queryParameter = null;
@@ -248,6 +250,14 @@ public final class IndicationImpl implements ProxyIndication {
                     filterCriteria.setCreatedAfter(FormatUtils.parseDateTime(value));
                 } else if (M2MConstants.ATTR_CREATED_BEFORE.equals(key)) {
                     filterCriteria.setCreatedBefore(FormatUtils.parseDateTime(value));
+                } else if (M2MConstants.ATTR_MAX_SIZE.equals(key)) {
+                    filterCriteria.setMaxSize(Long.parseLong(value));
+                } else if (M2MConstants.ATTR_SEARCH_PREFIX.equals(key)) {
+                    filterCriteria.setSearchPrefix(value);
+                } else if (M2MConstants.ATTR_IN_TYPE.equals(key)) {
+                    inType.add(value);
+                } else if (M2MConstants.ATTR_OUT_TYPE.equals(key)) {
+                    outType.add(value);
                 }
             }
             String[] listStr = null;
@@ -258,6 +268,14 @@ public final class IndicationImpl implements ProxyIndication {
             if (searchString.size() > 0) {
                 listStr = new String[searchString.size()];
                 filterCriteria.setSearchString((String[]) searchString.toArray(listStr));
+            }
+            if (inType.size() > 0) {
+                listStr = new String[inType.size()];
+                filterCriteria.setInType((String[]) inType.toArray(listStr));
+            }
+            if (outType.size() > 0) {
+                listStr = new String[outType.size()];
+                filterCriteria.setOutType((String[]) outType.toArray(listStr));
             }
         } catch (ParseException e) {
             throw new M2MException("Unable to decode filter criteria from query parameters: " + e.getMessage(),

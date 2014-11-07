@@ -68,6 +68,17 @@ else ifeq ($(TARGET),lpv3)
   LDLIBS =
   ARCH = lpv3
   INCLUDES+=$(LP_V3_HOST_HOME)/include/
+else ifeq ($(TARGET),angstrom_panrouter)
+  CC = arm-none-linux-gnueabi-gcc
+  GCC = arm-none-linux-gnueabi-g++
+  LD = arm-none-linux-gnueabi-gcc
+  AR = arm-none-linux-gnueabi-ar
+  # Specify compiler options
+  CFLAGS = -mcpu=cortex-a8 -Wall -O3 -fPIC -pipe
+  LDFLAGS = -mcpu=cortex-a8
+  LDLIBS =
+  ARCH = angstrom_panrouter
+  INCLUDES+=$(CO_V2_HOST_HOME)/include/
 else ifeq ($(TARGET),android_panrouter)
   CC = arm-android-gnueabi-gcc
   GCC = arm-android-gnueabi-g++

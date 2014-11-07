@@ -54,6 +54,7 @@ public final class M2MFileSystemLoader {
         if (domainName != null) {
             params.put("DOMAIN_NAME", domainName);
         }
+        params.put("SCL_CONTEXT_PATH", m2mContext.getContextPath());
         creates = new LinkedList();
         updates = new LinkedList();
         requestingEntity = m2mContext.createLocalUri(URI.create(M2MConstants.URI_SEP), Constants.PATH_ROOT);

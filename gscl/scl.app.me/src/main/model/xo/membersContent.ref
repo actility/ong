@@ -28,19 +28,20 @@
 #include "extern.ref"
 
 
-AnonStatus from ong:t_xml_obj
+AnonStatus168390395 from ong:t_xml_obj
 {
     id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
     statusCode    XoString    { } // (xmlType: xsd:string) 
     eTag    XoString    { } // (optional) (xmlType: xsd:string) 
+    resourceURI    XoString    { } // (xmlType: xsd:anyURI) 
     lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     resultBody    xmime:base64Binary    { } // (optional) 
 }
 
-m2m:AnonMembersContentResponses from ong:t_xml_obj
+m2m:AnonMembersContentResponses168390395 from ong:t_xml_obj
 {
-    status    AnonStatus    { list wraphidden } // (list size: [0, infinity[) 
+    status    AnonStatus168390395    { list wraphidden } // (list size: [0, infinity[) 
 }
-alias m2m:AnonMembersContentResponses with m2m:membersContentResponses
+alias m2m:AnonMembersContentResponses168390395 with m2m:membersContentResponses
 
 #endif // MEMBERSCONTENT_REF

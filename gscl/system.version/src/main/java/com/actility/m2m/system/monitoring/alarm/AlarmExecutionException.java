@@ -33,36 +33,38 @@ package com.actility.m2m.system.monitoring.alarm;
 
 /**
  * This exception is released when an error occurred during alarm execution
+ *
  * @author qdesrame
  *
  */
-public class AlarmExecutionException extends Exception {
+public final class AlarmExecutionException extends Exception {
     public static final int LEVEL_ERROR = 0;
     public static final int LEVEL_CLEAR = 1;
-   /**
+    /**
      *
      */
     private static final long serialVersionUID = -6688984152720760955L;
+
     private int level = 0;
 
-//    public AlarmExecutionException(String message) {
-//        super(message);
-//        level = 0;
-//    }
+    // public AlarmExecutionException(String message) {
+    // super(message);
+    // level = 0;
+    // }
     public AlarmExecutionException(String message, int level) {
         super(message);
         this.level = level;
     }
 
-//    public AlarmExecutionException(Throwable cause) {
-//        super(cause);
-//        this.level = 0;
-//    }
+    // public AlarmExecutionException(Throwable cause) {
+    // super(cause);
+    // this.level = 0;
+    // }
 
-//    public AlarmExecutionException(String message, Throwable cause) {
-//        super(message, cause);
-//        this.level = 0;
-//    }
+    // public AlarmExecutionException(String message, Throwable cause) {
+    // super(message, cause);
+    // this.level = 0;
+    // }
     public AlarmExecutionException(Throwable cause, int level) {
         super(cause);
         this.level = level;
@@ -72,8 +74,8 @@ public class AlarmExecutionException extends Exception {
         super(message, cause);
         this.level = level;
     }
-    
-    public int getLevel(){
+
+    public int getLevel() {
         return this.level;
     }
 }

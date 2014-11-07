@@ -41,8 +41,7 @@ import com.actility.m2m.system.log.BundleLogger;
 import com.actility.m2m.system.monitoring.MonitoringManager;
 import com.actility.m2m.util.log.OSGiLogger;
 
-public class SystemTimerListener implements TimerListener {
-
+public final class SystemTimerListener implements TimerListener {
     private static final Logger LOG = OSGiLogger.getLogger(SystemTimerListener.class, BundleLogger.LOG);
 
     /**
@@ -64,11 +63,11 @@ public class SystemTimerListener implements TimerListener {
                 LOG.debug("Timeout: SystemResourceManager to restart");
             }
             ResourcesManager resourcesManager = (ResourcesManager) info;
-            if(!resourcesManager.isInitialized()){
+            if (!resourcesManager.isInitialized()) {
                 resourcesManager.generate();
             }
         } else if (info instanceof MonitoringManager) {
-           ((MonitoringManager) info).onRefresh();
+            ((MonitoringManager) info).onRefresh();
         } else {
             LOG.error("No action associated with the timer");
         }

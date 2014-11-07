@@ -14,6 +14,7 @@
 			<!-- subresources -->
 			<element ref="tns:attachedDeviceCollection" minOccurs="0" />
 			<element ref="tns:subscriptionsReference" minOccurs="0" />
+			<element ref="tns:mgmtObjsReference" minOccurs="0" />
 		</sequence>
 	</complexType>
 

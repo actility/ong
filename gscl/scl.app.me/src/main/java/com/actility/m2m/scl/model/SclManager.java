@@ -33,11 +33,9 @@ package com.actility.m2m.scl.model;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.TimeZone;
 
 import com.actility.m2m.m2m.M2MContext;
 import com.actility.m2m.m2m.M2MException;
-import com.actility.m2m.storage.ConditionBuilder;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.storage.StorageRequestExecutor;
 import com.actility.m2m.xo.XoException;
@@ -45,19 +43,19 @@ import com.actility.m2m.xo.XoObject;
 import com.actility.m2m.xo.XoService;
 
 public interface SclManager {
+    URI getNsclUri();
+
     URI getLocalSclUri(URI reference) throws M2MException;
+
+    URI createPocUriFromServerRoot(URI reference, String path) throws M2MException;
 
     M2MContext getM2MContext();
 
     StorageRequestExecutor getStorageContext();
 
-    ConditionBuilder getConditionBuilder();
-
     XoService getXoService();
 
     SclConfig getSclConfig();
-
-    TimeZone getTimeZone();
 
     StatsManager getStatsManager();
 

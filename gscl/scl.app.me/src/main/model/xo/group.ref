@@ -30,17 +30,20 @@
 
 m2m:Group from ong:t_xml_obj
 {
-    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:anyURI) 
+    m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:NMTOKEN) 
     m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:accessRightID    XoString    { shdico } // (optional) (xmlType: xsd:anyURI) 
     m2m:searchStrings    m2m:SearchStrings    { } // (optional) 
     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:announceTo    m2m:AnnounceTo    { } // (optional) 
-    m2m:memberType    XoString    { } // (optional) (xmlType: m2m:MemberType) (enum: APPLICATION CONTAINER ACCESS_RIGHT SERVER_CAPABILITY_LAYER SCL ) 
+    m2m:memberType    XoString    { shdico } // (optional) (xmlType: m2m:MemberType) (enum: APPLICATION CONTAINER ACCESS_RIGHT SCL_BASE SCL LOCATION_CONTAINER MGMT_OBJ MGMT_CMD ATTACHED_DEVICE MIXED ) 
     m2m:currentNrOfMembers    XoString    { } // (optional) (xmlType: xsd:long) 
     m2m:maxNrOfMembers    XoString    { } // (optional) (xmlType: xsd:long) 
     m2m:members    m2m:AnyURIList    { } // (optional) 
+    m2m:membersContentAccessRightID    XoString    { } // (optional) (xmlType: xsd:anyURI) 
+    m2m:memberTypeValidated    XoString    { } // (optional) (xmlType: xsd:boolean) 
+    m2m:consistencyStrategy    XoString    { shdico } // (optional) (xmlType: m2m:ConsistencyStrategy) (enum: ABANDON_GROUP ABANDON_MEMBER MODIFY_TYPE ) 
     m2m:membersContentReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
     m2m:subscriptionsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
 }

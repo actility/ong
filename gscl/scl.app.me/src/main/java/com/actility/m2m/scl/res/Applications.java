@@ -35,14 +35,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -60,16 +56,16 @@ import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.SubscribedResource;
 import com.actility.m2m.storage.Condition;
-import com.actility.m2m.storage.ConditionBuilder;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.SearchResult;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.storage.StorageRequestExecutor;
 import com.actility.m2m.util.EmptyUtils;
 import com.actility.m2m.util.FormatUtils;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.Profiler;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.UUID;
+import com.actility.m2m.util.UtilConstants;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -78,6 +74,20 @@ import com.actility.m2m.xo.XoObject;
  * Collection of M2M Applications.
  * <p>
  * This resource can be subscribed.
+ *
+ * <pre>
+ * m2m:Applications from ong:t_xml_obj
+ * {
+ *     m2m:accessRightID    XoString    { shdico } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:applicationCollection    m2m:NamedReferenceCollection    { } // (optional)
+ *     m2m:applicationAnncCollection    m2m:NamedReferenceCollection    { } // (optional)
+ *     m2m:subscriptionsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:mgmtObjsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ * }
+ * alias m2m:Applications with m2m:applications
+ * </pre>
  */
 public final class Applications extends SclResource implements SubscribedResource {
     private static final Logger LOG = OSGiLogger.getLogger(Applications.class, BundleLogger.getStaticLogger());
@@ -106,21 +116,11 @@ public final class Applications extends SclResource implements SubscribedResourc
         reservedKeywords.add(M2MConstants.RES_MGMT_OBJS);
     }
 
-    // m2m:Applications from ong:t_xml_obj
-    // {
-    // m2m:accessRightID XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:creationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:lastModifiedTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:applicationCollection m2m:NamedReferenceCollection { } // (optional)
-    // m2m:applicationAnncCollection m2m:NamedReferenceCollection { } // (optional)
-    // m2m:subscriptionsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:mgmtObjsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // }
-    // alias m2m:Applications with m2m:applications
-
     public void checkRights(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity, String flag)
             throws UnsupportedEncodingException, StorageException, XoException, M2MException {
-        getAndCheckAccessRight(logId, manager, path, resource, requestingEntity, flag);
+        if (!M2MConstants.FLAG_CREATE.equals(flag)) {
+            getAndCheckAccessRight(logId, manager, path, resource, requestingEntity, flag);
+        }
     }
 
     public void createResource(SclManager manager, String path, Date creationDate, String creationTime, String accessRightID,
@@ -140,10 +140,11 @@ public final class Applications extends SclResource implements SubscribedResourc
                     transaction);
 
             // Save resource
-            Collection searchAttributes = new ArrayList();
-            searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-            searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-            transaction.createResource(path, resource, searchAttributes);
+            Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+            document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+            document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+            document.setContent(resource.saveBinary());
+            transaction.createResource(document);
         } finally {
             if (resource != null) {
                 resource.free(true);
@@ -176,11 +177,12 @@ public final class Applications extends SclResource implements SubscribedResourc
         updateLastModifiedTime(manager, resource, now);
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        manager.getStorageContext().update(path, resource.saveBinary(), searchAttributes);
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setContent(resource.saveBinary());
+        manager.getStorageContext().update(null, document, null);
 
         return false;
     }
@@ -190,15 +192,15 @@ public final class Applications extends SclResource implements SubscribedResourc
         if (LOG.isInfoEnabled()) {
             LOG.info("Delete applications resource on path: " + path);
         }
-        SearchResult searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, null);
-        Map children = searchResult.getResults();
-        Iterator it = children.entrySet().iterator();
-        Entry entry = null;
+        SearchResult searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                null, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
+        Iterator it = searchResult.getResults();
+        Document document = null;
         String subPath = null;
         Application application = Application.getInstance();
         while (it.hasNext()) {
-            entry = (Entry) it.next();
-            subPath = (String) entry.getKey();
+            document = (Document) it.next();
+            subPath = document.getPath();
             if (manager.getDefaultResourceId(subPath) == Constants.ID_RES_APPLICATION) {
                 application.deleteResource(logId, manager, subPath, transaction);
             }
@@ -218,17 +220,18 @@ public final class Applications extends SclResource implements SubscribedResourc
     public void deleteChildResource(String logId, SclManager manager, String path, XoObject resource, XoObject childResource,
             Date now, SclTransaction transaction) throws ParseException, XoException {
         resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME,
-                FormatUtils.formatDateTime(now, manager.getTimeZone()));
+                FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE));
 
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        transaction.updateResource(path, resource, searchAttributes);
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setContent(resource.saveBinary());
+        transaction.updateResource(document);
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException,
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path,
+            XoObject resource, FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException,
             StorageException, XoException {
         String appPath = manager.getM2MContext().getApplicationPath();
         String accessRight = resource.getStringAttribute(M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D);
@@ -241,15 +244,16 @@ public final class Applications extends SclResource implements SubscribedResourc
                 + M2MConstants.RES_SUBSCRIPTIONS + M2MConstants.URI_SEP);
         resource.setStringAttribute(M2MConstants.TAG_M2M_MGMT_OBJS_REFERENCE, appPath + encodedPath + M2MConstants.URI_SEP
                 + M2MConstants.RES_MGMT_OBJS + M2MConstants.URI_SEP);
-        // Add applcations children
-        Condition condition = manager.getConditionBuilder().createStringCondition(Constants.ATTR_TYPE,
-                ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_APPLICATION);
-        SearchResult searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, condition);
-        Map children = searchResult.getResults();
+        // Add applications children
+        Condition condition = manager.getStorageContext().getStorageFactory()
+                .createStringCondition(Constants.ATTR_TYPE, Condition.ATTR_OP_EQUAL, Constants.TYPE_APPLICATION);
+        SearchResult searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                condition, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
+        Iterator children = searchResult.getResults();
         generateNamedReferenceCollection(logId, manager, Application.getInstance(), requestingEntity, path, resource, children,
                 M2MConstants.TAG_M2M_APPLICATION_COLLECTION);
-        generateNamedReferenceCollection(logId, manager, null, requestingEntity, path, resource, EmptyUtils.EMPTY_MAP,
-                M2MConstants.TAG_M2M_APPLICATION_ANNC_COLLECTION);
+        generateNamedReferenceCollection(logId, manager, Application.getInstance(), null, path, resource,
+                EmptyUtils.EMPTY_ITERATOR, M2MConstants.TAG_M2M_APPLICATION_ANNC_COLLECTION);
     }
 
     public void doCreateIndication(SclManager manager, String path, XoObject resource, Indication indication)
@@ -280,7 +284,7 @@ public final class Applications extends SclResource implements SubscribedResourc
             }
             String childPath = path + M2MConstants.URI_SEP + appId;
 
-            SclLogger.logRequestIndication(Constants.PT_APPLICATION_CREATE_REQUEST, Constants.PT_APPLICATION_CREATE_RESPONSE,
+            SclLogger.logRequestIndication("applicationCreateRequestIndication", "applicationCreateResponseConfirm",
                     indication, null, Constants.ID_LOG_REPRESENTATION);
 
             if (appId.length() == 0) {
@@ -290,14 +294,14 @@ public final class Applications extends SclResource implements SubscribedResourc
             } else if (appId.indexOf('/') != -1) {
                 throw new M2MException("appId cannot contains a '/' character: " + appId, StatusCode.STATUS_BAD_REQUEST);
             }
-            byte[] testChildPath = manager.getStorageContext().retrieve(childPath);
-            if (testChildPath != null) {
+            Document testChildDocument = manager.getStorageContext().retrieve(null, childPath, null);
+            if (testChildDocument != null) {
                 sendUnsuccessResponse(manager, indication, StatusCode.STATUS_CONFLICT,
                         "An Application resource already exists with the appId " + appId);
             } else {
                 Application childController = Application.getInstance();
                 Date now = new Date();
-                String creationTime = FormatUtils.formatDateTime(now, manager.getTimeZone());
+                String creationTime = FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE);
                 SclTransaction transaction = new SclTransaction(manager.getStorageContext());
                 childResource = manager.getXoService().newXmlXoObject(representation.getName());
                 sendRepresentation = childController.createResource(manager, childPath, childResource,
@@ -306,11 +310,12 @@ public final class Applications extends SclResource implements SubscribedResourc
 
                 resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
 
-                Collection searchAttributes = new ArrayList();
-                searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                        .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-                searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-                transaction.updateResource(path, resource, searchAttributes);
+                Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+                document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                        FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+                document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+                document.setContent(resource.saveBinary());
+                transaction.updateResource(document);
                 transaction.execute();
 
                 childController.sendCreatedSuccessResponse(manager, childPath, childResource, indication, sendRepresentation);

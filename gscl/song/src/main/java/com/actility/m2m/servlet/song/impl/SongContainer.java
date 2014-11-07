@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongContainer.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: SongContainer.java 9481 2014-09-06 09:37:01Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9481 $
+ * lastrevision $Date: 2014-09-06 11:37:01 +0200 (Sat, 06 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-09-06 11:37:01 +0200 (Sat, 06 Sep 2014) $
  */
 
 package com.actility.m2m.servlet.song.impl;
@@ -59,6 +59,7 @@ import com.actility.m2m.be.messaging.DeliveryChannel;
 import com.actility.m2m.be.messaging.InOnly;
 import com.actility.m2m.be.messaging.InOut;
 import com.actility.m2m.be.messaging.MessagingException;
+import com.actility.m2m.framework.resources.ResourcesAccessorService;
 import com.actility.m2m.m2m.StatusCode;
 import com.actility.m2m.servlet.NamespaceException;
 import com.actility.m2m.servlet.ext.ExtApplicationSession;
@@ -66,11 +67,13 @@ import com.actility.m2m.servlet.ext.ExtProtocolServlet;
 import com.actility.m2m.servlet.ext.ExtServletContext;
 import com.actility.m2m.servlet.log.BundleLogger;
 import com.actility.m2m.servlet.service.ext.ExtServletService;
-import com.actility.m2m.servlet.song.LongPollURIs;
-import com.actility.m2m.servlet.song.SongBindingFacade;
+import com.actility.m2m.servlet.song.ChannelClientListener;
+import com.actility.m2m.servlet.song.ChannelServerListener;
+import com.actility.m2m.servlet.song.LongPollingURIs;
 import com.actility.m2m.servlet.song.SongServlet;
 import com.actility.m2m.servlet.song.SongServletResponse;
 import com.actility.m2m.servlet.song.SongURI;
+import com.actility.m2m.servlet.song.binding.SongBindingFacade;
 import com.actility.m2m.servlet.song.ext.SongNode;
 import com.actility.m2m.servlet.song.internal.BindingNode;
 import com.actility.m2m.servlet.song.internal.EndpointNode;
@@ -100,6 +103,7 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
     private final ExtServletService servletService;
     private final BackendService backendService;
     private final XoService xoService;
+    private final ResourcesAccessorService resourcesAccessorService;
     private final TransportLoggerService transportLoggerService;
     private final Set localhostNames;
     private final BindingNode defaultBindingNode;
@@ -149,12 +153,14 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
      * Default constructor for the SONG Container.
      */
     public SongContainer(ExtServletService servletService, BackendService backendService, XoService xoService,
-            TransportLoggerService transportLoggerService, RouteConfiguration[] routesConfiguration, String hostName,
-            String domainName, long maxRemoteRequests) throws BackendException, UnknownHostException {
+            ResourcesAccessorService resourcesAccessorService, TransportLoggerService transportLoggerService,
+            RouteConfiguration[] routesConfiguration, String hostName, String domainName, long maxRemoteRequests)
+            throws BackendException, UnknownHostException {
         this.servletService = servletService;
         this.backendService = backendService;
         this.xoService = xoService;
         InternalMessage.setAvailableXoMediaTypes(xoService);
+        this.resourcesAccessorService = resourcesAccessorService;
         this.transportLoggerService = transportLoggerService;
         this.pathRoutes = new TreeMap();
         this.privatePathRoutes = new TreeMap();
@@ -438,9 +444,22 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         MatchResult result = null;
         if (localhostNames.contains(uri.getHost())) {
             if (LOG.isInfoEnabled()) {
-                LOG.info(id + ": Host corresponds to the local server");
+                LOG.info(id + ": Host corresponds to the local server. Resolve request with port \"" + uri.getPort() + "\"");
             }
-            result = resolveLocalServlet(id, null, uri.normalize(), localRequest);
+            result = resolveScheme(id, uri.getScheme());
+            if (result != null) {
+                BindingNode bindingNode = (BindingNode) result.getSongNode();
+                if (uri.getPort() == bindingNode.getPort() || uri.getPort() == bindingNode.getServerURIPort()) {
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info(id + ": Port corresponds to a local application");
+                    }
+                    result = resolveLocalServlet(id, null, uri.normalize(), localRequest);
+                } else {
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info(id + ": Port corresponds to an external application. Forward request to binding");
+                    }
+                }
+            }
         } else {
             if (LOG.isInfoEnabled()) {
                 LOG.info(id + ": Host corresponds to a remote server");
@@ -537,6 +556,10 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         return xoService;
     }
 
+    public ResourcesAccessorService getResourcesAccessorService() {
+        return resourcesAccessorService;
+    }
+
     public String getLocalHostName() {
         return completeHostName;
     }
@@ -584,8 +607,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
 
     public void process(InOut exchange) {
         // long process = -System.currentTimeMillis();
-        if (LOG.isInfoEnabled()) {
-            LOG.info(exchange.getExchangeId() + ": Router process InOut exchange");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(exchange.getExchangeId() + ": Router process InOut exchange");
         }
         if (exchange.getOutMessage() != null) {
             // TODO is this possible now ?
@@ -887,7 +910,7 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
     }
 
     public void registerBindingServlet(ServletContext context, String servletName, SongServlet servlet, Map initParams,
-            SongBindingFacade facade, String serverScheme, String[] managedSchemes, boolean longPollSupported,
+            SongBindingFacade facade, String serverScheme, int serverPort, String[] managedSchemes, boolean longPollSupported,
             String defaultProtocol, InetAddress address, int port, Map configuration) throws NamespaceException,
             ServletException {
         String fullServletName = buildServletName(context.getServletContextName(), servletName);
@@ -896,8 +919,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         }
 
         BindingEndpointNode endpoint = new BindingEndpointNode(this, servlet, (ExtServletContext) context, servletName,
-                getPriority(configuration, true), facade, serverScheme, managedSchemes, longPollSupported, defaultProtocol,
-                address, port);
+                getPriority(configuration, true), facade, serverScheme, serverPort, managedSchemes, longPollSupported,
+                defaultProtocol, address, port);
 
         registerInternalServlet(fullServletName, servletName, endpoint, initParams, configuration);
         String scheme = null;
@@ -1022,49 +1045,53 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         throw new ServletException("Scheme " + songURI.getScheme() + " does not a corresponding binding");
     }
 
-    public LongPollURIs createServerLongPoll(SongURI serverURI) throws ServletException {
+    public LongPollingURIs createServerNotificationChannel(SongURI serverURI, ChannelServerListener listener)
+            throws ServletException {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Create server long poll connection on " + serverURI.absoluteURI());
+            LOG.info("Create server <notificationChannel> connection on " + serverURI.absoluteURI());
         }
         SongBindingFacade facade = getSongBindingFacade(serverURI);
         if (facade != null) {
-            return facade.createServerLongPoll(serverURI);
+            return facade.createServerNotificationChannel(serverURI, listener);
         }
-        throw new UnsupportedOperationException("SONG binding does not support long poll connections");
+        throw new UnsupportedOperationException("SONG binding does not support <notificationChannel> connections");
     }
 
-    public void createServerLongPoll(SongURI contactURI, SongURI longPollURI) throws ServletException {
+    public void createServerNotificationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Create server long poll connection with contact " + contactURI.absoluteURI() + " and long poll "
-                    + longPollURI.absoluteURI());
+            LOG.info("Create server <notificationChannel> connection with contact " + contactURI.absoluteURI()
+                    + " and long polling " + longPollingURI.absoluteURI());
         }
         SongBindingFacade facade = getSongBindingFacade(contactURI);
         if (facade != null) {
-            facade.createServerLongPoll(contactURI, longPollURI);
+            facade.createServerNotificationChannel(contactURI, longPollingURI, listener);
         } else {
-            throw new UnsupportedOperationException("SONG binding does not support long poll connections");
+            throw new UnsupportedOperationException("SONG binding does not support <notificationChannel> connections");
         }
     }
 
-    public void deleteServerLongPoll(SongURI contactURI, SongURI longPollURI) {
+    public void deleteServerNotificationChannel(SongURI contactURI, SongURI longPollingURI) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Delete server long poll connection on contact " + contactURI.absoluteURI() + " and long poll "
-                    + longPollURI.absoluteURI());
+            LOG.info("Delete server <notificationChannel> connection on contact " + contactURI.absoluteURI()
+                    + " and long polling " + longPollingURI.absoluteURI());
         }
         try {
             SongBindingFacade facade = getSongBindingFacade(contactURI);
-            facade.deleteServerLongPoll(contactURI, longPollURI);
+            facade.deleteServerNotificationChannel(contactURI, longPollingURI);
         } catch (ServletException e) {
-            LOG.warn("Servlet exception while deleting the server long poll connection", e);
+            LOG.warn("Servlet exception while deleting the server <notificationChannel> connection", e);
         } catch (UnsupportedOperationException e) {
-            LOG.warn("Try to delete a server long poll connection on a binding which does not support this", e);
+            LOG.warn("Try to delete a server <notificationChannel> connection on a binding which does not support this", e);
         }
     }
 
-    public void createClientLongPoll(SongURI contactURI, SongURI longPollURI, String contextPath) throws ServletException {
+    public void createClientNotificationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            SongURI relatedRequestingEntity, SongURI relatedTargetID, String contextPath, ChannelClientListener listener)
+            throws ServletException {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Create client long poll connection with contact " + contactURI.absoluteURI() + " and long poll "
-                    + longPollURI.absoluteURI());
+            LOG.info("Create client <notificationChannel> connection with contact " + contactURI.absoluteURI()
+                    + " and long polling " + longPollingURI.absoluteURI());
         }
         SongBindingFacade facade = getSongBindingFacade(contactURI);
         if (facade != null) {
@@ -1073,18 +1100,19 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
                 aliasURI += "/";
             }
             synchronized (externalAliasRoutes) {
-                facade.createClientLongPoll(contactURI, longPollURI);
+                facade.createClientNotificationChannel(contactURI, longPollingURI, requestingEntity, relatedRequestingEntity,
+                        relatedTargetID, listener);
                 externalAliasRoutes.put(aliasURI, contextPath);
             }
         } else {
-            throw new UnsupportedOperationException("SONG binding does not support long poll connections");
+            throw new UnsupportedOperationException("SONG binding does not support <notificationChannel> connections");
         }
     }
 
-    public void deleteClientLongPoll(SongURI contactURI, SongURI longPollURI) {
+    public void deleteClientNotificationChannel(SongURI contactURI, SongURI longPollingURI) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Delete client long poll connection on contact " + contactURI.absoluteURI() + " and long poll "
-                    + longPollURI.absoluteURI());
+            LOG.info("Delete client <notificationChannel> connection on contact " + contactURI.absoluteURI()
+                    + " and long polling " + longPollingURI.absoluteURI());
         }
         try {
             SongBindingFacade facade = getSongBindingFacade(contactURI);
@@ -1096,12 +1124,98 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
                 synchronized (externalAliasRoutes) {
                     externalAliasRoutes.remove(aliasURI);
                 }
-                facade.deleteClientLongPoll(contactURI, longPollURI);
+                facade.deleteClientNotificationChannel(contactURI, longPollingURI);
             }
         } catch (ServletException e) {
-            LOG.warn("Servlet exception while deleting the client long poll connection", e);
+            LOG.warn("Servlet exception while deleting the client <notificationChannel> connection", e);
         } catch (UnsupportedOperationException e) {
-            LOG.warn("Try to delete a client long poll connection on a binding which does not support this", e);
+            LOG.warn("Try to delete a client <notificationChannel> connection on a binding which does not support this", e);
+        }
+    }
+
+    public LongPollingURIs createServerCommunicationChannel(SongURI serverURI, ChannelServerListener listener)
+            throws ServletException {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Create server <communicationChannel> connection on " + serverURI.absoluteURI());
+        }
+        SongBindingFacade facade = getSongBindingFacade(serverURI);
+        if (facade != null) {
+            return facade.createServerCommunicationChannel(serverURI, listener);
+        }
+        throw new UnsupportedOperationException("SONG binding does not support <communicationChannel> connections");
+    }
+
+    public void createServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Create server <communicationChannel> connection with contact " + contactURI.absoluteURI()
+                    + " and long polling " + longPollingURI.absoluteURI());
+        }
+        SongBindingFacade facade = getSongBindingFacade(contactURI);
+        if (facade != null) {
+            facade.createServerCommunicationChannel(contactURI, longPollingURI, listener);
+        } else {
+            throw new UnsupportedOperationException("SONG binding does not support <communicationChannel> connections");
+        }
+    }
+
+    public void deleteServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI) {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Delete server <communicationChannel> connection on contact " + contactURI.absoluteURI()
+                    + " and long polling " + longPollingURI.absoluteURI());
+        }
+        try {
+            SongBindingFacade facade = getSongBindingFacade(contactURI);
+            facade.deleteServerCommunicationChannel(contactURI, longPollingURI);
+        } catch (ServletException e) {
+            LOG.warn("Servlet exception while deleting the server <communicationChannel> connection", e);
+        } catch (UnsupportedOperationException e) {
+            LOG.warn("Try to delete a server <communicationChannel> connection on a binding which does not support this", e);
+        }
+    }
+
+    public void createClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            String contextPath, ChannelClientListener listener) throws ServletException {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Create client <communicationChannel> connection with contact " + contactURI.absoluteURI()
+                    + " and long polling " + longPollingURI.absoluteURI());
+        }
+        SongBindingFacade facade = getSongBindingFacade(contactURI);
+        if (facade != null) {
+            String aliasURI = contactURI.absoluteURI();
+            if (!aliasURI.endsWith("/")) {
+                aliasURI += "/";
+            }
+            synchronized (externalAliasRoutes) {
+                facade.createClientCommunicationChannel(contactURI, longPollingURI, requestingEntity, listener);
+                externalAliasRoutes.put(aliasURI, contextPath);
+            }
+        } else {
+            throw new UnsupportedOperationException("SONG binding does not support <communicationChannel> connections");
+        }
+    }
+
+    public void deleteClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI) {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Delete client <comunicationChannel> connection on contact " + contactURI.absoluteURI()
+                    + " and long polling " + longPollingURI.absoluteURI());
+        }
+        try {
+            SongBindingFacade facade = getSongBindingFacade(contactURI);
+            if (facade != null) {
+                String aliasURI = contactURI.absoluteURI();
+                if (!aliasURI.endsWith("/")) {
+                    aliasURI += "/";
+                }
+                synchronized (externalAliasRoutes) {
+                    externalAliasRoutes.remove(aliasURI);
+                }
+                facade.deleteClientCommunicationChannel(contactURI, longPollingURI);
+            }
+        } catch (ServletException e) {
+            LOG.warn("Servlet exception while deleting the client <communicationChannel> connection", e);
+        } catch (UnsupportedOperationException e) {
+            LOG.warn("Try to delete a client <communicationChannel> connection on a binding which does not support this", e);
         }
     }
 

@@ -35,11 +35,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import com.actility.m2m.m2m.FilterCriteria;
 import com.actility.m2m.m2m.Indication;
@@ -53,9 +52,10 @@ import com.actility.m2m.scl.model.ResourceController;
 import com.actility.m2m.scl.model.SclLogger;
 import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.storage.Condition;
-import com.actility.m2m.storage.ConditionBuilder;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.SearchResult;
 import com.actility.m2m.storage.StorageException;
+import com.actility.m2m.storage.StorageFactory;
 import com.actility.m2m.storage.StorageRequestExecutor;
 import com.actility.m2m.util.EmptyUtils;
 import com.actility.m2m.util.FormatUtils;
@@ -117,16 +117,6 @@ public final class Discovery implements ResourceController {
         sendMethodNotAllowed(manager, path, indication, false, true, false, false);
     }
 
-    private Condition appendCondition(ConditionBuilder conditionBuilder, Condition current, Condition newCondition) {
-        Condition result = null;
-        if (current == null) {
-            result = newCondition;
-        } else {
-            result = conditionBuilder.createConjunction(current, newCondition);
-        }
-        return result;
-    }
-
     public void doRetrieveIndication(SclManager manager, String path, XoObject resource, Indication indication)
             throws ParseException, IOException, StorageException, XoException, M2MException {
         SclLogger.logRequestIndication("discoveryRetrieveRequestIndication", "discoveryRetrieveResponseConfirm", indication,
@@ -146,7 +136,7 @@ public final class Discovery implements ResourceController {
             }
         }
 
-        ConditionBuilder conditionBuilder = manager.getConditionBuilder();
+        StorageFactory storageFactory = manager.getStorageContext().getStorageFactory();
         String appPath = manager.getM2MContext().getApplicationPath();
         int limit = -1;
         if (indication.getMaxSize() != null) {
@@ -156,9 +146,9 @@ public final class Discovery implements ResourceController {
         String scopeParameter = indication.getQueryParameter("scope");
         FilterCriteria filterCriteria = indication.getFilterCriteria();
         SearchResult searchResult = null;
-        Map result = null;
+        Iterator it = null;
 
-        int scope = StorageRequestExecutor.SCOPE_SUBTREE;
+        int scope = StorageRequestExecutor.SCOPE_SUB_TREE;
         if (searchPrefix == null) {
             searchPrefix = M2MConstants.URI_SEP;
         } else {
@@ -168,33 +158,31 @@ public final class Discovery implements ResourceController {
             if (searchPrefix.startsWith(appPath)) {
                 searchPrefix = searchPrefix.substring(appPath.length());
             } else {
-                result = EmptyUtils.EMPTY_MAP;
+                it = EmptyUtils.EMPTY_ITERATOR;
             }
         }
         if (scopeParameter != null && "exact".equalsIgnoreCase(scopeParameter)) {
-            scope = StorageRequestExecutor.SCOPE_EXACT;
+            scope = StorageRequestExecutor.SCOPE_ONE_LEVEL;
         }
 
-        if (result == null) {
+        if (it == null) {
             // Build storage conditions
-            Condition condition = null;
+            List conditions = new ArrayList();
             if (filterCriteria.getCreatedAfter() != null) {
-                condition = appendCondition(conditionBuilder, condition, conditionBuilder.createDateCondition(
-                        M2MConstants.ATTR_CREATION_TIME, ConditionBuilder.OPERATOR_GREATER, filterCriteria.getCreatedAfter()));
+                conditions.add(storageFactory.createDateCondition(M2MConstants.ATTR_CREATION_TIME,
+                        Condition.ATTR_OP_GREATER_OR_EQUAL, filterCriteria.getCreatedAfter()));
             }
             if (filterCriteria.getCreatedBefore() != null) {
-                condition = appendCondition(conditionBuilder, condition, conditionBuilder.createDateCondition(
-                        M2MConstants.ATTR_CREATION_TIME, ConditionBuilder.OPERATOR_LOWER, filterCriteria.getCreatedBefore()));
+                conditions.add(storageFactory.createDateCondition(M2MConstants.ATTR_CREATION_TIME,
+                        Condition.ATTR_OP_LOWER_OR_EQUAL, filterCriteria.getCreatedBefore()));
             }
             if (filterCriteria.getIfModifiedSince() != null) {
-                condition = appendCondition(conditionBuilder, condition, conditionBuilder.createDateCondition(
-                        M2MConstants.ATTR_LAST_MODIFIED_TIME, ConditionBuilder.OPERATOR_GREATER,
-                        filterCriteria.getIfModifiedSince()));
+                conditions.add(storageFactory.createDateCondition(M2MConstants.ATTR_LAST_MODIFIED_TIME,
+                        Condition.ATTR_OP_GREATER_OR_EQUAL, filterCriteria.getIfModifiedSince()));
             }
             if (filterCriteria.getIfUnmodifiedSince() != null) {
-                condition = appendCondition(conditionBuilder, condition, conditionBuilder.createDateCondition(
-                        M2MConstants.ATTR_LAST_MODIFIED_TIME, ConditionBuilder.OPERATOR_LOWER,
-                        filterCriteria.getIfUnmodifiedSince()));
+                conditions.add(storageFactory.createDateCondition(M2MConstants.ATTR_LAST_MODIFIED_TIME,
+                        Condition.ATTR_OP_LOWER_OR_EQUAL, filterCriteria.getIfUnmodifiedSince()));
             }
             if (filterCriteria.getIfNoneMatch() != null) {
                 String[] ifNoneMatch = filterCriteria.getIfNoneMatch();
@@ -202,9 +190,8 @@ public final class Discovery implements ResourceController {
                 for (int i = 0; i < ifNoneMatch.length; ++i) {
                     try {
                         ifNotLastModifiedTime = FormatUtils.parseDateTime(ifNoneMatch[i]);
-                        condition = appendCondition(conditionBuilder, condition, conditionBuilder.createDateCondition(
-                                M2MConstants.ATTR_LAST_MODIFIED_TIME, ConditionBuilder.OPERATOR_NOT_EQUAL_TO,
-                                ifNotLastModifiedTime));
+                        conditions.add(storageFactory.createDateCondition(M2MConstants.ATTR_LAST_MODIFIED_TIME,
+                                Condition.ATTR_OP_NOT_EQUAL, ifNotLastModifiedTime));
                     } catch (ParseException e) {
                         // Ignore
                     }
@@ -213,14 +200,20 @@ public final class Discovery implements ResourceController {
             if (filterCriteria.getSearchString() != null) {
                 String[] searchString = filterCriteria.getSearchString();
                 for (int i = 0; i < searchString.length; ++i) {
-                    condition = appendCondition(conditionBuilder, condition, conditionBuilder.createStringCondition(
-                            M2MConstants.ATTR_SEARCH_STRING, ConditionBuilder.OPERATOR_EQUAL, searchString[i]));
+                    conditions.add(storageFactory.createStringExistsCondition(M2MConstants.ATTR_SEARCH_STRING,
+                            Condition.ATTR_OP_EQUAL, searchString[i]));
                 }
             }
+            Condition condition = null;
+            if (conditions.size() > 1) {
+                condition = storageFactory.createConjunction(Condition.COND_OP_AND, conditions);
+            } else if (conditions.size() == 1) {
+                condition = (Condition) conditions.get(0);
+            }
 
-            searchResult = manager.getStorageContext().search(searchPrefix, scope, condition, StorageRequestExecutor.ORDER_ASC,
-                    -1);
-            result = searchResult.getResults();
+            searchResult = manager.getStorageContext().search(null, searchPrefix, scope, condition,
+                    StorageRequestExecutor.ORDER_ASC, -1, true, EmptyUtils.EMPTY_LIST);
+            it = searchResult.getResults();
         }
 
         XoObject representation = null;
@@ -230,8 +223,7 @@ public final class Discovery implements ResourceController {
             XoObject discoveryURI = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_DISCOVERY_U_R_I);
             representation.setXoObjectAttribute(M2MConstants.TAG_M2M_DISCOVERY_U_R_I, discoveryURI);
             List discoveryUriList = discoveryURI.getStringListAttribute(M2MConstants.TAG_REFERENCE);
-            Iterator it = result.entrySet().iterator();
-            Entry entry = null;
+            Document document = null;
             String refPath = null;
             byte[] rawXoObject = null;
             XoObject xoObject = null;
@@ -241,9 +233,9 @@ public final class Discovery implements ResourceController {
                 urisCount = Integer.MAX_VALUE;
             }
             while (it.hasNext()) {
-                entry = (Entry) it.next();
-                refPath = (String) entry.getKey();
-                rawXoObject = (byte[]) entry.getValue();
+                document = (Document) it.next();
+                refPath = document.getPath();
+                rawXoObject = document.getContent();
                 xoObject = manager.getXoService().readBinaryXmlXoObject(rawXoObject);
                 try {
                     controller = manager.getControllerFromTag(xoObject.getName());

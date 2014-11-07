@@ -201,6 +201,13 @@ public class JniXoServiceImpl implements NiXoService {
         return JniXo.xoWritePartialExiMem((int) xoHandle, attributeName);
     }
 
+    public boolean xoNmContainsAttr(long xoHandle, String attributeName) {
+        if (JniXo.ARCH_64) {
+            return JniXo.xoNmContainsAttr64(xoHandle, attributeName);
+        }
+        return JniXo.xoNmContainsAttr((int) xoHandle, attributeName);
+    }
+
     public long xoObjectNmGetAttr(long xoHandle, String attributeName) {
         if (JniXo.ARCH_64) {
             return JniXo.xoObjectNmGetAttr64(xoHandle, attributeName);

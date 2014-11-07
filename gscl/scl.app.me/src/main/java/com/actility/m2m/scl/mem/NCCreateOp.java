@@ -32,40 +32,41 @@
 package com.actility.m2m.scl.mem;
 
 import java.net.URI;
-import java.util.Collection;
 
+import com.actility.m2m.m2m.ChannelServerListener;
 import com.actility.m2m.m2m.M2MConstants;
 import com.actility.m2m.m2m.M2MException;
 import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.TransientOp;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
 
 public final class NCCreateOp implements TransientOp {
 
     private final SclManager manager;
-    private final String path;
+    private final Document document;
     private final XoObject resource;
     private final URI targetID;
-    private final Collection searchAttributes;
+    private final ChannelServerListener channelListener;
     private final SclTransaction transaction;
     private URI contactUri;
     private URI longPollUri;
 
-    public NCCreateOp(SclManager manager, String path, XoObject resource, URI targetID, Collection searchAttributes,
+    public NCCreateOp(SclManager manager, Document document, XoObject resource, URI targetID, ChannelServerListener listener,
             SclTransaction transaction) {
         this.manager = manager;
-        this.path = path;
+        this.document = document;
         this.resource = resource;
         this.targetID = targetID;
-        this.searchAttributes = searchAttributes;
+        this.channelListener = listener;
         this.transaction = transaction;
     }
 
     public void prepare() throws XoException, M2MException {
         // Create long poll server connection
-        URI[] uris = manager.getM2MContext().createServerLongPoll(targetID);
+        URI[] uris = manager.getM2MContext().createServerNotificationChannel(targetID, channelListener);
         contactUri = uris[0];
         longPollUri = uris[1];
 
@@ -75,14 +76,15 @@ public final class NCCreateOp implements TransientOp {
         resource.setXoObjectAttribute(M2MConstants.TAG_M2M_CHANNEL_DATA, channelData);
         channelData.setStringAttribute(M2MConstants.ATTR_XSI_TYPE, M2MConstants.TYPE_M2M_LONG_POLLING_CHANNEL_DATA);
         channelData.setStringAttribute(M2MConstants.TAG_M2M_LONG_POLLING_U_R_I, longPollUri.toString());
+        document.setContent(resource.saveBinary());
 
         // Save resource
-        transaction.createResource(path, resource, searchAttributes);
+        transaction.createResource(document);
     }
 
     public void rollback() {
         if (contactUri != null && longPollUri != null) {
-            manager.getM2MContext().deleteServerLongPoll(contactUri, longPollUri);
+            manager.getM2MContext().deleteServerNotificationChannel(contactUri, longPollUri);
         }
     }
 

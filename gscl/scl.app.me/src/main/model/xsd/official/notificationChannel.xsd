@@ -16,32 +16,4 @@
 		</sequence>
 		<attribute ref="tns:id"/>
 	</complexType>
-
-
-	<element name="channelType" type="tns:ChannelType" />
-
-	<simpleType name="ChannelType">
-		<restriction base="string">
-			<enumeration value="LONG_POLLING" />
-		</restriction>
-	</simpleType>
-
-	<element name="channelData" type="tns:ChannelData" />
-
-	<complexType name="ChannelData" abstract="true" >
-		<sequence/>
-	</complexType>
-
-	<complexType name="LongPollingChannelData">
-		<complexContent>
-			<extension base="tns:ChannelData">
-				<sequence>
-					<element ref="tns:longPollingURI" />
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<element name="longPollingURI" type="anyURI" />
-
 </schema>

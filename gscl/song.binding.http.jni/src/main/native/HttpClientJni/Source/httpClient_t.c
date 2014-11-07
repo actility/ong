@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,7 +11,7 @@
 #include "rtlbase.h"
 
 #include "common.h"
-#include "header_t.h"                                                                               
+#include "header_t.h"
 #include "response_t.h"
 #include "transaction_t.h"
 #include "transactionsList_t.h"
@@ -81,8 +80,7 @@ static void httpClient_t_init(httpClient_t *This)
  * @param issuerHandle the issuer handler.
  * @return the new create instance of httpClient_t.
  */
-httpClient_t *new_httpClient_t(short curlDebugEnable, PF_HTTP_RESPONSE_CB responseCb, 
-  void *issuerHandle)
+httpClient_t *new_httpClient_t(short curlDebugEnable, PF_HTTP_RESPONSE_CB responseCb, void *issuerHandle)
 {
   httpClient_t *This = malloc(sizeof(httpClient_t));
   if (!This)
@@ -95,15 +93,12 @@ httpClient_t *new_httpClient_t(short curlDebugEnable, PF_HTTP_RESPONSE_CB respon
   This->free = httpClient_t_newFree;
   This->curlDebugEnable = curlDebugEnable;
   This->curlMultiHandle = curl_multi_init();
- 
+
   // max amount of connections hold in connection pool cache
-  CURLM_SETOPT(This->curlMultiHandle, CURLMOPT_MAX_HOST_CONNECTIONS, 
-    DEFAULT_HTTPCLIENT_MAX_CONNECTS, __LINE__);
+  CURLM_SETOPT(This->curlMultiHandle, CURLMOPT_MAX_HOST_CONNECTIONS, DEFAULT_HTTPCLIENT_MAX_CONNECTS, __LINE__);
   // max amount of simultaneously open connections in total
-  CURLM_SETOPT(This->curlMultiHandle, CURLMOPT_MAX_TOTAL_CONNECTIONS, 
-    DEFAULT_HTTPCLIENT_MAX_CONNECTS, __LINE__);
-  CURLM_SETOPT(This->curlMultiHandle, CURLMOPT_PIPELINING, DEFAULT_HTTPCLIENT_PIPELINE, 
-    __LINE__);
+  CURLM_SETOPT(This->curlMultiHandle, CURLMOPT_MAX_TOTAL_CONNECTIONS, DEFAULT_HTTPCLIENT_MAX_CONNECTS, __LINE__);
+  CURLM_SETOPT(This->curlMultiHandle, CURLMOPT_PIPELINING, DEFAULT_HTTPCLIENT_PIPELINE, __LINE__);
 
   This->transactions = new_transactionsList_t();
   This->freeTransactions = new_freeTransactionsList_t(This, DEFAULT_HTTPCLIENT_MAX_CONNECTS);
@@ -120,10 +115,10 @@ void httpClient_t_newFree(httpClient_t *This)
 {
   LOG(TRACE_DEBUG, "httpClient_t::newFree (This:0x%.8x)", This);
 
-  This->freeTransactions->free(This->freeTransactions); 
+  This->freeTransactions->free(This->freeTransactions);
   This->transactions->free(This->transactions);
   curl_multi_cleanup(This->curlMultiHandle);
- 
+
   if (This->proxyHostPort)
   {
     free(This->proxyHostPort);
@@ -140,14 +135,13 @@ void httpClient_t_newFree(httpClient_t *This)
  * @param This the object-like instance.
  * @param maxTotalSockets the number to set.
  */
-void httpClient_t_setMaxTotalSockets (httpClient_t *This, int maxTotalSockets)
+void httpClient_t_setMaxTotalSockets(httpClient_t *This, int maxTotalSockets)
 {
   LOG(TRACE_INFO, ">>> httpClient_t::setMaxTotalSockets (This:0x%.8x) "
-    "(maxTotalSockets:%d)", This, maxTotalSockets);
+      "(maxTotalSockets:%d)", This, maxTotalSockets);
   This->lock(This);
-  CURLM_SETOPT(This->curlMultiHandle, CURLMOPT_MAX_TOTAL_CONNECTIONS, maxTotalSockets,
-    __LINE__);
-  This->freeTransactions->free(This->freeTransactions); 
+  CURLM_SETOPT(This->curlMultiHandle, CURLMOPT_MAX_TOTAL_CONNECTIONS, maxTotalSockets, __LINE__);
+  This->freeTransactions->free(This->freeTransactions);
   This->freeTransactions = new_freeTransactionsList_t(This, maxTotalSockets);
   This->unlock(This);
 }
@@ -157,14 +151,13 @@ void httpClient_t_setMaxTotalSockets (httpClient_t *This, int maxTotalSockets)
  * @param This the object-like instance.
  * @param maxSocketsPerHost the number to set.
  */
-void httpClient_t_setMaxSocketsPerHost (httpClient_t *This, int maxSocketsPerHost)
+void httpClient_t_setMaxSocketsPerHost(httpClient_t *This, int maxSocketsPerHost)
 {
   LOG(TRACE_INFO, ">>> httpClient_t::setMaxSocketsPerHost (This:0x%.8x) "
-    "(maxSocketsPerHost:%d)", This, maxSocketsPerHost);
-This->lock(This);
-  CURLM_SETOPT(This->curlMultiHandle, CURLMOPT_MAX_HOST_CONNECTIONS, maxSocketsPerHost,
-    __LINE__); 
-This->unlock(This);
+      "(maxSocketsPerHost:%d)", This, maxSocketsPerHost);
+  This->lock(This);
+  CURLM_SETOPT(This->curlMultiHandle, CURLMOPT_MAX_HOST_CONNECTIONS, maxSocketsPerHost, __LINE__);
+  This->unlock(This);
 }
 
 /**
@@ -175,14 +168,14 @@ This->unlock(This);
 void httpClient_t_setProxyUserPwd(httpClient_t *This, char *proxyUserPwd)
 {
   LOG(TRACE_INFO, ">>> httpClient_t::setProxyUserPwd (This:0x%.8x) "
-    "(proxyUserPwd:%s)", This, proxyUserPwd);
-This->lock(This);
+      "(proxyUserPwd:%s)", This, proxyUserPwd);
+  This->lock(This);
   if (NULL != This->proxyUserPwd)
   {
     free(This->proxyUserPwd);
   }
   This->proxyUserPwd = strdup(proxyUserPwd);
-This->unlock(This);
+  This->unlock(This);
 }
 
 /**
@@ -193,14 +186,14 @@ This->unlock(This);
 void httpClient_t_setProxyHostPort(httpClient_t *This, char *proxyHostPort)
 {
   LOG(TRACE_INFO, ">>> httpClient_t::setProxyHostPort (This:0x%.8x) "
-    "(proxyHostPort:%s)", This, proxyHostPort);
-This->lock(This);
+      "(proxyHostPort:%s)", This, proxyHostPort);
+  This->lock(This);
   if (NULL != This->proxyHostPort)
   {
     free(This->proxyHostPort);
   }
   This->proxyHostPort = strdup(proxyHostPort);
-This->unlock(This);
+  This->unlock(This);
 }
 
 /**
@@ -211,10 +204,10 @@ This->unlock(This);
 void httpClient_t_setTcpNoDelay(httpClient_t *This, int tcpNoDelay)
 {
   LOG(TRACE_INFO, ">>> httpClient_t::setTcpNoDelay (This:0x%.8x) "
-    "(tcpNoDelay:%d)", This, tcpNoDelay);
-This->lock(This);
+      "(tcpNoDelay:%d)", This, tcpNoDelay);
+  This->lock(This);
   This->tcpNoDelay = tcpNoDelay;
-This->unlock(This);
+  This->unlock(This);
 }
 
 /**
@@ -225,10 +218,10 @@ This->unlock(This);
 void httpClient_t_setRequestTimeout(httpClient_t *This, long requestTimeout)
 {
   LOG(TRACE_INFO, ">>> httpClient_t::setRequestTimeout (This:0x%.8x) "
-    "(requestTimeout:%ld)", This, requestTimeout);
-This->lock(This);
+      "(requestTimeout:%ld)", This, requestTimeout);
+  This->lock(This);
   This->requestTimeout = requestTimeout;
-This->unlock(This);
+  This->unlock(This);
 }
 
 /**
@@ -239,24 +232,22 @@ This->unlock(This);
 void httpClient_t_setConnectionTimeout(httpClient_t *This, long connectionTimeout)
 {
   LOG(TRACE_INFO, ">>> httpClient_t::setConnectionTimeout (This:0x%.8x) "
-    "(connectionTimeout:%ld)", This, connectionTimeout);
-This->lock(This);
+      "(connectionTimeout:%ld)", This, connectionTimeout);
+  This->lock(This);
   This->connectionTimeout = connectionTimeout;
-This->unlock(This);
+  This->unlock(This);
 }
-
 
 /**
  * Get a free transaction for the new request.
  * @param This the object-like instance to destroy.
  * @param transId the identifier of the transaction.
  */
-void httpClient_t_createReq (httpClient_t *This, char *transId)
+void httpClient_t_createReq(httpClient_t *This, char *transId)
 {
   transaction_t *trans;
-  LOG(TRACE_INFO, ">>> httpClient_t::createReq (This:0x%.8x) (transId:%s)", 
-    This, transId);
-  
+  LOG(TRACE_INFO, ">>> httpClient_t::createReq (This:0x%.8x) (transId:%s)", This, transId);
+
   This->lock(This);
   trans = This->freeTransactions->recycle(This->freeTransactions);
   trans->setTransId(trans, transId);
@@ -284,22 +275,20 @@ transaction_t *httpClient_t_getTransaction(httpClient_t *This, char *transId)
  * @param This the object-like instance to destroy.
  * @param transId the identifier of the transaction to retrieve.
  */
-void httpClient_t_removeReq (httpClient_t *This, char *transId)
+void httpClient_t_removeReq(httpClient_t *This, char *transId)
 {
   transaction_t *trans;
   CURLMcode ret;
-  LOG(TRACE_INFO, ">>> httpClient_t::removeReq (This:0x%.8x) (transId:%s)", 
-    This, transId);
+  LOG(TRACE_INFO, ">>> httpClient_t::removeReq (This:0x%.8x) (transId:%s)", This, transId);
   This->lock(This);
   trans = This->transactions->remove(This->transactions, transId);
   if (trans)
   {
     ret = curl_multi_remove_handle(This->curlMultiHandle, trans->curlEasyHandle);
-    if (ret != CURLM_OK)                                                                        
+    if (ret != CURLM_OK)
     {
       LOG(TRACE_ERROR, "httpClient_t::removeReq: error - curl_multi_remove_handle "
-        "not OK (This:0x%.8x) (ret:%d) (msg:%s)", This, ret,
-        curl_easy_strerror(ret));
+          "not OK (This:0x%.8x) (ret:%d) (msg:%s)", This, ret, curl_easy_strerror(ret));
     }
     This->freeTransactions->add(This->freeTransactions, trans);
   }
@@ -327,8 +316,7 @@ int httpClient_t_sendReq(httpClient_t *This, char *transId, CURL *eh)
   if (ret != CURLM_OK)
   {
     LOG(TRACE_ERROR, "httpClient_t::sendReq: error - failed to send request "
-      "(This:0x%.8x) (transId:%s) (ret:%d) (msg:%s)", This, transId, ret, 
-      curl_easy_strerror(ret));
+        "(This:0x%.8x) (transId:%s) (ret:%d) (msg:%s)", This, transId, ret, curl_easy_strerror(ret));
     res = 0;
   }
 
@@ -357,16 +345,16 @@ void httpClient_t_invokeRespCompletion(httpClient_t *This, CURLcode result, CURL
   PF_HTTP_RESPONSE_CB pFunc = NULL;
   char *p = NULL;
   transaction_t *t = NULL;
- 
+
   This->lock(This);
-  curl_easy_getinfo(easyHandle, CURLINFO_PRIVATE, &p); 
-  t = (transaction_t *)p;
+  curl_easy_getinfo(easyHandle, CURLINFO_PRIVATE, &p);
+  t = (transaction_t *) p;
   This->unlock(This);
 
   if (t)
   {
 
-    if (! t->response )
+    if (!t->response)
     {
       t->response = new_response_t();
       t->response->statusCode = result;
@@ -374,19 +362,18 @@ void httpClient_t_invokeRespCompletion(httpClient_t *This, CURLcode result, CURL
     }
 
     LOG(TRACE_INFO, "<<< httpClient_t::invokeRespCompletion (This:0x%.8x) (transId:%s) "
-      "(statusCode:%d) (reasonPhrase:%s)", This, t->transId, t->response->statusCode, 
-      t->response->reasonPhrase);
+        "(statusCode:%d) (reasonPhrase:%s)", This, t->transId, t->response->statusCode, t->response->reasonPhrase);
 
     if (This->responseCb)
     {
-      pFunc = (PF_HTTP_RESPONSE_CB)(This->responseCb);
+      pFunc = (PF_HTTP_RESPONSE_CB) (This->responseCb);
       pFunc(This->issuerHandle, t);
     }
     else
     {
       LOG(TRACE_ERROR, "<<< httpClient_t::invokeRespCompletion: error - no call back "
-        "(This:0x%.8x) (transId:%s) (statusCode:%d) (reasonPhrase:%s)", This, t->transId, 
-        t->response->statusCode, t->response->reasonPhrase);
+          "(This:0x%.8x) (transId:%s) (statusCode:%d) (reasonPhrase:%s)", This, t->transId, t->response->statusCode,
+          t->response->reasonPhrase);
     }
   }
 }
@@ -395,7 +382,7 @@ void httpClient_t_invokeRespCompletion(httpClient_t *This, CURLcode result, CURL
  * Add lock protection on client. 
  * @param This the object-like instance.
  */
-void httpClient_t_lock (httpClient_t *This)
+void httpClient_t_lock(httpClient_t *This)
 {
   pthread_mutex_lock(&This->mutex);
 }
@@ -404,7 +391,7 @@ void httpClient_t_lock (httpClient_t *This)
  * Remove lock protection on client. 
  * @param This the object-like instance.
  */
-void httpClient_t_unlock (httpClient_t *This)
+void httpClient_t_unlock(httpClient_t *This)
 {
   pthread_mutex_unlock(&This->mutex);
 }
@@ -413,7 +400,7 @@ void httpClient_t_unlock (httpClient_t *This)
  * Look for request and response to perform. 
  * @param This the object-like instance to destroy.
  */
-void httpClient_t_processMessages (httpClient_t *This)
+void httpClient_t_processMessages(httpClient_t *This)
 {
   CURLMsg *msg;
   CURL *easy;
@@ -422,31 +409,32 @@ void httpClient_t_processMessages (httpClient_t *This)
   int msgsLeft;
   int cycles = 1;
 
-  do {
+  do
+  {
     struct timeval timeout;
-    int rc; /* select() return code */ 
- 
+    int rc; /* select() return code */
+
     fd_set fdread;
     fd_set fdwrite;
     fd_set fdexcep;
     int maxfd = -1;
- 
+
     FD_ZERO(&fdread);
     FD_ZERO(&fdwrite);
     FD_ZERO(&fdexcep);
- 
-    /* set a suitable timeout to play around with */ 
+
+    /* set a suitable timeout to play around with */
     timeout.tv_sec = 0;
     timeout.tv_usec = 10000;
- 
-    /* get file descriptors from the transfers */ 
-    This->lock(This); 
+
+    /* get file descriptors from the transfers */
+    This->lock(This);
     ret = curl_multi_fdset(This->curlMultiHandle, &fdread, &fdwrite, &fdexcep, &maxfd);
-    This->unlock(This); 
+    This->unlock(This);
     if (ret != CURLM_OK)
     {
       LOG(TRACE_ERROR, "httpClient_t::processMessages: error - curl_multi_fdset "
-        "not OK (This:0x%.8x) (ret:%d) (msg:%s)", This, ret, curl_easy_strerror(ret));
+          "not OK (This:0x%.8x) (ret:%d) (msg:%s)", This, ret, curl_easy_strerror(ret));
     }
     else
     {
@@ -455,26 +443,26 @@ void httpClient_t_processMessages (httpClient_t *This)
        * greater or equal than -1.  We call select(maxfd + 1, ...), specially in
        * case of (maxfd == -1), we call select(0, ...), which is basically
        * equal to sleep. 
-       */ 
-  
+       */
+
       if (maxfd >= -1)
       {
-        rc = select(maxfd+1, &fdread, &fdwrite, &fdexcep, &timeout);
-   
-        switch(rc) {
+        rc = select(maxfd + 1, &fdread, &fdwrite, &fdexcep, &timeout);
+
+        switch (rc)
+        {
         case -1:
-          /* select error */ 
+          /* select error */
           break;
-        case 0: /* timeout */ 
-        default: /* action */ 
-          This->lock(This); 
+        case 0: /* timeout */
+        default: /* action */
+          This->lock(This);
           ret = curl_multi_perform(This->curlMultiHandle, &msgsLeft);
-          This->unlock(This); 
+          This->unlock(This);
           if (ret != CURLM_OK)
           {
             LOG(TRACE_ERROR, "httpClient_t::processMessages: error - curl_multi_perform "
-              "not OK (This:0x%.8x) (ret:%d) (msg:%s) (msgsLeft:%d)", This, ret, 
-              curl_easy_strerror(ret), msgsLeft);
+                "not OK (This:0x%.8x) (ret:%d) (msg:%s) (msgsLeft:%d)", This, ret, curl_easy_strerror(ret), msgsLeft);
           }
           break;
         }
@@ -484,23 +472,23 @@ void httpClient_t_processMessages (httpClient_t *This)
         //break;
       }
     }
-    cycles --;
-  } while ( (msgsLeft) && (cycles > 0) );
- 
-  do 
-  { 
-    This->lock(This); 
+    cycles--;
+  } while ((msgsLeft) && (cycles > 0));
+
+  do
+  {
+    This->lock(This);
     msg = curl_multi_info_read(This->curlMultiHandle, &msgsLeft);
-    This->unlock(This); 
+    This->unlock(This);
     if (msg)
     {
       LOG(TRACE_DEBUG, "httpClient_t::processMessages - new message read (This:%0.8p)"
-        " (msgsLeft:%d)", This, msgsLeft);
+          " (msgsLeft:%d)", This, msgsLeft);
       if (CURLMSG_DONE == msg->msg)
       {
         easy = msg->easy_handle;
         res = msg->data.result;
-        This->invokeRespCompletion(This, res, easy); 
+        This->invokeRespCompletion(This, res, easy);
       }
     }
   } while (msg);
@@ -510,27 +498,26 @@ void httpClient_t_processMessages (httpClient_t *This)
  * Look for requests that have timed out and that libcurl hasn't detected as so.
  * @param This the object-like instance to destroy.
  */
-void httpClient_t_trackTimedOutMessages (httpClient_t *This)
+void httpClient_t_trackTimedOutMessages(httpClient_t *This)
 {
   int index = 0;
   transaction_t *trans;
   double duration;
 
-This->lock(This);
+  This->lock(This);
   while ((trans = This->transactions->getNth(This->transactions, index)))
   {
     curl_easy_getinfo(trans->curlEasyHandle, CURLINFO_TOTAL_TIME, &duration);
     if ((duration * 1000) > (This->requestTimeout + 2))
     {
-      LOG(TRACE_ERROR, "trackTimedOutMessages: timed out transaction found (%s)",
-        trans->transId);
-This->unlock(This);
-      This->invokeRespCompletion(This, CURLE_OPERATION_TIMEDOUT, trans->curlEasyHandle); 
-This->lock(This);
+      LOG(TRACE_ERROR, "trackTimedOutMessages: timed out transaction found (%s)", trans->transId);
+      This->unlock(This);
+      This->invokeRespCompletion(This, CURLE_OPERATION_TIMEDOUT, trans->curlEasyHandle);
+      This->lock(This);
     }
-    index++; 
+    index++;
   }
-This->unlock(This);
+  This->unlock(This);
 }
 
 /**
@@ -553,5 +540,4 @@ void httpClient_t_dumpInfo(httpClient_t *This, PF_DUMP_INFO_CB pFunc, void *issu
   This->unlock(This);
   pFunc(issuerHandle, "%d transactions found (client:0x%.8x)\n\n", i, This);
 }
-
 

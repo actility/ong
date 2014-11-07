@@ -36,9 +36,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -54,16 +52,36 @@ import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.SubscribedResource;
 import com.actility.m2m.scl.model.VolatileResource;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.FormatUtils;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.URIUtils;
+import com.actility.m2m.util.UtilConstants;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
 
 /**
  * M2M Service Capability Layer. This is the root resource which represents an M2M network.
+ *
+ * <pre>
+ * m2m:SclBase from ong:t_xml_obj
+ * {
+ *     m2m:accessRightID    XoString    { shdico } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:searchStrings    m2m:SearchStrings    { } // (optional)
+ *     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:aPocHandling    XoString    { } // (optional) (xmlType: m2m:APocHandling) (enum: SHALLOW DEEP )
+ *     m2m:sclsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:applicationsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:containersReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:groupsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:accessRightsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:subscriptionsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ *     m2m:discoveryReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ * }
+ * alias m2m:SclBase with m2m:sclBase
+ * </pre>
  */
 public final class SclBase extends SclResource implements VolatileResource, SubscribedResource {
     private static final Logger LOG = OSGiLogger.getLogger(SclBase.class, BundleLogger.getStaticLogger());
@@ -81,23 +99,6 @@ public final class SclBase extends SclResource implements VolatileResource, Subs
                 false);
     }
 
-    // m2m:SclBase from ong:t_xml_obj
-    // {
-    // m2m:accessRightID XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:searchStrings m2m:SearchStrings { } // (optional)
-    // m2m:creationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:lastModifiedTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:aPocHandling XoString { } // (optional) (xmlType: m2m:APocHandling) (enum: SHALLOW DEEP )
-    // m2m:sclsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:applicationsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:containersReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:groupsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:accessRightsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:subscriptionsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // m2m:discoveryReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // }
-    // alias m2m:SclBase with m2m:sclBase
-
     public void reload(SclManager manager, String path, XoObject resource, SclTransaction transaction) throws ParseException,
             StorageException, XoException {
         if (LOG.isInfoEnabled()) {
@@ -105,23 +106,24 @@ public final class SclBase extends SclResource implements VolatileResource, Subs
         }
         resource.setStringAttribute(M2MConstants.TAG_M2M_A_POC_HANDLING, null);
 
-        Collection searchAttributes = new ArrayList();
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
         XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
         List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-        Iterator it = searchStringList.iterator();
-        while (it.hasNext()) {
-            searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-        }
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME))));
-        transaction.updateResource(path, resource, searchAttributes);
+        document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME)));
+        document.setContent(resource.saveBinary());
+        transaction.updateResource(document);
     }
 
     public void checkRights(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity, String flag)
             throws UnsupportedEncodingException, StorageException, XoException, M2MException {
-        getAndCheckAccessRight(logId, manager, path, resource, requestingEntity, flag);
+        URI nsclUri = manager.getNsclUri();
+        if (nsclUri != null && !nsclUri.equals(requestingEntity)) {
+            getAndCheckAccessRight(logId, manager, path, resource, requestingEntity, flag);
+        }
     }
 
     public void createResource(SclManager manager, String path, SclTransaction transaction) throws XoException {
@@ -129,7 +131,7 @@ public final class SclBase extends SclResource implements VolatileResource, Subs
         try {
             resource = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_SCL_BASE);
             Date now = new Date();
-            String creationTime = FormatUtils.formatDateTime(now, manager.getTimeZone());
+            String creationTime = FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE);
 
             // Update resource
             resource.setNameSpace(M2MConstants.PREFIX_M2M);
@@ -151,16 +153,14 @@ public final class SclBase extends SclResource implements VolatileResource, Subs
                     transaction);
 
             // Save resource
-            Collection searchAttributes = new ArrayList();
+            Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
             XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
             List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-            Iterator it = searchStringList.iterator();
-            while (it.hasNext()) {
-                searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-            }
-            searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, now));
-            searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-            transaction.createResource(path, resource, searchAttributes);
+            document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+            document.setAttribute(M2MConstants.ATTR_CREATION_TIME, now);
+            document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+            document.setContent(resource.saveBinary());
+            transaction.createResource(document);
         } finally {
             if (resource != null) {
                 resource.free(true);
@@ -206,17 +206,15 @@ public final class SclBase extends SclResource implements VolatileResource, Subs
         updateStringOptional(resource, representation, M2MConstants.TAG_M2M_A_POC_HANDLING);
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
         XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
         List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-        Iterator it = searchStringList.iterator();
-        while (it.hasNext()) {
-            searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-        }
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        manager.getStorageContext().update(path, resource.saveBinary(), searchAttributes);
+        document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setContent(resource.saveBinary());
+        manager.getStorageContext().update(null, document, null);
 
         return false;
     }
@@ -240,17 +238,15 @@ public final class SclBase extends SclResource implements VolatileResource, Subs
         if (modified) {
             Date now = new Date();
             updateLastModifiedTime(manager, resource, now);
-            Collection searchAttributes = new ArrayList();
+            Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
             XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
             List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-            Iterator it = searchStringList.iterator();
-            while (it.hasNext()) {
-                searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-            }
-            searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                    .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-            searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-            manager.getStorageContext().update(path, resource.saveBinary(), searchAttributes);
+            document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+            document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                    FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+            document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+            document.setContent(resource.saveBinary());
+            manager.getStorageContext().update(null, document, null);
         }
     }
 
@@ -263,8 +259,8 @@ public final class SclBase extends SclResource implements VolatileResource, Subs
         throw new UnsupportedOperationException();
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) {
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path,
+            XoObject resource, FilterCriteria filterCriteria, Set supported) {
         String appPath = manager.getM2MContext().getApplicationPath();
         String accessRight = resource.getStringAttribute(M2MConstants.TAG_M2M_ACCESS_RIGHT_I_D);
         if (accessRight != null) {

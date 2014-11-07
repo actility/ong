@@ -12,7 +12,7 @@
 			<element ref="tns:securityConnectionId" />
 			<element ref="tns:securityKmcIndex" />
 			<element ref="tns:securityLifetime" />
-			<element ref="tns:securityM2MKey" />
+			<element ref="tns:securityEncryptedM2MKey" />
 			<element ref="tns:sclId" />
 			<element ref="tns:securitymIdFlags" />
 		</sequence>

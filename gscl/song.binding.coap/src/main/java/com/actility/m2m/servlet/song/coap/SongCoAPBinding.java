@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: SongCoAPBinding.java 8769 2014-05-21 15:43:39Z JReich $
+ * id $Id: SongCoAPBinding.java 9835 2014-10-31 16:33:57Z JReich $
  * author $Author: JReich $
- * version $Revision: 8769 $
- * lastrevision $Date: 2014-05-21 17:43:39 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9835 $
+ * lastrevision $Date: 2014-10-31 17:33:57 +0100 (Fri, 31 Oct 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:43:39 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-10-31 17:33:57 +0100 (Fri, 31 Oct 2014) $
  */
 
 package com.actility.m2m.servlet.song.coap;
@@ -40,12 +40,12 @@ import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 
-import com.actility.m2m.servlet.song.SongBindingFactory;
 import com.actility.m2m.servlet.song.SongServlet;
 import com.actility.m2m.servlet.song.SongServletMessage;
 import com.actility.m2m.servlet.song.SongServletRequest;
 import com.actility.m2m.servlet.song.SongServletResponse;
 import com.actility.m2m.servlet.song.SongURI;
+import com.actility.m2m.servlet.song.binding.SongBindingFactory;
 import com.actility.m2m.servlet.song.coap.log.BundleLogger;
 import com.actility.m2m.song.binding.coap.ni.api.DiaOpt;
 import com.actility.m2m.song.binding.coap.ni.api.NiSongBindingCoapService;

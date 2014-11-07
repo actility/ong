@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: M2MConstants.java 7360 2014-01-24 10:39:06Z JReich $
+ * id $Id: M2MConstants.java 9480 2014-09-06 09:36:22Z JReich $
  * author $Author: JReich $
- * version $Revision: 7360 $
- * lastrevision $Date: 2014-01-24 11:39:06 +0100 (Fri, 24 Jan 2014) $
+ * version $Revision: 9480 $
+ * lastrevision $Date: 2014-09-06 11:36:22 +0200 (Sat, 06 Sep 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-01-24 11:39:06 +0100 (Fri, 24 Jan 2014) $
+ * lastmodified $LastChangedDate: 2014-09-06 11:36:22 +0200 (Sat, 06 Sep 2014) $
  */
 
 package com.actility.m2m.m2m;
@@ -64,12 +64,16 @@ public interface M2MConstants {
     String RES_SCL_BASE = "sclBase";
     String RES_SCLS = "scls";
     String RES_SCL = "scl";
+    String RES_SCL_ANNCS = "sclAnncs";
+    String RES_SCL_ANNC = "sclAnnc";
     String RES_APPLICATIONS = "applications";
     String RES_APPLICATION = "application";
     String RES_APPLICATION_ANNC = "applicationAnnc";
     String RES_ACCESS_RIGHTS = "accessRights";
     String RES_ACCESS_RIGHT = "accessRight";
     String RES_ACCESS_RIGHT_ANNC = "accessRightAnnc";
+    String RES_COMMUNICATION_CHANNELS = "communicationChannels";
+    String RES_COMMUNICATION_CHANNEL = "communicationChannel";
     String RES_CONTAINERS = "containers";
     String RES_CONTAINER = "container";
     String RES_CONTAINER_ANNC = "containerAnnc";
@@ -80,6 +84,7 @@ public interface M2MConstants {
     String RES_GROUPS = "groups";
     String RES_GROUP = "group";
     String RES_GROUP_ANNC = "groupAnnc";
+    String RES_SUBCONTAINERS = "subcontainers";
     String RES_SUBSCRIPTIONS = "subscriptions";
     String RES_SUBSCRIPTION = "subscription";
     String RES_M2M_POCS = "m2mPocs";
@@ -95,6 +100,28 @@ public interface M2MConstants {
     String RES_NOTIFICATION_CHANNELS = "notificationChannels";
     String RES_NOTIFICATION_CHANNEL = "notificationChannel";
     String RES_DISCOVERY = "discovery";
+    String RES_MEMBERS_CONTENT = "membersContent";
+
+    // ///////////////////////////////////////////////////////////////////////
+    // M2M Short Resources
+    // ///////////////////////////////////////////////////////////////////////
+    String RES_SHORT_SCLS = "SL";
+    String RES_SHORT_SCL_ANNCS = "SLA";
+    String RES_SHORT_APPLICATIONS = "AP";
+    String RES_SHORT_ACCESS_RIGHTS = "AR";
+    String RES_SHORT_COMMUNICATION_CHANNELS = "CC";
+    String RES_SHORT_CONTAINERS = "CO";
+    String RES_SHORT_CONTENT_INSTANCES = "CI";
+    String RES_SHORT_GROUPS = "GR";
+    String RES_SHORT_SUBCONTAINERS = "SC";
+    String RES_SHORT_SUBSCRIPTIONS = "SU";
+    String RES_SHORT_M2M_POCS = "PC";
+    String RES_SHORT_MGMT_OBJS = "MO";
+    String RES_SHORT_ATTACHED_DEVICES = "AD";
+    String RES_SHORT_NOTIFICATION_CHANNELS = "NC";
+    String RES_SHORT_DISCOVERY = "DC";
+    String RES_SHORT_MEMBERS_CONTENT = "MC";
+    String RES_SHORT_EXEC_INSTANCES = "EI";
 
     // ///////////////////////////////////////////////////////////////////////
     // M2M Attributes
@@ -116,6 +143,8 @@ public interface M2MConstants {
     String ATTR_A_PO_C_PATHS = "aPoCPaths";
     String ATTR_CHANNEL_DATA = "channelData";
     String ATTR_CHANNEL_TYPE = "channelType";
+    String ATTR_COMMUNICATION_CHANNEL_COLLECTION = "communicationChannelCollection";
+    String ATTR_COMMUNICATION_CHANNELS_REFERENCE = "communicationChannelsReference";
     String ATTR_CONTACT = "contact";
     String ATTR_CONTACT_INFO = "contactInfo";
     String ATTR_CONTACT_U_R_I = "contactURI";
@@ -146,6 +175,7 @@ public interface M2MConstants {
     String ATTR_IF_NONE_MATCH = "ifNoneMatch";
     String ATTR_IF_UNMODIFIED_SINCE = "ifUnmodifiedSince";
     String ATTR_INTEGRITY_VAL_RESULTS = "integrityValResults";
+    String ATTR_IN_TYPE = "inType";
     String ATTR_LAST_MODIFIED_TIME = "lastModifiedTime";
     String ATTR_LATEST = "latest";
     String ATTR_LINK = "link";
@@ -171,11 +201,15 @@ public interface M2MConstants {
     String ATTR_NOTIFICATION_CHANNELS_REFERENCE = "notificationChannelsReference";
     String ATTR_OLDEST = "oldest";
     String ATTR_ONLINE_STATUS = "onlineStatus";
+    String ATTR_OUT_TYPE = "outType";
     String ATTR_PERMISSIONS = "permissions";
+    String ATTR_POC = "poc";
     String ATTR_POCS = "pocs";
+    String ATTR_REFERENCE_POINT = "referencePoint";
     String ATTR_REM_TRIGGER_ADDR = "remTriggerAddr";
     String ATTR_SERVER_CAPABILITY = "serverCapability";
     String ATTR_SCHEDULE = "schedule";
+    String ATTR_SCL_ANNC_COLLECTION = "sclAnncCollection";
     String ATTR_SCL_COLLECTION = "sclCollection";
     String ATTR_SCL_ID = "sclId";
     String ATTR_SCLS_REFERENCE = "sclsReference";
@@ -185,6 +219,7 @@ public interface M2MConstants {
     String ATTR_SELF_PERMISSIONS = "selfPermissions";
     String ATTR_SIZE_FROM = "sizeFrom";
     String ATTR_SIZE_UNTIL = "sizeUntil";
+    String ATTR_SUBCONTAINERS_REFERENCE = "subcontainersReference";
     String ATTR_SUBSCRIPTION_COLLECTION = "subscriptionCollection";
     String ATTR_SUBSCRIPTION_TYPE = "subscriptionType";
     String ATTR_SUBSCRIPTIONS_REFERENCE = "subscriptionsReference";
@@ -200,27 +235,53 @@ public interface M2MConstants {
 
     String ATTR_HREF = "href";
 
+    String TAG_ACCEPT_HEADER = "acceptHeader";
     String TAG_ATTRIBUTE_ACCESSOR = "attributeAccessor";
     String TAG_CONTENT_TYPE = "contentType";
+    String TAG_CONTENT_TYPE_HEADER = "contentTypeHeader";
     String TAG_CREATED_AFTER = "createdAfter";
     String TAG_CREATED_BEFORE = "createdBefore";
-    String TAG_CREATED_SINCE = "createdSince";
-    String TAG_CREATED_UNTIL = "createdUntil";
     String TAG_CREATOR = "creator";
+    String TAG_ETAG_HEADER = "etagHeader";
+    String TAG_FILTER_CRITERIA = "filterCriteria";
+    String TAG_GROUP_REQUEST_IDENTIFIER = "groupRequestIdentifier";
     String TAG_IF_MATCH = "ifMatch";
+    String TAG_IF_MATCH_HEADER = "ifMatchHeader";
     String TAG_IF_MODIFIED_SINCE = "ifModifiedSince";
+    String TAG_IF_MODIFIED_SINCE_HEADER = "ifModifiedSinceHeader";
     String TAG_IF_NONE_MATCH = "ifNoneMatch";
+    String TAG_IF_NONE_MATCH_HEADER = "ifNoneMatchHeader";
     String TAG_IF_UNMODIFIED_SINCE = "ifUnmodifiedSince";
+    String TAG_IF_UNMODIFIED_SINCE_HEADER = "ifUnmodifiedSinceHeader";
+    String TAG_IN_TYPE = "inType";
     String TAG_IVAL_RESULTS = "ivalResults";
+    String TAG_LAST_MODIFIED_HEADER = "lastModifiedHeader";
+    String TAG_LOCATION_HEADER = "locationHeader";
+    String TAG_MAX_SIZE = "maxSize";
     String TAG_META_DATA_ONLY = "metaDataOnly";
+    String TAG_METHOD = "method";
+    String TAG_OUT_TYPE = "outType";
+    String TAG_PRIMITIVE_TYPE = "primitiveType";
+    String TAG_R_C_A_T = "RCAT";
     String TAG_REFERENCE = "reference";
     String TAG_REPRESENTATION = "representation";
+    String TAG_REQUESTING_ENTITY = "requestingEntity";
+    String TAG_RESOURCE_U_R_I = "resourceURI";
+    String TAG_SEARCH_PREFIX = "searchPrefix";
     String TAG_SEARCH_STRING = "searchString";
     String TAG_SECURE_TIME_STAMP = "secureTimeStamp";
     String TAG_SIGNED_IVAL_RESULTS = "signedIvalResults";
     String TAG_SIZE_FROM = "sizeFrom";
     String TAG_SIZE_UNTIL = "sizeUntil";
     String TAG_SUBSCRIPTION_REFERENCE = "subscriptionReference";
+    String TAG_TARGET_I_D = "targetID";
+    String TAG_TARGET_ID = "targetId";
+    String TAG_TIMEOUT_REASON = "timeoutReason";
+    String TAG_TOLERABLE_DELAY = "tolerableDelay";
+    String TAG_TOLERABLE_TIME = "tolerableTime";
+    String TAG_T_R_P_D_T = "TRPDT";
+    String TAG_X_ETSI_CONTACT_URI_HEADER = "xEtsiContactUriHeader";
+    String TAG_X_ETSI_CORRELATION_I_D_HEADER = "xEtsiCorrelationIDHeader";
 
     String ATTR_XSI_TYPE = "xsi:type";
 
@@ -229,6 +290,7 @@ public interface M2MConstants {
 
     String ATTR_M2M_ID = "m2m:id";
 
+    String TAG_M2M_AGGREGATE_U_R_I = "m2m:aggregateURI";
     String TAG_M2M_A_PO_C = "m2m:aPoC";
     String TAG_M2M_A_PO_C_PATH = "m2m:aPoCPath";
     String TAG_M2M_A_PO_C_PATHS = "m2m:aPoCPaths";
@@ -254,8 +316,13 @@ public interface M2MConstants {
     String TAG_M2M_APPLICATIONS = "m2m:applications";
     String TAG_M2M_APPLICATIONS_REFERENCE = "m2m:applicationsReference";
     String TAG_M2M_ATTACHED_DEVICES_REFERENCE = "m2m:attachedDevicesReference";
+    String TAG_M2M_BINARY_CONTENT = "m2m:binaryContent";
     String TAG_M2M_CHANNEL_DATA = "m2m:channelData";
     String TAG_M2M_CHANNEL_TYPE = "m2m:channelType";
+    String TAG_M2M_COMMUNICATION_CHANNEL = "m2m:communicationChannel";
+    String TAG_M2M_COMMUNICATION_CHANNEL_COLLECTION = "m2m:communicationChannelCollection";
+    String TAG_M2M_COMMUNICATION_CHANNELS = "m2m:communicationChannels";
+    String TAG_M2M_COMMUNICATION_CHANNELS_REFERENCE = "m2m:communicationChannelsReference";
     String TAG_M2M_CONTACT = "m2m:contact";
     String TAG_M2M_CONTACT_INFO = "m2m:contactInfo";
     String TAG_M2M_CONTACT_U_R_I = "m2m:contactURI";
@@ -274,6 +341,7 @@ public interface M2MConstants {
     String TAG_M2M_CONTENT_TYPE = "m2m:contentType";
     String TAG_M2M_CONTENT_TYPES = "m2m:contentTypes";
     String TAG_M2M_CREATION_TIME = "m2m:creationTime";
+    String TAG_M2M_CURRENT_ACCU_CREATES = "m2m:currentAccuCreates";
     String TAG_M2M_CURRENT_BYTE_SIZE = "m2m:currentByteSize";
     String TAG_M2M_CURRENT_NR_OF_INSTANCES = "m2m:currentNrOfInstances";
     String TAG_M2M_CURRENT_NR_OF_MEMBERS = "m2m:currentNrOfMembers";
@@ -313,6 +381,7 @@ public interface M2MConstants {
     String TAG_M2M_M2M_POCS = "m2m:m2mPocs";
     String TAG_M2M_M2M_POCS_REFERENCE = "m2m:m2mPocsReference";
     String TAG_M2M_MATCH_SIZE = "m2m:matchSize";
+    String TAG_M2M_MAX_ACCU_CREATES = "m2m:maxAccuCreates";
     String TAG_M2M_MAX_BYTE_SIZE = "m2m:maxByteSize";
     String TAG_M2M_MAX_INSTANCE_AGE = "m2m:maxInstanceAge";
     String TAG_M2M_MAX_NR_OF_INSTANCES = "m2m:maxNrOfInstances";
@@ -325,6 +394,7 @@ public interface M2MConstants {
     String TAG_M2M_MGMT_PROTOCOL_TYPE = "m2m:mgmtProtocolType";
     String TAG_M2M_MINIMAL_TIME_BETWEEN_NOTIFICATIONS = "m2m:minimalTimeBetweenNotifications";
     String TAG_M2M_NAMED_REFERENCE = "m2m:namedReference";
+    String TAG_M2M_NO_REPRESENTATION = "m2m:noRepresentation";
     String TAG_M2M_NOTIFICATION_CHANNEL = "m2m:notificationChannel";
     String TAG_M2M_NOTIFICATION_CHANNEL_COLLECTION = "m2m:notificationChannelCollection";
     String TAG_M2M_NOTIFICATION_CHANNELS = "m2m:notificationChannels";
@@ -338,11 +408,16 @@ public interface M2MConstants {
     String TAG_M2M_PERMISSION_FLAGS = "m2m:permissionFlags";
     String TAG_M2M_PERMISSION_HOLDERS = "m2m:permissionHolders";
     String TAG_M2M_PERMISSIONS = "m2m:permissions";
+    String TAG_M2M_POC = "m2m:poc";
     String TAG_M2M_POCS = "m2m:pocs";
+    String TAG_M2M_PUBLIC_DOMAIN = "m2m:publicDomain";
+    String TAG_M2M_REFERENCE_POINT = "m2m:referencePoint";
     String TAG_M2M_REM_TRIGGER_ADDR = "m2m:remTriggerAddr";
+    String TAG_M2M_REQUEST_NOTIFY = "m2m:requestNotify";
     String TAG_M2M_RESPONSE_NOTIFY = "m2m:responseNotify";
     String TAG_M2M_SCHEDULE = "m2m:schedule";
     String TAG_M2M_SCL = "m2m:scl";
+    String TAG_M2M_SCL_ANNCS_REFERENCE = "m2m:sclAnncsReference";
     String TAG_M2M_SCL_BASE = "m2m:sclBase";
     String TAG_M2M_SCL_COLLECTION = "m2m:sclCollection";
     String TAG_M2M_SCL_I_D = "m2m:sclID";
@@ -351,16 +426,22 @@ public interface M2MConstants {
     String TAG_M2M_SCL_LIST = "m2m:sclList";
     String TAG_M2M_SCLS = "m2m:scls";
     String TAG_M2M_SCLS_REFERENCE = "m2m:sclsReference";
+    String TAG_M2M_SCL_TYPE = "m2m:sclType";
     String TAG_M2M_SEARCH_STRING = "m2m:searchString";
     String TAG_M2M_SEARCH_STRINGS = "m2m:searchStrings";
     String TAG_M2M_SELF_PERMISSIONS = "m2m:selfPermissions";
     String TAG_M2M_SERVER_CAPABILITY = "m2m:serverCapability";
     String TAG_M2M_STATUS_CODE = "m2m:statusCode";
+    String TAG_M2M_SUBCONTAINERS = "m2m:subcontainers";
+    String TAG_M2M_SUBCONTAINERS_REFERENCE = "m2m:subcontainersReference";
+    String TAG_M2M_SUBSCRIBER_ID = "m2m:subscriberId";
     String TAG_M2M_SUBSCRIPTION = "m2m:subscription";
     String TAG_M2M_SUBSCRIPTION_COLLECTION = "m2m:subscriptionCollection";
     String TAG_M2M_SUBSCRIPTION_TYPE = "m2m:subscriptionType";
     String TAG_M2M_SUBSCRIPTIONS = "m2m:subscriptions";
     String TAG_M2M_SUBSCRIPTIONS_REFERENCE = "m2m:subscriptionsReference";
+    String TAG_M2M_TEXT_CONTENT = "m2m:textContent";
+    String TAG_M2M_TIMEOUT_REASON = "m2m:timeoutReason";
     String TAG_M2M_TRUNCATED = "m2m:truncated";
 
     String TAG_XMIME_CONTENT_TYPE = "xmime:contentType";
@@ -388,18 +469,71 @@ public interface M2MConstants {
     String SUBSCRIPTION_TYPE_ASYNCHRONOUS = "ASYNCHRONOUS";
     String SUBSCRIPTION_TYPE_SYNCHRONOUS = "SYNCHRONOUS";
 
+    String REFERENCE_POINT_MIA = "MIA_REFERENCE_POINT";
+    String REFERENCE_POINT_DIA = "DIA_REFERENCE_POINT";
+
     String FLAG_READ = "READ";
     String FLAG_WRITE = "WRITE";
     String FLAG_DISCOVER = "DISCOVER";
     String FLAG_DELETE = "DELETE";
     String FLAG_CREATE = "CREATE";
 
-    String MGMT_PROTOCOL_TYPE_OMA_DM = "OMA DM";
-    String MGMT_PROTOCOL_TYPE_BBF = "BBF";
-    String MGMT_PROTOCOL_TYPE_TR_069 = "TR 069";
+    String MGMT_PROTOCOL_TYPE_OMA_DM = "OMA_DM";
+    String MGMT_PROTOCOL_TYPE_BBF_TR069 = "BBF_TR069";
+
+    String SCL_TYPE_NSCL = "NSCL";
+    String SCL_TYPE_GSCL = "GSCL";
+    String SCL_TYPE_DSCL = "DSCL";
 
     String BOOLEAN_TRUE = "true";
     String BOOLEAN_FALSE = "false";
+
+    String RCAT_TYPE_RCAT_0 = "RCAT_0";
+    String RCAT_TYPE_RCAT_1 = "RCAT_1";
+    String RCAT_TYPE_RCAT_2 = "RCAT_2";
+    String RCAT_TYPE_RCAT_3 = "RCAT_3";
+    String RCAT_TYPE_RCAT_4 = "RCAT_4";
+    String RCAT_TYPE_RCAT_5 = "RCAT_5";
+    String RCAT_TYPE_RCAT_6 = "RCAT_6";
+    String RCAT_TYPE_RCAT_7 = "RCAT_7";
+
+    String METHOD_TYPE_CREATE = "CREATE";
+    String METHOD_TYPE_DELETE = "DELETE";
+    String METHOD_TYPE_EXECUTE = "EXECUTE";
+    String METHOD_TYPE_NOTIFY = "NOTIFY";
+    String METHOD_TYPE_RETRIEVE = "RETRIEVE";
+    String METHOD_TYPE_UPDATE = "UPDATE";
+
+    String CONSISTENCY_STRATEGY_ABANDON_GROUP = "ABANDON_GROUP";
+    String CONSISTENCY_STRATEGY_ABANDON_MEMBER = "ABANDON_MEMBER";
+    String CONSISTENCY_STRATEGY_ABANDON_TYPE = "ABANDON_TYPE";
+
+    String MEMBER_TYPE_ACCESS_RIGHT = "ACCESS_RIGHT";
+    String MEMBER_TYPE_APPLICATION = "APPLICATION";
+    String MEMBER_TYPE_ATTACHED_DEVICE = "ATTACHED_DEVICE";
+    String MEMBER_TYPE_CONTAINER = "CONTAINER";
+    String MEMBER_TYPE_LOCATION_CONTAINER = "LOCATION_CONTAINER";
+    String MEMBER_TYPE_MGMT_CMD = "MGMT_CMD";
+    String MEMBER_TYPE_MGMT_OBJ = "MGMT_OBJ";
+    String MEMBER_TYPE_MIXED = "MIXED";
+    String MEMBER_TYPE_SCL = "SCL";
+    String MEMBER_TYPE_SCL_BASE = "SCL_BASE";
+
+    String RESOURCE_TYPE_AN = "AN";
+    String RESOURCE_TYPE_AP = "AP";
+    String RESOURCE_TYPE_AR = "AR";
+    String RESOURCE_TYPE_CI = "CI";
+    String RESOURCE_TYPE_CS = "CS";
+    String RESOURCE_TYPE_CT = "CT";
+    String RESOURCE_TYPE_GP = "GP";
+    String RESOURCE_TYPE_MT = "MT";
+    String RESOURCE_TYPE_PM = "PM";
+    String RESOURCE_TYPE_RS = "RS";
+    String RESOURCE_TYPE_SB = "SB";
+    String RESOURCE_TYPE_SL = "SL";
+
+    String LOCATION_CONTAINER_TYPE_APPLICATION_GENERATED = "APPLICATION_GENERATED";
+    String LOCATION_CONTAINER_TYPE_LOCATION_SERVER_BASED = "LOCATION_SERVER_BASED";
 
     // ///////////////////////////////////////////////////////////////////////
     // Misc

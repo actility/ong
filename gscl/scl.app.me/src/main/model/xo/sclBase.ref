@@ -34,7 +34,7 @@ m2m:SclBase from ong:t_xml_obj
     m2m:searchStrings    m2m:SearchStrings    { } // (optional) 
     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime) 
-    m2m:aPocHandling    XoString    { } // (optional) (xmlType: m2m:APocHandling) (enum: SHALLOW DEEP ) 
+    m2m:aPocHandling    XoString    { shdico } // (optional) (xmlType: m2m:APocHandling) (enum: SHALLOW DEEP ) 
     m2m:sclsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
     m2m:applicationsReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 
     m2m:containersReference    XoString    { } // (optional) (xmlType: xsd:anyURI) 

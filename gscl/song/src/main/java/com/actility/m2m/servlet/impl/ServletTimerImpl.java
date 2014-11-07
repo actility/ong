@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: ServletTimerImpl.java 9688 2014-10-01 13:08:16Z JReich $
+ * id $Id: ServletTimerImpl.java 9691 2014-10-01 13:17:58Z JReich $
  * author $Author: JReich $
- * version $Revision: 9688 $
- * lastrevision $Date: 2014-10-01 15:08:16 +0200 (Wed, 01 Oct 2014) $
+ * version $Revision: 9691 $
+ * lastrevision $Date: 2014-10-01 15:17:58 +0200 (Wed, 01 Oct 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-10-01 15:08:16 +0200 (Wed, 01 Oct 2014) $
+ * lastmodified $LastChangedDate: 2014-10-01 15:17:58 +0200 (Wed, 01 Oct 2014) $
  */
 
 package com.actility.m2m.servlet.impl;
@@ -35,6 +35,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.framework.resources.BackupClassLoader;
 import com.actility.m2m.servlet.ApplicationSession;
 import com.actility.m2m.servlet.ServletTimer;
 import com.actility.m2m.servlet.TimerListener;
@@ -98,9 +99,9 @@ public final class ServletTimerImpl implements ServletTimer, Runnable {
     }
 
     public void cancel() {
-        LOG.debug("removeServletTimer");
+        LOG.info("removeServletTimer");
         appSession.removeServletTimer(this);
-        LOG.debug("cancel timerTask");
+        LOG.info("cancel timerTask");
         timerTask.cancel();
     }
 
@@ -166,22 +167,20 @@ public final class ServletTimerImpl implements ServletTimer, Runnable {
 
     public void run() {
         long run = System.currentTimeMillis();
-        // PORTAGE chgt de classLoader pour le currentThread
-        // ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+        BackupClassLoader backup = null;
         try {
-            // ClassLoader cl = listener.getClass().getClassLoader();
-            // Thread.currentThread().setContextClassLoader(cl);
-            LOG.debug("Call timeout");
+            backup = appSession.getInternalServletContext().getServletContainer().getResourcesAccessorService()
+                    .setThreadClassLoader(listener.getClass());
+            LOG.info("Call timeout");
             listener.timeout(this);
         } catch (Throwable e) {
             LOG.error("An unexpected exception happened in the timer callback", e);
         } finally {
-            // Thread.currentThread().setContextClassLoader(oldClassLoader);
+            backup.restoreThreadClassLoader();
             if (repeatingTimer) {
-                LOG.debug("Reset repeating servlet timer");
+                LOG.info("Reset repeating servlet timer");
                 estimateNextExecution();
             } else {
-                LOG.debug("Cancel servlet timer");
                 // this non-repeating timer is now "ready"
                 // and should not be included in the list of active timers
                 // The application may already have canceled() the timer though
@@ -189,8 +188,8 @@ public final class ServletTimerImpl implements ServletTimer, Runnable {
             }
         }
         run = System.currentTimeMillis() - run;
-        if (run > 500) {
-            LOG.error(appSession.getId() + ": The servlet timer has taken more than 500 ms to be handled: " + run + " ms");
+        if (run > 1000) {
+            LOG.error(appSession.getId() + ": The servlet timer has taken more than 1000 ms to be handled: " + run + " ms");
         }
     }
 }

@@ -51,7 +51,7 @@ public interface SubscribedResource {
 
     FilterCriteria mergeFilterCriteria(FilterCriteria mergedFilterCriteria, FilterCriteria filterCriteria);
 
-    void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource, URI requestingEntity,
+    void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path, XoObject resource,
             FilterCriteria filterCriteria, Set supported) throws UnsupportedEncodingException, StorageException, XoException,
             M2MException;
 
@@ -60,8 +60,7 @@ public interface SubscribedResource {
 
     void restoreResponse(Map context, XoObject resource);
 
-    byte[] getResponseRepresentation(String logId, SclManager manager, String path, URI requestingEntity,
-            FilterCriteria filterCriteria, Set supported, String mediaType) throws UnsupportedEncodingException,
-            StorageException, XoException, M2MException;
+    byte[] getResponseRepresentation(String logId, SclManager manager, URI requestingEntity, String path, FilterCriteria filterCriteria,
+            Set supported, String mediaType) throws UnsupportedEncodingException, StorageException, XoException, M2MException;
 
 }

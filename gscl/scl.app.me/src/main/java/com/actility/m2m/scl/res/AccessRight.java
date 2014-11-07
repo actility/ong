@@ -36,7 +36,6 @@ import java.io.Serializable;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -58,10 +57,10 @@ import com.actility.m2m.scl.model.SclManager;
 import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.SubscribedResource;
 import com.actility.m2m.scl.model.VolatileResource;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.util.EmptyUtils;
 import com.actility.m2m.util.FormatUtils;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.URIUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
@@ -69,6 +68,22 @@ import com.actility.m2m.xo.XoObject;
 
 /**
  * M2M Access Right. Defines the permissions applied to a resource.
+ *
+ * <pre>
+ * m2m:AccessRight from ong:t_xml_obj
+ * {
+ *     m2m:id    XoString    { embattr } // (optional) (xmlType: xsd:NMTOKEN)
+ *     m2m:expirationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:searchStrings    m2m:SearchStrings    { } // (optional)
+ *     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:announceTo    m2m:AnnounceTo    { } // (optional)
+ *     m2m:permissions    m2m:PermissionListType    { } // (optional)
+ *     m2m:selfPermissions    m2m:PermissionListType    { }
+ *     m2m:subscriptionsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ * }
+ * alias m2m:AccessRight with m2m:accessRight
+ * </pre>
  */
 public final class AccessRight extends SclResource implements VolatileResource, SubscribedResource {
     private static final Logger LOG = OSGiLogger.getLogger(AccessRight.class, BundleLogger.getStaticLogger());
@@ -86,20 +101,6 @@ public final class AccessRight extends SclResource implements VolatileResource, 
                 "accessRightDeleteResponseConfirm", Constants.ID_NO_FILTER_CRITERIA_MODE, true, true, AccessRights
                         .getInstance(), true, false);
     }
-
-    // m2m:AccessRight from ong:t_xml_obj
-    // {
-    // m2m:id XoString { embattr } // (optional) (xmlType: xsd:anyURI)
-    // m2m:expirationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:searchStrings m2m:SearchStrings { } // (optional)
-    // m2m:creationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:lastModifiedTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:announceTo m2m:AnnounceTo { } // (optional)
-    // m2m:permissions m2m:PermissionListType { } // (optional)
-    // m2m:selfPermissions m2m:PermissionListType { }
-    // m2m:subscriptionsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // }
-    // alias m2m:AccessRight with m2m:accessRight
 
     public void reload(SclManager manager, String path, XoObject resource, SclTransaction transaction) throws IOException,
             M2MException, StorageException, XoException {
@@ -129,26 +130,30 @@ public final class AccessRight extends SclResource implements VolatileResource, 
                 resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SELF_PERMISSIONS));
     }
 
+    /**
+     * <pre>
+     * id:                     O  (response M*)
+     * expirationTime:         O  (response M*)
+     * searchStrings:          O  (response M)
+     * creationTime:           NP (response M)
+     * lastModifiedTime:       NP (response M)
+     * announceTo:             O  (response M*)
+     * permissions:            O  (response M)
+     * selfPermissions:        M  (response M)
+     * subscriptionsReference: NP (response M#)
+     * </pre>
+     */
     public boolean createResource(SclManager manager, String path, XoObject resource, URI requestingEntity, String id,
             Date creationDate, String creationTime, XoObject representation, SclTransaction transaction) throws XoException,
             M2MException {
-        // id: O (response M*)
-        // expirationTime: O (response M*)
-        // searchStrings: O (response M)
-        // creationTime: NP (response M)
-        // lastModifiedTime: NP (response M)
-        // announceTo: O (response M*)
-        // permissions; O (response M)
-        // selfPermissions: O (response M)
-        // subscriptionsReference: NP (response M)
-
         // Check representation
         checkRepresentation(representation, M2MConstants.TAG_M2M_ACCESS_RIGHT);
         Date recvExpirationTime = getAndCheckDateTime(representation, M2MConstants.TAG_M2M_EXPIRATION_TIME,
                 Constants.ID_MODE_OPTIONAL, creationDate.getTime());
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_CREATION_TIME, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, Constants.ID_MODE_FORBIDDEN);
         getAndCheckPermissionListType(representation, M2MConstants.TAG_M2M_PERMISSIONS, Constants.ID_MODE_OPTIONAL);
-        getAndCheckPermissionListType(representation, M2MConstants.TAG_M2M_SELF_PERMISSIONS, Constants.ID_MODE_OPTIONAL);
+        getAndCheckPermissionListType(representation, M2MConstants.TAG_M2M_SELF_PERMISSIONS, Constants.ID_MODE_REQUIRED);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_SUBSCRIPTIONS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
 
         boolean modified = false;
@@ -163,9 +168,11 @@ public final class AccessRight extends SclResource implements VolatileResource, 
         createXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_SEARCH_STRINGS);
         resource.setStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME, creationTime);
         resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
-        if (representation.getXoObjectAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO) != null) {
+        if (representation.containsAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO)) {
             modified = true;
         }
+        resource.setXoObjectAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO,
+                manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_ANNOUNCE_TO));
         createXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_PERMISSIONS);
         createXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_SELF_PERMISSIONS);
 
@@ -174,17 +181,15 @@ public final class AccessRight extends SclResource implements VolatileResource, 
                 transaction);
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_ACCESS_RIGHT));
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_ACCESS_RIGHT);
         XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
         List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-        Iterator it = searchStringList.iterator();
-        while (it.hasNext()) {
-            searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-        }
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-        transaction.createResource(path, resource, searchAttributes);
+        document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+        document.setContent(resource.saveBinary());
+        transaction.createResource(document);
 
         transaction.addTransientOp(new ExpirationTimerUpdateOp(manager, path, Constants.ID_RES_ACCESS_RIGHT, expirationTime
                 .getTime() - creationDate.getTime()));
@@ -192,18 +197,22 @@ public final class AccessRight extends SclResource implements VolatileResource, 
         return modified;
     }
 
+    /**
+     * <pre>
+     * id:                     NP (response M*)
+     * expirationTime:         O  (response M*)
+     * searchStrings:          O  (response M)
+     * creationTime:           NP (response M)
+     * lastModifiedTime:       NP (response M)
+     * announceTo:             O  (response M*)
+     * permissions:            O  (response M)
+     * selfPermissions:        M  (response M)
+     * subscriptionsReference: NP (response M#)
+     * </pre>
+     */
     public boolean updateResource(String logId, SclManager manager, String path, XoObject resource, Indication indication,
             XoObject representation, Date now) throws ParseException, XoException, StorageException, M2MException {
         boolean modified = false;
-        // id: NP (response M*)
-        // expirationTime: O (response M*)
-        // searchStrings: O (response M)
-        // creationTime: NP (response M)
-        // lastModifiedTime: NP (response M)
-        // announceTo: O (response M*)
-        // permissions; O (response M)
-        // selfPermissions: O (response M)
-        // subscriptionsReference: NP (response M)
 
         // Check representation
         checkRepresentation(representation, M2MConstants.TAG_M2M_ACCESS_RIGHT);
@@ -211,8 +220,9 @@ public final class AccessRight extends SclResource implements VolatileResource, 
         Date recvExpirationTime = getAndCheckDateTime(representation, M2MConstants.TAG_M2M_EXPIRATION_TIME,
                 Constants.ID_MODE_OPTIONAL, now.getTime());
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_CREATION_TIME, Constants.ID_MODE_FORBIDDEN);
+        getAndCheckStringMode(representation, M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, Constants.ID_MODE_FORBIDDEN);
         getAndCheckPermissionListType(representation, M2MConstants.TAG_M2M_PERMISSIONS, Constants.ID_MODE_OPTIONAL);
-        getAndCheckPermissionListType(representation, M2MConstants.TAG_M2M_SELF_PERMISSIONS, Constants.ID_MODE_OPTIONAL);
+        getAndCheckPermissionListType(representation, M2MConstants.TAG_M2M_SELF_PERMISSIONS, Constants.ID_MODE_REQUIRED);
         getAndCheckStringMode(representation, M2MConstants.TAG_M2M_SUBSCRIPTIONS_REFERENCE, Constants.ID_MODE_FORBIDDEN);
 
         // Update resource
@@ -222,25 +232,25 @@ public final class AccessRight extends SclResource implements VolatileResource, 
         }
         updateXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_SEARCH_STRINGS);
         updateLastModifiedTime(manager, resource, now);
-        if (representation.getXoObjectAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO) != null) {
+        if (representation.containsAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO)) {
             modified = true;
         }
+        resource.setXoObjectAttribute(M2MConstants.TAG_M2M_ANNOUNCE_TO,
+                manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_ANNOUNCE_TO));
         updateXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_PERMISSIONS);
         updateXoObjectMandatory(manager, resource, representation, M2MConstants.TAG_M2M_SELF_PERMISSIONS);
 
         // Save resource
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_ACCESS_RIGHT));
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_ACCESS_RIGHT);
         XoObject searchStrings = resource.getXoObjectAttribute(M2MConstants.TAG_M2M_SEARCH_STRINGS);
         List searchStringList = searchStrings.getStringListAttribute(M2MConstants.TAG_M2M_SEARCH_STRING);
-        Iterator it = searchStringList.iterator();
-        while (it.hasNext()) {
-            searchAttributes.add(new Pair(M2MConstants.ATTR_SEARCH_STRING, it.next()));
-        }
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        manager.getStorageContext().update(path, resource.saveBinary(), searchAttributes);
+        document.setAttribute(M2MConstants.ATTR_SEARCH_STRING, new ArrayList(searchStringList));
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setContent(resource.saveBinary());
+        manager.getStorageContext().update(null, document, null);
 
         new ExpirationTimerUpdateOp(manager, path, Constants.ID_RES_ACCESS_RIGHT, expirationTime.getTime() - now.getTime())
                 .postCommit();
@@ -270,8 +280,8 @@ public final class AccessRight extends SclResource implements VolatileResource, 
         throw new UnsupportedOperationException();
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) {
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path,
+            XoObject resource, FilterCriteria filterCriteria, Set supported) {
         String appPath = manager.getM2MContext().getApplicationPath();
         resource.setStringAttribute(M2MConstants.TAG_M2M_SUBSCRIPTIONS_REFERENCE, appPath + URIUtils.encodePath(path)
                 + M2MConstants.URI_SEP + M2MConstants.RES_SUBSCRIPTIONS + M2MConstants.URI_SEP);

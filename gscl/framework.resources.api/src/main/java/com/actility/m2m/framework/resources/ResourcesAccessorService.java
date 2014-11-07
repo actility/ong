@@ -38,7 +38,9 @@ import org.osgi.framework.BundleContext;
 
 
 public interface ResourcesAccessorService {
-    public InputStream getResourceAsStream(Bundle bundle, String path) throws IOException;
+    InputStream getResourceAsStream(Bundle bundle, String path) throws IOException;
 
-    public String getProperty(BundleContext context, String propertyName);
+    String getProperty(BundleContext context, String propertyName);
+
+    BackupClassLoader setThreadClassLoader(Class clazz);
 }

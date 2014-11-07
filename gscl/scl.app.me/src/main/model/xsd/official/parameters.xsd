@@ -2,7 +2,7 @@
 <schema xmlns:tns="http://uri.etsi.org/m2m" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://uri.etsi.org/m2m">
 	<include schemaLocation="commonDM.xsd"/>
 	<!-- generic mgmtObj type resource -->
-	<element name="parameters" type="tns:Parameters"/>
+	<!-- element name="parameters" type="tns:Parameters"/ -->
 	<!-- Definition of abstract "Parameters type" -->
 	<complexType name="Parameters">
 		<sequence>
@@ -16,6 +16,6 @@
 			<!-- MO specific attributes; but for ETSI defined models these are specified explicitly by extension -->
 			<any minOccurs="0" maxOccurs="unbounded" namespace="##other" processContents="lax"/>
 		</sequence>
-		<attribute ref="tns:id"/>
+		<attribute ref="tns:id" use="required" />
 	</complexType>
 </schema>

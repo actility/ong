@@ -21,12 +21,12 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: ServletContainer.java 8767 2014-05-21 15:41:33Z JReich $
+ * id $Id: ServletContainer.java 9309 2014-08-21 10:13:58Z JReich $
  * author $Author: JReich $
- * version $Revision: 8767 $
- * lastrevision $Date: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * version $Revision: 9309 $
+ * lastrevision $Date: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:41:33 +0200 (Wed, 21 May 2014) $
+ * lastmodified $LastChangedDate: 2014-08-21 12:13:58 +0200 (Thu, 21 Aug 2014) $
  */
 
 package com.actility.m2m.servlet.impl;
@@ -41,6 +41,7 @@ import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.framework.resources.ResourcesAccessorService;
 import com.actility.m2m.servlet.TimerListener;
 import com.actility.m2m.servlet.ext.ExtProtocolContainer;
 import com.actility.m2m.servlet.log.BundleLogger;
@@ -51,8 +52,7 @@ public final class ServletContainer implements ExtServletService {
     private static final Logger LOG = OSGiLogger.getLogger(ServletContainer.class, BundleLogger.getStaticLogger());
     private static final int DEFAULT_APPLICATION_TIMEOUT = 180000;
 
-    // PORTAGE ThreadLocal
-    // private final ThreadLocal currentRequestHandler = new ThreadLocal();
+    private final ResourcesAccessorService resourcesAccessorService;
     private final HashMap currentRequestHandler = new HashMap();
     private final int applicationTimeout;
     private final TimerServiceImpl timerService;
@@ -61,7 +61,8 @@ public final class ServletContainer implements ExtServletService {
     // Not thread safe
     private final Map applications;
 
-    public ServletContainer(String serverInfo) {
+    public ServletContainer(ResourcesAccessorService resourcesAccessorService, String serverInfo) {
+        this.resourcesAccessorService = resourcesAccessorService;
         this.applications = new HashMap();
         this.applicationTimeout = DEFAULT_APPLICATION_TIMEOUT;
         this.timerService = new TimerServiceImpl();
@@ -83,11 +84,8 @@ public final class ServletContainer implements ExtServletService {
             LOG.debug("Create application: " + applicationName);
         }
         if (!applications.containsKey(applicationName)) {
-          //PORTAGE ThreadLocal
-            // ServletContextImpl context = new ServletContextImpl(this, currentRequestHandler, contextPath, applicationName,
-            // initParams, timerListener, applicationTimeout, listeners, timerService);
             ServletContextImpl context = new ServletContextImpl(this, currentRequestHandler, contextPath, applicationName,
-                                        initParams, timerListener, applicationTimeout, listeners, timerService);
+                    initParams, timerListener, applicationTimeout, listeners, timerService);
             context.setAttribute("com.actility.servlet.TimerService", timerService);
             applications.put(applicationName, context);
             return context;
@@ -130,5 +128,9 @@ public final class ServletContainer implements ExtServletService {
 
     public void setServerInfo(String serverInfo) {
         this.serverInfo = serverInfo;
+    }
+
+    public ResourcesAccessorService getResourcesAccessorService() {
+        return resourcesAccessorService;
     }
 }

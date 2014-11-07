@@ -21,22 +21,23 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: HttpBindingFacade.java 8521 2014-04-14 09:05:59Z JReich $
+ * id $Id: HttpBindingFacade.java 9045 2014-07-03 15:51:41Z JReich $
  * author $Author: JReich $
- * version $Revision: 8521 $
- * lastrevision $Date: 2014-04-14 11:05:59 +0200 (Mon, 14 Apr 2014) $
+ * version $Revision: 9045 $
+ * lastrevision $Date: 2014-07-03 17:51:41 +0200 (Thu, 03 Jul 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-04-14 11:05:59 +0200 (Mon, 14 Apr 2014) $
+ * lastmodified $LastChangedDate: 2014-07-03 17:51:41 +0200 (Thu, 03 Jul 2014) $
  */
 
 package com.actility.m2m.servlet.song.http;
 
 import javax.servlet.ServletException;
 
-import com.actility.m2m.servlet.song.LongPollURIs;
-import com.actility.m2m.servlet.song.SongBindingFacade;
+import com.actility.m2m.servlet.song.ChannelClientListener;
+import com.actility.m2m.servlet.song.ChannelServerListener;
+import com.actility.m2m.servlet.song.LongPollingURIs;
 import com.actility.m2m.servlet.song.SongURI;
-
+import com.actility.m2m.servlet.song.binding.SongBindingFacade;
 
 /**
  * Implementation for this binding of the {@link SongBindingFacade} needed to register a SONG binding in the SONG container.
@@ -57,24 +58,48 @@ public final class HttpBindingFacade implements SongBindingFacade {
         this.songHttpBinding = songHttpBinding;
     }
 
-    public LongPollURIs createServerLongPoll(SongURI serverURI) {
-        return songHttpBinding.createServerLongPolling(serverURI);
+    public LongPollingURIs createServerNotificationChannel(SongURI serverURI, ChannelServerListener listener) {
+        return songHttpBinding.createServerNotificationChannel(serverURI, listener);
     }
 
-    public void createServerLongPoll(SongURI contactURI, SongURI longPollURI) throws ServletException {
-        songHttpBinding.createServerLongPolling(contactURI, longPollURI);
+    public void createServerNotificationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException {
+        songHttpBinding.createServerNotificationChannel(contactURI, longPollingURI, listener);
     }
 
-    public void deleteServerLongPoll(SongURI contactURI, SongURI longPollURI) {
-        songHttpBinding.deleteServerLongPolling(contactURI, longPollURI);
+    public void deleteServerNotificationChannel(SongURI contactURI, SongURI longPollingURI) {
+        songHttpBinding.deleteServerNotificationChannel(contactURI, longPollingURI);
     }
 
-    public void createClientLongPoll(SongURI contactURI, SongURI longPollURI) throws ServletException {
-        songHttpBinding.createClientLongPolling(contactURI, longPollURI);
+    public void createClientNotificationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            SongURI relatedRequestingEntity, SongURI relatedTargetID, ChannelClientListener listener) throws ServletException {
+        songHttpBinding.createClientNotificationChannel(contactURI, longPollingURI, requestingEntity, relatedRequestingEntity,
+                relatedTargetID, listener);
     }
 
-    public void deleteClientLongPoll(SongURI contactURI, SongURI longPollURI) {
-        songHttpBinding.deleteClientLongPolling(contactURI, longPollURI);
+    public void deleteClientNotificationChannel(SongURI contactURI, SongURI longPollingURI) {
+        songHttpBinding.deleteClientNotificationChannel(contactURI, longPollingURI);
     }
 
+    public LongPollingURIs createServerCommunicationChannel(SongURI serverURI, ChannelServerListener listener) {
+        return songHttpBinding.createServerCommunicationChannel(serverURI, listener);
+    }
+
+    public void createServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
+            throws ServletException {
+        songHttpBinding.createServerCommunicationChannel(contactURI, longPollingURI, listener);
+    }
+
+    public void deleteServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI) {
+        songHttpBinding.deleteServerCommunicationChannel(contactURI, longPollingURI);
+    }
+
+    public void createClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
+            ChannelClientListener listener) throws ServletException {
+        songHttpBinding.createClientCommunicationChannel(contactURI, longPollingURI, requestingEntity, listener);
+    }
+
+    public void deleteClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI) {
+        songHttpBinding.deleteClientCommunicationChannel(contactURI, longPollingURI);
+    }
 }

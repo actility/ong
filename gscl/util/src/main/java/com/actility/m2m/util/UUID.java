@@ -21,20 +21,16 @@
  * or visit www.actility.com if you need additional
  * information or have any questions.
  *
- * id $Id: UUID.java 7256 2014-01-16 15:08:52Z JReich $
+ * id $Id: UUID.java 9313 2014-08-21 10:19:57Z JReich $
  * author $Author: JReich $
- * version $Revision: 7256 $
- * lastrevision $Date: 2014-01-16 16:08:52 +0100 (Thu, 16 Jan 2014) $
+ * version $Revision: 9313 $
+ * lastrevision $Date: 2014-08-21 12:19:57 +0200 (Thu, 21 Aug 2014) $
  * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-01-16 16:08:52 +0100 (Thu, 16 Jan 2014) $
+ * lastmodified $LastChangedDate: 2014-08-21 12:19:57 +0200 (Thu, 21 Aug 2014) $
  */
 
 package com.actility.m2m.util;
 
-// PORTAGE Random
-//import java.security.MessageDigest;
-//import java.security.NoSuchAlgorithmException;
-//import java.security.SecureRandom;
 import java.util.Random;
 
 /**
@@ -46,24 +42,9 @@ public final class UUID {
         // Static class
     }
 
-    // private static final int HIGH_HALF_BYTE_FILTER = 0xf0;
-    // private static final int LOW_HALF_BYTE_FILTER = 0x0f;
-    // private static final int HALF_BYTE_LENGTH = 4;
     private static final char[] AUTHORIZED_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
             'e', 'f' };
 
-    // PORTAGE Random
-    // private static SecureRandom PRNG;
-    // private static MessageDigest SHA;
-    //
-    // static {
-    // try {
-    // PRNG = SecureRandom.getInstance("SHA1PRNG");
-    // SHA = MessageDigest.getInstance("SHA-1");
-    // } catch (NoSuchAlgorithmException e) {
-    // // Oups init failed
-    // }
-    // }
     private static final Random RANDOM = new Random(System.currentTimeMillis());
 
     /**
@@ -75,27 +56,6 @@ public final class UUID {
      * @return The generated unique identifier
      */
     public static String randomUUID(int length) {
-     // PORTAGE Random
-        // String randomNum = Integer.toString(PRNG.nextInt());
-        // byte[] randomBytes = randomNum.getBytes();
-        // try {
-        // byte[] seed = SHA.digest(randomBytes);
-        // StringBuffer result = new StringBuffer();
-        // int realLength = (length >> 1);
-        // byte b = 0;
-        // if (realLength > seed.length) {
-        // realLength = seed.length;
-        // }
-        // for (int idx = 0; idx < realLength; ++idx) {
-        // b = seed[idx];
-        // result.append(AUTHORIZED_DIGITS[(b & HIGH_HALF_BYTE_FILTER) >> HALF_BYTE_LENGTH]);
-        // result.append(AUTHORIZED_DIGITS[b & LOW_HALF_BYTE_FILTER]);
-        // }
-        // return result.toString();
-        // } catch (RuntimeException e) {
-        // // Prevent error from JDK 1.7
-        // return randomNum;
-        // }
         char[] result = new char[length];
         for (int i = 0; i < length; ++i) {
             result[i] = AUTHORIZED_DIGITS[RANDOM.nextInt(AUTHORIZED_DIGITS.length)];

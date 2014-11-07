@@ -37,6 +37,7 @@ all : $(EXE).x
 $(EXE).x : $(OBJ) $(LIB)
 	@(echo -e "$(BLINK)>>> link $@$(NORM)")
 	$(CC) $(SHLIB) $(STATIC) $(LDFLAGS) $(XML2LD) $(EXTRALD) -o $@ $^ $(LIBXML2)
+	mkdir -p $(ROOTACT)/bin/
 	cp $@ $(ROOTACT)/bin/
 
 %.o	: %.c $(foreach file,$(shell ls -1 *.h 2> /dev/null),$(file))

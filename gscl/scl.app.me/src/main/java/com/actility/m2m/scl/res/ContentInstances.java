@@ -38,15 +38,12 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
@@ -68,14 +65,15 @@ import com.actility.m2m.scl.model.SclTransaction;
 import com.actility.m2m.scl.model.SubscribedResource;
 import com.actility.m2m.scl.model.VolatileResource;
 import com.actility.m2m.storage.Condition;
-import com.actility.m2m.storage.ConditionBuilder;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.SearchResult;
 import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.storage.StorageRequestExecutor;
+import com.actility.m2m.util.EmptyUtils;
 import com.actility.m2m.util.FormatUtils;
-import com.actility.m2m.util.Pair;
 import com.actility.m2m.util.Profiler;
 import com.actility.m2m.util.URIUtils;
+import com.actility.m2m.util.UtilConstants;
 import com.actility.m2m.util.log.OSGiLogger;
 import com.actility.m2m.xo.XoException;
 import com.actility.m2m.xo.XoObject;
@@ -85,13 +83,27 @@ import com.actility.m2m.xo.XoService;
  * Collection of M2M Content Instances.
  * <p>
  * This resource can be subscribed.
+ *
+ * <pre>
+ * m2m:ContentInstances from ong:t_xml_obj
+ * {
+ *     _latest$    XoString    { embattr } // (optional) (xmlType: xsd:string)
+ *     m2m:creationTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:lastModifiedTime    XoString    { } // (optional) (xmlType: xsd:dateTime)
+ *     m2m:currentNrOfInstances    XoString    { } // (optional) (xmlType: xsd:long)
+ *     m2m:currentByteSize    XoString    { } // (optional) (xmlType: xsd:long)
+ *     m2m:contentInstanceCollection    m2m:ContentInstanceCollection    { } // (optional)
+ *     m2m:latest    m2m:ReferenceToNamedResource    { } // (optional)
+ *     m2m:oldest    m2m:ReferenceToNamedResource    { } // (optional)
+ *     m2m:subscriptionsReference    XoString    { } // (optional) (xmlType: xsd:anyURI)
+ * }
+ * alias m2m:ContentInstances with m2m:contentInstances
+ * </pre>
  */
 public final class ContentInstances extends SclResource implements SubscribedResource, VolatileResource {
     private static final Logger LOG = OSGiLogger.getLogger(ContentInstances.class, BundleLogger.getStaticLogger());
 
     private static final ContentInstances INSTANCE = new ContentInstances();
-
-    private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
     public static ContentInstances getInstance() {
         return INSTANCE;
@@ -114,19 +126,6 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         reservedKeywords.add(M2MConstants.RES_SUBSCRIPTIONS);
     }
 
-    // m2m:ContentInstances from ong:t_xml_obj
-    // {
-    // m2m:creationTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:lastModifiedTime XoString { } // (optional) (xmlType: xsd:dateTime)
-    // m2m:currentNrOfInstances XoString { } // (optional) (xmlType: xsd:long)
-    // m2m:currentByteSize XoString { } // (optional) (xmlType: xsd:long)
-    // m2m:contentInstanceCollection m2m:ContentInstanceCollection { } // (optional)
-    // m2m:latest m2m:ReferenceToNamedResource { } // (optional)
-    // m2m:oldest m2m:ReferenceToNamedResource { } // (optional)
-    // m2m:subscriptionsReference XoString { } // (optional) (xmlType: xsd:anyURI)
-    // }
-    // alias m2m:ContentInstances with m2m:contentInstances
-
     public void reload(SclManager manager, String path, XoObject resource, SclTransaction transaction) throws ParseException,
             IOException, StorageException, XoException, M2MException {
         if (LOG.isInfoEnabled()) {
@@ -141,7 +140,7 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             parentResource = manager.getXoResource(getParentPath(path));
 
             // Check conditions
-            long maxInstanceAge = getAndCheckLong(parentResource, M2MConstants.TAG_M2M_MAX_INSTANCE_AGE,
+            long maxInstanceAge = getAndCheckDuration(parentResource, M2MConstants.TAG_M2M_MAX_INSTANCE_AGE,
                     Constants.ID_MODE_OPTIONAL);
 
             // Check max instance age
@@ -151,27 +150,29 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                         .getStringAttribute(M2MConstants.TAG_M2M_CURRENT_NR_OF_INSTANCES));
                 long currentByteSize = Long.parseLong(resource.getStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE));
 
-                Condition ciCondition = manager.getConditionBuilder().createStringCondition(Constants.ATTR_TYPE,
-                        ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
+                Condition ciCondition = manager.getStorageContext().getStorageFactory()
+                        .createStringCondition(Constants.ATTR_TYPE, Condition.ATTR_OP_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
 
-                Date limitDate = new Date(now.getTime() - (maxInstanceAge * 1000L));
-                Condition lastCiToDeleteCondition = manager.getConditionBuilder().createDateCondition(
-                        M2MConstants.ATTR_CREATION_TIME, ConditionBuilder.OPERATOR_LOWER, limitDate);
-                Condition condition = manager.getConditionBuilder().createConjunction(ciCondition, lastCiToDeleteCondition);
+                Date limitDate = new Date(now.getTime() - maxInstanceAge);
+                List conditions = new ArrayList();
+                conditions.add(ciCondition);
+                conditions.add(manager.getStorageContext().getStorageFactory()
+                        .createDateCondition(M2MConstants.ATTR_CREATION_TIME, Condition.ATTR_OP_STRICTLY_LOWER, limitDate));
+                Condition condition = manager.getStorageContext().getStorageFactory()
+                        .createConjunction(Condition.COND_OP_AND, conditions);
 
-                SearchResult searchResult = storageContext.search(path, StorageRequestExecutor.SCOPE_EXACT, condition,
-                        StorageRequestExecutor.ORDER_ASC, 4);
-                Map result = searchResult.getResults();
-                Iterator it = result.entrySet().iterator();
+                SearchResult searchResult = storageContext.search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                        condition, StorageRequestExecutor.ORDER_ASC, 4, true, EmptyUtils.EMPTY_LIST);
+                Iterator it = searchResult.getResults();
                 XoObject ciToDelete = null;
-                Entry entry = null;
+                Document document = null;
                 while (it.hasNext()) {
                     try {
-                        entry = (Entry) it.next();
-                        ciToDelete = manager.getXoService().readBinaryXmlXoObject((byte[]) entry.getValue());
+                        document = (Document) it.next();
+                        ciToDelete = manager.getXoService().readBinaryXmlXoObject(document.getContent());
                         currentByteSize -= Long.parseLong(resource.getStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE));
                         --currentNbOfInstances;
-                        transaction.deleteResource((String) entry.getKey());
+                        transaction.deleteResource(document.getPath());
                     } finally {
                         if (ciToDelete != null) {
                             ciToDelete.free(true);
@@ -180,21 +181,22 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                     }
                 }
 
-                Condition lastCiCondition = manager.getConditionBuilder().createDateCondition(M2MConstants.ATTR_CREATION_TIME,
-                        ConditionBuilder.OPERATOR_GREATER, limitDate);
-                condition = manager.getConditionBuilder().createConjunction(ciCondition, lastCiCondition);
-                searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, condition,
-                        StorageRequestExecutor.ORDER_ASC, 1);
-                result = searchResult.getResults();
-                it = result.values().iterator();
+                conditions.clear();
+                conditions.add(ciCondition);
+                conditions.add(manager.getStorageContext().getStorageFactory()
+                        .createDateCondition(M2MConstants.ATTR_CREATION_TIME, Condition.ATTR_OP_EQUAL, limitDate));
+                condition = manager.getStorageContext().getStorageFactory()
+                        .createConjunction(Condition.COND_OP_AND, conditions);
+                searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                        condition, StorageRequestExecutor.ORDER_ASC, 1, true, EmptyUtils.EMPTY_LIST);
+                it = searchResult.getResults();
                 if (it.hasNext()) {
-                    lastCiResource = manager.getXoService().readBinaryXmlXoObject((byte[]) it.next());
+                    lastCiResource = manager.getXoService().readBinaryXmlXoObject(((Document) it.next()).getContent());
 
                     Date lastCiCreationTime = SclResource.getAndCheckDateTime(lastCiResource,
                             M2MConstants.TAG_M2M_CREATION_TIME, Constants.ID_MODE_REQUIRED, -1L);
-                    String timerId = manager.startResourceTimer(
-                            lastCiCreationTime.getTime() + (maxInstanceAge * 1000L) - now.getTime(), path,
-                            Constants.ID_RES_CONTENT_INSTANCES, null);
+                    String timerId = manager.startResourceTimer(lastCiCreationTime.getTime() + maxInstanceAge - now.getTime(),
+                            path, Constants.ID_RES_CONTENT_INSTANCES, null);
                     manager.getM2MContext().setAttribute(path + "/instanceAgeTimer", timerId);
                     manager.getM2MContext().setAttribute(path + "/instanceAgeId",
                             lastCiResource.getStringAttribute(M2MConstants.ATTR_M2M_ID));
@@ -203,14 +205,15 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                 resource.setStringAttribute(M2MConstants.TAG_M2M_CURRENT_NR_OF_INSTANCES, String.valueOf(currentNbOfInstances));
                 resource.setStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE, String.valueOf(currentByteSize));
                 resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME,
-                        FormatUtils.formatDateTime(now, manager.getTimeZone()));
+                        FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE));
 
-                Collection searchAttributes = new ArrayList();
-                searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                        .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-                searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-                searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES));
-                transaction.updateResource(path, resource, searchAttributes);
+                document = manager.getStorageContext().getStorageFactory().createDocument(path);
+                document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                        FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+                document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+                document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES);
+                document.setContent(resource.saveBinary());
+                transaction.updateResource(document);
             }
         } finally {
             if (parentResource != null) {
@@ -255,11 +258,12 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                     transaction);
 
             // Save resource
-            Collection searchAttributes = new ArrayList();
-            searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, creationDate));
-            searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate));
-            searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES));
-            transaction.createResource(path, resource, searchAttributes);
+            Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+            document.setAttribute(M2MConstants.ATTR_CREATION_TIME, creationDate);
+            document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, creationDate);
+            document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES);
+            document.setContent(resource.saveBinary());
+            transaction.createResource(document);
         } finally {
             if (resource != null) {
                 resource.free(true);
@@ -281,20 +285,20 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         try {
             parentResource = manager.getXoResource(getParentPath(path));
             Map storageConfig = createStorageConfiguration(parentResource, M2MConstants.TAG_ACY_STORAGE_CONFIGURATION);
-            Condition condition = manager.getConditionBuilder().createStringCondition(Constants.ATTR_TYPE,
-                    ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
+            Condition condition = manager.getStorageContext().getStorageFactory()
+                    .createStringCondition(Constants.ATTR_TYPE, Condition.ATTR_OP_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
             SearchResult searchResult = null;
             if (storageConfig != null) {
-                searchResult = manager.getStorageContext().search(storageConfig, path, StorageRequestExecutor.SCOPE_EXACT,
-                        condition);
+                searchResult = manager.getStorageContext().search(storageConfig, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                        condition, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
             } else {
-                searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, condition);
+                searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                        condition, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
             }
-            Map children = searchResult.getResults();
-            Iterator it = children.keySet().iterator();
+            Iterator it = searchResult.getResults();
             ContentInstance contentInstance = ContentInstance.getInstance();
             while (it.hasNext()) {
-                contentInstance.deleteResource(logId, manager, (String) it.next(), transaction);
+                contentInstance.deleteResource(logId, manager, ((Document) it.next()).getPath(), transaction);
             }
 
             Subscriptions.getInstance().deleteResource(logId, manager,
@@ -316,7 +320,7 @@ public final class ContentInstances extends SclResource implements SubscribedRes
     public void deleteChildResource(String logId, SclManager manager, String path, XoObject resource, XoObject childResource,
             Date now, SclTransaction transaction) throws ParseException, XoException {
         resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME,
-                FormatUtils.formatDateTime(now, manager.getTimeZone()));
+                FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE));
 
         long currentNbOfInstances = Long.parseLong(resource.getStringAttribute(M2MConstants.TAG_M2M_CURRENT_NR_OF_INSTANCES));
         long currentByteSize = Long.parseLong(resource.getStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE));
@@ -327,17 +331,17 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         resource.setStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE, String.valueOf(currentByteSize));
 
         transaction.addTransientOp(new CisChildDeleteOp(manager, path, childResource, now));
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES));
-        transaction.updateResource(path, resource, searchAttributes);
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES);
+        document.setContent(resource.saveBinary());
+        transaction.updateResource(document);
     }
 
-    public void prepareResourceForResponse(String logId, SclManager manager, String path, XoObject resource,
-            URI requestingEntity, FilterCriteria filterCriteria, Set supported) throws StorageException, XoException,
-            M2MException {
+    public void prepareResourceForResponse(String logId, SclManager manager, URI requestingEntity, String path,
+            XoObject resource, FilterCriteria filterCriteria, Set supported) throws StorageException, XoException, M2MException {
         XoService xoService = manager.getXoService();
         String appPath = manager.getM2MContext().getApplicationPath();
         resource.setStringAttribute(Constants.ATTR_LATEST, null);
@@ -349,27 +353,27 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             parentResource = manager.getXoResource(parentPath);
             Map storageConfig = createStorageConfiguration(parentResource, M2MConstants.TAG_ACY_STORAGE_CONFIGURATION);
             // Add contentInstances children
-            Condition condition = manager.getConditionBuilder().createStringCondition(Constants.ATTR_TYPE,
-                    ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
+            Condition condition = manager.getStorageContext().getStorageFactory()
+                    .createStringCondition(Constants.ATTR_TYPE, Condition.ATTR_OP_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
             SearchResult searchResult = null;
             if (storageConfig != null) {
-                searchResult = manager.getStorageContext().search(storageConfig, path, StorageRequestExecutor.SCOPE_EXACT,
-                        condition);
+                searchResult = manager.getStorageContext().search(storageConfig, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                        condition, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
             } else {
-                searchResult = manager.getStorageContext().search(path, StorageRequestExecutor.SCOPE_EXACT, condition);
+                searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                        condition, StorageRequestExecutor.ORDER_UNKNOWN, -1, true, EmptyUtils.EMPTY_LIST);
             }
-            Map children = searchResult.getResults();
             XoObject contentInstanceCollection = xoService.newXmlXoObject(M2MConstants.TAG_M2M_CONTENT_INSTANCE_COLLECTION);
             resource.setXoObjectAttribute(M2MConstants.TAG_M2M_CONTENT_INSTANCE_COLLECTION, contentInstanceCollection);
             List contentInstanceCollectionList = contentInstanceCollection
                     .getXoObjectListAttribute(M2MConstants.TAG_M2M_CONTENT_INSTANCE);
-            Iterator it = children.values().iterator();
+            Iterator it = searchResult.getResults();
             XoObject contentInstance = null;
             while (it.hasNext()) {
-                contentInstance = xoService.readBinaryXmlXoObject((byte[]) it.next());
+                contentInstance = xoService.readBinaryXmlXoObject(((Document) it.next()).getContent());
                 if (ContentInstance.getInstance().filterMatches(contentInstance, filterCriteria)) {
-                    ContentInstance.getInstance().prepareResourceForResponse(logId, manager, null, contentInstance,
-                            requestingEntity, filterCriteria, supported);
+                    ContentInstance.getInstance().prepareResourceForResponse(logId, manager, requestingEntity, null,
+                            contentInstance, filterCriteria, supported);
                     contentInstance.clearNameSpaces();
                     contentInstanceCollectionList.add(contentInstance);
                 } else {
@@ -445,13 +449,13 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         // TODO filter content instance according to filter criteria
     }
 
-    public byte[] getResponseRepresentation(String logId, SclManager manager, String path, URI requestingEntity,
+    public byte[] getResponseRepresentation(String logId, SclManager manager, URI requestingEntity, String path,
             FilterCriteria filterCriteria, Set supported, String mediaType) throws UnsupportedEncodingException,
             StorageException, XoException, M2MException {
         XoObject resource = null;
         try {
             resource = manager.getXoResource(path);
-            prepareResourceForResponse(logId, manager, path, resource, requestingEntity, filterCriteria, supported);
+            prepareResourceForResponse(logId, manager, requestingEntity, path, resource, filterCriteria, supported);
             // Partial addressing
             String attributeAccessor = ((filterCriteria != null) ? filterCriteria.getAttributeAccessor() : null);
             if (attributeAccessor != null
@@ -488,7 +492,7 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             long maxNumberOfInstances = getAndCheckLong(parentResource, M2MConstants.TAG_M2M_MAX_NR_OF_INSTANCES,
                     Constants.ID_MODE_OPTIONAL);
             long maxByteSize = getAndCheckLong(parentResource, M2MConstants.TAG_M2M_MAX_BYTE_SIZE, Constants.ID_MODE_OPTIONAL);
-            long maxInstanceAge = getAndCheckLong(parentResource, M2MConstants.TAG_M2M_MAX_INSTANCE_AGE,
+            long maxInstanceAge = getAndCheckDuration(parentResource, M2MConstants.TAG_M2M_MAX_INSTANCE_AGE,
                     Constants.ID_MODE_OPTIONAL);
 
             // long ciContentSize = Long.parseLong(childResource.getStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE));
@@ -505,10 +509,9 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                         + ciContentSize + ". Max byte size is " + maxByteSize, StatusCode.STATUS_BAD_REQUEST);
             }
 
-            if (maxInstanceAge > 0L
-                    && (lastChildResourceCreationDate.getTime() + (maxInstanceAge * 1000L) - now.getTime()) <= 0L) {
+            if (maxInstanceAge > 0L && (now.getTime() - lastChildResourceCreationDate.getTime()) > maxInstanceAge) {
                 throw new M2MException("Content instance is older than the maxInstanceAge defined in the container: "
-                        + maxInstanceAge, StatusCode.STATUS_BAD_REQUEST);
+                        + FormatUtils.formatDuration(maxInstanceAge), StatusCode.STATUS_BAD_REQUEST);
             }
 
             long currentNbOfInstances = Long.parseLong(resource
@@ -516,29 +519,29 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             long currentByteSize = Long.parseLong(resource.getStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE));
 
             Date lastCiCreationTimeToDelete = null;
-            Condition ciCondition = manager.getConditionBuilder().createStringCondition(Constants.ATTR_TYPE,
-                    ConditionBuilder.OPERATOR_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
+            Condition ciCondition = manager.getStorageContext().getStorageFactory()
+                    .createStringCondition(Constants.ATTR_TYPE, Condition.ATTR_OP_EQUAL, Constants.TYPE_CONTENT_INSTANCE);
             Condition condition = null;
             currentNbOfInstances += ciNbOfInstances;
             currentByteSize += ciContentSize;
 
             // Check max nb of instances
             if (maxNumberOfInstances > 0L && currentNbOfInstances > maxNumberOfInstances) {
-                SearchResult searchResult = storageContext.search(path, StorageRequestExecutor.SCOPE_EXACT, ciCondition,
-                        StorageRequestExecutor.ORDER_ASC, (int) (currentNbOfInstances - maxNumberOfInstances));
-                Map result = searchResult.getResults();
-                Iterator it = result.entrySet().iterator();
+                SearchResult searchResult = storageContext.search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                        ciCondition, StorageRequestExecutor.ORDER_ASC, (int) (currentNbOfInstances - maxNumberOfInstances),
+                        true, EmptyUtils.EMPTY_LIST);
+                Iterator it = searchResult.getResults();
                 XoObject ciToDelete = null;
-                Entry entry = null;
+                Document document = null;
                 while (it.hasNext()) {
                     try {
-                        entry = (Entry) it.next();
-                        ciToDelete = manager.getXoService().readBinaryXmlXoObject((byte[]) entry.getValue());
+                        document = (Document) it.next();
+                        ciToDelete = manager.getXoService().readBinaryXmlXoObject(document.getContent());
                         currentByteSize -= Long.parseLong(ciToDelete.getStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE));
                         if (LOG.isInfoEnabled()) {
-                            LOG.info("Content-instance to delete because of maxNrOfInstances limit: " + (String) entry.getKey());
+                            LOG.info("Content-instance to delete because of maxNrOfInstances limit: " + document.getPath());
                         }
-                        transaction.deleteResource((String) entry.getKey());
+                        transaction.deleteResource(document.getPath());
                         if (!it.hasNext()) {
                             lastCiCreationTimeToDelete = getAndCheckDateTime(ciToDelete, M2MConstants.TAG_M2M_CREATION_TIME,
                                     Constants.ID_MODE_REQUIRED, -1L);
@@ -556,29 +559,34 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             if (maxByteSize > 0L) {
                 while (currentByteSize > maxByteSize) {
                     if (lastCiCreationTimeToDelete != null) {
-                        Condition lastCiToDeleteCondition = manager.getConditionBuilder().createDateCondition(
-                                M2MConstants.ATTR_CREATION_TIME, ConditionBuilder.OPERATOR_GREATER, lastCiCreationTimeToDelete);
-                        condition = manager.getConditionBuilder().createConjunction(ciCondition, lastCiToDeleteCondition);
+                        List conditions = new ArrayList();
+                        conditions.add(ciCondition);
+                        conditions.add(manager
+                                .getStorageContext()
+                                .getStorageFactory()
+                                .createDateCondition(M2MConstants.ATTR_CREATION_TIME, Condition.ATTR_OP_STRICTLY_GREATER,
+                                        lastCiCreationTimeToDelete));
+                        condition = manager.getStorageContext().getStorageFactory()
+                                .createConjunction(Condition.COND_OP_AND, conditions);
                     } else {
                         condition = ciCondition;
                     }
-                    SearchResult searchResult = storageContext.search(path, StorageRequestExecutor.SCOPE_EXACT, condition,
-                            StorageRequestExecutor.ORDER_ASC, 4);
-                    Map result = searchResult.getResults();
-                    Iterator it = result.entrySet().iterator();
+                    SearchResult searchResult = storageContext.search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                            condition, StorageRequestExecutor.ORDER_ASC, 4, true, EmptyUtils.EMPTY_LIST);
+                    Iterator it = searchResult.getResults();
                     XoObject ciToDelete = null;
-                    Entry entry = null;
+                    Document document = null;
                     boolean end = false;
                     while (it.hasNext() && !end) {
                         try {
-                            entry = (Entry) it.next();
-                            ciToDelete = manager.getXoService().readBinaryXmlXoObject((byte[]) entry.getValue());
+                            document = (Document) it.next();
+                            ciToDelete = manager.getXoService().readBinaryXmlXoObject(document.getContent());
                             currentByteSize -= Long.parseLong(ciToDelete.getStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE));
                             --currentNbOfInstances;
                             if (LOG.isInfoEnabled()) {
-                                LOG.info("Content-instance to delete because of maxByteSize limit: " + (String) entry.getKey());
+                                LOG.info("Content-instance to delete because of maxByteSize limit: " + document.getPath());
                             }
-                            transaction.deleteResource((String) entry.getKey());
+                            transaction.deleteResource(document.getPath());
                             if (!it.hasNext()) {
                                 lastCiCreationTimeToDelete = getAndCheckDateTime(ciToDelete,
                                         M2MConstants.TAG_M2M_CREATION_TIME, Constants.ID_MODE_REQUIRED, -1L);
@@ -597,23 +605,28 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                 }
             }
             // Check max instance age
-            if (maxInstanceAge > 0L) {
+            if (maxInstanceAge > 0L && maxInstanceAge != Constants.MAX_MAX_INSTANCE_AGE) {
                 if (lastCiCreationTimeToDelete != null) {
-                    Condition lastCiToDeleteCondition = manager.getConditionBuilder().createDateCondition(
-                            M2MConstants.ATTR_CREATION_TIME, ConditionBuilder.OPERATOR_GREATER, lastCiCreationTimeToDelete);
-                    condition = manager.getConditionBuilder().createConjunction(ciCondition, lastCiToDeleteCondition);
+                    List conditions = new ArrayList();
+                    conditions.add(ciCondition);
+                    conditions.add(manager
+                            .getStorageContext()
+                            .getStorageFactory()
+                            .createDateCondition(M2MConstants.ATTR_CREATION_TIME, Condition.ATTR_OP_STRICTLY_GREATER,
+                                    lastCiCreationTimeToDelete));
+                    condition = manager.getStorageContext().getStorageFactory()
+                            .createConjunction(Condition.COND_OP_AND, conditions);
                 } else {
                     condition = ciCondition;
                 }
-                SearchResult searchResult = storageContext.search(path, StorageRequestExecutor.SCOPE_EXACT, condition,
-                        StorageRequestExecutor.ORDER_ASC, 1);
-                Map result = searchResult.getResults();
-                Iterator it = result.entrySet().iterator();
+                SearchResult searchResult = storageContext.search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
+                        condition, StorageRequestExecutor.ORDER_ASC, 1, true, EmptyUtils.EMPTY_LIST);
+                Iterator it = searchResult.getResults();
                 Date lastCiCreationDate = null;
                 String lastCiId = null;
                 if (it.hasNext()) {
-                    Entry entry = (Entry) it.next();
-                    lastCiResource = manager.getXoService().readBinaryXmlXoObject((byte[]) entry.getValue());
+                    Document document = (Document) it.next();
+                    lastCiResource = manager.getXoService().readBinaryXmlXoObject(document.getContent());
                     lastCiCreationDate = getAndCheckDateTime(lastCiResource, M2MConstants.TAG_M2M_CREATION_TIME,
                             Constants.ID_MODE_REQUIRED, -1L);
                     lastCiId = lastCiResource.getStringAttribute(M2MConstants.ATTR_M2M_ID);
@@ -625,8 +638,10 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                     lastCiCreationDate = lastChildResourceCreationDate;
                     lastCiId = lastChildResourceId;
                 }
-                transaction.addTransientOp(new CisChildCreateOp(manager, path, lastCiCreationDate, lastCiId, now,
-                        maxInstanceAge));
+                if ((lastCiCreationDate.getTime() + maxInstanceAge - now.getTime()) > 0) {
+                    transaction.addTransientOp(new CisChildCreateOp(manager, path, lastCiCreationDate, lastCiId, now,
+                            maxInstanceAge));
+                }
             }
 
             resource.setStringAttribute(M2MConstants.TAG_M2M_CURRENT_NR_OF_INSTANCES, String.valueOf(currentNbOfInstances));
@@ -665,12 +680,13 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         resource.setStringAttribute(Constants.ATTR_LATEST, childPath);
         resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME, creationTime);
 
-        Collection searchAttributes = new ArrayList();
-        searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-        searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-        searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES));
-        transaction.updateResource(path, resource, searchAttributes);
+        Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+        document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+        document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+        document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES);
+        document.setContent(resource.saveBinary());
+        transaction.updateResource(document);
         transaction.execute();
 
         if (!notify) {
@@ -700,28 +716,24 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         XoObject childResource = null;
         XoObject parentResource = null;
 
-        SclLogger.logRequestIndication(Constants.PT_CONTENT_INSTANCE_CREATE_REQUEST,
-                Constants.PT_CONTENT_INSTANCE_CREATE_RESPONSE, indication, null, Constants.ID_LOG_REPRESENTATION);
+        SclLogger.logRequestIndication("contentInstanceCreateRequestIndication", "contentInstanceCreateResponseConfirm",
+                indication, null, Constants.ID_LOG_REPRESENTATION);
         try {
             StorageRequestExecutor storageContext = manager.getStorageContext();
             boolean sendRepresentation = false;
             Date now = new Date();
-            String creationTime = FormatUtils.formatDateTime(now, manager.getTimeZone());
-            String id = representation.getStringAttribute(M2MConstants.ATTR_M2M_ID);
+            String creationTime = FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE);
+            String id = getAndCheckNmToken(representation, M2MConstants.ATTR_M2M_ID, Constants.ID_MODE_OPTIONAL);
             if (id == null) {
                 sendRepresentation = true;
-                id = FormatUtils.formatDateTime(now, GMT);
+                id = FormatUtils.formatDateTime(now, UtilConstants.GMT_TIMEZONE);
             }
             String href = URIUtils.encodePath(id) + M2MConstants.URI_SEP;
             String childPath = path + M2MConstants.URI_SEP + id;
 
-            if (id.length() == 0) {
-                throw new M2MException("id cannot be empty", StatusCode.STATUS_BAD_REQUEST);
-            } else if (reservedKeywords.contains(id)) {
+            if (reservedKeywords.contains(id)) {
                 throw new M2MException(id + " is a reserved keywork in contentInstances resource",
                         StatusCode.STATUS_BAD_REQUEST);
-            } else if (id.indexOf('/') != -1) {
-                throw new M2MException("id cannot contains a '/' character: " + id, StatusCode.STATUS_BAD_REQUEST);
             }
 
             ContentInstance childController = ContentInstance.getInstance();
@@ -729,8 +741,8 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             childResource = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_CONTENT_INSTANCE);
 
             // Check id
-            byte[] testChildPath = storageContext.retrieve(childPath);
-            if (testChildPath != null) {
+            Document testChildDocument = storageContext.retrieve(null, childPath, null);
+            if (testChildDocument != null) {
                 throw new M2MException("A Content Intance resource already exists with the id " + id,
                         StatusCode.STATUS_CONFLICT);
             }
@@ -766,13 +778,13 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         XoObject childResource = null;
         XoObject parentResource = null;
 
-        SclLogger.logRequestIndication(Constants.PT_CONTENT_INSTANCE_CREATE_REQUEST,
-                Constants.PT_CONTENT_INSTANCE_CREATE_RESPONSE, indication, null, Constants.ID_LOG_RAW_REPRESENTATION);
+        SclLogger.logRequestIndication("contentInstanceCreateRequestIndication", "contentInstanceCreateResponseConfirm",
+                indication, null, Constants.ID_LOG_RAW_REPRESENTATION);
         try {
             StorageRequestExecutor storageContext = manager.getStorageContext();
             Date now = new Date();
-            String creationTime = FormatUtils.formatDateTime(now, manager.getTimeZone());
-            String id = FormatUtils.formatDateTime(now, manager.getTimeZone());
+            String creationTime = FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE);
+            String id = FormatUtils.formatDateTime(now, UtilConstants.GMT_TIMEZONE);
             String href = URIUtils.encodePath(id) + M2MConstants.URI_SEP;
             String childPath = path + M2MConstants.URI_SEP + id;
             ContentInstance childController = ContentInstance.getInstance();
@@ -780,8 +792,8 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             childResource = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_CONTENT_INSTANCE);
 
             // Check id
-            byte[] testChildPath = storageContext.retrieve(childPath);
-            if (testChildPath != null) {
+            Document testChildDocument = storageContext.retrieve(null, childPath, null);
+            if (testChildDocument != null) {
                 throw new M2MException("A Content Intance resource already exists with the id " + id,
                         StatusCode.STATUS_CONFLICT);
             }
@@ -790,7 +802,8 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             Map storageConfig = createStorageConfiguration(parentResource, M2MConstants.TAG_ACY_STORAGE_CONFIGURATION);
 
             childController.createResourceFromBytes(manager, childPath, childResource, storageConfig, id, href, now,
-                    creationTime, indication.getRawContentType(), indication.getRawBytes(), transaction);
+                    creationTime, indication.getRawContentType(), indication.getRawCharacterEncoding(),
+                    indication.getRawBytes(), transaction);
 
             long ciContentSize = Long.parseLong(childResource.getStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE));
             Date lastCiCreationDate = getAndCheckDateTime(childResource, M2MConstants.TAG_M2M_CREATION_TIME,
@@ -818,13 +831,13 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         XoObject childResource = null;
         XoObject parentResource = null;
 
-        SclLogger.logRequestIndication(Constants.PT_CONTENT_INSTANCE_CREATE_REQUEST,
-                Constants.PT_CONTENT_INSTANCE_CREATE_RESPONSE, indication, null, Constants.ID_LOG_REPRESENTATION);
+        SclLogger.logRequestIndication("contentInstanceCreateRequestIndication", "contentInstanceCreateResponseConfirm",
+                indication, null, Constants.ID_LOG_REPRESENTATION);
         try {
             StorageRequestExecutor storageContext = manager.getStorageContext();
             Date now = new Date();
-            String creationTime = FormatUtils.formatDateTime(now, manager.getTimeZone());
-            String id = representation.getStringAttribute(M2MConstants.ATTR_M2M_ID);
+            String creationTime = FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE);
+            String id = getAndCheckNmToken(representation, M2MConstants.ATTR_M2M_ID, Constants.ID_MODE_OPTIONAL);
             String href = URIUtils.encodePath(id) + M2MConstants.URI_SEP;
             String childPath = path + M2MConstants.URI_SEP + id;
             ContentInstance childController = ContentInstance.getInstance();
@@ -837,16 +850,12 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                         "The <notify> representation contains a <contentInstance> representation without an id attribute",
                         StatusCode.STATUS_BAD_REQUEST);
             }
-            if (id.length() == 0) {
-                throw new M2MException("id cannot be empty", StatusCode.STATUS_BAD_REQUEST);
-            } else if (reservedKeywords.contains(id)) {
+            if (reservedKeywords.contains(id)) {
                 throw new M2MException(id + " is a reserved keywork in contentInstances resource",
                         StatusCode.STATUS_BAD_REQUEST);
-            } else if (id.indexOf('/') != -1) {
-                throw new M2MException("id cannot contains a '/' character: " + id, StatusCode.STATUS_BAD_REQUEST);
             }
-            byte[] testChildPath = storageContext.retrieve(childPath);
-            if (testChildPath != null) {
+            Document testChildDocument = storageContext.retrieve(null, childPath, null);
+            if (testChildDocument != null) {
                 throw new M2MException("A Content Intance resource already exists with the id " + id,
                         StatusCode.STATUS_CONFLICT);
             }
@@ -883,12 +892,12 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         XoObject childResource = null;
         XoObject parentResource = null;
 
-        SclLogger.logRequestIndication(Constants.PT_CONTENT_INSTANCE_CREATE_REQUEST,
-                Constants.PT_CONTENT_INSTANCE_CREATE_RESPONSE, indication, null, Constants.ID_LOG_REPRESENTATION);
+        SclLogger.logRequestIndication("contentInstanceCreateRequestIndication", "contentInstanceCreateResponseConfirm",
+                indication, null, Constants.ID_LOG_REPRESENTATION);
         try {
             StorageRequestExecutor storageContext = manager.getStorageContext();
             Date now = new Date();
-            String creationTime = FormatUtils.formatDateTime(now, manager.getTimeZone());
+            String creationTime = FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE);
             ContentInstance childController = ContentInstance.getInstance();
             SclTransaction transaction = new SclTransaction(storageContext);
             childResource = manager.getXoService().newXmlXoObject(M2MConstants.TAG_M2M_CONTENT_INSTANCE);
@@ -919,26 +928,17 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             while (it.hasNext()) {
                 contentInstance = (XoObject) it.next();
                 // Check id
-                id = contentInstance.getStringAttribute(M2MConstants.ATTR_M2M_ID);
-                if (id == null) {
-                    throw new M2MException(
-                            "The <notify> representation contains a <contentInstance> representation without an id attribute",
-                            StatusCode.STATUS_BAD_REQUEST);
-                }
+                id = getAndCheckNmToken(contentInstance, M2MConstants.ATTR_M2M_ID, Constants.ID_MODE_REQUIRED);
                 href = URIUtils.encodePath(id) + M2MConstants.URI_SEP;
                 childPath = path + M2MConstants.URI_SEP + id;
 
-                if (id.length() == 0) {
-                    throw new M2MException("id cannot be empty", StatusCode.STATUS_BAD_REQUEST);
-                } else if (reservedKeywords.contains(id)) {
+                if (reservedKeywords.contains(id)) {
                     throw new M2MException(id + " is a reserved keywork in contentInstances resource",
                             StatusCode.STATUS_BAD_REQUEST);
-                } else if (id.indexOf('/') != -1) {
-                    throw new M2MException("id cannot contains a '/' character: " + id, StatusCode.STATUS_BAD_REQUEST);
                 }
 
-                byte[] testChildPath = storageContext.retrieve(childPath);
-                if (testChildPath != null) {
+                Document testChildDocument = storageContext.retrieve(null, childPath, null);
+                if (testChildDocument != null) {
                     throw new M2MException("A Content Intance resource already exists with the id " + id,
                             StatusCode.STATUS_CONFLICT);
                 }
@@ -978,18 +978,33 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             throws ParseException, IOException, XoException, StorageException, M2MException {
         XoObject representation = null;
         XoObject notifyContent = null;
+        String parentPath = getParentPath(path);
+        XoObject container = null;
 
-        if (Profiler.getInstance().isTraceEnabled()) {
-            Profiler.getInstance().trace(
-                    indication.getTransactionId() + ": Check " + M2MConstants.FLAG_CREATE + " right on " + path);
-        }
-        checkRights(indication.getTransactionId(), manager, path, resource, indication.getRequestingEntity(),
-                M2MConstants.FLAG_CREATE);
-        if (Profiler.getInstance().isTraceEnabled()) {
-            Profiler.getInstance().trace(
-                    indication.getTransactionId() + ": " + M2MConstants.FLAG_CREATE + " right granted on " + path);
-        }
         try {
+            if (Profiler.getInstance().isTraceEnabled()) {
+                Profiler.getInstance().trace(
+                        indication.getTransactionId() + ": Check " + M2MConstants.FLAG_CREATE + " right on " + path);
+            }
+            container = manager.getXoResource(parentPath);
+            if (container.getName().equals(M2MConstants.TAG_M2M_LOCATION_CONTAINER)) {
+                LocationContainer.getInstance().checkRights(indication.getTransactionId(), manager, parentPath, container,
+                        indication.getRequestingEntity(), M2MConstants.FLAG_CREATE);
+                if (getAndCheckLocationContainerType(container, M2MConstants.TAG_M2M_LOCATION_CONTAINER_TYPE,
+                        Constants.ID_MODE_REQUIRED) == Constants.ID_LOCATION_CONTAINER_TYPE_LOCATION_SERVER_BASED) {
+                    throw new M2MException(
+                            "It is forbidden to create a <contentInstance> in a <locationContainer> marked as location server based",
+                            StatusCode.STATUS_FORBIDDEN);
+                }
+            } else {
+                Container.getInstance().checkRights(indication.getTransactionId(), manager, parentPath, container,
+                        indication.getRequestingEntity(), M2MConstants.FLAG_CREATE);
+            }
+            if (Profiler.getInstance().isTraceEnabled()) {
+                Profiler.getInstance().trace(
+                        indication.getTransactionId() + ": " + M2MConstants.FLAG_CREATE + " right granted on " + path);
+            }
+
             if (indication.getRawContentType() != null
                     && indication.getRawContentType().startsWith(M2MConstants.MT_APPLICATION_XML)) {
                 try {
@@ -1049,6 +1064,9 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                 doCreateIndicationFromBytes(manager, path, resource, indication);
             }
         } finally {
+            if (container != null) {
+                container.free(true);
+            }
             if (representation != null) {
                 representation.free(true);
             }
@@ -1081,17 +1099,18 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             resource.setStringAttribute(M2MConstants.TAG_M2M_CURRENT_NR_OF_INSTANCES, String.valueOf(currentNbOfInstances));
             resource.setStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE, String.valueOf(currentByteSize));
             resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME,
-                    FormatUtils.formatDateTime(now, manager.getTimeZone()));
+                    FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE));
 
             transaction.deleteResource(childPath);
 
             transaction.addTransientOp(new CisChildDeleteOp(manager, childPath, childResource, now));
-            Collection searchAttributes = new ArrayList();
-            searchAttributes.add(new Pair(M2MConstants.ATTR_CREATION_TIME, FormatUtils.parseDateTime(resource
-                    .getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME))));
-            searchAttributes.add(new Pair(M2MConstants.ATTR_LAST_MODIFIED_TIME, now));
-            searchAttributes.add(new Pair(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES));
-            transaction.updateResource(path, resource, searchAttributes);
+            Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+            document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                    FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+            document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+            document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES);
+            document.setContent(resource.saveBinary());
+            transaction.updateResource(document);
             transaction.execute();
         } finally {
             if (resource != null) {

@@ -156,25 +156,6 @@ public class Activator implements BundleActivator {
                     : commandLine;
             Command command = getCommand(commandName);
             if (command != null) {
-                // PORTAGE IS2T
-                // if (System.getSecurityManager() != null) {
-                // try {
-                // AccessController.doPrivileged(new ExecutePrivileged(command, commandLine, out, err));
-                // } catch (Exception ex) {
-                // throw ex.getException();
-                // }
-                // } else {
-                // try {
-                // if (command instanceof SessionCommand) {
-                // ((SessionCommand) command).execute(session, commandLine, out, err);
-                // } else {
-                // command.execute(commandLine, out, err);
-                // }
-                // } catch (Throwable ex) {
-                // err.println("Unable to execute command: " + ex);
-                // ex.printStackTrace(err);
-                // }
-                // }
                 try {
                     if (command instanceof SessionCommand) {
                         ((SessionCommand) command).execute(session, commandLine, out, err);
@@ -228,34 +209,6 @@ public class Activator implements BundleActivator {
             m_oldCommand.execute(line, out, err);
         }
     }
-
-//    // PORTAGE IS2T
-//    // public static class ExecutePrivileged implements PrivilegedExceptionAction {
-//    public static class ExecutePrivileged {
-//        private Command m_command = null;
-//        private String m_commandLine = null;
-//        private PrintStream m_out = null;
-//        private PrintStream m_err = null;
-//
-//        public ExecutePrivileged(Command command, String commandLine, PrintStream out, PrintStream err) throws Exception {
-//            m_command = command;
-//            m_commandLine = commandLine;
-//            m_out = out;
-//            m_err = err;
-//        }
-//
-//        // PORTAGE IS2T
-//        // public Object run() throw Exception{
-//        public Object run() {
-//            try {
-//                m_command.execute(m_commandLine, m_out, m_err);
-//            } catch (Exception e) {
-//                m_err.println("Unable to comple this command");
-//                m_err.println(e.toString());
-//            }
-//            return null;
-//        }
-//    }
 
     // customizer that handles tracked service
     // registration/modification/unregistration events

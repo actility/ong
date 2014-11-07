@@ -14,6 +14,7 @@
 							<sequence>
 								<element name="statusCode" type="string" />
 								<element name="eTag" type="string" minOccurs="0"/>
+								<element name="resourceURI" type="anyURI"/>
 								<element name="lastModifiedTime" type="dateTime" minOccurs="0"/>
 								<element name="resultBody" type="xmlmime:base64Binary" minOccurs="0"/>
 								<!-- element name="resultHeaders" type="string" ???? -->

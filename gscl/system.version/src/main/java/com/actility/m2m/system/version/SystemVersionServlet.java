@@ -68,7 +68,7 @@ import com.actility.m2m.xo.XoService;
  * @author mlouiset
  *
  */
-public class SystemVersionServlet extends SongServlet implements MonitoringServiceLauncher{
+public final class SystemVersionServlet extends SongServlet implements MonitoringServiceLauncher {
 
     /**
      * for serialization, required for TimerListener implementation
@@ -77,18 +77,17 @@ public class SystemVersionServlet extends SongServlet implements MonitoringServi
 
     private static final Logger LOG = OSGiLogger.getLogger(SystemVersionServlet.class, BundleLogger.LOG);
 
+    private final BundleContext context;
+    private final ResourcesAccessorService resourcesAccessorService;
+    private final XoService xoService;
+    private final MonitoringManager monitoringManager;
+    private final Configuration configuration;
+    private ServletTimer sshTunnelTimer;
+    private ApplicationSession appSession;
+    private ResourcesManager resManager;
     private SongFactory factory;
     private TimerService timerService;
-    private ApplicationSession appSession;
-    private BundleContext context;
-    private ServletTimer sshTunnelTimer;
 
-    private ResourcesAccessorService resourcesAccessorService;
-    private XoService xoService;
-
-    private MonitoringManager monitoringManager;
-    private ResourcesManager resManager;
-    private Configuration configuration;
     /**
      * Attribute names
      */
@@ -106,7 +105,7 @@ public class SystemVersionServlet extends SongServlet implements MonitoringServi
     public static final String RETARGETING_OP_POWER = "/retargeting1/power";
     public static final String RETARGETING_OP_TEMPERATURE = "/retargeting1/temperature";
     public static final String RETARGETING_OP_RELOAD_PROFILE = "/retargeting1/reloadProfile";
-    
+
     private static final String DEFAULT_SSH_TARGET_HOSTNAME = "support1.actility.com";
     private static final int DEFAULT_SSH_TARGET_PORT = 81;
     private static final String DEFAULT_SSH_TARGET_LOGIN = "support";
@@ -122,33 +121,37 @@ public class SystemVersionServlet extends SongServlet implements MonitoringServi
      * @param xoService
      * @param config
      */
-    public SystemVersionServlet(BundleContext context, ResourcesAccessorService resourcesAccessorService, XoService xoService, Configuration configuration) {
+    public SystemVersionServlet(BundleContext context, ResourcesAccessorService resourcesAccessorService, XoService xoService,
+            Configuration configuration) {
         this.context = context;
         this.resourcesAccessorService = resourcesAccessorService;
         this.xoService = xoService;
         this.configuration = configuration;
-        
+
         String shell = resourcesAccessorService.getProperty(context, "com.actility.m2m.framework.config.os.shell");
         if ((shell == null) || "".equals(shell.trim())) {
             shell = "sh";
-        }else{
+        } else {
             int space = shell.indexOf(' ');
-            if(space!=-1){
-                shell = shell.substring(0,space);
+            if (space != -1) {
+                shell = shell.substring(0, space);
             }
         }
         String rootact = resourcesAccessorService.getProperty(context, "com.actility.m2m.framework.config.rootact");
         if ((rootact == null) || "".equals(rootact.trim())) {
-            rootact = File.separatorChar+"home"+File.separatorChar+"ong"+File.separatorChar;
-        }else{
-            int lastChar = rootact.charAt(rootact.length()-1);
-            if(lastChar!=File.separatorChar){
-                rootact = rootact+File.separatorChar;
+            rootact = File.separatorChar + "home" + File.separatorChar + "ong" + File.separatorChar;
+        } else {
+            int lastChar = rootact.charAt(rootact.length() - 1);
+            if (lastChar != File.separatorChar) {
+                rootact = rootact + File.separatorChar;
             }
         }
         this.monitoringManager = new MonitoringManager(xoService, configuration, shell, rootact);
         setSshTunnelProperties();
+    }
 
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     /**
@@ -189,10 +192,11 @@ public class SystemVersionServlet extends SongServlet implements MonitoringServi
         SshTunnel.getInstance().closeSshTunnel();
 
     }
+
     /**
      * Launches the monitoring service
      */
-    public void launchMonitoringService(){
+    public void launchMonitoringService() {
         timerService.createTimer(appSession, 0, 60000, true, false, this.monitoringManager);
     }
 
@@ -210,14 +214,16 @@ public class SystemVersionServlet extends SongServlet implements MonitoringServi
         } else {
             SongServletResponse response = null;
             response = request.createResponse(SongServletResponse.SC_NOT_FOUND);
-            byte[] content = Utils.generateErrorContent(xoService, StatusCode.STATUS_NOT_FOUND, "Resource on URI " + request.getTargetID().absoluteURI() + " does not exist");
-            if(content!=null){
+            byte[] content = Utils.generateErrorContent(xoService, StatusCode.STATUS_NOT_FOUND, "Resource on URI "
+                    + request.getTargetID().absoluteURI() + " does not exist");
+            if (content != null) {
                 response.setContent(content, "application/xml; charset=utf-8");
             }
             response.send();
         }
 
     }
+
     /**
      * This method is called when create request is received
      */
@@ -276,18 +282,20 @@ public class SystemVersionServlet extends SongServlet implements MonitoringServi
             indicators.add(Indicator.Name.TEMP_FRAME);
             retargetingResponse(request, indicators);
         } else if (requestPath.equals(RETARGETING_OP_RELOAD_PROFILE)) {
-//            reloadProfile(request);
+            // reloadProfile(request);
             resManager.reloadProfile(request);
         } else {
             SongServletResponse response = null;
             response = request.createResponse(SongServletResponse.SC_NOT_FOUND);
-            byte[] content = Utils.generateErrorContent(xoService, StatusCode.STATUS_NOT_FOUND, "Resource on URI " + request.getTargetID().absoluteURI() + " does not exist");
-            if(content!=null){
+            byte[] content = Utils.generateErrorContent(xoService, StatusCode.STATUS_NOT_FOUND, "Resource on URI "
+                    + request.getTargetID().absoluteURI() + " does not exist");
+            if (content != null) {
                 response.setContent(content, "application/xml; charset=utf-8");
             }
             response.send();
         }
     }
+
     /**
      * This method is called when success response is received
      */
@@ -303,14 +311,15 @@ public class SystemVersionServlet extends SongServlet implements MonitoringServi
             LOG.debug("Content: " + value);
         }
         ResourcesManager callback = (ResourcesManager) response.getRequest().getAttribute(REQUEST_CONTEXT);
-        if(callback!=null){
-            if(!resManager.isInitialized()){
+        if (callback != null) {
+            if (!resManager.isInitialized()) {
                 callback.onResponse(response.getStatus());
-            }else{
-                    callback.onReloadProfileResponse(response);
+            } else {
+                callback.onReloadProfileResponse(response);
             }
         }
     }
+
     /**
      * This method is called when error response is received
      */
@@ -325,69 +334,74 @@ public class SystemVersionServlet extends SongServlet implements MonitoringServi
             String value = new String(content, response.getCharacterEncoding());
             LOG.debug("Content: " + value);
         }
-        if(!resManager.isInitialized()){
-            if ((response.getTargetID().getPath().equals("/m2m/applications/")
-                    && response.getStatus() == SongServletResponse.SC_NOT_FOUND) || response.getStatus() == SongServletResponse.SC_SERVICE_UNAVAILABLE ) {
-                int timeBetweenInit = ((Integer)configuration.getValue(Configuration.Name.TIME_BETWEEN_INIT/*, Integer.class*/)).intValue();
-                LOG.info("scl.app.me has not created m2m resources... Retrying in " + timeBetweenInit / 1000 + " secondes");
+        if (!resManager.isInitialized()) {
+            if ((response.getTargetID().getPath().equals("/m2m/applications/") && response.getStatus() == SongServletResponse.SC_NOT_FOUND)
+                    || response.getStatus() == SongServletResponse.SC_SERVICE_UNAVAILABLE) {
+                int timeBetweenInit = ((Integer) configuration
+                        .getValue(Configuration.Name.TIME_BETWEEN_INIT/* , Integer.class */)).intValue();
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("scl.app.me has not created m2m resources... Retrying in " + timeBetweenInit / 1000 + " secondes");
+                }
                 timerService.createTimer(appSession, timeBetweenInit, false, resManager);
-            }else{
+            } else {
                 ResourcesManager callback = (ResourcesManager) response.getRequest().getAttribute(REQUEST_CONTEXT);
                 callback.onResponse(response.getStatus());
             }
-        }else{
+        } else {
             ResourcesManager callback = (ResourcesManager) response.getRequest().getAttribute(REQUEST_CONTEXT);
-            if(callback!=null){
+            if (callback != null) {
                 callback.onReloadProfileResponse(response);
             }
         }
     }
 
-    
     /**
      * Create a response to a retargeting request from a list of indicators
+     *
      * @param request
      * @throws IOException
      */
-    private void retargetingResponse(SongServletRequest request, List/*<Indicator>*/ indicators) throws IOException{
+    private void retargetingResponse(SongServletRequest request, List/* <Indicator> */indicators) throws IOException {
         LOG.debug("Requesting uptime informations");
         SongServletResponse response = null;
         try {
             byte[] content = monitoringManager.snapshot(indicators);
-            if(content!=null){
+            if (content != null) {
                 response = request.createResponse(SongServletResponse.SC_OK);
                 response.setContent(content, "application/xml; charset=utf-8");
-            }else{
+            } else {
                 response = request.createResponse(SongServletResponse.SC_NOT_IMPLEMENTED);
             }
         } catch (XoException e) {
             LOG.error("Unable to create JXo obix object", e);
             response = request.createResponse(SongServletResponse.SC_INTERNAL_SERVER_ERROR);
-            byte[] content = Utils.generateErrorContent(xoService, StatusCode.STATUS_INTERNAL_SERVER_ERROR, "Error occured during Obix creation");
-            if(content!=null){
+            byte[] content = Utils.generateErrorContent(xoService, StatusCode.STATUS_INTERNAL_SERVER_ERROR,
+                    "Error occured during Obix creation");
+            if (content != null) {
                 response.setContent(content, "application/xml; charset=utf-8");
             }
         }
         response.send();
     }
-    
-//    private void reloadProfile(SongServletRequest request) throws IOException{
-//        resManager.reloadProfile(request);
-//        LOG.debug("Requesting reload profile");
-//        SongServletResponse retargetingResponse = null;
-//        SongServletRequest songRequest = factory.createRequest(appSession, SongServletRequest.MD_CREATE, reqEntity, toUri);
-//        resManager.
-//        retargetingResponse = request.createResponse(SongServletResponse.SC_NOT_IMPLEMENTED);
-//        retargetingResponse.send();
-//    }
+
+    // private void reloadProfile(SongServletRequest request) throws IOException{
+    // resManager.reloadProfile(request);
+    // LOG.debug("Requesting reload profile");
+    // SongServletResponse retargetingResponse = null;
+    // SongServletRequest songRequest = factory.createRequest(appSession, SongServletRequest.MD_CREATE, reqEntity, toUri);
+    // resManager.
+    // retargetingResponse = request.createResponse(SongServletResponse.SC_NOT_IMPLEMENTED);
+    // retargetingResponse.send();
+    // }
     /**
      * Process the request when the url points on /retargeting1/versions
+     *
      * @param request
      * @throws IOException
      */
     private void sendConfigVersion(SongServletRequest request) throws IOException {
         LOG.debug("Requesting version informations");
-        
+
         SongServletResponse response = null;
         XoObject xoObject = null;
         try {
@@ -399,18 +413,20 @@ public class SystemVersionServlet extends SongServlet implements MonitoringServi
 
             // GET ONG VERSION
             XoObject xoVersion = this.xoService.newObixXoObject("o:str");
+            xoChilds.add(xoVersion);
             xoVersion.setStringAttribute("name", "ong.firmware.base");
             String versionONG = response.getHeader("Server");
             versionONG = (versionONG != null && versionONG.length() > 4 ? versionONG.substring(4) : "unknown");
             xoVersion.setStringAttribute("val", versionONG);
             xoVersion.setStringAttribute("status", "ACTIVE");
-            xoChilds.add(xoVersion);
 
             XoObject xoList = this.xoService.newObixXoObject("o:list");
+            xoChilds.add(xoList);
             xoList.setStringAttribute("of", "bundle");
             List bundleList = xoList.getXoObjectListAttribute("[]");
             for (int i = 0; i < runningBundles.length; i++) {
                 XoObject xoBundle = this.xoService.newObixXoObject("o:str");
+                bundleList.add(xoBundle);
                 String bundleState;
                 switch (runningBundles[i].getState()) {
                 case Bundle.UNINSTALLED:
@@ -448,19 +464,18 @@ public class SystemVersionServlet extends SongServlet implements MonitoringServi
                     name = symbolicName;
                 }
                 xoBundle.setStringAttribute("name", name);
-                bundleList.add(xoBundle);
             }
-            xoChilds.add(xoList);
             byte[] content = xoObject.saveXml();
             response.setContent(content, "application/xml; charset=utf-8");
         } catch (XoException e) {
             LOG.error("Unable to create JXo obix object", e);
             response = request.createResponse(SongServletResponse.SC_INTERNAL_SERVER_ERROR);
-            byte[] content = Utils.generateErrorContent(xoService, StatusCode.STATUS_INTERNAL_SERVER_ERROR, "Error occured during Obix creation");
-            if(content!=null){
+            byte[] content = Utils.generateErrorContent(xoService, StatusCode.STATUS_INTERNAL_SERVER_ERROR,
+                    "Error occured during Obix creation");
+            if (content != null) {
                 response.setContent(content, "application/xml; charset=utf-8");
             }
-        } finally{
+        } finally {
             Utils.releaseXoObjectFromMemory(xoObject);
         }
         response.send();
