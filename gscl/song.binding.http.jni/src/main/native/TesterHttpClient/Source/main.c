@@ -40,7 +40,7 @@
 #define        IM_TIMER_GEN_V          10000   // ms
 
 
-int TraceLevel = 0;
+int TraceLevel = 5;
 int TraceDebug = 1;
 int TraceProto = 0;
 int PseudoOng = 0;
@@ -60,18 +60,17 @@ void DoClockMs()
 
 void  DoClockSc()
 {
-  static unsigned int nbclock = 0;
   time_t now = 0;
 
-  LOG(TRACE_INFO, "DoClockSc()\n");
-  nbclock++;
+  LOG(TRACE_INFO, "DoClockSc()");
+
   rtl_timemono(&now);
   AdmClockSc(now);
 }
 
 void  DoInternalEvent(t_imsg *imsg)
 {
-  LOG(TRACE_INFO, "receive event cl=%d ty=%d\n", imsg->im_class, imsg->im_type);
+  LOG(TRACE_INFO, "receive event cl=%d ty=%d", imsg->im_class, imsg->im_type);
   switch (imsg->im_class)
   {
 //  case <msg class> :
@@ -84,7 +83,7 @@ void  DoInternalEvent(t_imsg *imsg)
 
 void  DoInternalTimer(t_imsg *imsg)
 {
-  LOG(TRACE_INFO, "receive timer cl=%d ty=%d vsize=%ld\n",
+  LOG(TRACE_INFO, "receive timer cl=%d ty=%d vsize=%ld",
       imsg->im_class, imsg->im_type, rtl_vsize(getpid()));
 
   switch (imsg->im_class)

@@ -6,6 +6,10 @@
 #include <curl/curl.h>
 #include <jni.h>
 
+#ifndef typeof
+#define typeof(T) __typeof__(T)
+#endif
+
 #include "rtlbase.h"
 #include "rtllist.h"
 

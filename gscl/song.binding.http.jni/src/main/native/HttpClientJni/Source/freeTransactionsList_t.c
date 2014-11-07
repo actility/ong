@@ -6,6 +6,10 @@
 #include <curl/curl.h>
 #include <jni.h>
 
+#ifndef typeof
+#define typeof(T) __typeof__(T)
+#endif
+
 #include "rtlbase.h"
 #include "rtllist.h"
 
@@ -56,7 +60,7 @@ freeTransactionsList_t *new_freeTransactionsList_t(httpClient_t *client, int max
   This->free = freeTransactionsList_t_newFree;
   This->client = client;
   This->maxSize = maxSize;
-  LOG(TRACE_DEBUG, "new freeTransactionsList_t (This:0x%.8x)", This);
+  LOG(TRACE_DEBUG, "new freeTransactionsList_t (This:0x%.8x) (maxSize:%d)", This, maxSize);
   return This;
 }
 
@@ -88,9 +92,13 @@ void freeTransactionsList_t_add(freeTransactionsList_t *This, transaction_t *tra
     transaction->reset(transaction);
     list_add_tail(&transaction->chainLink, &(This->transactions));
     This->size++;
+    LOG(TRACE_DEBUG, "freeTransactionsList_t::add: transaction added to the pool "
+      "(This:0x%.8x) (size:%d) (transaction:0x%.8x)", This, This->size, transaction);
   }
   else
   {
+    LOG(TRACE_DEBUG, "freeTransactionsList_t::add: freeing transaction "
+      "(This:0x%.8x) (size:%d) (transaction:0x%.8x)", This, This->size, transaction);
     transaction->free(transaction);
   }
 }
@@ -111,9 +119,13 @@ transaction_t *freeTransactionsList_t_recycle(freeTransactionsList_t *This)
     list_del(&(toRemove->chainLink));
     //toRemove->reset(toRemove);
     This->size--;
+    LOG(TRACE_DEBUG, "freeTransactionsList_t::recycle: transaction peeked-up from pool "
+      "(This:0x%.8x) (size:%d) (transaction:0x%.8x)", This, This->size, toRemove);
   }
   else
   {
+    LOG(TRACE_DEBUG, "freeTransactionsList_t::recycle: allocate new transaction "
+      "(This:0x%.8x) (size:%d)", This, This->size);
     // allocate a new transaction
     toRemove = new_transaction_t(This->client);
   }

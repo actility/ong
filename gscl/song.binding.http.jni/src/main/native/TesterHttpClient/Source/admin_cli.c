@@ -583,7 +583,7 @@ static void *runContinuousLoad(void *data)
 //      nbReq++;
 //    }    
 
-    usleep(10000);
+    usleep(500000);
   }
  
   return NULL;
@@ -1569,7 +1569,7 @@ void  AdmClockSc(time_t now)
   int i = 0;
   time_t  diff;
   time_t  delta;
-  time_t  timer = 600;
+  time_t  timer = 600000;
 
   delta = timer - (timer / 10);
   for (i = 0 ; i < FD_MAX ; i++)

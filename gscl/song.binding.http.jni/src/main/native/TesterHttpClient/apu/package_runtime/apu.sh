@@ -13,7 +13,7 @@ buildProject()
 
   echo "***** Compiling HttpClientJni"
   cd HttpClientJni/ && \
-  make ARCH=$1 BIN_TARGET=$CURRENT/lib && \
+  make ARCH=$1 BIN_TARGET=$CURRENT/lib TESTER=on && \
   echo "***** Compiling TesterHttpClient" && \
   cd ../TesterHttpClient/ && \
   make ARCH=$1

@@ -28,12 +28,16 @@ static int g_nbClients = 0;
 static int g_nbMaxClients = 0;
 static httpClient_t ** g_clients = NULL;
 
+extern int g_traceLevel;
+
 void httpClientsInit(int nbMaxClients)
 {
   curl_global_init(CURL_GLOBAL_ALL);
   g_nbMaxClients = nbMaxClients;
   g_clients = malloc(g_nbMaxClients * sizeof(httpClient_t *));
   memset(g_clients, 0, g_nbMaxClients * sizeof(httpClient_t *));
+
+  g_traceLevel = 5;
 }
 
 void httpClientsUninit()

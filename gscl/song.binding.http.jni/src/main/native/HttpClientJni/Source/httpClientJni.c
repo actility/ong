@@ -97,10 +97,12 @@ static void songBindingHttpResponseCb(void *issuerHandler, transaction_t *transa
     void *mem;
   } env;
 
+  // in order not to loose the reference on transaction->jTransaction, store it locally
+  jobject jTransaction = transaction->jTransaction;
   (*g_vm)->GetEnv(g_vm, &(env.mem), g_vmJniVersion);
   (*(env.jenv))->CallVoidMethod(env.jenv, g_httpClJniObj, g_httpClResponseCb, 
-    transaction->jTransaction);
-  (*(env.jenv))->DeleteGlobalRef(env.jenv, transaction->jTransaction);
+    jTransaction);
+  (*(env.jenv))->DeleteGlobalRef(env.jenv, jTransaction);
 }
 
 /**

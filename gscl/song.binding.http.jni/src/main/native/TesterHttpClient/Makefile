@@ -57,7 +57,7 @@ cp -vf $(ROOT_PATH)/shlib/* $(BIN_TARGET)
 
 DYNAMIC_LIBS=-L$(ROOT_PATH)/lib -lcurl -lHttpClient -L$(ROOT_PATH)/shlib -lrtbase
 
-CFLAGS += -Wall -Werror
+CFLAGS += -Wall -Werror 
 
 # List of object file needed for the final program
 OBJS = \
@@ -72,8 +72,9 @@ $(ROOT_PATH)/include \
 $(ROOT_PATH)/include/linux \
 $(ROOT_PATH)/rtbase/include
 
-DEFINES = _LINUX_ 
-PROJ_DEFINES = 
+DEFINES = _LINUX_ _NATIVE_TESTER_
+PROJ_DEFINES =
+
 
 ifeq ($(TARGET),centos6-x86_64)
 EXTRA_CFLAGS=-DLINUX_64

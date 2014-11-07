@@ -79,10 +79,15 @@ $(ROOT_PATH)/rtbase/include
 DEFINES = _LINUX_ 
 PROJ_DEFINES = SHARED_LIB 
 
-ifeq ($(TARGET),centos6-x86_64)
-EXTRA_CFLAGS=-DLINUX_64
-export EXTRA_CFLAGS
+EXTRA_CFLAGS=
+ifeq ($(TESTER),on)
+EXTRA_CFLAGS += -D_NATIVE_TESTER_
 endif
+ifeq ($(TARGET),centos6-x86_64)
+EXTRA_CFLAGS += -DLINUX_64
+endif
+export EXTRA_CFLAGS
+
 
 include $(ROOT_PATH)/Makefile.common.compilation
 include $(ROOT_PATH)/Makefile.common.sharedlib

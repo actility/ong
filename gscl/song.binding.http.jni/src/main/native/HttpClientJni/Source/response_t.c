@@ -5,6 +5,10 @@
 #include <stddef.h>
 #include <curl/curl.h>
 
+#ifndef typeof
+#define typeof(T) __typeof__(T)
+#endif
+
 #include "rtlbase.h"
 #include "rtllist.h"
 

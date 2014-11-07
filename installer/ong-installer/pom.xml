@@ -605,6 +605,13 @@
       <version>1.1-0</version>
       <type>apu</type>
     </dependency>
+
+    <dependency>
+      <groupId>com.actility.m2m</groupId>
+      <artifactId>acy-init</artifactId>
+      <version>1.0.0-0</version>
+      <type>apu</type>
+    </dependency>
   </dependencies>
 
   <build>
