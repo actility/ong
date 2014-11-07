@@ -62,10 +62,10 @@ import com.actility.m2m.xo.XoService;
  * @author mlouiset
  *
  */
-public class Activator implements BundleActivator, ManagedService {
-
+public final class Activator implements BundleActivator, ManagedService {
     private static final Logger LOG = OSGiLogger.getLogger(Activator.class, BundleLogger.LOG);
-    private Configuration configuration;
+
+    private Dictionary config;
     private ServiceTracker songServiceServiceTracker;
     private ServiceTracker xoServiceServiceTracker;
     private ServiceTracker configAdminServiceTracker;
@@ -80,8 +80,8 @@ public class Activator implements BundleActivator, ManagedService {
 
     private BundleContext context;
 
-//    private Dictionary config;
-//    private ServiceRegistration managedServiceRegistration;
+    // private Dictionary config;
+    // private ServiceRegistration managedServiceRegistration;
 
     /**
      * Called to activate the current bundle.
@@ -92,7 +92,6 @@ public class Activator implements BundleActivator, ManagedService {
         this.context = context;
         // Initialize log mechanism
         BundleLogger.LOG.init(context);
-        configuration = new Configuration(context.getBundle().getSymbolicName());
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Starting bundle " + context.getBundle().getSymbolicName() + "...");
@@ -115,7 +114,8 @@ public class Activator implements BundleActivator, ManagedService {
             LOG.info("Starting tracker for " + ConfigurationAdmin.class.getName() + " service...");
         }
 
-        configAdminServiceTracker = new ServiceTracker(context, ConfigurationAdmin.class.getName(), new ConfigAdminServiceCustomizer());
+        configAdminServiceTracker = new ServiceTracker(context, ConfigurationAdmin.class.getName(),
+                new ConfigAdminServiceCustomizer());
         configAdminServiceTracker.open();
 
         if (LOG.isInfoEnabled()) {
@@ -127,14 +127,13 @@ public class Activator implements BundleActivator, ManagedService {
                 new ResourcesAccessorServiceCustomizer());
         resourcesAccessorServiceTracker.open();
 
-
         String pid = context.getBundle().getSymbolicName() + ".config";
         if (LOG.isInfoEnabled()) {
             LOG.info("Registering service " + ManagedService.class.getName() + " for pid " + pid + "...");
         }
         Dictionary props = new Hashtable();
         props.put(Constants.SERVICE_PID, pid);
-        /*managedServiceRegistration = */context.registerService(ManagedService.class.getName(), this, props);
+        /* managedServiceRegistration = */context.registerService(ManagedService.class.getName(), this, props);
     }
 
     /**
@@ -165,6 +164,7 @@ public class Activator implements BundleActivator, ManagedService {
         xoService = null;
         resourcesAccessorServiceTracker = null;
         resourcesAccessorService = null;
+        config = null;
         this.context = null;
         BundleLogger.LOG.init(null);
 
@@ -174,10 +174,11 @@ public class Activator implements BundleActivator, ManagedService {
      * Actually starts the application
      */
     private synchronized void startSystemVersionApp() {
-        if ((songService != null) && (resourcesAccessorService != null) && (xoService != null) && (configAdmin != null)) {
+        if ((songService != null) && (resourcesAccessorService != null) && (xoService != null) && (configAdmin != null)
+                && (config != null)) {
             try {
                 LOG.info("Starting System Application...");
-                configuration.setConfigAdminService(configAdmin);
+                Configuration configuration = new Configuration(context.getBundle().getSymbolicName(), configAdmin, config);
                 // create the servlet
                 systemVersionServlet = new SystemVersionServlet(context, resourcesAccessorService, xoService, configuration);
 
@@ -308,6 +309,7 @@ public class Activator implements BundleActivator, ManagedService {
             }
         }
     }
+
     private class ConfigAdminServiceCustomizer implements ServiceTrackerCustomizer {
 
         public Object addingService(ServiceReference reference) {
@@ -318,14 +320,14 @@ public class Activator implements BundleActivator, ManagedService {
                 return null;
             }
             configAdmin = (ConfigurationAdmin) context.getService(reference);
-            
+
             startSystemVersionApp();
             // Return the service to track it
             return configAdmin;
         }
 
         public void modifiedService(ServiceReference reference, Object service) {
-            
+
         }
 
         public void removedService(ServiceReference reference, Object service) {
@@ -338,6 +340,7 @@ public class Activator implements BundleActivator, ManagedService {
             }
         }
     }
+
     public void updated(Dictionary properties) throws ConfigurationException {
         if (LOG.isInfoEnabled()) {
             if (properties != null) {
@@ -352,8 +355,15 @@ public class Activator implements BundleActivator, ManagedService {
                 LOG.info("Received a null configuration for pid " + context.getBundle().getSymbolicName() + ".config");
             }
         }
-        configuration.update(properties);
-//        startSystemVersionApp();
+        config = properties;
+        if (config == null) {
+            config = new Hashtable();
+        }
+        if (systemVersionServlet == null) {
+            startSystemVersionApp();
+        } else {
+            systemVersionServlet.getConfiguration().update(config);
+        }
     }
 
 }

@@ -33,41 +33,48 @@ package com.actility.m2m.system.monitoring.alarm;
 
 /**
  * This object is the result of an alarm monitoring script
+ *
  * @author qdesrame
  *
  */
-public class AlarmExecutionResult{
-    private int state;
-    private int index;
-    private String info;
+public final class AlarmExecutionResult {
+    private final int state;
+    private final int index;
+    private final String info;
 
     public AlarmExecutionResult(int state) {
-        this.index=-1;
+        this.index = -1;
         this.state = state;
         this.info = null;
     }
+
     public AlarmExecutionResult(int state, String info) {
         this.state = state;
         this.info = info;
         this.index = -1;
     }
+
     public AlarmExecutionResult(int state, int index) {
-        this.index= index;
+        this.index = index;
         this.state = state;
         this.info = null;
     }
+
     public AlarmExecutionResult(int state, String info, int index) {
         this.state = state;
         this.info = info;
         this.index = index;
     }
+
     public int getState() {
         return state;
     }
+
     public String getInfo() {
         return info;
     }
-    public int getIndex(){
+
+    public int getIndex() {
         return index;
     }
 

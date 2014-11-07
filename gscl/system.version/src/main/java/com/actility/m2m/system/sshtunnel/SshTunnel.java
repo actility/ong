@@ -48,7 +48,7 @@ import com.actility.m2m.util.FormatUtils;
 import com.actility.m2m.util.StringUtils;
 import com.actility.m2m.util.log.OSGiLogger;
 
-public class SshTunnel implements Serializable, TimerListener {
+public final class SshTunnel implements Serializable, TimerListener {
 
     /**
      * generated serial UID for SshTunnel
@@ -300,7 +300,9 @@ public class SshTunnel implements Serializable, TimerListener {
         long sshConnectionMaxDuration = 0;
         SongServletResponse response = null;
 
-        LOG.info("Establishing SSH tunnel with " + sshTargetHostname);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Establishing SSH tunnel with " + sshTargetHostname);
+        }
 
         if (sshTunnelProcess != null) {
             // tunnel is already available
@@ -515,7 +517,9 @@ public class SshTunnel implements Serializable, TimerListener {
     public void invokeCloseSshTunnel(SongServletRequest request) {
         SongServletResponse response = null;
 
-        LOG.info("Closing SSH tunnel with " + sshTargetHostname);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Closing SSH tunnel with " + sshTargetHostname);
+        }
 
         if (closeSshTunnel()) {
             response = request.createResponse(SongServletResponse.SC_ACCEPTED);
