@@ -45,9 +45,11 @@ TARGET_PROJ_DIR = $(OUTPUT_PATH)/$(REL_PROJ_PATH)
 
 SRC_PATH = $(CURRENT_PROJ_DIR)/
 SO_TARGET = $(TARGET_PROJ_DIR)/lib/
+A_TARGET = $(TARGET_PROJ_DIR)/lib/
 OBJS_TARGET = $(TARGET_PROJ_DIR)/obj/
 
 # Executable name
+LIBNAME = $(A_TARGET)/libSongOverHttp.a
 SONAME = $(SO_TARGET)/libSongOverHttp.so
 MKWHAT = $(ROOTACT)/rtbase/shells/mkwhat.sh
 
@@ -99,5 +101,6 @@ endif
 
 include $(ROOTACT)/Makefile.common.compilation
 include $(ROOTACT)/Makefile.common.sharedlib
+include $(ROOTACT)/Makefile.common.staticlib
 
 

@@ -44,10 +44,12 @@ CURRENT_PROJ_DIR = $(ROOTACT)/$(REL_PROJ_PATH)
 TARGET_PROJ_DIR = $(OUTPUT_PATH)/$(REL_PROJ_PATH)
 
 SRC_PATH = $(CURRENT_PROJ_DIR)/
+A_TARGET = $(TARGET_PROJ_DIR)/lib/
 SO_TARGET = $(TARGET_PROJ_DIR)/lib/
 OBJS_TARGET = $(TARGET_PROJ_DIR)/obj/
 
 # Executable name
+LIBNAME = $(SO_TARGET)/libHttpSubsMgmt.a
 SONAME = $(SO_TARGET)/libHttpSubsMgmt.so
 MKWHAT = $(ROOTACT)/rtbase/shells/mkwhat.sh
 
@@ -96,5 +98,6 @@ endif
 
 include $(ROOTACT)/Makefile.common.compilation
 include $(ROOTACT)/Makefile.common.sharedlib
+include $(ROOTACT)/Makefile.common.staticlib
 
 

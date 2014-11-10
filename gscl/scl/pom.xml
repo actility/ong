@@ -430,11 +430,6 @@
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
-      <artifactId>phoneme.command.shell</artifactId>
-      <version>2.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
       <artifactId>song.binding.http.command.shell</artifactId>
       <version>1.0.0</version>
     </dependency>
@@ -867,6 +862,25 @@
     </dependency>
 
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>centos6-x86_64</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>!centos6-x86_64</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>2.0.0</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 
   <build>
     <resources>
