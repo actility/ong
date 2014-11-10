@@ -84,7 +84,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.actility.m2m</groupId>
+      <groupId>com.actility</groupId>
       <artifactId>zigbee</artifactId>
       <version>1.8.5-0</version>
       <classifier>${build.type}</classifier>
