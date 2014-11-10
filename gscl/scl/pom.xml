@@ -150,12 +150,12 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>m2m</artifactId>
-      <version>3.0.3</version>
+      <version>3.0.4</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>scl.app.me</artifactId>
-      <version>2.0.6</version>
+      <version>2.0.8</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -307,7 +307,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>song.binding.http.jni</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
       <classifier>rpib</classifier>
     </dependency>
     <dependency>
@@ -338,43 +338,43 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.0</version>
+      <version>2.0.1</version>
       <classifier>centos6-x86</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.0</version>
+      <version>2.0.1</version>
       <classifier>centos6-x86_64</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.0</version>
+      <version>2.0.1</version>
       <classifier>cov1</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.0</version>
+      <version>2.0.1</version>
       <classifier>cov2</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.0</version>
+      <version>2.0.1</version>
       <classifier>lpv3</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.0</version>
+      <version>2.0.1</version>
       <classifier>rpib</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>system.version</artifactId>
-      <version>4.4.1</version>
+      <version>4.4.4</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -427,11 +427,6 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>log.command.shell</artifactId>
       <version>2.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>phoneme.command.shell</artifactId>
-      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -867,6 +862,25 @@
     </dependency>
 
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>centos6-x86_64</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>!centos6-x86_64</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>2.0.0</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 
   <build>
     <resources>

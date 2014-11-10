@@ -195,7 +195,7 @@ build gscl/song.trace.command.shell
 build gscl/cm.command.shell
 build gscl/log.command.shell
 build gscl/inspector.command.shell
-build gscl/phoneme.command.shell
+build gscl/phoneme.command.shell - "{cov1|cov2|rpib|lpv3|centos6-x86}"
 
 build gscl/m2m
 build gscl/storage

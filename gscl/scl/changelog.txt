@@ -11,7 +11,10 @@ New Features:
 Bug Fixes:
 ----------
  - Up-graded packages:
+  * m2m-3.0.4
+  * scl.app.me-2.0.8
   * song.binding.http.jni-1.0.1
+  * storage.driver.sqlite.jni-2.0.1
 
 -------------------------------------------------------------------------------
 Version: 2.4.1
