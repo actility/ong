@@ -115,6 +115,8 @@ esac
 
 
 # now build all sub-modules in the right order
+build common/rtbase $TARGET
+
 build external/argp-standalone $TARGET "{lpv3}"
 build external/libiconv $TARGET
 build external/pthsem $TARGET
@@ -145,7 +147,6 @@ build common/makefile-common noarch
 build dev-tools/apu-maven-plugin
 build dev-tools/cocoon-maven-plugin
 
-build common/rtbase $TARGET
 build common/xo $TARGET
 build common/libcoap $TARGET
 build common/libdIa $TARGET
