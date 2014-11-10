@@ -37,7 +37,6 @@ REPOSITORY=-Dmaven.repo.local=$REPO_DIR
   projectsApi=( \
   "java.pom" "m2m/common/pom/" "2.0.0" \
   "java.cdc.pom" "m2m/common/pom/" "3.0.0" \
-  "native-src-extractor" "m2m/ong/installer/" "1.0.13" \
   "backend.api" "m2m/ong/scl/" "3.0.0" \
   "cm.api" "m2m/ong/scl/" "1.0.0" \
   "log.api" "m2m/ong/scl/" "1.0.0" \
@@ -82,9 +81,9 @@ REPOSITORY=-Dmaven.repo.local=$REPO_DIR
   "song.command.shell" "m2m/ong/scl/" "3.0.0" \
   "song.trace.command.shell" "m2m/ong/scl/" "3.0.0" \
   "phoneme.command.shell" "m2m/ong/scl/" "2.0.0" \
-  "m2m" "m2m/ong/scl/" "3.0.3" \
-  "scl.app.me" "m2m/ong/scl/" "2.0.6" \
-  "system.version" "m2m/ong/scl/" "4.4.1" \
+  "m2m" "m2m/ong/scl/" "3.0.4" \
+  "scl.app.me" "m2m/ong/scl/" "2.0.8" \
+  "system.version" "m2m/ong/scl/" "4.4.4" \
   "transport.logger.log" "m2m/ong/scl/" "1.0.1" \
   "jxo" "m2m/ong/scl/" "3.0.1" \
   "shutdown.hook" "m2m/ong/scl/" "3.0.1" \
@@ -96,9 +95,9 @@ REPOSITORY=-Dmaven.repo.local=$REPO_DIR
   projectsNative=( \
   "shutdown.hook.jni" "m2m/ong/scl/" "1.0.0" \
   "jxo.jni" "m2m/ong/scl/" "1.2.1" \
-  "storage.driver.sqlite.jni" "m2m/ong/scl/" "2.0.0" \
+  "storage.driver.sqlite.jni" "m2m/ong/scl/" "2.0.1" \
   "song.binding.coap.jni" "m2m/ong/scl/" "1.0.0" \
-  "song.binding.http.jni" "m2m/ong/scl/" "1.0.0" \
+  "song.binding.http.jni" "m2m/ong/scl/" "1.0.1" \
   )
   nbProjectsNative=${#projectsNative[@]}
 
