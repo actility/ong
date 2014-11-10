@@ -389,6 +389,7 @@
 
   <profiles>
     <profile>
+      <id>centos6-x86_64</id>
       <activation>
         <property>
           <name>build.type</name>
@@ -400,13 +401,6 @@
           <groupId>com.actility.m2m</groupId>
           <artifactId>phoneme.command.shell</artifactId>
           <version>2.0.0</version>
-        </dependency>
-        <dependency>
-          <groupId>com.sun</groupId>
-          <artifactId>phoneme-advanced-mr2</artifactId>
-          <version>167.13-6</version>
-          <classifier>${build.type}</classifier>
-          <type>apu</type>
         </dependency>
       </dependencies>
     </profile>
