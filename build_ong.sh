@@ -3,13 +3,38 @@
 CURRENT=$(pwd)
 APU_MAKE=apu-make
 APU_INSTALL=apu-install-stdalone.sh
-TARGET=$1
+BUILD_INTALLER=1
+PRGM_NAME=$(basename $0)
 
 usage() {
-  echo "usage: $0 <target>"
+  echo "usage: $PRGM_NAME <options> <target>"
   echo "where <target> can be {centos6-x86|centos6-x86_64|cov1|cov2|rpib}"
+  echo "where <options> can be:"
+  echo " -h|--help:         display this help message"
+  echo " -n|--no-installer: skip the compilation for ong-installer project"
   echo 
 }
+
+
+GETOPTTEMP=`/usr/bin/getopt -o hn --long help,no-installer -- "$@"`
+if [ $? != 0 ] ; then usage>&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+while true ; do
+       case "$1" in
+               -h|--help) usage; exit;;
+               -n|--no-installer) BUILD_INTALLER=0 ; shift ;;
+               --) shift ; break ;;
+               *) echo "Internal error!" ; exit 1 ;;
+        esac
+done
+
+if [ $# -ne 1 ]; then
+  usage
+  exit 1
+fi
+
+TARGET=$1
 
 abortWithMsg() {
   echo "*************************************" >&2
@@ -109,24 +134,63 @@ case "$HOST_TARGET" in
 		fi
 		;;
 	*)
-  		abortWithMsg "Unsupported HOST_TARGET in $HOME/.apu/apu-tools.conf ($HOST_TARGET)"
+		abortWithMsg "Unsupported HOST_TARGET in $HOME/.apu/apu-tools.conf ($HOST_TARGET)"
 		;;
 esac
 
+case "$TARGET" in
+
+	"centos6-x86")
+		if [ "$HOST_TARGET" = "centos6-x86_64" ] && [ -z "$(apu-make ls-targets | grep ^cross-centos6-x86$)" ]; then
+			build targets/target-cross-centos6-x86 noarch
+			apuInstallTarget cross-centos6-x86
+		fi
+		;;
+
+	"centos6-x86_64")
+		# nothing to do
+		;;
+
+	"cov1")
+		if [ -z "$(apu-make ls-targets | grep ^cross-cov1$)" ]; then
+			build targets/target-cross-cov1 noarch
+			apuInstallTarget cov1
+		fi
+		;;
+
+	"cov2")
+		if [ -z "$(apu-make ls-targets | grep ^cross-cov2$)" ]; then
+			build targets/target-cross-cov2 noarch
+			apuInstallTarget cross-cov2
+		fi
+		;;
+
+	"rpib")
+		if [ -z "$(apu-make ls-targets | grep ^cross-rpib$)" ]; then
+			build targets/target-cross-rpib noarch
+			apuInstallTarget cross-rpib
+		fi
+		;;
+
+	*)
+		abortWithMsg "Unsupported TARGET ($TARGET)"
+		;;
+
+esac
 
 # now build all sub-modules in the right order
 build common/rtbase $TARGET
 
 build external/argp-standalone $TARGET "{lpv3}"
 build external/libiconv $TARGET
-build external/pthsem $TARGET
-build external/eibd $TARGET
+build external/pthsem $TARGET "{cov2|rpib|lpv3|centos6-x86|centos6-x86_64}"
+build external/eibd $TARGET "{cov2|rpib|lpv3|centos6-x86|centos6-x86_64}"
 build external/libxml2 $TARGET
 build external/mxml $TARGET
 build external/ntpclient $TARGET "{cov1|cov2|rpib}"
 build external/libpcap $TARGET
 build external/tcpdump $TARGET
-build external/libmodbus $TARGET
+build external/libmodbus $TARGET "{cov2|rpib|lpv3|centos6-x86|centos6-x86_64}"
 build external/sqlite $TARGET
 build external/curl $TARGET
 build external/cproto $TARGET
@@ -161,9 +225,9 @@ build drivers/drvcommon $TARGET
 build drivers/zigbee $TARGET
 build drivers/watteco $TARGET
 build drivers/wmbus $TARGET
-build drivers/knx $TARGET
+build drivers/knx $TARGET "{cov2|rpib|lpv3|centos6-x86|centos6-x86_64}"
 build drivers/iec61131 $TARGET
-build drivers/modbus $TARGET
+build drivers/modbus $TARGET "{cov2|rpib|lpv3|centos6-x86|centos6-x86_64}"
 
 build gscl/backend.api
 build gscl/storage.api
@@ -220,6 +284,9 @@ build gscl/storage.driver.sqlite.jni $TARGET
 build gscl/transport.logger.log
 build gscl/scl $TARGET
 
-build installer/ong-installer
+if [ $BUILD_INTALLER -eq 1 ]; then
+  build installer/ong-installer
+fi
 
+echo "done"
  
