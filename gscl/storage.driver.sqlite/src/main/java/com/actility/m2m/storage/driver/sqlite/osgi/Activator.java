@@ -37,31 +37,35 @@ import java.util.Hashtable;
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import com.actility.m2m.storage.DeletionHandler;
+import com.actility.m2m.storage.StorageException;
+import com.actility.m2m.storage.StorageRequestExecutor;
 import com.actility.m2m.storage.driver.StorageRequestDriverExecutor;
 import com.actility.m2m.storage.driver.sqlite.impl.BackupCommand;
 import com.actility.m2m.storage.driver.sqlite.impl.StorageRequestDriverExecutorImpl;
 import com.actility.m2m.storage.driver.sqlite.log.BundleLogger;
-import com.actility.m2m.storage.driver.sqlite.ni.SqliteDriverNIService;
 import com.actility.m2m.util.log.OSGiLogger;
 
-public class Activator implements BundleActivator {
-
-    private static final Logger LOG = OSGiLogger.getLogger(Activator.class, BundleLogger.getStaticLogger());
-
+public final class Activator implements BundleActivator, ManagedService {
+    private static final Logger LOG = OSGiLogger.getLogger(Activator.class, BundleLogger.LOG);
     private static final String DEFAULT_DRIVER_NAME = "sqlite";
 
     private BundleContext context;
-
+    private StorageRequestDriverExecutorImpl storageRequestDriverExecutor;
     private ServiceRegistration storageRequestDriverExecutorRegistration;
     private ServiceRegistration commandRegistration;
-
-    private ServiceTracker sqliteDriverNIServiceTracker;
-    private SqliteDriverNIService sqliteDriverNIService;
+    private ServiceRegistration managedServiceRegistration;
+    private Dictionary config;
+    private DeletionHandler deletionhandler;
+    private ServiceTracker deletionHandlerTracker;
 
     /**
      * Creates a new database if the existing doesn't exists and checks the database version of the database.
@@ -72,55 +76,76 @@ public class Activator implements BundleActivator {
     public void start(BundleContext context) throws Exception {
         this.context = context;
         // Initialize log mechanism
-        BundleLogger.getStaticLogger().init(context);
+        BundleLogger.LOG.init(context);
+
         if (LOG.isInfoEnabled()) {
-            LOG.info("Starting bundle " + context.getBundle().getSymbolicName() + "...");
-            LOG.info("Starting tracker for " + SqliteDriverNIService.class.getName() + " service...");
+            LOG.info("Starting tracker for " + DeletionHandler.class.getName() + " service...");
         }
 
         // for ResourcesAccessorService
-        sqliteDriverNIServiceTracker = new ServiceTracker(context, SqliteDriverNIService.class.getName(),
-                new SqliteDriverServiceCustomizer());
-        sqliteDriverNIServiceTracker.open();
+        deletionHandlerTracker = new ServiceTracker(context, DeletionHandler.class.getName(),
+                new DeletionHandlerTracker());
+        deletionHandlerTracker.open();
+
+        String pid = context.getBundle().getSymbolicName() + ".config";
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Registering service " + ManagedService.class.getName() + " for pid " + pid + "...");
+        }
+        config = null;
+        Dictionary props = new Hashtable();
+        props.put(Constants.SERVICE_PID, pid);
+        managedServiceRegistration = context.registerService(ManagedService.class.getName(), this, props);
     }
 
     public void stop(BundleContext context) throws Exception {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Stopping bundle " + context.getBundle().getSymbolicName() + "...");
-            LOG.info("Stopping tracker for " + SqliteDriverNIService.class.getName() + " service...");
+            LOG.info("Stopping tracker for " + DeletionHandler.class.getName() + " service...");
         }
 
-        sqliteDriverNIServiceTracker.close();
+        deletionHandlerTracker.close();
+        deletionhandler = null;
+
+        if (LOG.isInfoEnabled()) {
+            String pid = context.getBundle().getSymbolicName() + ".config";
+            LOG.info("Unregistering service " + ManagedService.class.getName() + " for pid " + pid + "...");
+        }
+        managedServiceRegistration.unregister();
+        managedServiceRegistration = null;
 
         stopSqliteDriverService();
 
-        sqliteDriverNIServiceTracker = null;
-        sqliteDriverNIService = null;
         this.context = null;
-        BundleLogger.getStaticLogger().init(null);
+        BundleLogger.LOG.init(null);
     }
 
     private synchronized void startSqliteDriverService() {
-        if ((sqliteDriverNIService != null)) {
-            // Create configuration
-            Dictionary props = new Hashtable();
-            props.put(StorageRequestDriverExecutor.PARAM_DRIVER_NAME, DEFAULT_DRIVER_NAME);
+        if (config != null) {
+            try {
+                // Create configuration
+                Dictionary props = new Hashtable();
+                props.put(StorageRequestExecutor.CONFIG_DRIVER_NAME, DEFAULT_DRIVER_NAME);
 
-            StorageRequestDriverExecutorImpl storageRequestDriverExecutor = new StorageRequestDriverExecutorImpl(
-                    sqliteDriverNIService);
+                storageRequestDriverExecutor = new StorageRequestDriverExecutorImpl(config);
+                if (deletionhandler != null) {
+                    storageRequestDriverExecutor.bindDeletionHandler(deletionhandler);
+                }
 
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Registering service " + org.apache.felix.shell.Command.class.getName() + " for backup command...");
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Registering service " + org.apache.felix.shell.Command.class.getName() + " for backup command...");
+                }
+
+                // Register the backup command service.
+                commandRegistration = context.registerService(org.apache.felix.shell.Command.class.getName(),
+                        new BackupCommand(storageRequestDriverExecutor.getSQLiteRequestExecutor()), null);
+
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Registering service " + StorageRequestDriverExecutor.class.getName() + "...");
+                }
+                storageRequestDriverExecutorRegistration = context.registerService(
+                        StorageRequestDriverExecutor.class.getName(), storageRequestDriverExecutor, props);
+            } catch (StorageException e) {
+                LOG.error("Cannot start SQLite storage", e);
             }
-            // Register the backup command service.
-            commandRegistration = context.registerService(org.apache.felix.shell.Command.class.getName(), new BackupCommand(
-                    sqliteDriverNIService), null);
-
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Registering service " + StorageRequestDriverExecutor.class.getName() + "...");
-            }
-            storageRequestDriverExecutorRegistration = context.registerService(StorageRequestDriverExecutor.class.getName(),
-                    storageRequestDriverExecutor, props);
         }
     }
 
@@ -129,7 +154,7 @@ public class Activator implements BundleActivator {
      *
      */
     private synchronized void stopSqliteDriverService() {
-        if (storageRequestDriverExecutorRegistration != null) {
+        if (storageRequestDriverExecutor != null) {
             if (LOG.isInfoEnabled()) {
                 LOG.info("Unregistering service " + org.apache.felix.shell.Command.class.getName() + " for backup command...");
             }
@@ -142,25 +167,43 @@ public class Activator implements BundleActivator {
 
             commandRegistration = null;
             storageRequestDriverExecutorRegistration = null;
+            storageRequestDriverExecutor = null;
         }
+    }
+
+    public void updated(Dictionary properties) throws ConfigurationException {
+        LOG.info("Configuration updated...");
+
+        config = properties;
+        if (config == null) {
+            config = new Hashtable();
+        }
+        if (storageRequestDriverExecutor != null) {
+            stopSqliteDriverService();
+        }
+        startSqliteDriverService();
     }
 
     // customizer that handles tracked service
     // registration/modification/unregistration events
-    private class SqliteDriverServiceCustomizer implements ServiceTrackerCustomizer {
+    private class DeletionHandlerTracker implements ServiceTrackerCustomizer {
 
         public Object addingService(ServiceReference reference) {
             if (LOG.isInfoEnabled()) {
-                LOG.info("Adding service " + SqliteDriverNIService.class.getName() + "...");
+                LOG.info("Adding service " + DeletionHandler.class.getName() + "...");
             }
-            if (sqliteDriverNIService != null) {
-                return null;
-            }
-            sqliteDriverNIService = (SqliteDriverNIService) context.getService(reference);
+            synchronized (Activator.this) {
+                if (deletionhandler != null) {
+                    return null;
+                }
+                deletionhandler = (DeletionHandler) context.getService(reference);
 
-            startSqliteDriverService();
-            // Return the service to track it
-            return sqliteDriverNIService;
+                if (storageRequestDriverExecutor != null) {
+                    storageRequestDriverExecutor.bindDeletionHandler(deletionhandler);
+                }
+                // Return the service to track it
+                return deletionhandler;
+            }
         }
 
         public void modifiedService(ServiceReference reference, Object service) {
@@ -168,11 +211,15 @@ public class Activator implements BundleActivator {
 
         public void removedService(ServiceReference reference, Object service) {
             if (LOG.isInfoEnabled()) {
-                LOG.info("Removing service " + SqliteDriverNIService.class.getName() + "...");
+                LOG.info("Removing service " + DeletionHandler.class.getName() + "...");
             }
-            if (service == sqliteDriverNIService) {
-                stopSqliteDriverService();
-                sqliteDriverNIService = null;
+            synchronized (Activator.this) {
+                if (service == deletionhandler) {
+                    if (storageRequestDriverExecutor != null) {
+                        storageRequestDriverExecutor.unbindDeletionHandler(deletionhandler);
+                    }
+                    deletionhandler = null;
+                }
             }
         }
     }

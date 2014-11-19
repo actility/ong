@@ -1,64 +1,56 @@
-/*
- * Copyright   Actility, SA. All Rights Reserved.
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version
- * 2 only, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License version 2 for more details (a copy is
- * included at /legal/license.txt).
- *
- * You should have received a copy of the GNU General Public License
- * version 2 along with this work; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA
- *
- * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
- * or visit www.actility.com if you need additional
- * information or have any questions.
- *
- * id $Id: TransactionImpl.java 8771 2014-05-21 15:46:29Z JReich $
- * author $Author: JReich $
- * version $Revision: 8771 $
- * lastrevision $Date: 2014-05-21 17:46:29 +0200 (Wed, 21 May 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-05-21 17:46:29 +0200 (Wed, 21 May 2014) $
- */
-
 package com.actility.m2m.storage.driver.sqlite.impl;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.storage.Batch;
+import com.actility.m2m.storage.Condition;
+import com.actility.m2m.storage.Document;
 import com.actility.m2m.storage.StorageException;
-import com.actility.m2m.storage.StorageRequestExecutor;
 import com.actility.m2m.storage.driver.Transaction;
-import com.actility.m2m.storage.driver.sqlite.log.BundleLogger;
-import com.actility.m2m.storage.driver.sqlite.ni.SqliteDriverNIService;
-import com.actility.m2m.util.log.OSGiLogger;
+import com.actility.m2m.storage.driver.sqlite.impl.SqliteDB;
 
-public class TransactionImpl implements Transaction {
-    private static final Logger LOG = OSGiLogger.getLogger(TransactionImpl.class, BundleLogger.getStaticLogger());
+public final class TransactionImpl implements Transaction {
+    private final static Logger LOG = Logger.getLogger(TransactionImpl.class);
 
-    private final StorageRequestDriverExecutorImpl driver;
-    private SqliteDriverNIService sqliteDriverService;
+    private final SqliteDB openedDB;
+    private final SQLiteRequestExecutor driver;
 
-    public TransactionImpl(SqliteDriverNIService sqliteDriverService) throws StorageException {
+    public TransactionImpl(SQLiteRequestExecutor driver) throws StorageException {
         super();
-
-        this.sqliteDriverService = sqliteDriverService;
-        driver = new StorageRequestDriverExecutorImpl(sqliteDriverService);
-        LOG.info("Begin transaction");
-        int sqliteCode = sqliteDriverService.beginTransaction();
-        if (sqliteCode != sqliteDriverService.getSqliteOk()) {
-            throw new StorageException("Cannot begin the transaction (sqliteCode:" + sqliteCode + ")");
+        if (LOG.isInfoEnabled()) {
+            LOG.info("beginTransaction");
         }
+        this.driver = driver;
+        this.openedDB = driver.openedDB;
+        driver.createTransaction();
+    }
+
+    public TransactionImpl(SqliteDB openedDb) throws StorageException {
+        super();
+        if (LOG.isInfoEnabled()) {
+            LOG.info("beginTransaction");
+        }
+        this.openedDB = openedDb;
+        this.driver = new SQLiteRequestExecutor(openedDB);
+        // Thread.currentThread().getName();
+        // sqlitedriver.beginTransaction(openedDB);
+        driver.createTransaction();
+    }
+
+    /**
+     * Prepares the transaction.
+     * <p>
+     * According to real storage implementation, operations happen here and may return an error through its return value.
+     *
+     * @return An integer which described the preparation result. ({@link Batch#BATCH_OK}, {@link Batch#BATCH_CREATE_FAILED},
+     *         {@link Batch#BATCH_UPDATE_FAILED}, {@link Batch#BATCH_DELETE_FAILED})
+     * @throws StorageException if transaction cannot be prepared
+     */
+    public int prepareTransaction() throws StorageException {
+        return Batch.BATCH_OK;
     }
 
     /**
@@ -66,12 +58,9 @@ public class TransactionImpl implements Transaction {
      *
      * @throws StorageException if transaction cannot be committed
      */
+
     public void commitTransaction() throws StorageException {
-        LOG.info("Commit transaction");
-        int sqliteCode = sqliteDriverService.commitTransaction();
-        if (sqliteCode != sqliteDriverService.getSqliteOk()) {
-            throw new StorageException("Cannot commit the transaction (sqliteCode:" + sqliteCode + ")");
-        }
+        driver.commitTransaction();
     }
 
     /**
@@ -81,39 +70,30 @@ public class TransactionImpl implements Transaction {
      */
 
     public void rollbackTransaction() throws StorageException {
-        try {
-            LOG.info("Rollback transaction");
-            int sqliteCode = sqliteDriverService.rollbackTransaction();
+        driver.rollbackTransaction();
+    }
 
-            if (sqliteCode != sqliteDriverService.getSqliteOk()) {
-                throw new StorageException("Cannot rollback the transaction (sqliteCode:" + sqliteCode + ")");
-            }
-        } finally {
-            // nothing is possible
+    public boolean update(Map config, Document document, Condition condition) throws StorageException {
+        return driver.update(config, document, condition);
+    }
+
+    public boolean partialUpdate(Map config, Document document, byte[] content, List attrOps, Condition condition)
+            throws StorageException {
+        return driver.partialUpdate(config, document, content, attrOps, condition);
+    }
+
+    public boolean create(Map config, Document document) throws StorageException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Begin of create document(" + Util.documentToString(document) + ")");
         }
+        return driver.create(config, document);
     }
 
-    public void create(String path, byte[] rawDocument, Map config) throws StorageException {
-        driver.create(path, rawDocument, null, true);
+    public boolean delete(Map config, Document document, int scope, Condition condition) throws StorageException {
+        return driver.delete(config, document, scope, condition);
     }
 
-    public void create(String path, byte[] rawDocument, Collection searchAttributes, Map config) throws StorageException {
-        driver.create(path, rawDocument, searchAttributes, true);
-    }
-
-    public void delete(String path, Map config) throws StorageException {
-        driver.delete(path, StorageRequestExecutor.CASCADING_NONE, true);
-    }
-
-    public void delete(String path, int cascade, Map config) throws StorageException {
-        driver.delete(path, cascade, true);
-    }
-
-    public void update(String path, byte[] rawDocument, Map config) throws StorageException {
-        driver.update(path, rawDocument, null, true);
-    }
-
-    public void update(String path, byte[] rawDocument, Collection searchAttributes, Map config) throws StorageException {
-        driver.update(path, rawDocument, searchAttributes, true);
+    public boolean delete(Map config, Document document, Condition condition) throws StorageException {
+        return driver.delete(config, document, condition);
     }
 }

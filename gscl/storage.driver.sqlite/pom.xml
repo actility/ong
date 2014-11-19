@@ -8,36 +8,33 @@
     <version>3.0.0</version>
   </parent>
   <artifactId>storage.driver.sqlite</artifactId>
-  <version>0.2.2</version>
+  <version>1.0.0</version>
   <packaging>bundle</packaging>
 
-  <name>[Bnd] SQLite Storage driver Service</name>
+  <name>[Bnd] SQLite Storage driver</name>
+
+  <properties>
+    <jni.library>libSqliteJni.so</jni.library>
+    <rootact>${basedir}/target-native/${build.type}</rootact>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.api</artifactId>
-      <version>0.2.0</version>
+      <version>1.0.0-SNAPSHOT</version>
+      <type>bundle</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.api</artifactId>
-      <version>0.2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>storage.driver.sqlite.ni.api</artifactId>
-      <version>2.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>framework.resources.api</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.0-SNAPSHOT</version>
+      <type>bundle</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>util</artifactId>
-      <version>[4.0.0,5)</version>
+      <version>4.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -49,8 +46,8 @@
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.shell.acy.api</artifactId>
-      <version>1.0.0</version>
+      <artifactId>org.apache.felix.shell.acy</artifactId>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -80,6 +77,65 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <configuration>
+              <environmentVariables>
+                <LD_LIBRARY_PATH>${rootact}/package_runtime/lib</LD_LIBRARY_PATH>
+              </environmentVariables>
+              <argLine>-Djava.library.path=${basedir}/src/main/target/resources/lib/${build.type}</argLine>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/main/generated/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-native</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <exec dir="src/main/native/SqliteJni" executable="apu-make"
+                  failonerror="true">
+                  <arg value="compile ${build.type} ${rootact}" />
+                </exec>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+
 </project>
