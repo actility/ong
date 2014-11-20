@@ -89,6 +89,14 @@
       <version>1.8.5-0</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
+   </dependency>
+
+    <dependency>
+      <groupId>com.actility.m2m</groupId>
+      <artifactId>zigbee</artifactId>
+      <version>1.8.5-0</version>
+      <classifier>${build.type}</classifier>
+      <type>apu</type>
     </dependency>
 
     <dependency>
@@ -333,7 +341,7 @@
         <groupId>com.actility.m2m</groupId>
         <artifactId>cocoon-maven-plugin</artifactId>
         <configuration>
-          <excludeArchitectures>centos6-x86_64,lpv3</excludeArchitectures>
+          <excludeArchitectures>centos6-x86_64,lpv3,ntc6200</excludeArchitectures>
           <excludeProducts>ong-osgime</excludeProducts>
           <excludeModules>ong.osgime</excludeModules>
           <excludeTypes>pom</excludeTypes>
