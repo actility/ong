@@ -149,13 +149,17 @@ public class GenerateKfInitMojo extends AbstractMojo {
             try {
                 BundleConfiguration bundleConfig = new BundleConfiguration(getLog(), nameToDependency, classifier,
                         StringUtils.split(realConfig, ":"));
-                LevelConfiguration levelConfig = levelsConfiguration.get(bundleConfig.getStartLevel());
-                if (levelConfig == null) {
-                    levelConfig = new LevelConfiguration(bundleConfig.getStartLevel());
-                    levelsConfiguration.put(bundleConfig.getStartLevel(), levelConfig);
-                }
-                levelConfig.addBundleConfiguration(bundleConfig);
                 getLog().debug("Read bundle configuration OK: " + realConfig);
+                if (bundleConfig.getArtifact() != null) {
+                    LevelConfiguration levelConfig = levelsConfiguration.get(bundleConfig.getStartLevel());
+                    if (levelConfig == null) {
+                        levelConfig = new LevelConfiguration(bundleConfig.getStartLevel());
+                        levelsConfiguration.put(bundleConfig.getStartLevel(), levelConfig);
+                    }
+                    levelConfig.addBundleConfiguration(bundleConfig);
+                } else {
+                    getLog().info("Do not add bundle as it is optional and dependency is not found: " + realConfig);
+                }
             } catch (RuntimeException e) {
                 getLog().info("Exception on line: " + realConfig);
                 throw e;
