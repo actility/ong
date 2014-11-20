@@ -23,15 +23,19 @@ public class BundleConfiguration extends FirmwareEntryConfiguration {
     public BundleConfiguration(Log log, Map<String, Artifact> nameTodependency, String classifier, String[] args)
             throws MojoExecutionException {
         super(log);
-        if (args.length < 3 || args.length > 7) {
+        if (args.length < 3 || args.length > 8) {
             throw new MojoExecutionException("Bundle configuration has a wrong number of arguments: "
                     + StringUtils.join(args, ":"));
         }
         try {
+            optional = false;
+            if (args.length >= 5) {
+                optional = Boolean.parseBoolean(args[4]);
+            }
             artifact = nameTodependency.get(args[0] + ":" + args[1]);
             if (artifact == null) {
                 artifact = nameTodependency.get(args[0] + ":" + args[1] + ":" + classifier);
-                if (artifact == null) {
+                if (artifact == null && !optional) {
                     throw new MojoExecutionException("Bundle dependency does not exist: " + args[0] + ":" + args[1]
                             + ((classifier != null) ? ":" + classifier : ""));
                 }
@@ -46,38 +50,40 @@ public class BundleConfiguration extends FirmwareEntryConfiguration {
             } else {
                 toStart = true;
             }
-            if (args.length >= 5) {
-                comment = Boolean.parseBoolean(args[4]);
+            if (args.length >= 6) {
+                comment = Boolean.parseBoolean(args[5]);
             } else {
                 comment = false;
             }
             boolean deploymentPlugin = false;
-            if (args.length >= 6) {
-                deploymentPlugin = Boolean.parseBoolean(args[5]);
-            }
             if (args.length >= 7) {
-                oneTime = Boolean.parseBoolean(args[6]);
+                deploymentPlugin = Boolean.parseBoolean(args[6]);
+            }
+            if (args.length >= 8) {
+                oneTime = Boolean.parseBoolean(args[7]);
             } else {
                 oneTime = false;
             }
-            // Load manifest read values and check content
-            JarInputStream jarStream = new JarInputStream(new FileInputStream(artifact.getFile()));
-            Attributes attributes = jarStream.getManifest().getMainAttributes();
-            checkManifest(attributes);
+            if (artifact != null) {
+                // Load manifest read values and check content
+                JarInputStream jarStream = new JarInputStream(new FileInputStream(artifact.getFile()));
+                Attributes attributes = jarStream.getManifest().getMainAttributes();
+                checkManifest(attributes);
 
-            id = attributes.getValue("Bundle-SymbolicName");
-            int semicolonIndex = id.indexOf(';');
-            if (semicolonIndex != -1) {
-                id = id.substring(0, semicolonIndex);
+                id = attributes.getValue("Bundle-SymbolicName");
+                int semicolonIndex = id.indexOf(';');
+                if (semicolonIndex != -1) {
+                    id = id.substring(0, semicolonIndex);
+                }
+                namespace = "osgiBundleSymbolicName";
+                name = attributes.getValue("Bundle-Name");
+                if (deploymentPlugin) {
+                    installationType = "deploymentPluginBundle";
+                } else {
+                    installationType = "osgiBundle";
+                }
+                version = attributes.getValue("Bundle-Version");
             }
-            namespace = "osgiBundleSymbolicName";
-            name = attributes.getValue("Bundle-Name");
-            if (deploymentPlugin) {
-                installationType = "deploymentPluginBundle";
-            } else {
-                installationType = "osgiBundle";
-            }
-            version = attributes.getValue("Bundle-Version");
         } catch (NumberFormatException e) {
             throw new MojoExecutionException(
                     "Bundle configuration start level is not a number: " + StringUtils.join(args, ":"), e);

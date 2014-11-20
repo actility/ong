@@ -18,6 +18,7 @@ public class FirmwareEntryConfiguration {
     protected String name;
     protected String installationType;
     protected String version;
+    protected boolean optional;
     protected boolean comment;
     protected boolean oneTime;
 

@@ -206,12 +206,14 @@ public class GenerateKfCocoonMojo extends AbstractMojo {
             String realConfig = config.trim();
             BundleConfiguration bundleConfig = new BundleConfiguration(getLog(), nameToDependency, classifier,
                     StringUtils.split(realConfig, ":"));
-            LevelConfiguration levelConfig = levelsConfiguration.get(bundleConfig.getStartLevel());
-            if (levelConfig == null) {
-                levelConfig = new LevelConfiguration(bundleConfig.getStartLevel());
-                levelsConfiguration.put(bundleConfig.getStartLevel(), levelConfig);
+            if (bundleConfig.getArtifact() != null) {
+                LevelConfiguration levelConfig = levelsConfiguration.get(bundleConfig.getStartLevel());
+                if (levelConfig == null) {
+                    levelConfig = new LevelConfiguration(bundleConfig.getStartLevel());
+                    levelsConfiguration.put(bundleConfig.getStartLevel(), levelConfig);
+                }
+                levelConfig.addBundleConfiguration(bundleConfig);
             }
-            levelConfig.addBundleConfiguration(bundleConfig);
             getLog().debug("Read bundle configuration OK: " + realConfig);
         }
     }

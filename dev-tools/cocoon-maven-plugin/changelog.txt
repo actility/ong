@@ -1,6 +1,20 @@
 -------------------------------------------------------------------------------
 Maven Cocoon Plugin changelog
 -------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2014-11-20
+
+New Features:
+-------------
+- Added the possibility to tag a bundle as optional. In case it is optional and
+  dependency is not found then the bundle is not added to the osgi
+  configuration file
+
+Bug Fixes:
+----------
+- N/A
+
+-------------------------------------------------------------------------------
 Version: 2.0.0
 Date: 2014-03-21
 
