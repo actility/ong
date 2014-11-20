@@ -8,35 +8,6 @@ applyPatch()
 
 buildProject()
 {
-  ROOTACT=`pwd`
-  FLAGS=
-  case "$1" in 
-    centos6-x86)
-      CROSS_COMPILATION=0
-      ;;
-    cov1)
-      CROSS_COMPILATION=1
-      FLAGS=-mcpu=arm920t
-      PREFIX=arm-linux
-      ;;
-    cov2)
-      CROSS_COMPILATION=1
-      FLAGS=-mcpu=arm920t
-      PREFIX=arm-none-linux-gnueabi
-      ;;
-    lpv3)
-      CROSS_COMPILATION=1
-      PREFIX=mips-openwrt-linux-uclibc
-      ;;
-    rpib)
-      CROSS_COMPILATION=1
-      source $RPI_B_HOST_HOME/../../environment-setup-armv6-vfp-poky-linux-gnueabi
-      PREFIX=arm-poky-linux-gnueabi
-      ;;
-    *)
-      ;;
-  esac
-
   cd tcpdump
   tar zxvf tcpdump-4.3.0.tar.gz
   cd tcpdump-4.3.0/
@@ -56,14 +27,13 @@ buildProject()
 
   autoreconf
   if [ ! -f Makefile ]; then
-    if [ $CROSS_COMPILATION = 1 ]; then
-        if [ "x" != "x$FLAGS" ]; then
-            ac_cv_linux_vers=2 CFLAGS="$FLAGS" LDFLAGS="$FLAGS" ./configure --host $PREFIX --prefix $TARGET_DIR || (echo "FAILED to configure" && exit 1)
-        else
-            ac_cv_linux_vers=2 ./configure --host $PREFIX --prefix $TARGET_DIR || (echo "FAILED to configure" && exit 1)
-        fi
+    if [ "$1" == "centos6-x86" -o "$1" == "centos6-x86_64" ]
+    then
+      echo ./configure $CONFIGURE_FLAGS --prefix $ROOTACT
+      ./configure $CONFIGURE_FLAGS --prefix $ROOTACT
     else
-        ./configure --prefix $TARGET_DIR || (echo "FAILED to configure" && exit 1)
+      echo ac_cv_linux_vers=2 ./configure $CONFIGURE_FLAGS --prefix $ROOTACT
+      ac_cv_linux_vers=2 ./configure $CONFIGURE_FLAGS --prefix $ROOTACT
     fi
   fi
   sed -i 's:/usr/lib:${TARGET_DIR}/lib:' ./Makefile

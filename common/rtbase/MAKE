@@ -48,6 +48,8 @@ EchoTargetList()
 	echo    "14	| android_panrouter"
 	echo    "15	| wirmav2"
 	echo    "16	| rpib"
+        echo    "17     | ntc6200"
+        echo    "18     | ntc6200_debug"
 
 	echo "> "
 }
@@ -116,6 +118,12 @@ ChooseTarget()
 		16|rpib)	
 			echo "SYSTEM=rpib" > $file
 			;;
+                17|ntc6200)
+                        echo "SYSTEM=ntc6200" > $file
+                        ;;
+                18|ntc6200_debug)
+                        echo "SYSTEM=ntc6200_debug" > $file
+                        ;;
 		*)
 			echo "MAKE rtbase : unknown target $rep"
 			tty > /dev/null 2>&1

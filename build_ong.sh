@@ -71,9 +71,9 @@ apuInstallTarget() {
 mavenBuild() {
   SUB_MOD_TARGET=$1
   OPTIONS="-Dmaven.test.skip=true"
-  [ -n "$SUB_MOD_TARGET" ] && OPTIONS=$OPTIONS" -Dbuild.type=$SUB_MOD_TARGET" && \
-  [ $SUB_MOD_TARGET == "rpib" ] && OPTIONS=$OPTIONS" -Dbuild.arch=arm"
+  [ -n "$SUB_MOD_TARGET" ] && OPTIONS=$OPTIONS" -Dbuild.type=$SUB_MOD_TARGET -Dbuild.arch=$ARCH"
   
+  echo mvn clean install $OPTIONS
   mvn clean install $OPTIONS || \
   abortWithMsg "failed to build jar"
 }
@@ -172,32 +172,41 @@ case "$TARGET" in
 		fi
 		;;
 
+        "ntc6200")
+                if [ -z "$(apu-make ls-targets | grep ^cross-ntc6200$)" ]; then
+                        build targets/target-cross-ntc6200 noarch
+                        apuInstallTarget cross-ntc6200
+                fi
+                ;;
+
 	*)
 		abortWithMsg "Unsupported TARGET ($TARGET)"
 		;;
 
 esac
 
+ARCH=$(apu-make env $TARGET | grep "export ARCH=" | sed -e "s|^export ARCH=\(.*\)$|\1|")
+
 # now build all sub-modules in the right order
 build common/rtbase $TARGET
 
 build external/argp-standalone $TARGET "{lpv3}"
 build external/libiconv $TARGET
-build external/pthsem $TARGET "{cov2|rpib|lpv3|centos6-x86|centos6-x86_64}"
-build external/eibd $TARGET "{cov2|rpib|lpv3|centos6-x86|centos6-x86_64}"
+build external/pthsem $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
+build external/eibd $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build external/libxml2 $TARGET
 build external/mxml $TARGET
 build external/ntpclient $TARGET "{cov1|cov2|rpib}"
 build external/libpcap $TARGET
 build external/tcpdump $TARGET
-build external/libmodbus $TARGET "{cov2|rpib|lpv3|centos6-x86|centos6-x86_64}"
+build external/libmodbus $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build external/sqlite $TARGET
 build external/curl $TARGET
 build external/cproto $TARGET
 build external/libmicrohttpd $TARGET
 build external/jni $TARGET
 build external/exip $TARGET
-build external/phoneme-advanced-mr2 $TARGET "{cov1|cov2|rpib|lpv3|centos6-x86}"
+build external/phoneme-advanced-mr2 $TARGET "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
 PHONEME_VERSION=$(cat external/phoneme-advanced-mr2/Version)-$(cat external/phoneme-advanced-mr2/apu/revision)
 export PHONEME_TARGET_DIR=$CURRENT/.build/$TARGET/phoneme
 PHONEME_APU=$HOME/.m2/repository/com/sun/phoneme-advanced-mr2/$PHONEME_VERSION/phoneme-advanced-mr2-$PHONEME_VERSION-$TARGET.apu
@@ -225,10 +234,9 @@ build drivers/drvcommon $TARGET
 build drivers/zigbee $TARGET
 build drivers/watteco $TARGET
 build drivers/wmbus $TARGET
-build drivers/knx $TARGET "{cov2|rpib|lpv3|centos6-x86|centos6-x86_64}"
+build drivers/knx $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build drivers/iec61131 $TARGET
-build drivers/modbus $TARGET "{cov2|rpib|lpv3|centos6-x86|centos6-x86_64}"
-
+build drivers/modbus $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build gscl/backend.api
 build gscl/storage.api
 build gscl/storage.driver.api
@@ -259,7 +267,7 @@ build gscl/song.trace.command.shell
 build gscl/cm.command.shell
 build gscl/log.command.shell
 build gscl/inspector.command.shell
-build gscl/phoneme.command.shell - "{cov1|cov2|rpib|lpv3|centos6-x86}"
+build gscl/phoneme.command.shell - "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
 
 build gscl/m2m
 build gscl/storage

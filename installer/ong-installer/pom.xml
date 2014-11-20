@@ -109,6 +109,13 @@
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
+    <dependency>
+      <groupId>com.actility.m2m</groupId>
+      <artifactId>gscl</artifactId>
+      <version>2.4.2</version>
+      <classifier>ntc6200</classifier>
+      <type>apu</type>
+    </dependency>
 
     <dependency>
       <groupId>com.actility</groupId>
@@ -152,6 +159,13 @@
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
+    <dependency>
+      <groupId>com.actility</groupId>
+      <artifactId>drvcommon</artifactId>
+      <version>1.4.14-0</version>
+      <classifier>ntc6200</classifier>
+      <type>apu</type>
+    </dependency>
 
     <dependency>
       <groupId>com.actility</groupId>
@@ -188,49 +202,63 @@
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
-
     <dependency>
       <groupId>com.actility</groupId>
+      <artifactId>watteco</artifactId>
+      <version>1.4.11-0</version>
+      <classifier>ntc6200</classifier>
+      <type>apu</type>
+   </dependency>
+
+    <dependency>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
       <version>1.8.5-0</version>
       <classifier>centos6-x86</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
       <version>1.8.5-0</version>
       <classifier>centos6-x86_64</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
       <version>1.8.5-0</version>
       <classifier>cov1</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
       <version>1.8.5-0</version>
       <classifier>cov2</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
       <version>1.8.5-0</version>
       <classifier>lpv3</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
       <version>1.8.5-0</version>
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
+    <dependency>
+      <groupId>com.actility.m2m</groupId>
+      <artifactId>zigbee</artifactId>
+      <version>1.8.5-0</version>
+      <classifier>ntc6200</classifier>
+      <type>apu</type>
+   </dependency>
 
     <dependency>
       <groupId>com.actility</groupId>
@@ -274,6 +302,13 @@
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
+    <dependency>
+      <groupId>com.actility</groupId>
+      <artifactId>wmbus</artifactId>
+      <version>1.2.4-0</version>
+      <classifier>ntc6200</classifier>
+      <type>apu</type>
+    </dependency>
 
     <dependency>
       <groupId>com.actility</groupId>
@@ -308,6 +343,13 @@
       <artifactId>knx</artifactId>
       <version>1.0.3-0</version>
       <classifier>rpib</classifier>
+      <type>apu</type>
+    </dependency>
+    <dependency>
+      <groupId>com.actility</groupId>
+      <artifactId>knx</artifactId>
+      <version>1.0.3-0</version>
+      <classifier>ntc6200</classifier>
       <type>apu</type>
     </dependency>
 
@@ -346,6 +388,13 @@
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
+    <dependency>
+      <groupId>org.gnu</groupId>
+      <artifactId>pthsem</artifactId>
+      <version>2.0.8-1</version>
+      <classifier>ntc6200</classifier>
+      <type>apu</type>
+    </dependency>
 
     <dependency>
       <groupId>org.gnu</groupId>
@@ -382,6 +431,13 @@
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
+    <dependency>
+      <groupId>org.gnu</groupId>
+      <artifactId>eibd</artifactId>
+      <version>0.0.5-1</version>
+      <classifier>ntc6200</classifier>
+      <type>apu</type>
+    </dependency>
 
     <dependency>
       <groupId>com.actility</groupId>
@@ -418,6 +474,13 @@
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
+    <dependency>
+      <groupId>com.actility</groupId>
+      <artifactId>iec61131</artifactId>
+      <version>1.0.36-0</version>
+      <classifier>ntc6200</classifier>
+      <type>apu</type>
+    </dependency>
 
     <dependency>
       <groupId>org.msweet</groupId>
@@ -454,6 +517,13 @@
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
+    <dependency>
+      <groupId>org.msweet</groupId>
+      <artifactId>mxml</artifactId>
+      <version>2.7-2</version>
+      <classifier>ntc6200</classifier>
+      <type>apu</type>
+    </dependency>
 
     <dependency>
       <groupId>com.actility</groupId>
@@ -488,6 +558,13 @@
       <artifactId>modbus</artifactId>
       <version>1.2.0-0</version>
       <classifier>rpib</classifier>
+      <type>apu</type>
+    </dependency>
+    <dependency>
+      <groupId>com.actility</groupId>
+      <artifactId>modbus</artifactId>
+      <version>1.2.0-0</version>
+      <classifier>ntc6200</classifier>
       <type>apu</type>
     </dependency>
 
@@ -533,6 +610,13 @@
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
+    <dependency>
+      <groupId>org.tcpdump</groupId>
+      <artifactId>tcpdump</artifactId>
+      <version>4.3.0-1</version>
+      <classifier>ntc6200</classifier>
+      <type>apu</type>
+    </dependency>
 
     <dependency>
       <groupId>com.actility</groupId>
@@ -574,6 +658,13 @@
       <artifactId>tty_mapper</artifactId>
       <version>1.0.1-0</version>
       <classifier>rpib</classifier>
+      <type>apu</type>
+    </dependency>
+    <dependency>
+      <groupId>com.actility</groupId>
+      <artifactId>tty_mapper</artifactId>
+      <version>1.0.1-0</version>
+      <classifier>ntc6200</classifier>
       <type>apu</type>
     </dependency>
 
@@ -677,7 +768,7 @@
         <groupId>com.actility.m2m</groupId>
         <artifactId>cocoon-maven-plugin</artifactId>
         <configuration>
-          <excludeArchitectures>centos6-x86_64,lpv3</excludeArchitectures>
+          <excludeArchitectures>centos6-x86_64,lpv3,ntc6200</excludeArchitectures>
           <excludeProducts>ong-osgime</excludeProducts>
           <excludeModules>ong.osgime</excludeModules>
           <excludeTypes>pom</excludeTypes>
