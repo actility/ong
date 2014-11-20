@@ -60,27 +60,27 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>jxo.api</artifactId>
-      <version>3.2.0</version>
+      <version>[3.2,4.0)</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>util</artifactId>
-      <version>4.0.0</version>
+      <version>[4.0,5.0)</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>m2m.api</artifactId>
-      <version>4.0.0</version>
+      <version>[4.0,5.0)</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>framework.resources.api</artifactId>
-      <version>1.0.0</version>
+      <version>[1.0,2.0)</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.api</artifactId>
-      <version>1.0.0</version>
+      <version>[1.0,2.0)</version>
     </dependency>
   </dependencies>
 

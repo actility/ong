@@ -179,6 +179,8 @@ case "$TARGET" in
 esac
 
 # now build all sub-modules in the right order
+build dev-tools/apu-tools noarch
+build common/acy-init noarch
 build common/rtbase $TARGET
 
 build external/argp-standalone $TARGET "{lpv3}"
@@ -243,7 +245,7 @@ build gscl/shutdown.hook.ni.api
 build gscl/song.binding.coap.ni.api
 build gscl/song.binding.http.api
 build gscl/song.binding.http.ni.api
-build gscl/storage.driver.sqlite.ni.api
+#build gscl/storage.driver.sqlite.ni.api
 build gscl/transport.logger.api
 build gscl/org.apache.felix.shell.acy.api
 
@@ -262,10 +264,10 @@ build gscl/inspector.command.shell
 build gscl/phoneme.command.shell
 
 build gscl/m2m
-build gscl/storage
+build gscl/storage.me
 build gscl/system.version
 build gscl/shutdown.hook
-build gscl/storage.driver.sqlite
+build gscl/storage.driver.sqlite $TARGET
 build gscl/jxo
 build gscl/song.binding.http
 build gscl/song.binding.coap
@@ -280,9 +282,9 @@ build gscl/log
 build gscl/shutdown.hook.jni $TARGET
 build gscl/song.binding.coap.jni $TARGET
 build gscl/song.binding.http.jni $TARGET
-build gscl/storage.driver.sqlite.jni $TARGET
+#build gscl/storage.driver.sqlite.jni $TARGET
 build gscl/transport.logger.log
-build gscl/scl $TARGET
+build gscl/gscl $TARGET
 
 if [ $BUILD_INTALLER -eq 1 ]; then
   build installer/ong-installer

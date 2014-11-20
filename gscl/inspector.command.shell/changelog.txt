@@ -10,7 +10,7 @@ New Features:
 
 Bug Fixes:
 ----------
- - N/A
+ - Fixed javax.servlet had not a version in the bundle MANIFEST.MF
 
 -------------------------------------------------------------------------------
 Version: 1.2.0
