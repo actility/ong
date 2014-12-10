@@ -2,7 +2,8 @@
 buildProject()
 {
   cd rtbase
-  ./MAKE clean
+  #./MAKE clean
+  make clean
 
   return $?
 }

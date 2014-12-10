@@ -15,8 +15,10 @@ buildProject()
 #  ./MAKE clean
 #  echo $CHOICE | ./MAKE
 
-  ./MAKE clean
-  echo $1 | ./MAKE
+#  ./MAKE clean
+#  echo $1 | ./MAKE
+  make clean
+  make
   return $?
 }
 
