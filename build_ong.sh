@@ -7,7 +7,7 @@ TARGET=$1
 
 usage() {
   echo "usage: $0 <target>"
-  echo "where <target> can be {centos6-x86|centos6-x86_64|cov1|cov2|rpib}"
+  echo "where <target> can be {centos6-x86|centos6-x86_64|cov1|cov2|rpib|ntc6200}"
   echo 
 }
 
@@ -115,6 +115,7 @@ esac
 
 
 # now build all sub-modules in the right order
+build common/makefile-common noarch
 build common/rtbase $TARGET
 
 build external/argp-standalone $TARGET "{lpv3}"
@@ -143,7 +144,6 @@ export PHONEME_HOME=$PHONEME_TARGET_DIR/bin/phoneme
 
 build common/java.pom
 build common/java.cdc.pom
-build common/makefile-common noarch
 build dev-tools/apu-maven-plugin
 build dev-tools/cocoon-maven-plugin
 
