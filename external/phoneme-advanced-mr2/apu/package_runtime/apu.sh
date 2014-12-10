@@ -10,7 +10,7 @@ applyPatch()
 
 buildProject()
 {
-  ROOTACT=`pwd`
+  ROOTACT=$(pwd)
 
   BUILD_DIR=$ROOTACT/phoneme-advanced-mr2/build/
   TARGET_DIR=$BUILD_DIR/target
@@ -52,6 +52,7 @@ buildProject()
       PHONEME_DEBUG=1
       echo -n "Apply patch to linux-x86-generic GNUmakefile..."
       sed -i "s|^CC_ARCH_FLAGS[ \t]*=\(.*\)$|CC_ARCH_FLAGS = -m32 \1|" $COMPILE_DIR/GNUmakefile
+      sed -i "s|^ASM_ARCH_FLAGS[ \t]*=\(.\)*$|ASM_ARCH_FLAGS = -m32 \1|" $COMPILE_DIR/GNUmakefile
       sed -i "s|^LINK_ARCH_FLAGS[ \t]*=\(.*\)$|LINK_ARCH_FLAGS = -m32 \1|" $COMPILE_DIR/GNUmakefile
       echo "OK"
       ;;
@@ -104,7 +105,6 @@ buildProject()
       sed -i "s|^CVM_TARGET_TOOLS_PREFIX[ \t]*=.*$|CVM_TARGET_TOOLS_PREFIX = arm-android-gnueabi-|" $COMPILE_DIR/GNUmakefile
       echo "OK"
       ;;
-
     rpib)
       COMPILE_DIR=$BUILD_DIR/phoneme_advanced_mr2_b167/cdc/build/linux-arm-generic
       echo -n "Apply patch to linux-arm-generic GNUmakefile..."
@@ -115,7 +115,16 @@ buildProject()
       sed -i "s|^CVM_TARGET_TOOLS_PREFIX[ \t]*=.*$|CVM_TARGET_TOOLS_PREFIX = arm-poky-linux-gnueabi-|" $COMPILE_DIR/GNUmakefile
       echo "OK"
       ;;
-
+    ntc6200)
+        COMPILE_DIR=$BUILD_DIR/phoneme_advanced_mr2_b167/cdc/build/linux-arm-generic
+        echo -n "Apply patch to linux-arm-generic GNUmakefile..."
+        sed -i "s|^CC_ARCH_FLAGS[ \t]*=.*$|CC_ARCH_FLAGS = -mcpu=arm926ej-s|" $COMPILE_DIR/GNUmakefile
+        sed -i "s|^ASM_ARCH_FLAGS[ \t]*=.*$|ASM_ARCH_FLAGS = -mcpu=arm926ej-s|" $COMPILE_DIR/GNUmakefile
+        sed -i "s|^LINK_ARCH_FLAGS[ \t]*=.*$|LINK_ARCH_FLAGS = -mcpu=arm926ej-s|" $COMPILE_DIR/GNUmakefile
+        sed -i "s|^USE_AAPCS[ \t]*?=.*$|USE_AAPCS ?= true|" $COMPILE_DIR/GNUmakefile
+        sed -i "s|^CVM_TARGET_TOOLS_PREFIX[ \t]*=.*$|CVM_TARGET_TOOLS_PREFIX = arm-cdcs-linux-gnueabi-|" $COMPILE_DIR/GNUmakefile
+        echo "OK"
+      ;;
     *)
       echo "Unsupported target"
       exit 1

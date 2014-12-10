@@ -212,6 +212,35 @@ ifeq ($(SYSTEM),lpv3_debug)
     ARFLAGS=rv
 endif
 
+ifeq ($(SYSTEM),ntc6200)
+    CC=arm-cdcs-linux-gnueabi-gcc
+    CFLAGS=-Wall -O3 -fPIC -mcpu=arm926ej-s -DLINUX -DARCHARM
+    CFLAGSNOO=-Wall -fPIC -mcpu=arm926ej-s -DLINUX -DARCHARM
+    CCFLAGS=$(CFLAGS)
+
+    LD=$(CC)
+    CCLD=$(CC)
+    LDFLAGS=-mcpu=arm926ej-s -L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lrt
+    LDSOFLAGS=-mcpu=arm926ej-s -m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+    AR=ar
+    ARFLAGS=rv
+endif
+
+ifeq ($(SYSTEM),ntc6200_debug)
+    CC=arm-cdcs-linux-gnueabi-gcc
+    CFLAGS=-Wall -O3 -fPIC -mcpu=arm926ej-s -DLINUX -DARCHARM -g
+    CFLAGSNOO=-Wall -fPIC -mcpu=arm926ej-s -DLINUX -DARCHARM -g
+    CCFLAGS=$(CFLAGS)
+
+    LD=$(CC)
+    CCLD=$(CC)
+    LDFLAGS=-mcpu=arm926ej-s -L$(ROOTACT)/lib -L$(ROOTACT)/shlib -lm -lrt
+    LDSOFLAGS=-mcpu=arm926ej-s -m32 -shared -fPIC -L$(ROOTACT)/lib -L$(ROOTACT)/shlib
+
+    AR=ar
+    ARFLAGS=rv
+endif
 
 ifeq ($(SYSTEM),centos6-x86)
 	CC=gcc

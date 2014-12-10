@@ -3,13 +3,38 @@
 CURRENT=$(pwd)
 APU_MAKE=apu-make
 APU_INSTALL=apu-install-stdalone.sh
-TARGET=$1
+BUILD_INTALLER=1
+PRGM_NAME=$(basename $0)
 
 usage() {
-  echo "usage: $0 <target>"
-  echo "where <target> can be {centos6-x86|centos6-x86_64|cov1|cov2|rpib|ntc6200}"
+  echo "usage: $PRGM_NAME <options> <target>"
+  echo "where <target> can be {centos6-x86|centos6-x86_64|cov1|cov2|rpib}"
+  echo "where <options> can be:"
+  echo " -h|--help:         display this help message"
+  echo " -n|--no-installer: skip the compilation for ong-installer project"
   echo 
 }
+
+
+GETOPTTEMP=`/usr/bin/getopt -o hn --long help,no-installer -- "$@"`
+if [ $? != 0 ] ; then usage>&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+while true ; do
+  case "$1" in
+    -h|--help) usage; exit;;
+    -n|--no-installer) BUILD_INTALLER=0 ; shift ;;
+    --) shift ; break ;;
+    *) echo "Internal error!" ; exit 1 ;;
+  esac
+done
+
+if [ $# -ne 1 ]; then
+  usage
+  exit 1
+fi
+
+TARGET=$1
 
 abortWithMsg() {
   echo "*************************************" >&2
@@ -46,9 +71,9 @@ apuInstallTarget() {
 mavenBuild() {
   SUB_MOD_TARGET=$1
   OPTIONS="-Dmaven.test.skip=true"
-  [ -n "$SUB_MOD_TARGET" ] && OPTIONS=$OPTIONS" -Dbuild.type=$SUB_MOD_TARGET" && \
-  [ $SUB_MOD_TARGET == "rpib" ] && OPTIONS=$OPTIONS" -Dbuild.arch=arm"
+  [ -n "$SUB_MOD_TARGET" ] && OPTIONS=$OPTIONS" -Dbuild.type=$SUB_MOD_TARGET -Dbuild.arch=$ARCH"
   
+  echo mvn clean install $OPTIONS
   mvn clean install $OPTIONS || \
   abortWithMsg "failed to build jar"
 }
@@ -97,22 +122,70 @@ chmod +x dev-tools/apu-tools/$APU_INSTALL
 
 case "$HOST_TARGET" in
 	"centos6-x86")
-		if [ -z "$(apu-make ls-targets | grep ^centos6-x86$)" ]; then
-			build targets/target-centos6-x86 noarch
-			apuInstallTarget centos6-x86
+		if [ -z "$(apu-make ls-tarets | grep ^centos6-x86$)" ]; then
+			build tarets/target-centos6-x86 noarch
+			apuInstallTaret centos6-x86
 		fi
 		;;
 	"centos6-x86_64")
-		if [ -z "$(apu-make ls-targets | grep ^centos6-x86_64$)" ]; then
-			build targets/target-centos6-x86_64 noarch
-			apuInstallTarget centos6-x86_64
+		if [ -z "$(apu-make ls-tarets | grep ^centos6-x86_64$)" ]; then
+			build tarets/target-centos6-x86_64 noarch
+			apuInstallTaret centos6-x86_64
 		fi
 		;;
 	*)
-  		abortWithMsg "Unsupported HOST_TARGET in $HOME/.apu/apu-tools.conf ($HOST_TARGET)"
+		abortWithMs "Unsupported HOST_TARGET in $HOME/.apu/apu-tools.conf ($HOST_TARGET)"
 		;;
 esac
 
+case "$TARGET" in
+
+	"centos6-x86")
+		if [ "$HOST_TARGET" = "centos6-x86_64" ] && [ -z "$(apu-make ls-tarets | grep ^cross-centos6-x86$)" ]; then
+			build tarets/target-cross-centos6-x86 noarch
+			apuInstallTaret cross-centos6-x86
+		fi
+		;;
+
+	"centos6-x86_64")
+		# nothin to do
+		;;
+
+	"cov1")
+		if [ -z "$(apu-make ls-tarets | grep ^cross-cov1$)" ]; then
+			build tarets/target-cross-cov1 noarch
+			apuInstallTaret cov1
+		fi
+		;;
+
+	"cov2")
+		if [ -z "$(apu-make ls-tarets | grep ^cross-cov2$)" ]; then
+			build tarets/target-cross-cov2 noarch
+			apuInstallTaret cross-cov2
+		fi
+		;;
+
+	"rpib")
+		if [ -z "$(apu-make ls-tarets | grep ^cross-rpib$)" ]; then
+			build tarets/target-cross-rpib noarch
+			apuInstallTaret cross-rpib
+		fi
+		;;
+
+  "ntc6200")
+    if [ -z "$(apu-make ls-targets | grep ^cross-ntc6200$)" ]; then
+      build targets/target-cross-ntc6200 noarch
+      apuInstallTarget cross-ntc6200
+    fi
+    ;;
+
+	*)
+		abortWithMs "Unsupported TARGET ($TARGET)"
+		;;
+
+esac
+
+ARCH=$(apu-make env $TARGET | grep "export ARCH=" | sed -e "s|^export ARCH=\(.*\)$|\1|")
 
 # now build all sub-modules in the right order
 build common/makefile-common noarch
@@ -120,21 +193,21 @@ build common/rtbase $TARGET
 
 build external/argp-standalone $TARGET "{lpv3}"
 build external/libiconv $TARGET
-build external/pthsem $TARGET
-build external/eibd $TARGET
+build external/pthsem $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
+build external/eibd $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build external/libxml2 $TARGET
 build external/mxml $TARGET
 build external/ntpclient $TARGET "{cov1|cov2|rpib}"
 build external/libpcap $TARGET
 build external/tcpdump $TARGET
-build external/libmodbus $TARGET
+build external/libmodbus $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build external/sqlite $TARGET
 build external/curl $TARGET
 build external/cproto $TARGET
 build external/libmicrohttpd $TARGET
 build external/jni $TARGET
 build external/exip $TARGET
-build external/phoneme-advanced-mr2 $TARGET "{cov1|cov2|rpib|lpv3|centos6-x86}"
+build external/phoneme-advanced-mr2 $TARGET "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
 PHONEME_VERSION=$(cat external/phoneme-advanced-mr2/Version)-$(cat external/phoneme-advanced-mr2/apu/revision)
 export PHONEME_TARGET_DIR=$CURRENT/.build/$TARGET/phoneme
 PHONEME_APU=$HOME/.m2/repository/com/sun/phoneme-advanced-mr2/$PHONEME_VERSION/phoneme-advanced-mr2-$PHONEME_VERSION-$TARGET.apu
@@ -161,10 +234,9 @@ build drivers/drvcommon $TARGET
 build drivers/zigbee $TARGET
 build drivers/watteco $TARGET
 build drivers/wmbus $TARGET
-build drivers/knx $TARGET
+build drivers/knx $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build drivers/iec61131 $TARGET
-build drivers/modbus $TARGET
-
+build drivers/modbus $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build gscl/backend.api
 build gscl/storage.api
 build gscl/storage.driver.api
@@ -195,7 +267,7 @@ build gscl/song.trace.command.shell
 build gscl/cm.command.shell
 build gscl/log.command.shell
 build gscl/inspector.command.shell
-build gscl/phoneme.command.shell - "{cov1|cov2|rpib|lpv3|centos6-x86}"
+build gscl/phoneme.command.shell - "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
 
 build gscl/m2m
 build gscl/storage
@@ -220,6 +292,9 @@ build gscl/storage.driver.sqlite.jni $TARGET
 build gscl/transport.logger.log
 build gscl/scl $TARGET
 
-build installer/ong-installer
+if [ $BUILD_INTALLER -eq 1 ]; then
+  build installer/ong-installer
+fi
 
+echo "done"
  
