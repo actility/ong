@@ -110,25 +110,24 @@ build() {
   cd $CURRENT
 }
 
-
+chmod +x dev-tools/apu-tools/$APU_MAKE
+chmod +x dev-tools/apu-tools/$APU_INSTALL
+export PATH=$(pwd)/dev-tools/apu-tools/:$PATH
 
 [ -x $(which $APU_MAKE) ] || abortWithMsg "apu-make not found"
 [ -z "$TARGET" ] && usage && abortWithMsg "<target> is missing"
 [ -f $HOME/.apu/apu-tools.conf ] || abortWithMsg "APU environment not set; please refer to README file"
 source $HOME/.apu/apu-tools.conf
 
-chmod +x dev-tools/apu-tools/$APU_MAKE
-chmod +x dev-tools/apu-tools/$APU_INSTALL
-
 case "$HOST_TARGET" in
 	"centos6-x86")
-		if [ -z "$(apu-make ls-targets | grep ^centos6-x86$)" ]; then
+		if [ -z "$($APU_MAKE ls-targets | grep ^centos6-x86$)" ]; then
 			build targets/target-centos6-x86 noarch
 			apuInstallTarget centos6-x86
 		fi
 		;;
 	"centos6-x86_64")
-		if [ -z "$(apu-make ls-targets | grep ^centos6-x86_64$)" ]; then
+		if [ -z "$($APU_MAKE ls-targets | grep ^centos6-x86_64$)" ]; then
 			build targets/target-centos6-x86_64 noarch
 			apuInstallTarget centos6-x86_64
 		fi
@@ -141,9 +140,9 @@ esac
 case "$TARGET" in
 
 	"centos6-x86")
-		if [ "$HOST_TARGET" = "centos6-x86_64" ] && [ -z "$(apu-make ls-targets | grep ^cross-centos6-x86$)" ]; then
+		if [ "$HOST_TARGET" = "centos6-x86_64" ] && [ -z "$($APU_MAKE ls-targets | grep ^cross-centos6-x86$)" ]; then
 			build targets/target-cross-centos6-x86 noarch
-			apuInstallTarget cross-centos6-x86
+			apuInstallTarget centos6-x86
 		fi
 		;;
 
@@ -152,28 +151,28 @@ case "$TARGET" in
 		;;
 
 	"cov1")
-		if [ -z "$(apu-make ls-targets | grep ^cross-cov1$)" ]; then
+		if [ -z "$($APU_MAKE ls-targets | grep ^cross-cov1$)" ]; then
 			build targets/target-cross-cov1 noarch
 			apuInstallTarget cov1
 		fi
 		;;
 
 	"cov2")
-		if [ -z "$(apu-make ls-targets | grep ^cross-cov2$)" ]; then
+		if [ -z "$($APU_MAKE ls-targets | grep ^cross-cov2$)" ]; then
 			build targets/target-cross-cov2 noarch
-			apuInstallTarget cross-cov2
+			apuInstallTarget cov2
 		fi
 		;;
 
 	"rpib")
-		if [ -z "$(apu-make ls-targets | grep ^cross-rpib$)" ]; then
+		if [ -z "$($APU_MAKE ls-targets | grep ^cross-rpib$)" ]; then
 			build targets/target-cross-rpib noarch
-			apuInstallTarget cross-rpib
+			apuInstallTarget rpib
 		fi
 		;;
 
   "ntc6200")
-    if [ -z "$(apu-make ls-targets | grep ^cross-ntc6200$)" ]; then
+    if [ -z "$($APU_MAKE ls-targets | grep ^cross-ntc6200$)" ]; then
       build targets/target-cross-ntc6200 noarch
       apuInstallTarget ntc6200
     fi
@@ -185,7 +184,7 @@ case "$TARGET" in
 
 esac
 
-ARCH=$(apu-make env $TARGET | grep "export ARCH=" | sed -e "s|^export ARCH=\(.*\)$|\1|")
+ARCH=$($APU_MAKE env $TARGET | grep "export ARCH=" | sed -e "s|^export ARCH=\(.*\)$|\1|")
 
 # now build all sub-modules in the right order
 build dev-tools/apu-tools noarch

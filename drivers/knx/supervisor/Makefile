@@ -52,9 +52,9 @@ EXENAME = $(EXE_TARGET)/knx.x
 STATIC_LIBS= \
 $(OUTPUT_PATH)/knx/lib/lib/libknx.a
 DYNAMIC_LIBS= \
--L$(ROOTACT)/shlib -ldrvcommon -lxo -ldIa \
--L$(ROOTACT)/lib -leibclient \
--lrtbase -lm -lrt
+-L$(ROOTACT)/shlib -ldrvcommon -lxo -ldIa -lrtbase \
+-L$(ROOTACT)/lib -leibclient -xml2 \
+-lm -lrt
 
 ifeq ($(SYSTEM),lpv3)
 DYNAMIC_LIBS += -liconv

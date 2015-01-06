@@ -51,8 +51,9 @@ EXENAME = $(EXE_TARGET)/zigbee.x
 STATIC_LIBS = \
 $(ROOTACT)/AZAP/lib/libazap.a
 DYNAMIC_LIBS = \
--L$(ROOTACT)/shlib -ldrvcommon -lxo -ldIa \
--lrtbase -lm -lrt
+-L$(ROOTACT)/shlib -ldrvcommon -lxo -ldIa -lrtbase \
+-L$(ROOTACT)/lib -lxml2 \
+-lm -lrt
 
 ifeq ($(SYSTEM),cov1)
 DYNAMIC_LIBS += -lpthread
