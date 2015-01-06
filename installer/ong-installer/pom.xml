@@ -39,7 +39,7 @@
     <version>2.0.0</version>
   </parent>
   <artifactId>ong-installer</artifactId>
-  <version>3.4.2</version>
+  <version>3.4.3</version>
   <packaging>jar</packaging>
 
   <name>ONG Installer</name>
@@ -70,142 +70,142 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
+      <version>2.4.3</version>
       <classifier>centos6-x86</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
+      <version>2.4.3</version>
       <classifier>centos6-x86_64</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
+      <version>2.4.3</version>
       <classifier>cov1</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
+      <version>2.4.3</version>
       <classifier>cov2</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
+      <version>2.4.3</version>
       <classifier>lpv3</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
+      <version>2.4.3</version>
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
+      <version>2.4.3</version>
       <classifier>ntc6200</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
+      <version>1.4.14-1</version>
       <classifier>centos6-x86</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
+      <version>1.4.14-1</version>
       <classifier>centos6-x86_64</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
+      <version>1.4.14-1</version>
       <classifier>cov1</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
+      <version>1.4.14-1</version>
       <classifier>cov2</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
+      <version>1.4.14-1</version>
       <classifier>lpv3</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
+      <version>1.4.14-1</version>
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
+      <version>1.4.14-1</version>
       <classifier>ntc6200</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
+      <version>1.4.11-1</version>
       <classifier>centos6-x86</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
+      <version>1.4.11-1</version>
       <classifier>centos6-x86_64</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
+      <version>1.4.11-1</version>
       <classifier>cov2</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
+      <version>1.4.11-1</version>
       <classifier>lpv3</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
+      <version>1.4.11-1</version>
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
+      <version>1.4.11-1</version>
       <classifier>ntc6200</classifier>
       <type>apu</type>
    </dependency>
@@ -213,142 +213,142 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
+      <version>1.8.5-1</version>
       <classifier>centos6-x86</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
+      <version>1.8.5-1</version>
       <classifier>centos6-x86_64</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
+      <version>1.8.5-1</version>
       <classifier>cov1</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
+      <version>1.8.5-1</version>
       <classifier>cov2</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
+      <version>1.8.5-1</version>
       <classifier>lpv3</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
+      <version>1.8.5-1</version>
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
+      <version>1.8.5-1</version>
       <classifier>ntc6200</classifier>
       <type>apu</type>
    </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
+      <version>1.2.4-1</version>
       <classifier>centos6-x86</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
+      <version>1.2.4-1</version>
       <classifier>centos6-x86_64</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
+      <version>1.2.4-1</version>
       <classifier>cov1</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
+      <version>1.2.4-1</version>
       <classifier>cov2</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
+      <version>1.2.4-1</version>
       <classifier>lpv3</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
+      <version>1.2.4-1</version>
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
+      <version>1.2.4-1</version>
       <classifier>ntc6200</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
+      <version>1.0.3-1</version>
       <classifier>centos6-x86</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
+      <version>1.0.3-1</version>
       <classifier>centos6-x86_64</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
+      <version>1.0.3-1</version>
       <classifier>cov2</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
+      <version>1.0.3-1</version>
       <classifier>lpv3</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
+      <version>1.0.3-1</version>
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
+      <version>1.0.3-1</version>
       <classifier>ntc6200</classifier>
       <type>apu</type>
     </dependency>
@@ -440,44 +440,37 @@
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
+      <version>1.0.36-1</version>
       <classifier>centos6-x86</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
+      <version>1.0.36-1</version>
       <classifier>cov2</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
+      <version>1.0.36-1</version>
       <classifier>lpv3</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
+      <version>1.0.36-1</version>
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
+      <version>1.0.36-1</version>
       <classifier>ntc6200</classifier>
       <type>apu</type>
     </dependency>
@@ -526,44 +519,44 @@
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
+      <version>1.2.0-1</version>
       <classifier>centos6-x86</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
+      <version>1.2.0-1</version>
       <classifier>centos6-x86_64</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
+      <version>1.2.0-1</version>
       <classifier>cov2</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
+      <version>1.2.0-1</version>
       <classifier>lpv3</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
+      <version>1.2.0-1</version>
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
+      <version>1.2.0-1</version>
       <classifier>ntc6200</classifier>
       <type>apu</type>
     </dependency>
@@ -619,51 +612,51 @@
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
+      <version>1.0.1-1</version>
       <classifier>centos6-x86</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
+      <version>1.0.1-1</version>
       <classifier>centos6-x86_64</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
+      <version>1.0.1-1</version>
       <classifier>cov1</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
+      <version>1.0.1-1</version>
       <classifier>cov2</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
+      <version>1.0.1-1</version>
       <classifier>lpv3</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
+      <version>1.0.1-1</version>
       <classifier>rpib</classifier>
       <type>apu</type>
     </dependency>
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
+      <version>1.0.1-1</version>
       <classifier>ntc6200</classifier>
       <type>apu</type>
     </dependency>
@@ -698,9 +691,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>apu-install</artifactId>
-      <version>1.1-0</version>
+      <version>1.1-1</version>
       <type>apu</type>
     </dependency>
 

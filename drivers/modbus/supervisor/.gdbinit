@@ -1,1 +1,1 @@
-set env LD_LIBRARY_PATH=../../shlib:../contrib/root/lib
+set env LD_LIBRARY_PATH=../../lib:../contrib/root/lib

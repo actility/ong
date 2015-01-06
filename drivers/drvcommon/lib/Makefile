@@ -54,7 +54,7 @@ PRELIMINARY = \
  $(MKWHAT) -p drvcommon -vf ../Version > _whatstr.h
 
 DYNAMIC_LIBS=\
--L$(ROOTACT)/shlib -lrtbase -ldIa \
+-L$(ROOTACT)/lib -lrtbase -ldIa \
 
 CFLAGS += -Wall #-Werror
 

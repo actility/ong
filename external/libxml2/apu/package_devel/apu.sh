@@ -21,13 +21,13 @@ buildApuImage()
   echo "apu ROOTACT: $ROOTACT"
   
   rm -rf apu && \
-  mkdir -p apu/data/shlib && \
+  mkdir -p apu/data/lib && \
   mkdir -p apu/data/include && \
   mkdir -p apu/control && \
   XML_VERSION=$(projectVersion) && \
-  cp lib/libxml2.so.$XML_VERSION apu/data/shlib/ && \
+  cp lib/libxml2.so.$XML_VERSION apu/data/lib/ && \
   cp -r include/* apu/data/include/ && \
-  echo "cd \$ROOTACT/shlib" > apu/control/postinst && \
+  echo "cd \$ROOTACT/lib" > apu/control/postinst && \
   echo "ln -fs libxml2.so.$XML_VERSION libxml2.so" >> apu/control/postinst && \
   echo "ln -fs libxml2.so.$XML_VERSION libxml2.so.2" >> apu/control/postinst
 }

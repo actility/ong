@@ -53,7 +53,7 @@ STATIC_LIBS= \
 $(OUTPUT_PATH)/watteco/tictools/lib/libtictools.a \
 $(OUTPUT_PATH)/watteco/lib/lib/libwatteco.a
 DYNAMIC_LIBS= \
--L$(ROOTACT)/shlib -ldrvcommon -lxo -ldIa -lrtbase \
+-L$(ROOTACT)/lib -ldrvcommon -lxo -ldIa -lrtbase \
 -L$(ROOTACT)/lib -lxml2 \
 -lm -lrt
 

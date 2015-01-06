@@ -69,13 +69,13 @@ $(ROOTACT)/xo/libexi/lib/libxoexi.a \
 $(ROOTACT)/rtbase/lib/librtbase.a
 DYNAMIC_LIBS= \
 -L$(ROOTACT)/lib -lexip \
--L$(ROOTACT)/shlib -lxml2 -lrt
+-L$(ROOTACT)/lib -lxml2 -lrt
 else
 STATIC_LIBS = \
 $(ROOTACT)/xo/lib/lib/libxo.a \
 $(ROOTACT)/rtbase/lib/librtbase.a
 DYNAMIC_LIBS= \
--L$(ROOTACT)/shlib -lxml2 -lrt
+-L$(ROOTACT)/lib -lxml2 -lrt
 endif
 
 STATIC_LIB=

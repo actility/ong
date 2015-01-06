@@ -55,7 +55,7 @@ STATIC_LIBS=-L$(ROOTACT)/libcoap/libcoap.a
 
 DYNAMIC_LIBS= \
 -L$(OUTPUT_PATH)/libdIa/lib -ldIa \
--L$(ROOTACT)/shlib -lrtbase
+-L$(ROOTACT)/lib -lrtbase
 
 CFLAGS += -Wall -Werror
 

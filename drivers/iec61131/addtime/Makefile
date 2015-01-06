@@ -54,7 +54,7 @@ LASTACTIONS = \
 cp -vf $(CURRENT_PROJ_DIR)/test.sh $(EXE_TARGET) && \
 cp -vf $(CURRENT_PROJ_DIR)/LOOP $(EXE_TARGET) && \
 cd $(EXE_TARGET) && \
-LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib ./test.sh
+LD_LIBRARY_PATH=$(ROOTACT)/lib ./test.sh
 endif
 
 STATIC_LIBS=

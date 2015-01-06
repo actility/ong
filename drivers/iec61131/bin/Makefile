@@ -55,7 +55,7 @@ LASTACTIONS = \
 cp -vf $(CURRENT_PROJ_DIR)/test.sh $(EXE_TARGET) && \
 cp -vf $(CURRENT_PROJ_DIR)/test.py $(EXE_TARGET) && \
 cd $(EXE_TARGET) && \
-LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib ./test.sh
+LD_LIBRARY_PATH=$(ROOTACT)/lib ./test.sh
 endif
 
 
@@ -63,7 +63,7 @@ STATIC_LIBS= \
 $(OUTPUT_PATH)/iec61131/libinterv2/lib/libinterv2.a
 DYNAMIC_LIBS= \
 -L$(ROOTACT)/lib -lmxml \
--L$(ROOTACT)/shlib -ldIa -lrtbase -lm -lrt
+-L$(ROOTACT)/lib -ldIa -lrtbase -lm -lrt
 
 ifeq ($(SYSTEM),cov1)
 DYNAMIC_LIBS += -lpthread

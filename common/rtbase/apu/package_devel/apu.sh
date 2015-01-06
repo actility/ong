@@ -15,14 +15,14 @@ buildApuImage()
   mkdir -p apu/data/rtbase/base && \
   mkdir -p apu/data/rtbase/shells && \
   mkdir -p apu/data/rtbase/lib && \
-  mkdir -p apu/data/shlib && \
+  mkdir -p apu/data/lib && \
   mkdir -p apu/control && \
-  cp rtbase/lib/lib/librtbase.so apu/data/shlib/librtbase-$RTBASE_VERSION.so && \
+  cp rtbase/lib/lib/librtbase.so apu/data/lib/librtbase-$RTBASE_VERSION.so && \
   cp rtbase/include/* apu/data/rtbase/include/ && \
   cp rtbase/base/* apu/data/rtbase/base/ && \
   cp rtbase/shells/*.sh apu/data/rtbase/shells/ && \
   cp rtbase/lib/lib/*.a apu/data/rtbase/lib/ && \
-  echo "cd \$ROOTACT/shlib" > apu/control/postinst && \
+  echo "cd \$ROOTACT/lib" > apu/control/postinst && \
   echo "ln -s librtbase-$RTBASE_VERSION.so librtbase.so" >> apu/control/postinst && \
   echo "chmod +x \$ROOTACT/rtbase/base/*.sh" >> apu/control/postinst
 }

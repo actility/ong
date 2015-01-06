@@ -54,9 +54,9 @@ mkdir -p $(BIN_TARGET) && \
 cp -vf $(EXENAME) $(BIN_TARGET)
 
 DYNAMIC_LIBS= \
--L$(ROOTACT)/shlib -lrtbase \
+-L$(ROOTACT)/lib -lrtbase \
 -L$(ROOTACT)/lib -lxml2 \
--L$(ROOTACT)/shlib -lxo \
+-L$(ROOTACT)/lib -lxo \
 -L$(ROOTACT)/lib -lcurl -lmicrohttpd \
 -L$(ROOTACT)/lib -lSongOverHttp \
 -L$(ROOTACT)/lib -lHttpSubsMgmt

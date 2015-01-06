@@ -189,12 +189,14 @@ ARCH=$($APU_MAKE env $TARGET | grep "export ARCH=" | sed -e "s|^export ARCH=\(.*
 # now build all sub-modules in the right order
 build common/makefile-common noarch
 build common/rtbase $TARGET
+[ "$HOST_TARGET" != "$TARGET" ] && build common/rtbase $HOST_TARGET
 
 build external/argp-standalone $TARGET "{lpv3}"
 build external/libiconv $TARGET
 build external/pthsem $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build external/eibd $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build external/libxml2 $TARGET
+[ "$HOST_TARGET" != "$TARGET" ] && build external/libxml2 $HOST_TARGET
 build external/mxml $TARGET
 build external/ntpclient $TARGET "{cov1|cov2|rpib}"
 build external/libpcap $TARGET
@@ -220,6 +222,7 @@ build dev-tools/apu-maven-plugin
 build dev-tools/cocoon-maven-plugin
 
 build common/xo $TARGET
+[ "$HOST_TARGET" != "$TARGET" ] && build common/xo $HOST_TARGET
 build common/libcoap $TARGET
 build common/libdIa $TARGET
 build common/m2mxoref $HOST_TARGET

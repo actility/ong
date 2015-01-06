@@ -60,7 +60,7 @@ LASTACTIONS = \
  else echo "warning: no INC_TARGET provided... header files not copied"; \
  fi 
 
-DYNAMIC_LIBS=-L$(ROOTACT)/shlib -lxml2
+DYNAMIC_LIBS=-L$(ROOTACT)/lib -lxml2
 
 #CFLAGS += -Wall -Werror
 

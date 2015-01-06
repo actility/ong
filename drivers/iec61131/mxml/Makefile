@@ -57,14 +57,14 @@ cp -vf $(CURRENT_PROJ_DIR)/FILTER $(EXE_TARGET) && \
 cp -vf $(CURRENT_PROJ_DIR)/*.xml $(EXE_TARGET) && \
 cp -vf $(CURRENT_PROJ_DIR)/*.obx $(EXE_TARGET) && \
 cd $(EXE_TARGET) && \
-LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib ./test.sh
+LD_LIBRARY_PATH=$(ROOTACT)/lib ./test.sh
 endif
 
 STATIC_LIBS=
 DYNAMIC_LIBS= \
 -L$(ROOTACT)/lib -lmxml \
 $(MALLOC) \
--L$(ROOTACT)/shlib -lrtbase \
+-L$(ROOTACT)/lib -lrtbase \
 -lrt -lpthread
 
 EXE_BASENAME=xml lookxml scanObix filterxml base64decode
@@ -104,5 +104,5 @@ all_exe: build_dependencies $(OBJS) $(EXE_BASENAME)
 .PHONY: all_exe
 
 tests :
-	LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib $(EXE_TARGET)/filterxml.x -f $(CURRENT_PROJ_DIR)/plc.xml -w | xmllint --format -
+	LD_LIBRARY_PATH=$(ROOTACT)/lib $(EXE_TARGET)/filterxml.x -f $(CURRENT_PROJ_DIR)/plc.xml -w | xmllint --format -
 

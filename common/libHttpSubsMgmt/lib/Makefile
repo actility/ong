@@ -67,8 +67,8 @@ LASTACTIONS = \
  fi 
 
 DYNAMIC_LIBS=\
--L$(ROOTACT)/shlib -lrtbase \
--L$(ROOTACT)/shlib -lxo \
+-L$(ROOTACT)/lib -lrtbase \
+-L$(ROOTACT)/lib -lxo \
 -L$(ROOTACT)/lib/ -lSongOverHttp
 
 CFLAGS += -Wall -Werror

@@ -49,13 +49,13 @@ EXENAME = $(EXE_TARGET)/m2m_zcl_0x0000_abstraction_test.x
 
 ifeq ($(UNARY_TEST),on)
 LASTACTIONS = \
-LD_LIBRARY_PATH=$(ROOTACT)/shlib $(EXENAME)
+LD_LIBRARY_PATH=$(ROOTACT)/lib $(EXENAME)
 endif
 
 STATIC_LIBS = \
 $(ROOTACT)/AZAP/lib/libazap.a
 DYNAMIC_LIBS = \
--L$(ROOTACT)/shlib -ldrvcommon -lxo -ldIa -lrtbase \
+-L$(ROOTACT)/lib -ldrvcommon -lxo -ldIa -lrtbase \
 -L$(ROOTACT)/lib -lxml2 \
 -lm -lrt
 

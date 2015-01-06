@@ -16,17 +16,17 @@ buildApuImage()
   rm -rf apu && \
   mkdir -p apu/data/xo/include/ && \
   mkdir -p apu/data/xo/lib/ && \
-  mkdir -p apu/data/shlib/ && \
+  mkdir -p apu/data/lib/ && \
   mkdir -p apu/control && \
   cp xo/include/*.h apu/data/xo/include/ && \
   cp xo/lib/lib/*.a apu/data/xo/lib/ && \
-  cp xo/lib/lib/libxo.so apu/data/shlib/libxo-$XO_VERSION.so && \
-  echo "cd \$ROOTACT/shlib" > apu/control/postinst && \
+  cp xo/lib/lib/libxo.so apu/data/lib/libxo-$XO_VERSION.so && \
+  echo "cd \$ROOTACT/lib" > apu/control/postinst && \
   echo "ln -s libxo-$XO_VERSION.so libxo.so" >> apu/control/postinst && \
   if [ -f xo/libexi/lib/libxoexi.so ]
   then
-    cp xo/libexi/lib/libxoexi.so apu/data/shlib/libxoexi-$XO_VERSION.so && \
-    echo "cd \$ROOTACT/shlib" >> apu/control/postinst && \
+    cp xo/libexi/lib/libxoexi.so apu/data/lib/libxoexi-$XO_VERSION.so && \
+    echo "cd \$ROOTACT/lib" >> apu/control/postinst && \
     echo "ln -sf libxoexi-$XO_VERSION.so libxoexi.so" >> apu/control/postinst
   fi
 }

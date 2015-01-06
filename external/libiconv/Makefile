@@ -14,12 +14,12 @@
 ###############################################################################
 
 
-ROOT_PATH = $(shell pwd)
+ROOT_PATH = $(shell cd .. && pwd)
 OUTPUT_PATH ?= $(ROOT_PATH)
 
-SRC_PATH = $(ROOT_PATH)/libiconv-1.11/src
-SO_TARGET = $(OUTPUT_PATH)/libiconv-1.11/$(ARCH)/sharedlib/
-OBJS_TARGET = $(OUTPUT_PATH)/libiconv-1.11/$(ARCH)/obj/
+SRC_PATH = $(ROOT_PATH)/libiconv/libiconv-1.11/src
+SO_TARGET = $(OUTPUT_PATH)/libiconv/libiconv-1.11/$(ARCH)/sharedlib/
+OBJS_TARGET = $(OUTPUT_PATH)/libiconv/libiconv-1.11/$(ARCH)/obj/
 
 PRELIMINARY =
 

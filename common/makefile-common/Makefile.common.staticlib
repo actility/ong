@@ -17,7 +17,7 @@
 # define phony targets
 .PHONY: clean all build_o_target build_a_target preliminaryAction lastAction
 
-all: preliminaryAction build_a_target build_o_target $(LIBNAME) lastAction
+all: preliminaryAction build_so_target build_a_target build_o_target $(SONAME) $(LIBNAME) lastAction
 	@ echo -e "\033[0;1m$(LIBNAME) done\033[0m"
 
 preliminaryAction: $(PRELIMINARY_DEP)
@@ -30,6 +30,10 @@ lastAction: $(LASTACTIONS_DEP)
 
 build_o_target:
 	@ ( [ -n "$(OBJS_TARGET)" ] && [ ! -e $(OBJS_TARGET) ] && mkdir -vp $(OBJS_TARGET) ) || [ true ]
+
+build_so_target:
+	@echo "Building .so target"
+	@ ( [ -n "$(SO_TARGET)" ] && [ ! -e $(SO_TARGET) ] && mkdir -vp $(SO_TARGET) ) || [ true ]        
 
 build_a_target:
 	@ ( [ -n "$(A_TARGET)" ] && [ ! -e $(A_TARGET) ] && mkdir -vp $(A_TARGET) ) || [ true ]

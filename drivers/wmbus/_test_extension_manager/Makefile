@@ -59,7 +59,7 @@ STATIC_LIBS= \
 $(OUTPUT_PATH)/wmbus/lib/lib/libwmbus.a \
 $(ROOTACT)/drvcommon/lib/libdrvcommon.a
 DYNAMIC_LIBS = \
--L$(ROOTACT)/shlib -lrtbase \
+-L$(ROOTACT)/lib -lrtbase \
 -ldl -lrt
 
 ifeq ($(SYSTEM),cov1)
@@ -100,7 +100,7 @@ unary_tests:
 	@echo TESTS
 	@for file in $(shell ls -1 $(EXE_TARGET)/*.x); do \
 		echo Running $$file ; \
-		LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib $$file || exit 1 ;\
+		LD_LIBRARY_PATH=$(ROOTACT)/lib $$file || exit 1 ;\
 	done
 
 .PHONY: unary_tests

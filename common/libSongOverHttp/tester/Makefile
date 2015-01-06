@@ -56,7 +56,7 @@ cp -vf $(EXENAME) $(BIN_TARGET)
 DYNAMIC_LIBS= \
 -L$(ROOTACT)/lib -lSongOverHttp \
 -L$(ROOTACT)/lib -lcurl -lmicrohttpd \
--L$(ROOTACT)/shlib -lrtbase
+-L$(ROOTACT)/lib -lrtbase
 
 CFLAGS += -Wall -Werror
 
