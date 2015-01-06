@@ -1,9 +1,15 @@
 
 buildProject()
 {
+  OPTIONS=
+  if [ $1 == "centos6-x86" -o $1 == "centos6-x86_64" ]
+  then
+    OPTIONS="UNARY_TEST=on"
+  fi
+
   cd wmbus && \
   make clean && \
-  make UNARY_TEST=on
+  make $OPTIONS
 
   return $?
 }
