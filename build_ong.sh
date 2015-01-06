@@ -255,7 +255,7 @@ build gscl/shutdown.hook.ni.api
 build gscl/song.binding.coap.ni.api
 build gscl/song.binding.http.api
 build gscl/song.binding.http.ni.api
-#build gscl/storage.driver.sqlite.ni.api
+build gscl/storage.driver.sqlite.ni.api
 build gscl/transport.logger.api
 build gscl/org.apache.felix.shell.acy.api
 
@@ -292,7 +292,7 @@ build gscl/log
 build gscl/shutdown.hook.jni $TARGET
 build gscl/song.binding.coap.jni $TARGET
 build gscl/song.binding.http.jni $TARGET
-#build gscl/storage.driver.sqlite.jni $TARGET
+build gscl/storage.driver.sqlite.jni $TARGET
 build gscl/transport.logger.log
 build gscl/gscl $TARGET
 build common/supervision

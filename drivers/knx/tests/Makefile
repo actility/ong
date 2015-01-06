@@ -59,7 +59,7 @@ $(ROOTACT)/drvcommon/lib/libdrvcommon.a \
 $(OUTPUT_PATH)/knx/lib/lib/libknx.a
 DYNAMIC_LIBS= \
 -L$(ROOTACT)/lib -lxo -ldIa -lrtbase \
--L$(ROOTACT)/lib -leibclient \
+-L$(ROOTACT)/lib -leibclient -lxml2 \
 -lm -lrt
 
 ifeq ($(SYSTEM),cov1)
