@@ -236,7 +236,7 @@ build drivers/zigbee $TARGET
 build drivers/watteco $TARGET
 build drivers/wmbus $TARGET
 build drivers/knx $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
-build drivers/iec61131 $TARGET
+build drivers/iec61131 $TARGET "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
 build drivers/modbus $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build gscl/backend.api
 build gscl/storage.api
