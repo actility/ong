@@ -1,39 +1,98 @@
-include $(ROOTACT)/rtbase/base/makefile.def
+#
+# Copyright   Actility, SA. All Rights Reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version
+# 2 only, as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License version 2 for more details (a copy is
+# included at /legal/license.txt).
+#
+# You should have received a copy of the GNU General Public License
+# version 2 along with this work; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+#
+# Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+# or visit www.actility.com if you need additional
+# information or have any questions.
+#
+# id $Id$  
+# author $Author$
+# version $Revision$
+# lastrevision $Date$
+# modifiedby $LastChangedBy$
+# lastmodified $LastChangedDate$
 
-COAP=$(ROOTACT)/libcoap_29Oct2013
-COAP=$(ROOTACT)/libcoap
+###############################################################################
 
-LIBCOAP_VERSION=$(shell grep VERSION $(COAP)/Makefile | cut --delimiter='=' -f2 | cut --delimiter="." -f1)
+
+ROOTACT ?= $(shell cd .. && pwd)
+OUTPUT_PATH ?= $(ROOTACT)
+export OUTPUT_PATH
+
+BIN_TARGET ?= $(OUTPUT_PATH)/lib/
+INC_TARGET ?= $(OUTPUT_PATH)/include/
+
+PROJECTS_DIR = $(ROOTACT)/libdIa
+REL_PROJ_PATH = libdIa/
+CURRENT_PROJ_DIR = $(ROOTACT)/$(REL_PROJ_PATH)
+TARGET_PROJ_DIR = $(OUTPUT_PATH)/$(REL_PROJ_PATH)
+
+SRC_PATH = $(CURRENT_PROJ_DIR)/
+SO_TARGET = $(TARGET_PROJ_DIR)/lib/
+A_TARGET = $(TARGET_PROJ_DIR)/lib/
+OBJS_TARGET = $(TARGET_PROJ_DIR)/obj/
+
+# Executable name
+LIBNAME = $(A_TARGET)/libdIa.a
+SONAME = $(SO_TARGET)/libdIa.so
+MKWHAT = $(ROOTACT)/rtbase/shells/mkwhat.sh
+
+LIBCOAP_VERSION=$(shell grep VERSION $(ROOTACT)/libcoap/Makefile | cut -d'=' -f2 | cut -d"." -f1)
 ifeq ($(LIBCOAP_VERSION),)
-	LIBCOAP_VERSION=2
+  LIBCOAP_VERSION=2
+endif 
+
+PRELIMINARY = \
+ $(MKWHAT) -p dia -vf Version > _whatstr.h
+
+STATIC_LIBS=\
+$(ROOTACT)/libcoap/libcoap.a
+
+DYNAMIC_LIBS=\
+-L$(ROOTACT)/shlib -lrtbase
+
+#CFLAGS += -Wall -Werror
+
+# List of object file needed for the final program
+OBJS = \
+$(OBJS_TARGET)/dIa.o \
+$(OBJS_TARGET)/dnscache.o \
+$(OBJS_TARGET)/options.o \
+$(OBJS_TARGET)/version.o \
+$(OBJS_TARGET)/hashtbl.o
+
+INCLUDES = \
+$(SRC_PATH) \
+$(PROJECTS_DIR)/include \
+$(ROOTACT)/include \
+$(ROOTACT)/libcoap/ \
+$(ROOTACT)/rtbase/include
+
+DEFINES = _LINUX_ LIBCOAP_VERSION=$(LIBCOAP_VERSION) 
+PROJ_DEFINES = SHARED_LIB 
+
+ifeq ($(TARGET),centos6-x86_64)
+EXTRA_CFLAGS=-DLINUX_64
+export EXTRA_CFLAGS
 endif
 
-CFLAGS+=-fPIC -I$(COAP) -I$(ROOTACT)/rtbase/include -DLIBCOAP_VERSION=$(LIBCOAP_VERSION) -DACTILITY_CHANGES
-ifeq ($(SYSTEM),macosx_x86)
-	CFLAGS+=-fnested-functions
-endif
-LDFLAGS+=-L$(ROOTACT)/shlib
-LIBOBJS=dIa.o dnscache.o options.o version.o hashtbl.o
-LIBCOAP=$(COAP)/libcoap.a
+include $(ROOTACT)/Makefile.common.compilation
+include $(ROOTACT)/Makefile.common.sharedlib
+include $(ROOTACT)/Makefile.common.staticlib
 
-all : libdIa.so libdIa.a
-
-libdIa.so : $(LIBOBJS) $(LIBCOAP)
-	$(CC) -shared $(LDFLAGS) -o libdIa.so $(LIBOBJS) $(LIBCOAP) -lrtbase
-	cp libdIa.so $(ROOTACT)/shlib
-
-libdIa.a : $(LIBOBJS)
-	$(AR) r libdIa.a $(LIBOBJS)
-
-version.o       : version.c _whatstr.h
-	$(CC) $(CFLAGS) -c $<
-
-_whatstr.h : Version
-	$(MKWHAT) -p dia -vf Version > _whatstr.h
-
-
-%.o     : %.c
-	$(CC) $(CFLAGS) -c $<
-
-clean   :
-	@(rm *.x *.o *.a *.so *.dylib core _whatstr.h 2>/dev/null || exit 0)

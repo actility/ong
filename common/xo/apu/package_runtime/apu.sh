@@ -1,55 +1,41 @@
 
 buildProject()
 {
-  cd exip
-  ./MAKE clean
-  ./MAKE
-
-  cd ../xo
-  ./MAKE clean
-  ./MAKE
+  cd xo && \
+  make clean && \
+  make
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/lib
-  mkdir -p apu/control
 
   XO_VERSION=`projectVersion`
 
-  cp xo/lib/libxo.so apu/data/lib/libxo-$XO_VERSION.so
-  echo "cd \$ROOTACT/lib" > apu/control/postinst
+  rm -rf apu && \
+  mkdir -p apu/data/lib && \
+  mkdir -p apu/control && \
+  cp xo/lib/lib/libxo.so apu/data/lib/libxo-$XO_VERSION.so && \
+  echo "cd \$ROOTACT/lib" > apu/control/postinst && \
   echo "ln -sf libxo-$XO_VERSION.so libxo.so" >> apu/control/postinst
 
-  if [ -f xo/libexi/libxoexi.so ]
+  RET1=$?
+  RET2=0
+  if [ -f xo/libexi/lib/libxoexi.so ]
   then
-	  cp xo/libexi/libxoexi.so apu/data/lib/libxoexi-$XO_VERSION.so
-	  echo "cd \$ROOTACT/lib" >> apu/control/postinst
+	  cp xo/libexi/lib/libxoexi.so apu/data/lib/libxoexi-$XO_VERSION.so && \
+	  echo "cd \$ROOTACT/lib" >> apu/control/postinst && \
 	  echo "ln -sf libxoexi-$XO_VERSION.so libxoexi.so" >> apu/control/postinst
-  fi
-}
 
-projectGroupId()
-{
-  echo "com.actility"
+    RET2=$?
+  fi
+  return $RET1 && $RET2
 }
 
 projectName()
 {
   echo "xo"
-}
-
-projectVersion()
-{
-  cat xo/Version
-}
-
-projectApuRev()
-{
-  cat xo/apu/revision
 }
 
 projectDescription()

@@ -24,5 +24,6 @@ $(foreach subdir,$(SUBDIRS),_subclean_$(subdir)):
 	@$(MAKE) -C $(subst _subclean_,,$@) clean
 
 $(SUBDIRS):
+	@ echo -e "\033[0;1m> Entering $@\033[0m"
 	@$(MAKE) -C $@ $+ 
 

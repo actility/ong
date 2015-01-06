@@ -20,10 +20,11 @@
 .PHONY: $(foreach subdirdep,$(SUBDIRS_DEP),_depbuild_$(subdirdep) _depclean_$(subdirdep))
 
 all: preliminaryAction build_o_target build_exe_target build_dependencies $(EXENAME) lastAction
+	@ echo -e "\033[0;1m$(EXENAME) done\033[0m"
 
 noaction:
 
-preliminaryAction:
+preliminaryAction: $(PRELIMINARY_DEP)
 	@echo "Preliminary actions"
 	@$(PRELIMINARY)
 
@@ -33,7 +34,7 @@ build_o_target:
 build_exe_target:
 	@ ( [ -n "$(EXE_TARGET)" ] && [ ! -e $(EXE_TARGET) ] && mkdir -vp $(EXE_TARGET) ) || [ true ]
 
-lastAction:
+lastAction: $(LASTACTIONS_DEP)
 	@echo "Last actions"
 	@$(LASTACTIONS)
 

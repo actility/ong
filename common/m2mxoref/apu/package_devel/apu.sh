@@ -16,36 +16,21 @@ buildProject()
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/m2mxoref/xoref/
-  mkdir -p apu/control
 
   M2M_VERSION=`projectVersion`
 
-  cp m2mxoref/xoref/m2m.xor apu/data/m2mxoref/xoref/
-  cp m2mxoref/xoref/m2m.xdi apu/data/m2mxoref/xoref/
-  cp m2mxoref/xoref/xobix.xor apu/data/m2mxoref/xoref/
+  rm -rf apu && \
+  mkdir -p apu/data/m2mxoref/xoref/ && \
+  mkdir -p apu/control && \
+  cp m2mxoref/xoref/m2m.xor apu/data/m2mxoref/xoref/ && \
+  cp m2mxoref/xoref/m2m.xdi apu/data/m2mxoref/xoref/ && \
+  cp m2mxoref/xoref/xobix.xor apu/data/m2mxoref/xoref/ && \
   cp m2mxoref/xoref/namespace.xns apu/data/m2mxoref/xoref/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "m2mxoref-devel"
-}
-
-projectVersion()
-{
-  cat m2mxoref/Version
-}
-
-projectApuRev()
-{
-  cat m2mxoref/apu/revision
 }
 
 projectDescription()

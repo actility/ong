@@ -1,41 +1,26 @@
 
 buildProject()
 {
-  cd drvcommon
-  ./MAKE clean
+  cd drvcommon && \
+  make clean
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/
-  mkdir -p apu/control
 
   DRVCOMMON_VERSION=`projectVersion`
 
+  rm -rf apu && \
+  mkdir -p apu/data/ && \
+  mkdir -p apu/control && \
   cp -r drvcommon apu/data/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "drvcommon-src"
-}
-
-projectVersion()
-{
-  cat drvcommon/Version
-}
-
-projectApuRev()
-{
-  cat drvcommon/apu/revision
 }
 
 projectDescription()

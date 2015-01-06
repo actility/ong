@@ -1,41 +1,26 @@
 
 buildProject()
 {
-  cd watteco
-  ./MAKE clean
+  cd watteco && \
+  make clean
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/
-  mkdir -p apu/control
 
   WATTECO_VERSION=`projectVersion`
 
+  rm -rf apu && \
+  mkdir -p apu/data/ && \
+  mkdir -p apu/control && \
   cp -r watteco apu/data/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "watteco-src"
-}
-
-projectVersion()
-{
-  cat watteco/Version
-}
-
-projectApuRev()
-{
-  cat watteco/apu/revision
 }
 
 projectDescription()

@@ -1,4 +1,3 @@
-include $(ROOTACT)/rtbase/base/makefile.def
 
 all: _whatstr.h
 

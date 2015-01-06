@@ -1,47 +1,32 @@
 
 buildProject()
 {
-  cd AZAP
-  if [[ $1 == centos6-x86 ]]
+  OPTIONS=
+  if [ $1 == "centos6-x86" -o $1 == "centos6-x86_64" ]
   then
-    ./MAKE test
-  else
-    ./MAKE clean
-    ./MAKE
+    OPTIONS="UNARY_TEST=on"
   fi
+
+  cd AZAP && \
+  make clean && \
+  make $OPTIONS
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/AZAP/include/
-  mkdir -p apu/data/AZAP/lib/
-  mkdir -p apu/control
-  
-  cp AZAP/include/*.h apu/data/AZAP/include/
-  cp AZAP/lib/*.a apu/data/AZAP/lib/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
+  rm -rf apu && \
+  mkdir -p apu/data/AZAP/include/ && \
+  mkdir -p apu/data/AZAP/lib/ && \
+  mkdir -p apu/control && \
+  cp AZAP/include/*.h apu/data/AZAP/include/ && \
+  cp AZAP/lib/lib/*.a apu/data/AZAP/lib/
 }
 
 projectName()
 {
   echo "AZAP-devel"
-}
-
-projectVersion()
-{
-  cat AZAP/Version
-}
-
-projectApuRev()
-{
-  cat AZAP/apu/revision
 }
 
 projectDescription()

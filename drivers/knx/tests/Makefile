@@ -1,33 +1,120 @@
-include $(ROOTACT)/knx/base/makefile.def
+#
+# Copyright   Actility, SA. All Rights Reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version
+# 2 only, as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License version 2 for more details (a copy is
+# included at /legal/license.txt).
+#
+# You should have received a copy of the GNU General Public License
+# version 2 along with this work; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+#
+# Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+# or visit www.actility.com if you need additional
+# information or have any questions.
+#
+# id $Id$  
+# author $Author$
+# version $Revision$
+# lastrevision $Date$
+# modifiedby $LastChangedBy$
+# lastmodified $LastChangedDate$
 
-SRC=test-fp16.c \
-    test-db.c \
-    test-var-helpers.c \
-    test-xo-helpers.c \
-    test-knx2obix-bits.c \
-    test-knx2obix.c \
-    test-obix2knx-bits.c \
-    test-obix2knx.c \
-    test-covconfig.c
-   
-EXTRA_LIB=
+###############################################################################
+
+
+ROOTACT ?= $(shell cd ../.. && pwd)
+OUTPUT_PATH ?= $(ROOTACT)
+export OUTPUT_PATH
+
+BIN_TARGET ?= $(OUTPUT_PATH)/bin/
+
+PROJECTS_DIR = $(ROOTACT)/
+REL_PROJ_PATH = knx/tests
+CURRENT_PROJ_DIR = $(ROOTACT)/$(REL_PROJ_PATH)
+TARGET_PROJ_DIR = $(OUTPUT_PATH)/$(REL_PROJ_PATH)
+
+SRC_PATH = $(CURRENT_PROJ_DIR)/
+EXE_TARGET = $(TARGET_PROJ_DIR)/bin/
+OBJS_TARGET = $(TARGET_PROJ_DIR)/obj/
+
+# Executable name
+EXENAME = all_exe
+
+ifeq ($(UNARY_TEST),on)
+LASTACTIONS_DEP = unary_tests
+endif
+
+STATIC_LIBS= \
+$(OUTPUT_PATH)/knx/lib/lib/libknx.a \
+$(ROOTACT)/drvcommon/lib/libdrvcommon.a \
+$(OUTPUT_PATH)/knx/lib/lib/libknx.a
+DYNAMIC_LIBS= \
+-L$(ROOTACT)/shlib -lxo -ldIa -lrtbase \
+-L$(ROOTACT)/lib -leibclient \
+-lm -lrt
+
+ifeq ($(SYSTEM),cov1)
+DYNAMIC_LIBS += -lpthread
+endif
+
 ifeq ($(SYSTEM),lpv3)
-EXTRA_LIB+=-liconv
-endif 
+DYNAMIC_LIBS += -liconv
+endif
 
-SHARED_LIB=-lpthread -lrt -leibclient -lrtbase -lxo -ldIa
-DRVCOMMON=$(ROOTACT)/drvcommon/lib/libdrvcommon.a
+#EXE_BASENAME = $(patsubst $(CURRENT_PROJ_DIR)/%.c, %, ${CURRENT_PROJ_DIR})
+EXE_BASENAME = test-fp16 test-db test-var-helpers test-xo-helpers test-knx2obix-bits \
+test-knx2obix test-obix2knx-bits test-obix2knx test-covconfig
 
-EXE=$(patsubst %.c, %.x, ${SRC})
+CFLAGS += -Wall #-Werror
 
-all: $(EXE)
+# List of object file needed for the final program
+OBJS = $(foreach item,$(EXE_BASENAME),$(OBJS_TARGET)/$(item).o) 
 
-%.x: %.c $(KNXLIB)
-	$(CC) -g -O0 $(INC) $(LDPATH) -o $@ $^ $(DRVCOMMON) $(KNXLIB) -lm $(SHARED_LIB) $(XML2LD) $(LIBXML2) $(EXTRA_LIB)
-	chmod +x $@
+INCLUDES = \
+$(SRC_PATH) \
+$(ROOTACT)/include \
+$(ROOTACT)/knx/lib \
+$(ROOTACT)/knx/include \
+$(ROOTACT)/knx/supervisor \
+$(ROOTACT)/drvcommon/lib \
+$(ROOTACT)/libdIa \
+$(ROOTACT)/libcoap \
+$(ROOTACT)/xo/include \
+$(ROOTACT)/rtbase/include
 
-clean:
-	@(rm -f *.x *.o *.a core *.log 2>/dev/null || exit 0)
+DEFINES = _LINUX_ MAIN
+PROJ_DEFINES = 
 
+ifeq ($(TARGET),centos6-x86_64)
+EXTRA_CFLAGS=-DLINUX_64
+export EXTRA_CFLAGS
+endif
+
+include $(ROOTACT)/Makefile.common.compilation
+include $(ROOTACT)/Makefile.common.binexe
+
+$(foreach exefile,$(EXE_BASENAME),$(exefile)):
+	$(CC) -o $(EXE_TARGET)/$@.x $(CFLAGS) $(OBJS_TARGET)/$@.o $(STATIC_LIBS) $(DYNAMIC_LIBS)
+
+all_exe: build_dependencies $(OBJS) $(EXE_BASENAME)
+	@ echo done # required to override rule $(EXENAME) in Makefile.common.binexe
+
+unary_tests:
+	@echo TESTS
+	@for file in $(shell ls -1 $(EXE_TARGET)/*.x); do \
+		echo Running $$file ; \
+		LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib $$file || exit 1 ;\
+	done
+
+.PHONY: all_exe unary_tests
 
 

@@ -1,39 +1,23 @@
 
 buildProject()
 {
-  cd libdIa
-  ./MAKE clean
+  cd libdIa && \
+  make clean
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/
-  mkdir -p apu/control
-  
+  rm -rf apu && \
+  mkdir -p apu/data/ && \
+  mkdir -p apu/control && \
   cp -r libdIa/ apu/data/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "libdIa-src"
-}
-
-projectVersion()
-{
-  cat libdIa/Version
-}
-
-projectApuRev()
-{
-  cat libdIa/apu/revision
 }
 
 projectDescription()

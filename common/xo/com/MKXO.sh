@@ -1,6 +1,4 @@
 
-. ${ROOTACT}/rtbase/base/system
-
 help=""
 upper=""
 verbose=""

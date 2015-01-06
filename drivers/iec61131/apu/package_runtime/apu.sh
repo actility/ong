@@ -3,9 +3,15 @@ NAME=iec61131
 
 buildProject()
 {
-  cd $NAME
-  ./MAKE clean
-  ./MAKE
+  OPTIONS=
+  if [ $1 == "centos6-x86" -o $1 == "centos6-x86_64" ]
+  then
+    OPTIONS="UNARY_TEST=on"
+  fi
+
+  cd $NAME && \
+  make clean && \
+  make $OPTIONS
 
   return $?
 }
@@ -25,30 +31,15 @@ buildApuImage()
   rm /tmp/__temp__.$$ && \
   popd && \
   \
-  cp $NAME/bin/plc.x apu/data/bin/ && \
+  cp $NAME/bin/bin/plc.x apu/data/bin/ && \
   cp $NAME/config/spvconfig.std.xml apu/data/etc/$NAME/spvconfig.xml && \
   cp $NAME/$NAME-init apu/data/etc/init.d/$NAME && \
   cp $NAME/apu/$1/postinst apu/control/postinst
 }
 
-projectGroupId()
-{
-  echo "com.actility"
-}
-
 projectName()
 {
   echo $NAME
-}
-
-projectVersion()
-{
-  cat $NAME/Version
-}
-
-projectApuRev()
-{
-  cat $NAME/apu/revision
 }
 
 projectDescription()

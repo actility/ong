@@ -1,8 +1,8 @@
 
 buildProject()
 {
-  cd knx
-  make clean
+  cd knx && \
+  make clean && \
   make
 
   return $?
@@ -40,31 +40,16 @@ buildApuImage()
   cp knx/config/modelconfig.xml apu/data/etc/knx/ && \
   cp knx/config/spvconfig.xml apu/data/etc/knx/ && \
   copyTemplate knx/diatemplates/ $ROOTACT/apu/data/etc/knx/diatemplates/ && \
-  cp knx/supervisor/knx.x apu/data/bin/ && \
+  cp knx/supervisor/bin/knx.x apu/data/bin/ && \
   cp knx/xoref/knx.xns apu/data/etc/knx/ && \
   cp knx/xoref/*.xor apu/data/etc/knx/ && \
   cp knx/apu/$1/postinst apu/control/postinst && \
   cp knx/knx-init apu/data/etc/init.d/knx
 }
 
-projectGroupId()
-{
-  echo "com.actility"
-}
-
 projectName()
 {
   echo "knx"
-}
-
-projectVersion()
-{
-  cat knx/Version
-}
-
-projectApuRev()
-{
-  cat knx/apu/revision
 }
 
 projectDescription()

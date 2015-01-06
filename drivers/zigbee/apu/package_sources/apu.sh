@@ -7,8 +7,7 @@ projectName()
 buildProject()
 {
   cd zigbee && \
-  rm -rf .svn && \
-  ./MAKE clean
+  make clean
 
   return $?
 }
