@@ -2,7 +2,7 @@
 buildProject()
 {
   cd exip && \
-  mkdir -p $ROOTACT/shlib && \
+  mkdir -p $ROOTACT/lib && \
   ./MAKE clean && \
   ./MAKE
 
@@ -24,7 +24,7 @@ buildApuImage()
   cp $ROOTACT/exip/include/*.h apu/data/exip/include && \
   cp $ROOTACT/exip/build/gcc/pc/*.h apu/data/exip/build/gcc/pc && \
   cp $ROOTACT/exip/src/stringTables/include/*.h apu/data/exip/src/stringTables/include && \
-  cp $ROOTACT/shlib/libexip.so.$EXIP_VERSION apu/data/lib/ && \
+  cp $ROOTACT/lib/libexip.so.$EXIP_VERSION apu/data/lib/ && \
   echo "cd \$ROOTACT/lib" > apu/control/postinst && \
   echo "ln -sf libexip.so.$EXIP_VERSION libexip.so" >> apu/control/postinst
 }

@@ -91,7 +91,7 @@
             </goals>
             <configuration>
               <environmentVariables>
-                <LD_LIBRARY_PATH>${rootact}/package_runtime/shlib</LD_LIBRARY_PATH>
+                <LD_LIBRARY_PATH>${rootact}/package_runtime/lib</LD_LIBRARY_PATH>
               </environmentVariables>
               <argLine>-Djava.library.path=${basedir}/src/main/target/resources/lib/${build.type}</argLine>
             </configuration>

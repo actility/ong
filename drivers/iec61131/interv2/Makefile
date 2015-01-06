@@ -55,13 +55,13 @@ cp -vf $(CURRENT_PROJ_DIR)/test.sh $(EXE_TARGET) && \
 cp -vfr $(CURRENT_PROJ_DIR)/tests $(EXE_TARGET) && \
 cp -vf $(CURRENT_PROJ_DIR)/VG $(EXE_TARGET) && \
 cd $(EXE_TARGET) && \
-LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib ./test.sh
+LD_LIBRARY_PATH=$(ROOTACT)/lib ./test.sh
 endif
 
 STATIC_LIBS= \
 $(OUTPUT_PATH)/iec61131/unitTest/lib/libunitTest.a
 DYNAMIC_LIBS= \
--L$(ROOTACT)/shlib -lrtbase \
+-L$(ROOTACT)/lib -lrtbase \
 -lm -lrt
 
 ifeq ($(SYSTEM),cov1)

@@ -52,7 +52,7 @@ LIBNAME = $(A_TARGET)/libazap.a
 MKWHAT = $(ROOTACT)/rtbase/shells/mkwhat.sh
 
 DYNAMIC_LIBS=\
--L$(ROOTACT)/shlib -lrtbase
+-L$(ROOTACT)/lib -lrtbase
 
 CFLAGS += -Wall -Werror
 

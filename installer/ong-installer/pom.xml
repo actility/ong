@@ -76,36 +76,29 @@
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
+      <version>1.4.14-1</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
-
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
-      <classifier>${build.type}</classifier>
-      <type>apu</type>
-   </dependency>
 
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
+      <version>1.8.5-1</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
+      <version>1.2.4-1</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
+
 
     <dependency>
       <groupId>org.tcpdump</groupId>
@@ -116,9 +109,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
+      <version>1.0.1-1</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
@@ -131,9 +124,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>apu-install</artifactId>
-      <version>1.1-0</version>
+      <version>1.1-1</version>
       <type>apu</type>
     </dependency>
 
@@ -156,16 +149,16 @@
       </activation>
       <dependencies>
         <dependency>
-          <groupId>com.actility</groupId>
+          <groupId>com.actility.m2m</groupId>
           <artifactId>watteco</artifactId>
-          <version>1.4.11-0</version>
+          <version>1.4.11-1</version>
           <classifier>${build.type}</classifier>
           <type>apu</type>
         </dependency>
         <dependency>
-          <groupId>com.actility</groupId>
+          <groupId>com.actility.m2m</groupId>
           <artifactId>knx</artifactId>
-          <version>1.0.3-0</version>
+          <version>1.0.3-1</version>
           <classifier>${build.type}</classifier>
           <type>apu</type>
         </dependency>
@@ -184,9 +177,9 @@
           <type>apu</type>
         </dependency>
         <dependency>
-          <groupId>com.actility</groupId>
+          <groupId>com.actility.m2m</groupId>
           <artifactId>iec61131</artifactId>
-          <version>1.0.36-0</version>
+          <version>1.0.36-1</version>
           <classifier>${build.type}</classifier>
           <type>apu</type>
         </dependency>
@@ -198,9 +191,9 @@
           <type>apu</type>
         </dependency>
         <dependency>
-          <groupId>com.actility</groupId>
+          <groupId>com.actility.m2m</groupId>
           <artifactId>modbus</artifactId>
-          <version>1.2.0-0</version>
+          <version>1.2.0-1</version>
           <classifier>${build.type}</classifier>
           <type>apu</type>
         </dependency>

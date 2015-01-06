@@ -51,7 +51,7 @@ OBJS_TARGET = $(TARGET_PROJ_DIR)/obj/
 LIBNAME = $(A_TARGET)/libunitTest.a
 
 DYNAMIC_LIBS=\
--L$(ROOTACT)/shlib -lrtbase
+-L$(ROOTACT)/lib -lrtbase
 
 CFLAGS += -Wall -Werror
 

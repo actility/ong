@@ -15,12 +15,12 @@ buildApuImage()
 
   rm -rf apu && \
   mkdir -p apu/data/drvcommon/lib/ && \
-  mkdir -p apu/data/shlib/ && \
+  mkdir -p apu/data/lib/ && \
   mkdir -p apu/control && \
   cp drvcommon/lib/*.h apu/data/drvcommon/lib/ && \
   cp drvcommon/lib/lib/*.a apu/data/drvcommon/lib/ && \
-  cp drvcommon/lib/lib/libdrvcommon.so apu/data/shlib/libdrvcommon-$SELF_VERSION.so && \
-  echo "cd \$ROOTACT/shlib" > apu/control/postinst && \
+  cp drvcommon/lib/lib/libdrvcommon.so apu/data/lib/libdrvcommon-$SELF_VERSION.so && \
+  echo "cd \$ROOTACT/lib" > apu/control/postinst && \
   echo "ln -s libdrvcommon-$SELF_VERSION.so libdrvcommon.so" >> apu/control/postinst
 }
 

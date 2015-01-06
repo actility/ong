@@ -58,7 +58,7 @@ $(OUTPUT_PATH)/knx/lib/lib/libknx.a \
 $(ROOTACT)/drvcommon/lib/libdrvcommon.a \
 $(OUTPUT_PATH)/knx/lib/lib/libknx.a
 DYNAMIC_LIBS= \
--L$(ROOTACT)/shlib -lxo -ldIa -lrtbase \
+-L$(ROOTACT)/lib -lxo -ldIa -lrtbase \
 -L$(ROOTACT)/lib -leibclient \
 -lm -lrt
 
@@ -112,7 +112,7 @@ unary_tests:
 	@echo TESTS
 	@for file in $(shell ls -1 $(EXE_TARGET)/*.x); do \
 		echo Running $$file ; \
-		LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib $$file || exit 1 ;\
+		LD_LIBRARY_PATH=$(ROOTACT)/lib $$file || exit 1 ;\
 	done
 
 .PHONY: all_exe unary_tests

@@ -51,13 +51,13 @@ EXENAME = $(EXE_TARGET)/format_znp_test.x
 
 ifeq ($(UNARY_TEST),on)
 LASTACTIONS = \
-LD_LIBRARY_PATH=$(ROOTACT)/shlib $(EXENAME)
+LD_LIBRARY_PATH=$(ROOTACT)/lib $(EXENAME)
 endif
 
 STATIC_LIBS= \
 $(OUTPUT_PATH)/AZAP/lib/lib/libazap.a
 DYNAMIC_LIBS= \
--L$(ROOTACT)/shlib -lrtbase -lm -lrt
+-L$(ROOTACT)/lib -lrtbase -lm -lrt
 
 ifeq ($(SYSTEM),cov1)
 DYNAMIC_LIBS += -lpthread

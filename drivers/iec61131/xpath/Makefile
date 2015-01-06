@@ -51,16 +51,16 @@ EXENAME = $(EXE_TARGET)/xpathExpr.x
 
 ifeq ($(UNARY_TEST),on)
 LASTACTIONS = \
-LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib $(EXENAME) sample1.xml /foo/bar && \
-LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib $(EXENAME) sample2.xml /foo/bar[@attr] && \
-LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib $(EXENAME) sample2.xml /foo/bar[@attr='Hello'] && \
-LD_LIBRARY_PATH=$(ROOTACT)/shlib:$(ROOTACT)/lib $(EXENAME) sample2.xml /foo/bar[@attr='World']
+LD_LIBRARY_PATH=$(ROOTACT)/lib $(EXENAME) sample1.xml /foo/bar && \
+LD_LIBRARY_PATH=$(ROOTACT)/lib $(EXENAME) sample2.xml /foo/bar[@attr] && \
+LD_LIBRARY_PATH=$(ROOTACT)/lib $(EXENAME) sample2.xml /foo/bar[@attr='Hello'] && \
+LD_LIBRARY_PATH=$(ROOTACT)/lib $(EXENAME) sample2.xml /foo/bar[@attr='World']
 endif
 
 STATIC_LIBS= \
 $(OUTPUT_PATH)/iec61131/unitTest/lib/libunitTest.a
 DYNAMIC_LIBS= \
--L$(ROOTACT)/shlib -lrtbase \
+-L$(ROOTACT)/lib -lrtbase \
 -L$(ROOTACT)/lib -lmxml \
 -lrt
 

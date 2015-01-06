@@ -77,7 +77,7 @@ DEFINES = _LINUX_
 PROJ_DEFINES = SHARED_LIB
 
 DYNAMIC_LIBS = \
- -L$(ROOTACT)/shlib/ \
+ -L$(ROOTACT)/lib/ \
  -ldIa -lrtbase
 
 include $(ROOT_PATH)/Makefile.common.compilation

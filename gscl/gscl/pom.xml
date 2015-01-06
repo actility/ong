@@ -356,9 +356,9 @@
 
     <!-- apus -->
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>m2mxoref</artifactId>
-      <version>1.1.12-1</version>
+      <version>1.1.12-2</version>
       <type>apu</type>
     </dependency>
 
@@ -371,25 +371,25 @@
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>rtbase</artifactId>
-      <version>1.2.3-0</version>
+      <version>1.2.3-1</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>libdIa</artifactId>
-      <version>1.0.25-0</version>
+      <version>1.0.25-1</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>xo</artifactId>
-      <version>4.4.13-0</version>
+      <version>4.4.13-1</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
@@ -403,17 +403,17 @@
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>stdin-logger</artifactId>
-      <version>1.2.1-0</version>
+      <version>1.2.1-1</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>trans_pty</artifactId>
-      <version>1.0.1-0</version>
+      <version>1.0.1-1</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>

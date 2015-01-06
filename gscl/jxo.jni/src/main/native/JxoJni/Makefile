@@ -82,7 +82,7 @@ export EXTRA_CFLAGS
 endif
 
 DYNAMIC_LIBS = \
- -L$(ROOTACT)/lib/ -L$(ROOTACT)/shlib/ \
+ -L$(ROOTACT)/lib/ \
  -lrtbase -lxml2
 
 ifeq ($(TARGET),centos6-x86)

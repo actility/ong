@@ -2,7 +2,7 @@ include $(ROOTACT)/rtbase/base/makefile.def
 
 CFLAGS+=-fPIC -I$(ROOTACT)/libcoap -I$(ROOTACT)/rtbase/include -I$(ROOTACT)/libdIa
 CFLAGS += -I$(ROOTACT)/iec61131/unitTest
-LDFLAGS+=-L$(ROOTACT)/shlib
+LDFLAGS+=-L$(ROOTACT)/lib
 LIBCOAP=$(ROOTACT)/libcoap/libcoap.a
 OBJS=unitTest.o $(ROOTACT)/iec61131/unitTest/unitTest.o
 

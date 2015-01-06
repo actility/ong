@@ -123,7 +123,7 @@
         <configuration>
           <jvm>/usr/java/jdk1.7.0_03/bin/java</jvm>
           <environmentVariables>
-            <LD_LIBRARY_PATH>${rootact}/package_runtime/shlib</LD_LIBRARY_PATH>
+            <LD_LIBRARY_PATH>${rootact}/package_runtime/lib</LD_LIBRARY_PATH>
           </environmentVariables>
           <argLine>-Djava.library.path=${basedir}/src/main/target/resources/lib/centos6-x86</argLine>
         </configuration>

@@ -51,7 +51,7 @@ EXENAME = $(EXE_TARGET)/wmbus.x
 STATIC_LIBS= \
 $(OUTPUT_PATH)/wmbus/lib/lib/libwmbus.a
 DYNAMIC_LIBS= \
--L$(ROOTACT)/shlib -ldrvcommon -lxo -ldIa -lrtbase \
+-L$(ROOTACT)/lib -ldrvcommon -lxo -ldIa -lrtbase \
 -L$(ROOTACT)/lib -lxml2 \
 -lm -lrt
 
