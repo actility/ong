@@ -1,6 +1,6 @@
 
 
-ROOTACT ?= (cd ../.. && pwd)
+ROOTACT ?= $(shell cd .. && pwd)
 SUBDIRS = include lib
 
 include $(ROOTACT)/Makefile.common.recurse

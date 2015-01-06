@@ -24,15 +24,17 @@ buildProject()
   esac
 
   cd eibd
+  rm -rf bcusdk-0.0.5/
   tar zxvf bcusdk_0.0.5.tar.gz
   cd bcusdk-0.0.5/
   export LD_LIBRARY_PATH=$ROOTACT/lib
   
-  if [ ! -f Makefile ]; then
+  #if [ ! -f Makefile ]; then
     echo ./configure $CONFIGURE_FLAGS --prefix $ROOTACT $CONFIGURE_OPTIONS $CONFIGURE_ADD_OPTIONS
     ./configure $CONFIGURE_FLAGS --prefix $ROOTACT $CONFIGURE_OPTIONS $CONFIGURE_ADD_OPTIONS
-  fi
-  make
+  #fi
+  sed -i -e 's/SUBDIRS=.*/SUBDIRS=def c ./' eibd/client/Makefile.am && \
+  make && \
   make install
 
   return $?

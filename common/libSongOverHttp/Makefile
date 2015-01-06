@@ -6,7 +6,7 @@
 # lastmodified $LastChangedDate$
 
 
-ROOTACT ?= (cd ../.. && pwd)
+ROOTACT ?= $(shell cd .. && pwd)
 SUBDIRS = lib tester
 
 include $(ROOTACT)/Makefile.common.recurse

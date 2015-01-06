@@ -1,47 +1,32 @@
 
 buildProject()
 {
-  cd drvcommon
-  ./MAKE clean
-  ./MAKE
+  cd drvcommon && \
+  make clean && \
+  make
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/drvcommon/lib/
-  mkdir -p apu/data/shlib/
-  mkdir -p apu/control
 
   SELF_VERSION=`projectVersion`
 
-  cp drvcommon/lib/*.h apu/data/drvcommon/lib/
-  cp drvcommon/lib/*.a apu/data/drvcommon/lib/
-  cp drvcommon/lib/libdrvcommon.so apu/data/shlib/libdrvcommon-$SELF_VERSION.so
-  echo "cd \$ROOTACT/shlib" > apu/control/postinst
+  rm -rf apu && \
+  mkdir -p apu/data/drvcommon/lib/ && \
+  mkdir -p apu/data/shlib/ && \
+  mkdir -p apu/control && \
+  cp drvcommon/lib/*.h apu/data/drvcommon/lib/ && \
+  cp drvcommon/lib/lib/*.a apu/data/drvcommon/lib/ && \
+  cp drvcommon/lib/lib/libdrvcommon.so apu/data/shlib/libdrvcommon-$SELF_VERSION.so && \
+  echo "cd \$ROOTACT/shlib" > apu/control/postinst && \
   echo "ln -s libdrvcommon-$SELF_VERSION.so libdrvcommon.so" >> apu/control/postinst
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "drvcommon-devel"
-}
-
-projectVersion()
-{
-  cat drvcommon/Version
-}
-
-projectApuRev()
-{
-  cat drvcommon/apu/revision
 }
 
 projectDescription()

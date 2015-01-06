@@ -1,0 +1,16 @@
+chmod 755 $ROOTACT/etc/init.d/supervision
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/init.d/supervision
+mkdir -p $ROOTACT/etc/rc.d/
+cd $ROOTACT/etc/rc.d
+ln -s ../init.d/supervision S99supervision
+mkdir -p $ROOTACT/var/log/supervision
+if ! [ -f $ROOTACT/etc/acy.cfg ]; then
+  cd $ROOTACT/etc
+  _NOT_RMS_=0
+  _NOT_ONG_=0
+  ( [ -f rms.cfg ] && ln -s rms.cfg acy.cfg ) || _NOT_RMS_=1
+  ( [ -f ong.cfg ] && ln -s ong.cfg acy.cfg ) || _NOT_ONG_=1
+  ( [ $_NOT_RMS_ -eq 0 ] || [ $_NOT_ONG_ -eq 0 ] ) || \
+  ( echo "*** $ROOTACT/etc/acy.cfg file is missing" && false )
+fi
+

@@ -1,8 +1,7 @@
 
 buildProject()
 {
-  cd rtbase
-  #./MAKE clean
+  cd rtbase && \
   make clean
 
   return $?
@@ -10,31 +9,15 @@ buildProject()
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/
-  mkdir -p apu/control
-  
+  rm -rf apu && \
+  mkdir -p apu/data/ && \
+  mkdir -p apu/control && \
   cp -r rtbase/ apu/data/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "rtbase-src"
-}
-
-projectVersion()
-{
-  cat rtbase/Version
-}
-
-projectApuRev()
-{
-  cat rtbase/apu/revision
 }
 
 projectDescription()

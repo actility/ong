@@ -1,40 +1,24 @@
 
 buildProject()
 {
-  cd wmbus
-  rm -rf .svn
-  ./MAKE clean
+  cd wmbus && \
+  make clean
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/
-  mkdir -p apu/control
-  
+  rm -rf apu && \
+  mkdir -p apu/data/ && \
+  mkdir -p apu/control && \
+  \
   cp -r wmbus/ apu/data/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "wmbus-src"
-}
-
-projectVersion()
-{
-  cat wmbus/Version
-}
-
-projectApuRev()
-{
-  cat wmbus/apu/revision
 }
 
 projectDescription()

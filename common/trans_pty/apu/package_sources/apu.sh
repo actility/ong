@@ -19,24 +19,9 @@ buildApuImage()
   cp -r trans_pty apu/data/
 }
 
-projectGroupId()
-{
-  echo "com.actility"
-}
-
 projectName()
 {
   echo "trans_pty-src"
-}
-
-projectVersion()
-{
-  cat trans_pty/Version
-}
-
-projectApuRev()
-{
-  cat trans_pty/apu/revision
 }
 
 projectDescription()

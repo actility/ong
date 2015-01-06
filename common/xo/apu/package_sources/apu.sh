@@ -1,41 +1,26 @@
 
 buildProject()
 {
-  cd xo
-  ./MAKE clean
+  cd xo && \
+  make clean
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data
-  mkdir -p apu/control
 
   XO_VERSION=`projectVersion`
 
+  rm -rf apu && \
+  mkdir -p apu/data && \
+  mkdir -p apu/control && \
   cp -r xo apu/data
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "xo-src"
-}
-
-projectVersion()
-{
-  cat xo/Version
-}
-
-projectApuRev()
-{
-  cat xo/apu/revision
 }
 
 projectDescription()

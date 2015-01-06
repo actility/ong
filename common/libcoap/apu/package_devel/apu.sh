@@ -1,42 +1,26 @@
 
 buildProject()
 {
-  cd libcoap
-  ./MAKE clean
-  ./MAKE
+  cd libcoap && \
+  make clean && \
+  make
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/libcoap/
-  mkdir -p apu/control
-  
-  cp libcoap/*.h apu/data/libcoap/
-  cp libcoap/*.a apu/data/libcoap/
+  rm -rf apu && \
+  mkdir -p apu/data/libcoap/ && \
+  mkdir -p apu/control && \
+  cp libcoap/*.h apu/data/libcoap/ && \
+  cp libcoap/*.a apu/data/libcoap/ && \
   cp libcoap/Makefile apu/data/libcoap/
-}
-
-projectGroupId()
-{
-  echo "org.tzi"
 }
 
 projectName()
 {
   echo "libcoap-devel"
-}
-
-projectVersion()
-{
-  cat libcoap/Version
-}
-
-projectApuRev()
-{
-  cat libcoap/apu/revision
 }
 
 projectDescription()

@@ -11,7 +11,7 @@ buildProject()
         CC="arm-none-linux-gnueabi-gcc -mcpu=arm920t"
         ;;
     rpib)
-        source $RPI_B_HOST_HOME/../../environment-setup-armv6-vfp-poky-linux-gnueabi
+        source $TOOLCHAIN_HOME/environment-setup-armv6-vfp-poky-linux-gnueabi
         PREFIX=arm-poky-linux-gnueabi
         ;;
     *)

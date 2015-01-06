@@ -8,7 +8,7 @@ PRGM_NAME=$(basename $0)
 
 usage() {
   echo "usage: $PRGM_NAME <options> <target>"
-  echo "where <target> can be {centos6-x86|centos6-x86_64|cov1|cov2|rpib|ntc6200}"
+  echo "where <target> can be {centos6-x86|centos6-x86_64|cov1|cov2|ntc6200|rpib}"
   echo "where <options> can be:"
   echo " -h|--help:         display this help message"
   echo " -n|--no-installer: skip the compilation for ong-installer project"
@@ -175,7 +175,7 @@ case "$TARGET" in
   "ntc6200")
     if [ -z "$(apu-make ls-targets | grep ^cross-ntc6200$)" ]; then
       build targets/target-cross-ntc6200 noarch
-      apuInstallTarget cross-ntc6200
+      apuInstallTarget ntc6200
     fi
     ;;
 
@@ -208,7 +208,7 @@ build external/curl $TARGET
 build external/cproto $TARGET
 build external/libmicrohttpd $TARGET
 build external/jni $TARGET
-build external/exip $TARGET
+build external/exip $TARGET "{centos6-x86}"
 build external/phoneme-advanced-mr2 $TARGET "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
 PHONEME_VERSION=$(cat external/phoneme-advanced-mr2/Version)-$(cat external/phoneme-advanced-mr2/apu/revision)
 export PHONEME_TARGET_DIR=$CURRENT/.build/$TARGET/phoneme
@@ -293,6 +293,7 @@ build gscl/song.binding.http.jni $TARGET
 #build gscl/storage.driver.sqlite.jni $TARGET
 build gscl/transport.logger.log
 build gscl/gscl $TARGET
+build common/supervision
 
 if [ $BUILD_INTALLER -eq 1 ]; then
   build installer/ong-installer

@@ -211,7 +211,7 @@ $(LIB_BIN_DIR)/libexip.a: $(LIB_OBJECTS)
 		$(ARCHIVER) rcs $(LIB_BIN_DIR)/libexip.a $(LIB_OBJECTS)
 
 $(LIB_BIN_DIR)/libexip.so: $(LIB_OBJECTS)
-		$(CC) -shared -Wl,-soname,libexip.so.$(EXIP_VERSION) -o $(LIB_BIN_DIR)/libexip.so.$(EXIP_VERSION) $(LIB_OBJECTS)
+		$(CC) $(LDFLAGS) -shared -Wl,-soname,libexip.so.$(EXIP_VERSION) -o $(LIB_BIN_DIR)/libexip.so.$(EXIP_VERSION) $(LIB_OBJECTS)
 		ln -sf $(LIB_BIN_DIR)/libexip.so.$(EXIP_VERSION) $(LIB_BIN_DIR)/libexip.so
 
 $(BIN_DIR):

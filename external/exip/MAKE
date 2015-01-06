@@ -14,7 +14,7 @@ Compile()
 {
 # TARGET=pc|android|contiki
 
-	(cd build/gcc && make TARGET=pc $*)
+	(cd build/gcc && LDFLAGS=-m32 CFLAGS=-m32 make TARGET=pc $*)
 #	(cd actility && make)
 	cp ./bin/lib/libexip.so.${EXIP_VERSION} $ROOTACT/shlib
 #	cp ./examples/*/*.exi ./bin/examples

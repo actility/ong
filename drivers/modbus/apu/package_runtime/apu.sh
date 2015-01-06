@@ -1,15 +1,15 @@
 
 buildProject()
 {
-  export PATH=$PATH:$(pwd)/bin
+  OPTIONS=
+  if [ $1 == "centos6-x86" -o $1 == "centos6-x86_64" ]
+  then
+    OPTIONS="UNARY_TEST=on"
+  fi
+
   cd modbus && \
   make clean && \
-  make && \
-  if [[ $1 == centos6-x86 ]] 
-  then
-    cd tests && \
-    make run
-  fi
+  make $OPTIONS 
 
   return $?
 }
@@ -43,31 +43,16 @@ buildApuImage()
   cp modbus/config/modelconfig.xml apu/data/etc/modbus/ && \
   cp modbus/config/spvconfig.xml apu/data/etc/modbus/ && \
   copyTemplate modbus/diatemplates/ $ROOTACT/apu/data/etc/modbus/diatemplates/ && \
-  cp modbus/supervisor/modbus.x apu/data/bin/ && \
+  cp modbus/supervisor/bin/modbus.x apu/data/bin/ && \
   cp modbus/xoref/modbus.xns apu/data/etc/modbus/ && \
   cp modbus/xoref/*.xor apu/data/etc/modbus/ && \
   cp modbus/apu/$1/postinst apu/control/postinst && \
   cp modbus/modbus-init apu/data/etc/init.d/modbus
 }
 
-projectGroupId()
-{
-  echo "com.actility"
-}
-
 projectName()
 {
   echo "modbus"
-}
-
-projectVersion()
-{
-  cat modbus/Version
-}
-
-projectApuRev()
-{
-  cat modbus/apu/revision
 }
 
 projectDescription()

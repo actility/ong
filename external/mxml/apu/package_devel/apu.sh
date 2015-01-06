@@ -5,6 +5,10 @@ buildProject()
   rm -rf mxml-2.7/ $ROOTACT/lib/ $ROOTACT/include/
   tar zxvf mxml-2.7.tar.gz
   cd mxml-2.7/
+ 
+  # don't know how to workaround this another way... 
+  [ "$1" == "centos6-x86" ] && [ $(uname -p) == "x86_64" ] && export DSOFLAGS=" -m32 "
+  
   if [ ! -f Makefile ]; then
     echo ./configure $CONFIGURE_FLAGS --prefix $ROOTACT
     ./configure $CONFIGURE_FLAGS --prefix $ROOTACT
