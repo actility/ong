@@ -58,7 +58,7 @@ $(OUTPUT_PATH)/modbus/lib/lib/libmodbus-acy.a \
 $(ROOTACT)/lib/libmodbus.a \
 $(ROOTACT)/drvcommon/lib/libdrvcommon.a
 DYNAMIC_LIBS= \
--L$(ROOTACT)/lib -lxo -ldIa -lrtbase \
+-L$(ROOTACT)/lib -lxo -ldIa -lrtbase -lxml2 \
 -lm -lrt
 
 ifeq ($(SYSTEM),cov1)
