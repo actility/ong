@@ -47,6 +47,8 @@
 
   <properties>
     <kf.framework.version>5.1.14</kf.framework.version>
+    <phoneme-advanced-mr2.version>167.13-7</phoneme-advanced-mr2.version>
+    <phoneme.command.shell.version>2.0.0</phoneme.command.shell.version>
   </properties>
 
   <dependencies>
@@ -100,43 +102,7 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>jxo.jni</artifactId>
       <version>1.2.1</version>
-      <classifier>centos6-x86</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>jxo.jni</artifactId>
-      <version>1.2.1</version>
-      <classifier>centos6-x86_64</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>jxo.jni</artifactId>
-      <version>1.2.1</version>
-      <classifier>cov1</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>jxo.jni</artifactId>
-      <version>1.2.1</version>
-      <classifier>cov2</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>jxo.jni</artifactId>
-      <version>1.2.1</version>
-      <classifier>lpv3</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>jxo.jni</artifactId>
-      <version>1.2.1</version>
-      <classifier>rpib</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>jxo.jni</artifactId>
-      <version>1.2.1</version>
-      <classifier>ntc6200</classifier>
+      <classifier>${build.type}</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -177,43 +143,7 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>shutdown.hook.jni</artifactId>
       <version>1.0.0</version>
-      <classifier>centos6-x86</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>shutdown.hook.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>centos6-x86_64</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>shutdown.hook.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>cov1</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>shutdown.hook.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>cov2</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>shutdown.hook.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>lpv3</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>shutdown.hook.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>rpib</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>shutdown.hook.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>ntc6200</classifier>
+      <classifier>${build.type}</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -239,44 +169,8 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>song.binding.coap.jni</artifactId>
       <version>1.0.0</version>
-      <classifier>centos6-x86</classifier>
+      <classifier>${build.type}</classifier>
     </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.coap.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>centos6-x86_64</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.coap.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>cov1</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.coap.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>cov2</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.coap.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>lpv3</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.coap.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>rpib</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.coap.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>ntc6200</classifier>
-   </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>song.binding.http.api</artifactId>
@@ -296,43 +190,7 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>song.binding.http.jni</artifactId>
       <version>1.0.1</version>
-      <classifier>centos6-x86</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.http.jni</artifactId>
-      <version>1.0.1</version>
-      <classifier>centos6-x86_64</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.http.jni</artifactId>
-      <version>1.0.1</version>
-      <classifier>cov1</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.http.jni</artifactId>
-      <version>1.0.1</version>
-      <classifier>cov2</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.http.jni</artifactId>
-      <version>1.0.1</version>
-      <classifier>lpv3</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.http.jni</artifactId>
-      <version>1.0.1</version>
-      <classifier>rpib</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.http.jni</artifactId>
-      <version>1.0.1</version>
-      <classifier>ntc6200</classifier>
+      <classifier>${build.type}</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -363,43 +221,7 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.sqlite.jni</artifactId>
       <version>2.0.1</version>
-      <classifier>centos6-x86</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.1</version>
-      <classifier>centos6-x86_64</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.1</version>
-      <classifier>cov1</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.1</version>
-      <classifier>cov2</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.1</version>
-      <classifier>lpv3</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.1</version>
-      <classifier>rpib</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.1</version>
-      <classifier>ntc6200</classifier>
+      <classifier>${build.type}</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -511,146 +333,19 @@
       <type>apu</type>
     </dependency>
 
-    <!--<dependency>
-      <groupId>com.sun</groupId>
-      <artifactId>phoneme-advanced-mr2</artifactId>
-      <version>167.13-7</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>-->
-    <dependency>
-      <groupId>com.sun</groupId>
-      <artifactId>phoneme-advanced-mr2</artifactId>
-      <version>167.13-7</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.sun</groupId>
-      <artifactId>phoneme-advanced-mr2</artifactId>
-      <version>167.13-7</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.sun</groupId>
-      <artifactId>phoneme-advanced-mr2</artifactId>
-      <version>167.13-7</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.sun</groupId>
-      <artifactId>phoneme-advanced-mr2</artifactId>
-      <version>167.13-7</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.sun</groupId>
-      <artifactId>phoneme-advanced-mr2</artifactId>
-      <version>167.13-7</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-    </dependency>
-
     <dependency>
       <groupId>org.xmlsoft</groupId>
       <artifactId>libxml2</artifactId>
       <version>2.7.8-2</version>
-      <classifier>centos6-x86</classifier>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
-    <dependency>
-      <groupId>org.xmlsoft</groupId>
-      <artifactId>libxml2</artifactId>
-      <version>2.7.8-2</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xmlsoft</groupId>
-      <artifactId>libxml2</artifactId>
-      <version>2.7.8-2</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xmlsoft</groupId>
-      <artifactId>libxml2</artifactId>
-      <version>2.7.8-2</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xmlsoft</groupId>
-      <artifactId>libxml2</artifactId>
-      <version>2.7.8-2</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xmlsoft</groupId>
-      <artifactId>libxml2</artifactId>
-      <version>2.7.8-2</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xmlsoft</groupId>
-      <artifactId>libxml2</artifactId>
-      <version>2.7.8-2</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-   </dependency>
 
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>rtbase</artifactId>
       <version>1.2.3-1</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>rtbase</artifactId>
-      <version>1.2.3-1</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>rtbase</artifactId>
-      <version>1.2.3-1</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>rtbase</artifactId>
-      <version>1.2.3-1</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>rtbase</artifactId>
-      <version>1.2.3-1</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>rtbase</artifactId>
-      <version>1.2.3-1</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>rtbase</artifactId>
-      <version>1.2.3-1</version>
-      <classifier>ntc6200</classifier>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
@@ -658,49 +353,7 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>libdIa</artifactId>
       <version>1.0.25-1</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>libdIa</artifactId>
-      <version>1.0.25-1</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>libdIa</artifactId>
-      <version>1.0.25-1</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>libdIa</artifactId>
-      <version>1.0.25-1</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>libdIa</artifactId>
-      <version>1.0.25-1</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>libdIa</artifactId>
-      <version>1.0.25-1</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>libdIa</artifactId>
-      <version>1.0.25-1</version>
-      <classifier>ntc6200</classifier>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
@@ -708,49 +361,7 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>xo</artifactId>
       <version>4.4.13-1</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>xo</artifactId>
-      <version>4.4.13-1</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>xo</artifactId>
-      <version>4.4.13-1</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>xo</artifactId>
-      <version>4.4.13-1</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>xo</artifactId>
-      <version>4.4.13-1</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>xo</artifactId>
-      <version>4.4.13-1</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>xo</artifactId>
-      <version>4.4.13-1</version>
-      <classifier>ntc6200</classifier>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
@@ -758,49 +369,7 @@
       <groupId>org.sqlite</groupId>
       <artifactId>sqlite</artifactId>
       <version>3.8.3-0</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sqlite</groupId>
-      <artifactId>sqlite</artifactId>
-      <version>3.8.3-0</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sqlite</groupId>
-      <artifactId>sqlite</artifactId>
-      <version>3.8.3-0</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sqlite</groupId>
-      <artifactId>sqlite</artifactId>
-      <version>3.8.3-0</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sqlite</groupId>
-      <artifactId>sqlite</artifactId>
-      <version>3.8.3-0</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sqlite</groupId>
-      <artifactId>sqlite</artifactId>
-      <version>3.8.3-0</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sqlite</groupId>
-      <artifactId>sqlite</artifactId>
-      <version>3.8.3-0</version>
-      <classifier>ntc6200</classifier>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
@@ -808,49 +377,7 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>stdin-logger</artifactId>
       <version>1.2.1-1</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>stdin-logger</artifactId>
-      <version>1.2.1-1</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>stdin-logger</artifactId>
-      <version>1.2.1-1</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>stdin-logger</artifactId>
-      <version>1.2.1-1</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>stdin-logger</artifactId>
-      <version>1.2.1-1</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>stdin-logger</artifactId>
-      <version>1.2.1-1</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>stdin-logger</artifactId>
-      <version>1.2.1-1</version>
-      <classifier>ntc6200</classifier>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
@@ -858,49 +385,7 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>trans_pty</artifactId>
       <version>1.0.1-1</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>trans_pty</artifactId>
-      <version>1.0.1-1</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>trans_pty</artifactId>
-      <version>1.0.1-1</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>trans_pty</artifactId>
-      <version>1.0.1-1</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>trans_pty</artifactId>
-      <version>1.0.1-1</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>trans_pty</artifactId>
-      <version>1.0.1-1</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>trans_pty</artifactId>
-      <version>1.0.1-1</version>
-      <classifier>ntc6200</classifier>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
@@ -908,69 +393,165 @@
       <groupId>se.haxx</groupId>
       <artifactId>curl</artifactId>
       <version>7.36.0-2</version>
-      <classifier>centos6-x86</classifier>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
-    <dependency>
-      <groupId>se.haxx</groupId>
-      <artifactId>curl</artifactId>
-      <version>7.36.0-2</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>se.haxx</groupId>
-      <artifactId>curl</artifactId>
-      <version>7.36.0-2</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>se.haxx</groupId>
-      <artifactId>curl</artifactId>
-      <version>7.36.0-2</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>se.haxx</groupId>
-      <artifactId>curl</artifactId>
-      <version>7.36.0-2</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>se.haxx</groupId>
-      <artifactId>curl</artifactId>
-      <version>7.36.0-2</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>se.haxx</groupId>
-      <artifactId>curl</artifactId>
-      <version>7.36.0-2</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-    </dependency>
-
 
   </dependencies>
 
+
   <profiles>
+
+    <profile>
+      <id>centos6-x86</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>centos6-x86</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>${phoneme.command.shell.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
     <profile>
       <id>centos6-x86_64</id>
       <activation>
         <property>
           <name>build.type</name>
-          <value>!centos6-x86_64</value>
+          <value>centos6-x86_64</value>
+        </property>
+      </activation>
+    </profile>
+
+    <profile>
+      <id>cov1</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>cov1</value>
         </property>
       </activation>
       <dependencies>
         <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
           <groupId>com.actility.m2m</groupId>
           <artifactId>phoneme.command.shell</artifactId>
-          <version>2.0.0</version>
+          <version>${phoneme.command.shell.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>cov2</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>cov2</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>${phoneme.command.shell.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>lpv3</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>lpv3</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>${phoneme.command.shell.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>rpib</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>rpib</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>${phoneme.command.shell.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>ntc6200</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>ntc6200</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>${phoneme.command.shell.version}</version>
         </dependency>
       </dependencies>
     </profile>
@@ -997,6 +578,10 @@
                 <requireProperty>
                   <property>build.type</property>
                   <message>You must set a build.type property!</message>
+                </requireProperty>
+                <requireProperty>
+                  <property>build.arch</property>
+                  <message>You must set a build.arch property!</message>
                 </requireProperty>
               </rules>
               <fail>true</fail>
