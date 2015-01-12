@@ -39,7 +39,7 @@
     <version>2.0.0</version>
   </parent>
   <artifactId>ong-installer</artifactId>
-  <version>3.4.3</version>
+  <version>3.6.0</version>
   <packaging>jar</packaging>
 
   <name>ONG Installer</name>
@@ -476,6 +476,9 @@
 
     <profile>
       <id>ntc6200</id>
+      <properties>
+      	<build.type>ntc6200</build.type>
+      </properties>
       <activation>
         <property>
           <name>build.type</name>
@@ -621,7 +624,7 @@
         <groupId>com.actility.m2m</groupId>
         <artifactId>cocoon-maven-plugin</artifactId>
         <configuration>
-          <excludeArchitectures>centos6-x86_64,lpv3,ntc6200</excludeArchitectures>
+          <includeArchitecture>${build.type}</includeArchitecture>
           <excludeProducts>ong-osgime</excludeProducts>
           <excludeModules>ong.osgime</excludeModules>
           <excludeTypes>pom</excludeTypes>
@@ -630,22 +633,22 @@
           <defaultModule>gscl.osgi</defaultModule>
           <modules>
             org.xmlsoft:libxml2:core,
-            com.actility:rtbase:core,
-            com.actility:xo:core,
-            com.actility:libdIa:core,
-            com.actility:m2mxoref:core,
-            com.actility:stdin-logger:core,
+            com.actility.m2m:rtbase:core,
+            com.actility.m2m:xo:core,
+            com.actility.m2m:libdIa:core,
+            com.actility.m2m:m2mxoref:core,
+            com.actility.m2m:stdin-logger:core,
             org.sqlite:sqlite:core,
-            com.actility:zigbee:zigbee,
-            com.actility:wmbus:wmbus,
-            com.actility:watteco:watteco,
-            com.actility:knx:knx,
+            com.actility.m2m:zigbee:zigbee,
+            com.actility.m2m:wmbus:wmbus,
+            com.actility.m2m:watteco:watteco,
+            com.actility.m2m:knx:knx,
             org.gnu:eibd:knx,
             org.gnu:pthsem:knx,
-            com.actility:modbus:modbus,
-            com.actility:iec61131:iec61131,
+            com.actility.m2m:modbus:modbus,
+            com.actility.m2m:iec61131:iec61131,
             org.msweet:mxml:iec61131,
-            com.actility:tty_mapper:tty_mapper,
+            com.actility.m2m:tty_mapper:tty_mapper,
             com.icarus:ntpclient:ntpclient,
             org.tcpdump:tcpdump:tcpdump,
           </modules>

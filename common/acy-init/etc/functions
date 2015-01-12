@@ -103,10 +103,9 @@ start() {
             PIDDIR=$(dirname $PIDFILE)
             [ ! -d $PIDDIR ] && mkdir -p $PIDDIR
             echo "$SERVICE_PID|$SERVICE_NAME|$START_DATE|0" > $PIDFILE
-            [ -z "$SERVICE_PID" ] && echo "Failed to determinate SERVICE_PID"
-            [ -z "$SERVICE_NAME" ] && echo "Failed to determinate SERVICE_NAME"
-            [ -z "$START_DATE" ] && echo "Failed to determinate START_DATE"
-            ret=$?
+            [ -z "$SERVICE_PID" ] && echo "Failed to determinate SERVICE_PID" && ret=1
+            [ -z "$SERVICE_NAME" ] && echo "Failed to determinate SERVICE_NAME" && ret=1
+            [ -z "$START_DATE" ] && echo "Failed to determinate START_DATE" && ret=1
 
             postStart $ret
             ret=$?

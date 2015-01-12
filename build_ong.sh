@@ -218,7 +218,7 @@ export PHONEME_HOME=$PHONEME_TARGET_DIR/bin/phoneme
 
 build common/java.pom
 build common/java.cdc.pom
-build dev-tools/apu-tools
+build dev-tools/apu-tools noarch
 build dev-tools/apu-maven-plugin
 build dev-tools/cocoon-maven-plugin
 
@@ -298,7 +298,7 @@ build gscl/transport.logger.log
 build gscl/scl $TARGET
 
 if [ $BUILD_INTALLER -eq 1 ]; then
-  build installer/ong-installer
+  build installer/ong-installer $TARGET
 fi
 
 echo "done"

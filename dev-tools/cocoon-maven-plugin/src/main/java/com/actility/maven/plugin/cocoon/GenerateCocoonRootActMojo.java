@@ -32,6 +32,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.shared.artifact.filter.collection.ArtifactsFilter;
 import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver;
+import org.codehaus.plexus.util.DirectoryScanner;
 
 /**
  * Goal which generate the init.xargs Knopflerfish init script.
@@ -73,11 +74,11 @@ public class GenerateCocoonRootActMojo extends AbstractDependencyFilterMojo {
     private String modules;
 
     /**
-     * Comma separated list of Architectures names to exclude.
+     * The name of the only architecture to include.
      *
      * @parameter
      */
-    private String excludeArchitectures;
+    private String includeArchitecture;
 
     /**
      * Comma separated list of Products names to exclude.
@@ -121,8 +122,6 @@ public class GenerateCocoonRootActMojo extends AbstractDependencyFilterMojo {
                 getLog().info(artifact.getFile().getName() + " already exists in destination.");
             }
 
-            List<String> excludedArchitecturesList = (excludeArchitectures != null) ? Arrays.asList(excludeArchitectures
-                    .split(",")) : Collections.EMPTY_LIST;
             List<String> excludedProductsList = (excludeProducts != null) ? Arrays.asList(excludeProducts.split(","))
                     : Collections.EMPTY_LIST;
             List<String> excludedModulesList = (excludeModules != null) ? Arrays.asList(excludeModules.split(","))
@@ -132,7 +131,7 @@ public class GenerateCocoonRootActMojo extends AbstractDependencyFilterMojo {
             File destDir = null;
             for (Artifact artifact : dependencies) {
 
-                if ("jar".equals(artifact.getType())) {
+            	if ("jar".equals(artifact.getType())) {
                     if (isBundle(artifact)) {
                         if (artifact.getClassifier() != null) {
                             destDir = new File(outputDirectory.getAbsolutePath() + "/arch/" + artifact.getClassifier() + "/"
@@ -196,10 +195,11 @@ public class GenerateCocoonRootActMojo extends AbstractDependencyFilterMojo {
                             + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ")");
                 }
             }
-            for (String arch : excludedArchitecturesList) {
-                arch = arch.trim();
-                if (arch.length() > 1) {
-                    removeDirectory(new File(outputDirectory.getAbsolutePath() + "/arch/" + arch + "/"));
+            
+            
+            for (File archDir : new File(outputDirectory.getAbsolutePath() + "/arch/").listFiles()) {
+            	if (! includeArchitecture.equals(archDir.getName())) {
+                    removeDirectory(archDir);
                 }
             }
             for (String product : excludedProductsList) {

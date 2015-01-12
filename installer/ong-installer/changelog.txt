@@ -1,6 +1,22 @@
 -------------------------------------------------------------------------------
 ONG remote installer
 -------------------------------------------------------------------------------
+Version: 3.6.0
+Date: 2014-11-10
+
+New Features:
+-------------
+ - ong-installer is now split, and there is one installer per supported target
+   (centos6-x86, centos6-x86_64, lpv3, cov1, cov2, rpib, ntc6200 (new))
+
+Bug Fixes:
+----------
+ - Actility up-graded packages:
+   * gscl-2.4.3
+ - Actility added packages:
+   * supervision-3.4.2
+
+-------------------------------------------------------------------------------
 Version: 3.4.2
 Date: 2014-11-10
 
