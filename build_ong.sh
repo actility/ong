@@ -298,7 +298,7 @@ build gscl/transport.logger.log
 build gscl/gscl $TARGET
 
 if [ $BUILD_INTALLER -eq 1 ]; then
-  build installer/ong-installer
+  build installer/ong-installer $TARGET
 fi
 
 echo "done"

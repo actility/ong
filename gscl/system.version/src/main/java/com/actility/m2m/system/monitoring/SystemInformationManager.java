@@ -71,7 +71,7 @@ public final class SystemInformationManager {
     private static final String CMD_DF = "df";
     private static final String PATH_RELATIVE_SECTOR_SIZE = File.separatorChar + "queue" + File.separatorChar
             + "hw_sector_size";
-    private static final String[] CMD_ONG_STATUS = new String[] { "sh", "-c", "$ROOTACT\"/etc/ong\" status" };
+    private static final String[] CMD_ONG_STATUS = new String[] { "sh", "-c", "$ROOTACT\"/etc/acy\" status" };
 
     private static final String CATEGORY_CPU = "CATEGORY_CPU";
     private static final String CATEGORY_UPTIME = "CATEGORY_UPTIME";

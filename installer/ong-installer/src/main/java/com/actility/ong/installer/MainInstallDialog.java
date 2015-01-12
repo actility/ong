@@ -98,7 +98,6 @@ public class MainInstallDialog {
     private JTextField text_rootAct;
     private JTextField text_ongName;
     private JTextField text_domainName;
-    private JComboBox combo_boxArch;
     private JComboBox combo_boxProduct;
     // private JComboBox combo_boxZbZnpSecurityMode;
     private JButton btn_install;
@@ -125,6 +124,7 @@ public class MainInstallDialog {
     private PrintStream log;
     private RemoteOngInstaller installer;
     private String ongVersion;
+	private String targetedArch;
 
     /**
      * Launch the application.
@@ -186,21 +186,20 @@ public class MainInstallDialog {
         try {
             props.load(is);
             ongVersion = props.getProperty("version");
+            targetedArch = props.getProperty("targetedarch");
         } catch (IOException e1) {
             ongVersion = "(version unknown)";
         }
-        List<MyFileEntry> archs = myJarFile.getSubDirectoriesOnOneLevel("arch/");
-        for (MyFileEntry arch : archs) {
-            Properties archProps = new Properties();
-            try {
-                archProps.load(getClass().getClassLoader().getResourceAsStream(
-                        "arch/" + arch.getFileBaseName() + "/installer/arch.properties"));
-                InstallerUtil.getInstance().addNewArch(arch.getFileBaseName(), archProps);
-            } catch (IOException e1) {
-                log.append("Cannot load architecture property file: arch/" + arch.getFileBaseName()
-                        + "/installer/arch.properties");
-            }
+        Properties archProps = new Properties();
+        try {
+            archProps.load(getClass().getClassLoader().getResourceAsStream(
+                    "arch/" + targetedArch + "/installer/arch.properties"));
+            InstallerUtil.getInstance().setArch(targetedArch, archProps);
+        } catch (IOException e1) {
+            log.append("Cannot load architecture property file: arch/" + targetedArch
+                    + "/installer/arch.properties");
         }
+
         List<MyFileEntry> products = myJarFile.getSubDirectoriesOnOneLevel("product/");
         for (MyFileEntry product : products) {
             Properties productProps = new Properties();
@@ -310,17 +309,13 @@ public class MainInstallDialog {
 
         yOffset += 24;
 
-        JLabel lbl_boxArch = new JLabel("Architecture");
-        lbl_boxArch.setBounds(firstColumnXOffset, yOffset, firstColumnWidth, 15);
-        frame.getContentPane().add(lbl_boxArch);
+        JLabel lbl_Arch = new JLabel("Architecture");
+        lbl_Arch.setBounds(firstColumnXOffset, yOffset, firstColumnWidth, 15);
+        frame.getContentPane().add(lbl_Arch);
 
-        combo_boxArch = new JComboBox();
-        String[] flavors = InstallerUtil.getInstance().getArchitectures();
-        combo_boxArch.setModel(new DefaultComboBoxModel(flavors));
-        combo_boxArch.setMaximumRowCount(4);
-        combo_boxArch.setBounds(secondColumnXOffset, yOffset - 5, secondColumnWidth, 24);
-        combo_boxArch.setAction(new SwingActionComboBoxArch());
-        frame.getContentPane().add(combo_boxArch);
+        JLabel lbl_ArchValue = new JLabel(targetedArch);
+        lbl_ArchValue.setBounds(secondColumnXOffset, yOffset - 5, secondColumnWidth, 24);
+        frame.getContentPane().add(lbl_ArchValue);
 
         yOffset += 26;
 
@@ -354,7 +349,7 @@ public class MainInstallDialog {
 
         text_maxLogSizeDefault = new JTextField();
         text_maxLogSizeDefault.setBounds(thirdSubColumn3XOffset, yOffset - 2, thirdSubColumn3Width, 19);
-        text_maxLogSizeDefault.setText(InstallerUtil.getInstance().getArchFromLabel(flavors[0]).getMaxLogSize());
+        text_maxLogSizeDefault.setText(InstallerUtil.getInstance().getArch().getMaxLogSize());
         text_maxLogSizeDefault.setEditable(false);
         frame.getContentPane().add(text_maxLogSizeDefault);
         text_maxLogSizeDefault.setColumns(20);
@@ -651,7 +646,6 @@ public class MainInstallDialog {
         text_sshPort.setEnabled(enable);
         text_maxLogSize.setEnabled(enable);
         text_maxLogSizeDefault.setEnabled(enable);
-        combo_boxArch.setEnabled(enable);
         combo_boxProduct.setEnabled(enable);
         text_rootAct.setEnabled(enable);
         text_nsclUri.setEnabled(enable);
@@ -959,8 +953,7 @@ public class MainInstallDialog {
                     if (!chckbx_ongName.isSelected()) {
                         ongName = text_ongName.getText();
                     }
-                    ArchConfig arch = InstallerUtil.getInstance().getArchFromLabel(
-                            combo_boxArch.getModel().getSelectedItem().toString());
+                    ArchConfig arch = InstallerUtil.getInstance().getArch();
                     ProductConfig product = InstallerUtil.getInstance().getProductFromLabel(
                             combo_boxProduct.getModel().getSelectedItem().toString());
                     List<ModuleConfig> modules = buildModules(arch, product);
@@ -1010,8 +1003,7 @@ public class MainInstallDialog {
                     if (!chckbx_ongName.isSelected()) {
                         ongName = text_ongName.getText();
                     }
-                    ArchConfig arch = InstallerUtil.getInstance().getArchFromLabel(
-                            combo_boxArch.getModel().getSelectedItem().toString());
+                    ArchConfig arch = InstallerUtil.getInstance().getArch();
                     ProductConfig product = InstallerUtil.getInstance().getProductFromLabel(
                             combo_boxProduct.getModel().getSelectedItem().toString());
                     List<ModuleConfig> modules = buildModules(arch, product);
@@ -1060,7 +1052,7 @@ public class MainInstallDialog {
 
             // Determine status
             String flavor = cb.getModel().getSelectedItem().toString();
-            ArchConfig arch = InstallerUtil.getInstance().getArchFromLabel(flavor);
+            ArchConfig arch = InstallerUtil.getInstance().getArch();
             String[] excludedModulesArray = arch.getExcludedModules();
             List<String> excludedModules = (excludedModulesArray != null) ? Arrays.asList(excludedModulesArray) : null;
             if (excludedModules != null) {

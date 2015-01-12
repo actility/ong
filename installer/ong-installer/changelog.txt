@@ -6,14 +6,16 @@ Date: 2015-XX-XX
 
 New Features:
 -------------
- - N/A
+ - ong-installer is now split, and there is one installer per supported target
+   (centos6-x86, centos6-x86_64, lpv3, cov1, cov2, rpib, ntc6200 (new))
 
 Bug Fixes:
 ----------
  - Actility up-graded packages:
-   * gscl-2.4.2
+   * gscl-2.4.3
    * zigbee-1.8.5
  - Actility added packages:
+   * supervision-3.4.2
    * acy-init-1.0.1
 
 -------------------------------------------------------------------------------

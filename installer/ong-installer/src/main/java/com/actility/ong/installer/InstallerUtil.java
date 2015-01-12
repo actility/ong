@@ -56,7 +56,7 @@ public class InstallerUtil {
 
     private static InstallerUtil installerUtil = new InstallerUtil();
 
-    private final Map<String, ArchConfig> archProperties = new HashMap<String, ArchConfig>();
+    private ArchConfig arch;
     private final Map<String, ProductConfig> productProperties = new HashMap<String, ProductConfig>();
     private final Map<String, ModuleConfig> moduleProperties = new HashMap<String, ModuleConfig>();
 
@@ -69,11 +69,14 @@ public class InstallerUtil {
         return installerUtil;
     }
 
-    public void addNewArch(String name, Properties properties) {
-        ArchConfig config = new ArchConfig(name, properties);
-        archProperties.put(config.getLabel(), config);
+    public void setArch(String name, Properties properties) {
+    	arch = new ArchConfig(name, properties);
     }
-
+    
+    public ArchConfig getArch() {
+    	return arch;
+    }
+    
     public void addNewProduct(String name, Properties properties) {
         ProductConfig config = new ProductConfig(name, properties);
         productProperties.put(config.getLabel(), config);
@@ -82,10 +85,6 @@ public class InstallerUtil {
     public void addNewModule(String name, Properties properties) {
         ModuleConfig config = new ModuleConfig(name, properties);
         moduleProperties.put(config.getName(), config);
-    }
-
-    public ArchConfig getArchFromLabel(String label) {
-        return archProperties.get(label);
     }
 
     public ProductConfig getProductFromLabel(String label) {
@@ -147,20 +146,6 @@ public class InstallerUtil {
             log.println("unable to remove folder " + dirName);
             e.printStackTrace(log);
         }
-    }
-
-    public String[] getArchitectures() {
-        Map<Integer, String> flavors = new TreeMap<Integer, String>();
-        for (ArchConfig arch : archProperties.values()) {
-            flavors.put(Integer.valueOf(arch.getIndex()), arch.getLabel());
-        }
-        String[] result = new String[flavors.size()];
-        int index = 0;
-        for (String label : flavors.values()) {
-            result[index] = label;
-            ++index;
-        }
-        return result;
     }
 
     public String[] getProducts() {
