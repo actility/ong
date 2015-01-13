@@ -55,11 +55,7 @@ $(OUTPUT_PATH)/watteco/lib/lib/libwatteco.a
 DYNAMIC_LIBS= \
 -L$(ROOTACT)/lib -ldrvcommon -lxo -ldIa -lrtbase \
 -L$(ROOTACT)/lib -lxml2 \
--lm -lrt
-
-ifeq ($(SYSTEM),cov1)
-DYNAMIC_LIBS += -lpthread
-endif
+-lpthread -lm -lrt
 
 CFLAGS += -Wall #-Werror
 
