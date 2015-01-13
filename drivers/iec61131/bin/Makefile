@@ -63,11 +63,7 @@ STATIC_LIBS= \
 $(OUTPUT_PATH)/iec61131/libinterv2/lib/libinterv2.a
 DYNAMIC_LIBS= \
 -L$(ROOTACT)/lib -lmxml \
--L$(ROOTACT)/lib -ldIa -lrtbase -lm -lrt
-
-ifeq ($(SYSTEM),cov1)
-DYNAMIC_LIBS += -lpthread
-endif
+-L$(ROOTACT)/lib -ldIa -lrtbase -lpthread -lm -lrt
 
 CFLAGS += -Wall #-Werror
 

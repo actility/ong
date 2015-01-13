@@ -205,7 +205,7 @@ build external/libmodbus $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x8
 build external/sqlite $TARGET
 build external/curl $TARGET
 build external/cproto $HOST_TARGET
-build external/libmicrohttpd $TARGET
+build external/libmicrohttpd $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build external/jni $TARGET
 build external/exip $TARGET "{centos6-x86}"
 build external/phoneme-advanced-mr2 $TARGET "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
@@ -230,8 +230,8 @@ build common/m2mxoref $HOST_TARGET
 build common/stdin-logger $TARGET
 build common/trans_pty $TARGET
 build common/tty_mapper $TARGET
-build common/libSongOverHttp $TARGET
-build common/libHttpSubsMgmt $TARGET
+build common/libSongOverHttp $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
+build common/libHttpSubsMgmt $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build common/supervision noarch
 build common/acy-init noarch
 build drivers/AZAP $TARGET
