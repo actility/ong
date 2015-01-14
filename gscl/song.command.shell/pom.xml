@@ -35,7 +35,7 @@
   <parent>
     <groupId>com.actility.m2m</groupId>
     <artifactId>java.cdc.pom</artifactId>
-    <version>3.0.0</version>
+    <version>[3.0.0,4)</version>
   </parent>
   <artifactId>song.command.shell</artifactId>
   <version>3.2.0</version>

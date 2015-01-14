@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.actility.m2m</groupId>
     <artifactId>java.pom</artifactId>
-    <version>2.0.0</version>
+    <version>[2.0.0,3)</version>
   </parent>
   <artifactId>apu-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
