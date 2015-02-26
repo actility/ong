@@ -107,6 +107,7 @@ SOH_RCODE sohUninit()
 {
   MHD_stop_daemon (songHttpDaemon);
   httpClient->free(httpClient);
+  pendingSrvTransactions->free(pendingSrvTransactions);
 
   songHttpDaemon = NULL;
   httpClient = NULL;

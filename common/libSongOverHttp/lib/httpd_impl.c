@@ -147,6 +147,11 @@ int answerToConnection (void *cls, struct MHD_Connection *connection,
   {
     user = MHD_basic_auth_get_username_password (connection, &pass);
     trans->setReqEntity(trans, user);
+    // WARNING: MHD_basic_auth_get_username_password does a strdup, 
+    // and setReqEntity also does
+    free(user);
+    // pass is not used. 
+    free(pass); 
   }
 
   if (0 == strcmp (method, MHD_HTTP_METHOD_POST))
