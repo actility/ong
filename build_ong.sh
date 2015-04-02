@@ -172,12 +172,12 @@ case "$TARGET" in
 		fi
 		;;
 
-        "ntc6200")
-                if [ -z "$(apu-make ls-targets | grep ^cross-ntc6200$)" ]; then
-                        build targets/target-cross-ntc6200 noarch
-                        apuInstallTarget cross-ntc6200
-                fi
-                ;;
+  "ntc6200")
+    if [ -z "$(apu-make ls-targets | grep ^cross-ntc6200$)" ]; then
+      build targets/target-cross-ntc6200 noarch
+      apuInstallTarget cross-ntc6200
+    fi
+    ;;
 
 	*)
 		abortWithMsg "Unsupported TARGET ($TARGET)"
