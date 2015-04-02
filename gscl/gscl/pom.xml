@@ -47,6 +47,8 @@
 
   <properties>
     <kf.framework.version>5.1.14</kf.framework.version>
+    <phoneme-advanced-mr2.version>167.13-7</phoneme-advanced-mr2.version>
+    <phoneme.command.shell.version>2.0.0</phoneme.command.shell.version>
   </properties>
 
   <dependencies>
@@ -104,12 +106,6 @@
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
-      <artifactId>jxo.jni</artifactId>
-      <version>1.2.1</version>
-      <classifier>ntc6200</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
       <artifactId>log.api</artifactId>
       <version>1.0.0</version>
     </dependency>
@@ -151,12 +147,6 @@
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
-      <artifactId>shutdown.hook.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>ntc6200</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
       <artifactId>song.api</artifactId>
       <version>5.0.0</version>
     </dependency>
@@ -183,12 +173,6 @@
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.coap.jni</artifactId>
-      <version>1.0.0</version>
-      <classifier>ntc6200</classifier>
-   </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
       <artifactId>song.binding.http.api</artifactId>
       <version>1.0.0</version>
     </dependency>
@@ -207,12 +191,6 @@
       <artifactId>song.binding.http.jni</artifactId>
       <version>1.0.1</version>
       <classifier>${build.type}</classifier>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>song.binding.http.jni</artifactId>
-      <version>1.0.1</version>
-      <classifier>ntc6200</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -244,13 +222,6 @@
       <artifactId>storage.driver.sqlite.jni</artifactId>
       <version>2.0.1</version>
       <classifier>${build.type}</classifier>
-    </dependency>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>storage.driver.sqlite.jni</artifactId>
-      <version>2.0.1</version>
-      <classifier>ntc6200</classifier>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -430,21 +401,159 @@
 
   <profiles>
     <profile>
-      <id>centos6-x86_64</id>
+      <id>centos6-x86</id>
       <activation>
         <property>
           <name>build.type</name>
-          <value>!centos6-x86_64</value>
+          <value>centos6-x86</value>
         </property>
       </activation>
       <dependencies>
         <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
           <groupId>com.actility.m2m</groupId>
           <artifactId>phoneme.command.shell</artifactId>
-          <version>2.0.0</version>
+          <version>${phoneme.command.shell.version}</version>
         </dependency>
       </dependencies>
     </profile>
+
+    <profile>
+      <id>centos6-x86_64</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>centos6-x86_64</value>
+        </property>
+      </activation>
+    </profile>
+
+    <profile>
+      <id>cov1</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>cov1</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>${phoneme.command.shell.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>cov2</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>cov2</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>${phoneme.command.shell.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>lpv3</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>lpv3</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>${phoneme.command.shell.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>rpib</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>rpib</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>${phoneme.command.shell.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>ntc6200</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>ntc6200</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>phoneme-advanced-mr2</artifactId>
+          <version>${phoneme-advanced-mr2.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>phoneme.command.shell</artifactId>
+          <version>${phoneme.command.shell.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+
   </profiles>
 
   <build>
@@ -468,6 +577,10 @@
                 <requireProperty>
                   <property>build.type</property>
                   <message>You must set a build.type property!</message>
+                </requireProperty>
+                <requireProperty>
+                  <property>build.arch</property>
+                  <message>You must set a build.arch property!</message>
                 </requireProperty>
               </rules>
               <fail>true</fail>

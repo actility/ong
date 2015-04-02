@@ -187,8 +187,6 @@ esac
 ARCH=$($APU_MAKE env $TARGET | grep "export ARCH=" | sed -e "s|^export ARCH=\(.*\)$|\1|")
 
 # now build all sub-modules in the right order
-build dev-tools/apu-tools noarch
-build common/acy-init noarch
 build common/makefile-common noarch
 build common/rtbase $TARGET
 [ "$HOST_TARGET" != "$TARGET" ] && build common/rtbase $HOST_TARGET
@@ -206,7 +204,7 @@ build external/tcpdump $TARGET
 build external/libmodbus $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build external/sqlite $TARGET
 build external/curl $TARGET
-build external/cproto $TARGET
+build external/cproto $HOST_TARGET
 build external/libmicrohttpd $TARGET
 build external/jni $TARGET
 build external/exip $TARGET "{centos6-x86}"
@@ -220,6 +218,7 @@ export PHONEME_HOME=$PHONEME_TARGET_DIR/bin/phoneme
 
 build common/java.pom
 build common/java.cdc.pom
+build dev-tools/apu-tools noarch
 build dev-tools/apu-maven-plugin
 build dev-tools/cocoon-maven-plugin
 
@@ -233,6 +232,8 @@ build common/trans_pty $TARGET
 build common/tty_mapper $TARGET
 build common/libSongOverHttp $TARGET
 build common/libHttpSubsMgmt $TARGET
+build common/supervision noarch
+build common/acy-init noarch
 build drivers/AZAP $TARGET
 build drivers/drvcommon $TARGET
 build drivers/zigbee $TARGET
@@ -271,7 +272,7 @@ build gscl/song.trace.command.shell
 build gscl/cm.command.shell
 build gscl/log.command.shell
 build gscl/inspector.command.shell
-build gscl/phoneme.command.shell - "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
+build gscl/phoneme.command.shell
 
 build gscl/m2m
 build gscl/storage.me
@@ -295,7 +296,6 @@ build gscl/song.binding.http.jni $TARGET
 build gscl/storage.driver.sqlite.jni $TARGET
 build gscl/transport.logger.log
 build gscl/gscl $TARGET
-build common/supervision
 
 if [ $BUILD_INTALLER -eq 1 ]; then
   build installer/ong-installer
