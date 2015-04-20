@@ -13,6 +13,7 @@ Bug Fixes:
 ----------
  - Actility up-graded packages:
    * gscl-2.4.3
+   * supervision-3.4.3
  - Actility added packages:
    * supervision-3.4.2
 

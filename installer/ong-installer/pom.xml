@@ -129,7 +129,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>supervision</artifactId>
-      <version>3.4.2-0</version>
+      <version>3.4.3-0</version>
       <type>apu</type>
     </dependency>
 
