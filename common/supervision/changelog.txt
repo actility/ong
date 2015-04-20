@@ -1,6 +1,21 @@
 -------------------------------------------------------------------------------
 Supervision script
 -------------------------------------------------------------------------------
+Version: 3.4.3
+Date: 2015-04-20
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Changed 'ps' options so that allocated resources on processes are
+   displayed.
+ - Added hostname of the issuer machine in the emails sent by the supervision
+   service.
+
+-------------------------------------------------------------------------------
 Version: 3.4.2
 Date: 2014-12-17
 

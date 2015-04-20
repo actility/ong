@@ -13,9 +13,9 @@ Bug Fixes:
 ----------
  - Actility up-graded packages:
    * gscl-2.4.3
-   * zigbee-1.8.5
  - Actility added packages:
-   * supervision-3.4.2
+   * supervision-3.4.3
+   * zigbee-1.8.5
    * acy-init-1.0.1
 
 -------------------------------------------------------------------------------

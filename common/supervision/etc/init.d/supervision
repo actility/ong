@@ -1,5 +1,5 @@
 #!(SHELL)
-# v2.0.0
+# v3.4.3
 # supervision:  Starts the SUPERVISION
 
 CURRENT_DIR=$(dirname $0)
@@ -39,7 +39,7 @@ RESTART_TIMER=60
 PROGNAME=supervision
 REBOOT_CMD="/sbin/reboot"
 STDIN_LOGGER_CMD="$ROOTACT/bin/stdin-logger $ROOTACT/var/log/supervision/ supervision 2048 2 1 1 0"
-PS_CMD="ps -eLf ww"
+PS_CMD="ps -eLFww"
 SAR_CMD="sar -A"
 
 usage() {
