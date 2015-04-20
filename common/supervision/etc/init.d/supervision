@@ -150,8 +150,8 @@ infoService() {
   # send an email
   if [ -n "$ADMIN_EMAILS" ]
   then
-    echo "Subject: [Info] [$(hostname):$ROOTACT] Monitoring unstable for: $*" > $EMAIL_MSG_FILE
-    echo "Monitoring unstable for: $* ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
+    echo "Subject: [Info] [$(hostname):$ROOTACT] Monitoring unstable for: $* on $(hostname)" > $EMAIL_MSG_FILE
+    echo "Monitoring unstable for: $* on $(hostname) ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
     echo "Logs have been backed up in $BACKUP_FILE."  >> $EMAIL_MSG_FILE
     echo "--------------------------" >> $EMAIL_MSG_FILE
     echo "Excerpt from log file:" >> $EMAIL_MSG_FILE
@@ -188,15 +188,15 @@ alertService() {
   if [ -n "$ADMIN_EMAILS" ]
   then
     if [ "$STRATEGY" == "alert" ]; then
-      echo "Subject: [Alert] [$(hostname):$ROOTACT] Monitoring failed for: $*" > $EMAIL_MSG_FILE
-      echo "Monitoring failed for: $* ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
+      echo "Subject: [Alert] [$(hostname):$ROOTACT] Monitoring failed for: $* on $(hostname)" > $EMAIL_MSG_FILE
+      echo "Monitoring failed for: $* on $(hostname) ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
     elif [ "$STRATEGY" == "restart" ]; then
-      echo "Subject: [Alert] [Restart] [$(hostname):$ROOTACT] Monitoring failed for: $*" > $EMAIL_MSG_FILE
-      echo "Monitoring failed for: $* ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
+      echo "Subject: [Alert] [Restart] [$(hostname):$ROOTACT] Monitoring failed for: $* on $(hostname)" > $EMAIL_MSG_FILE
+      echo "Monitoring failed for: $* on $(hostname) ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
       echo "Restart all problematic services." >> $EMAIL_MSG_FILE
     elif [ "$STRATEGY" == "reboot" ]; then
-      echo "Subject: [Alert] [Reboot] [$(hostname):$ROOTACT] Monitoring failed for: $*" > $EMAIL_MSG_FILE
-      echo "Monitoring failed for: $* ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
+      echo "Subject: [Alert] [Reboot] [$(hostname):$ROOTACT] Monitoring failed for: $* on $(hostname)" > $EMAIL_MSG_FILE
+      echo "Monitoring failed for: $* on $(hostname) ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
       echo "Reboot machine." >> $EMAIL_MSG_FILE
     fi
     echo "Logs have been backed up in $BACKUP_FILE."  >> $EMAIL_MSG_FILE
