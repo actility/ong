@@ -11,8 +11,8 @@
  *
  * @date Sep 3, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: ASCII_stringManipulate.c 279 2013-04-05 17:05:00Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: ASCII_stringManipulate.c 348 2014-11-21 12:34:51Z kjussakov $
  */
 
 #include "stringManipulate.h"
@@ -24,16 +24,16 @@ errorCode allocateStringMemory(CharType** str, Index UCSchars)
 {
 	*str = EXIP_MALLOC(sizeof(CharType)*UCSchars);
 	if((*str) == NULL)
-		return MEMORY_ALLOCATION_ERROR;
-	return ERR_OK;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
+	return EXIP_OK;
 }
 
 errorCode allocateStringMemoryManaged(CharType** str, Index UCSchars, AllocList* memList)
 {
 	(*str) = (CharType*) memManagedAllocate(memList, sizeof(CharType)*UCSchars);
 	if((*str) == NULL)
-		return MEMORY_ALLOCATION_ERROR;
-	return ERR_OK;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
+	return EXIP_OK;
 }
 
 /**
@@ -42,10 +42,10 @@ errorCode allocateStringMemoryManaged(CharType** str, Index UCSchars, AllocList*
 errorCode writeCharToString(String* str, uint32_t code_point, Index* writerPosition)
 {
 	if(*writerPosition >= str->length)
-		return OUT_OF_BOUND_BUFFER;
+		return EXIP_OUT_OF_BOUND_BUFFER;
 	str->str[*writerPosition] = (CharType) code_point;
 	*writerPosition += 1;
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 void getEmptyString(String* emptyStr)
@@ -69,20 +69,20 @@ errorCode asciiToString(const char* inStr, String* outStr, AllocList* memList, b
 		if(clone == FALSE)
 		{
 			outStr->str = (CharType*) inStr;
-			return ERR_OK;
+			return EXIP_OK;
 		}
 		else
 		{
 			outStr->str = (CharType*) memManagedAllocate(memList, sizeof(CharType)*(outStr->length));
 			if(outStr->str == NULL)
-				return MEMORY_ALLOCATION_ERROR;
+				return EXIP_MEMORY_ALLOCATION_ERROR;
 			memcpy(outStr->str, inStr, outStr->length);
-			return ERR_OK;
+			return EXIP_OK;
 		}
 	}
 	else
 		outStr->str = NULL;
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 boolean stringEqual(const String str1, const String str2)
@@ -155,25 +155,25 @@ uint32_t readCharFromString(const String* str, Index* readerPosition)
 errorCode cloneString(const String* src, String* newStr)
 {
 	if(newStr == NULL)
-		return NULL_POINTER_REF;
+		return EXIP_NULL_POINTER_REF;
 	newStr->str = EXIP_MALLOC(sizeof(CharType)*src->length);
 	if(newStr->str == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 	newStr->length = src->length;
 	memcpy(newStr->str, src->str, src->length);
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode cloneStringManaged(const String* src, String* newStr, AllocList* memList)
 {
 	if(newStr == NULL)
-		return NULL_POINTER_REF;
+		return EXIP_NULL_POINTER_REF;
 	newStr->str = memManagedAllocate(memList, sizeof(CharType)*src->length);
 	if(newStr->str == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 	newStr->length = src->length;
 	memcpy(newStr->str, src->str, src->length);
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 Index getIndexOfChar(const String* src, CharType sCh)
@@ -195,7 +195,7 @@ errorCode stringToInteger(const String* src, int* number)
 	char *endPointer;
 
 	if(src->length == 0 || src->length >= PARSING_STRING_MAX_LENGTH)
-		return INVALID_STRING_OPERATION;
+		return EXIP_INVALID_STRING_OPERATION;
 
 	memcpy(buff, src->str, src->length);
 	buff[src->length] = '\0';
@@ -203,14 +203,14 @@ errorCode stringToInteger(const String* src, int* number)
 	result = strtol(buff, &endPointer, 10);
 
 	if(result == LONG_MAX || result == LONG_MIN || *src->str == *endPointer)
-		return INVALID_STRING_OPERATION;
+		return EXIP_INVALID_STRING_OPERATION;
 
 	if(result >= INT_MAX || result <= INT_MIN)
-		return OUT_OF_BOUND_BUFFER;
+		return EXIP_OUT_OF_BOUND_BUFFER;
 
 	*number = (int) result;
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode stringToInt64(const String* src, int64_t* number)
@@ -220,7 +220,7 @@ errorCode stringToInt64(const String* src, int64_t* number)
 	char *endPointer;
 
 	if(src->length == 0 || src->length >= PARSING_STRING_MAX_LENGTH)
-		return INVALID_STRING_OPERATION;
+		return EXIP_INVALID_STRING_OPERATION;
 
 	memcpy(buff, src->str, src->length);
 	buff[src->length] = '\0';
@@ -228,27 +228,53 @@ errorCode stringToInt64(const String* src, int64_t* number)
 	result = EXIP_STRTOLL(buff, &endPointer, 10);
 
 	if(result == LLONG_MAX || result == LLONG_MIN || *src->str == *endPointer)
-		return INVALID_STRING_OPERATION;
+		return EXIP_INVALID_STRING_OPERATION;
 
 	if(result >= LLONG_MAX || result <= LLONG_MIN)
-		return OUT_OF_BOUND_BUFFER;
+		return EXIP_OUT_OF_BOUND_BUFFER;
 
 	*number = (int64_t) result;
 
-	return ERR_OK;
+	return EXIP_OK;
 }
+
+#if EXIP_IMPLICIT_DATA_TYPE_CONVERSION
+
+errorCode integerToString(Integer number, String* outStr)
+{
+	return EXIP_NOT_IMPLEMENTED_YET;
+}
+
+errorCode booleanToString(boolean b, String* outStr)
+{
+	return EXIP_NOT_IMPLEMENTED_YET;
+}
+
+errorCode floatToString(Float f, String* outStr)
+{
+	return EXIP_NOT_IMPLEMENTED_YET;
+}
+
+errorCode decimalToString(Decimal d, String* outStr)
+{
+	return EXIP_NOT_IMPLEMENTED_YET;
+}
+
+errorCode dateTimeToString(EXIPDateTime dt, String* outStr)
+{
+	return EXIP_NOT_IMPLEMENTED_YET;
+}
+
+#endif /* EXIP_IMPLICIT_DATA_TYPE_CONVERSION */
 
 #if EXIP_DEBUG == ON
 
 void printString(const String* inStr)
 {
-	Index i = 0;
 	if(inStr->length == 0)
 		return;
-	for(i = 0; i < inStr->length; i++)
-	{
-		DEBUG_CHAR_OUTPUT(inStr->str[i]);
-	}
+
+	DEBUG_OUTPUT(("%.*s", inStr->length, inStr->str));
 }
 
 #endif /* EXIP_DEBUG */

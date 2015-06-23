@@ -11,8 +11,8 @@
  *
  * @date Oct 26, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: streamEncode.h 242 2013-01-28 15:13:45Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: streamEncode.h 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #ifndef STREAMENCODE_H_
@@ -133,10 +133,12 @@ errorCode encodeFloatValue(EXIStream* strm, Float fl_val);
  * @brief Encode EXI DateTime type
  *
  * @param[in, out] strm EXI stream of bits
+ * @param[in] dtType the exact type of the dateTime value. Should be one of
+ * VALUE_TYPE_DATE_TIME, VALUE_TYPE_YEAR, VALUE_TYPE_DATE, VALUE_TYPE_MONTH, VALUE_TYPE_TIME
  * @param[in] dt_val DateTime value to be encoded
  * @return Error handling code.
  */
-errorCode encodeDateTimeValue(EXIStream* strm, EXIPDateTime dt_val);
+errorCode encodeDateTimeValue(EXIStream* strm, EXIType dtType, EXIPDateTime dt_val);
 
 /**
  * @brief Serialize an event code to an EXI stream

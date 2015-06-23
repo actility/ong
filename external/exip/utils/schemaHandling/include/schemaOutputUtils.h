@@ -10,14 +10,15 @@
  * @brief Utility functions for storing EXIPSchema instances to external streams
  * @date May 7, 2012
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: schemaOutputUtils.h 247 2013-01-29 18:00:30Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: schemaOutputUtils.h 352 2014-11-25 16:37:24Z kjussakov $
  */
 
 #ifndef SCHEMABUILDUTILS_H_
 #define SCHEMABUILDUTILS_H_
 
 #include "procTypes.h"
+#include "createGrammars.h"
 
 // Maximum number of characters in a variable name buffer
 #define VAR_BUFFER_MAX_LENGTH 200
@@ -77,9 +78,10 @@ void staticStringTblDefsOutput(UriTable* uriTbl, char* prefix, FILE* out);
  * @param[in] pfxTbl prefix string table to be stored
  * @param[in] prefix prefix for the definitions
  * @param[in] uriId uriId of the prefix
+ * @param[in] dvis the number of deviations in url, ln, pfx and grammars
  * @param[out] out output stream
  */
-void staticPrefixOutput(PfxTable* pfxTbl, char* prefix, Index uriId, FILE* out);
+void staticPrefixOutput(PfxTable* pfxTbl, char* prefix, Index uriId, Deviations dvis, FILE* out);
 
 /**
  * @brief Builds all grammar productions for a grammar as a static code representation and stores it in out
@@ -112,17 +114,19 @@ void staticDocGrammarOutput(EXIGrammar* docGr, char* prefix, FILE* out);
  * @param[in] lnTbl the LnTable instance
  * @param[in] prefix prefix for the definitions
  * @param[in] uriId uriId for that LnTable
+ * @param[in] dvis the number of deviations in url, ln, pfx and grammars
  * @param[out] out output stream
  */
-void staticLnEntriesOutput(LnTable* lnTbl, char* prefix, Index uriId, FILE* out);
+void staticLnEntriesOutput(LnTable* lnTbl, char* prefix, Index uriId, Deviations dvis, FILE* out);
 
 /**
  * @brief Builds all the URI entries in the UriTable as a static code representation and stores it in out
  * @param[in] uriTbl the UriTable instance
  * @param[in] prefix prefix for the definitions
+ * @param[in] dvis the number of deviations in url, ln, pfx and grammars
  * @param[out] out output stream
  */
-void staticUriTableOutput(UriTable* uriTbl, char* prefix, FILE* out);
+void staticUriTableOutput(UriTable* uriTbl, char* prefix, Deviations dvis, FILE* out);
 
 /**
  * @brief Builds all the Enumeration definitions

@@ -10,8 +10,8 @@
  * @brief Implementation of help functions for contentHandler interface
  * @date Oct 22, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: contentHandler.c 260 2013-02-13 12:09:55Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: contentHandler.c 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #include "contentHandler.h"

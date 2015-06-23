@@ -11,8 +11,8 @@
  *
  * @date Jul 7, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: streamRead.h 242 2013-01-28 15:13:45Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: streamRead.h 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #ifndef STREAMREADER_H_

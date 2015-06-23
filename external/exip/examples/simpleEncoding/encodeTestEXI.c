@@ -11,8 +11,8 @@
  *
  * @date Nov 4, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: encodeTestEXI.c 280 2013-04-09 09:45:22Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: encodeTestEXI.c 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #include "encodeTestEXI.h"
@@ -57,7 +57,7 @@ static String ENUM_DATA_4 = {"hej", 3};
 
 errorCode encode(EXIPSchema* schemaPtr, FILE *outfile, size_t (*outputStream)(void* buf, size_t size, void* stream))
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	EXIStream testStrm;
 	String uri;
 	String ln;
@@ -231,14 +231,7 @@ errorCode encode(EXIPSchema* schemaPtr, FILE *outfile, size_t (*outputStream)(vo
 		// schema mode
 		EXIPDateTime dt;
 
-		dt.presenceMask = 0;
-		dt.presenceMask = dt.presenceMask | YEAR_PRESENCE;
-		dt.presenceMask = dt.presenceMask | MON_PRESENCE;
-		dt.presenceMask = dt.presenceMask | MDAY_PRESENCE;
-		dt.presenceMask = dt.presenceMask | HOUR_PRESENCE;
-		dt.presenceMask = dt.presenceMask | MIN_PRESENCE;
-		dt.presenceMask = dt.presenceMask | SEC_PRESENCE;
-		dt.presenceMask = dt.presenceMask | FRACT_PRESENCE;
+		dt.presenceMask = FRACT_PRESENCE;
 
 		dt.dateTime.tm_year = 112; // 2012
 		dt.dateTime.tm_mon = 6;	// July

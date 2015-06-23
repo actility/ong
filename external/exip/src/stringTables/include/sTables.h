@@ -10,8 +10,8 @@
  * @brief Functions describing EXI sting tables operations
  * @date Sep 14, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: sTables.h 285 2013-05-07 09:03:04Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: sTables.h 352 2014-11-25 16:37:24Z kjussakov $
  */
 
 #ifndef STABLES_H_
@@ -22,7 +22,7 @@
 
 #define DEFAULT_VALUE_ENTRIES_NUMBER 50
 #define DEFAULT_URI_ENTRIES_NUMBER   4
-#define DEFAULT_PFX_ENTRIES_NUMBER   2
+#define DEFAULT_PFX_ENTRIES_NUMBER   1
 #define DEFAULT_LN_ENTRIES_NUMBER    10
 #define DEFAULT_VX_ENTRIES_NUMBER    10
 
@@ -52,14 +52,6 @@
  * @return Error handling code
  */
 errorCode createValueTable(ValueTable* valueTable);
-
-/**
- * @brief Creates fresh empty PfxTable (prefix partition of EXI string table)
- * This operation includes allocation of memory for DEFAULT_PFX_ENTRIES_NUMBER number of prefix entries
- * @param[out] pfxTable Prefix string table partition
- * @return Error handling code
- */
-errorCode createPfxTable(PfxTable** pfxTable);
 
 /**
  * @brief Add new row into the URI string table

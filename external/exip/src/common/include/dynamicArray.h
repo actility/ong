@@ -11,8 +11,8 @@
  *
  * @date Jan 25, 2011
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: dynamicArray.h 218 2012-10-16 07:21:10Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: dynamicArray.h 352 2014-11-25 16:37:24Z kjussakov $
  */
 
 
@@ -33,6 +33,11 @@
  * @endcode
  */
 #define DYN_ARRAY_SIZE (sizeof(DynArray) + sizeof(void*) + sizeof(Index))
+
+/**
+ * When the chunkEntries == 0 this will be used to create the new array and later extend it
+ */
+#define DEFAULT_NUMBER_CHUNK_ENTRIES 5
 
 /**
  * @brief Creates fresh empty Untyped Dynamic Array
@@ -72,7 +77,7 @@ errorCode addDynEntry(DynArray* dynArray, void* entry, Index* entryID);
  *
  * @param[in, out] dynArray Untyped Dynamic Array
  * @param[in] entryID the ID of the entry to be deleted
- * @return Error handling code - NULL_POINTER_REF if dArray is NULL; OUT_OF_BOUND_BUFFER if the index is
+ * @return Error handling code - EXIP_NULL_POINTER_REF if dArray is NULL; EXIP_OUT_OF_BOUND_BUFFER if the index is
  * bigger than the array size or the array size is 0
  */
 errorCode delDynEntry(DynArray* dynArray, Index entryID);

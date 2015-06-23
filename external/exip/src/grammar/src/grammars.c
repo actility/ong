@@ -10,8 +10,8 @@
  * @brief Defines grammar related functions
  * @date Sep 13, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: grammars.c 286 2013-05-21 16:27:24Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: grammars.c 335 2014-05-05 18:23:26Z kjussakov $
  */
 
 #include "grammars.h"
@@ -33,7 +33,7 @@ errorCode createDocGrammar(EXIPSchema* schema, QNameID* elQnameArr, Index qnameC
 	SET_DOCUMENT_GR(schema->docGrammar.props);
 	schema->docGrammar.rule = (GrammarRule*) memManagedAllocate(&schema->memList, sizeof(GrammarRule)*DEF_DOC_GRAMMAR_RULE_NUMBER);
 	if(schema->docGrammar.rule == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 
 	/* Rule for Document */
 	/*
@@ -56,7 +56,7 @@ errorCode createDocGrammar(EXIPSchema* schema, QNameID* elQnameArr, Index qnameC
 
 		tmp_rule->production = (Production*) memManagedAllocate(&schema->memList, sizeof(Production)*tmp_code1);
 		if(tmp_rule->production == NULL)
-			return MEMORY_ALLOCATION_ERROR;
+			return EXIP_MEMORY_ALLOCATION_ERROR;
 
 		/*
 		 * DocContent :
@@ -80,7 +80,7 @@ errorCode createDocGrammar(EXIPSchema* schema, QNameID* elQnameArr, Index qnameC
 	{
 		tmp_rule->production = (Production*) memManagedAllocate(&schema->memList, sizeof(Production));
 		if(tmp_rule->production == NULL)
-			return MEMORY_ALLOCATION_ERROR;
+			return EXIP_MEMORY_ALLOCATION_ERROR;
 
 		tmp_rule->pCount = 1;
 		tmp_rule->meta = 0;
@@ -108,7 +108,7 @@ errorCode createDocGrammar(EXIPSchema* schema, QNameID* elQnameArr, Index qnameC
 	/* Part 1 */
 	tmp_rule->production = (Production*) memManagedAllocate(&schema->memList, sizeof(Production));
 	if(tmp_rule->production == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 
 	SET_PROD_EXI_EVENT(tmp_rule->production[0].content, EVENT_ED);
 	SET_PROD_NON_TERM(tmp_rule->production[0].content, GR_VOID_NON_TERMINAL);
@@ -119,7 +119,7 @@ errorCode createDocGrammar(EXIPSchema* schema, QNameID* elQnameArr, Index qnameC
 	tmp_rule->pCount = 1;
 	tmp_rule->meta = 0;
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 #if BUILD_IN_GRAMMARS_USE
@@ -132,7 +132,7 @@ errorCode createBuiltInElementGrammar(EXIGrammar* elementGrammar, EXIStream* str
 	SET_BUILT_IN_ELEM_GR(elementGrammar->props);
 	elementGrammar->rule = (GrammarRule*) EXIP_MALLOC(sizeof(DynGrammarRule)*DEF_ELEMENT_GRAMMAR_RULE_NUMBER);
 	if(elementGrammar->rule == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 
 	/* Rule for StartTagContent */
 	/* StartTagContent :
@@ -152,7 +152,7 @@ errorCode createBuiltInElementGrammar(EXIGrammar* elementGrammar, EXIStream* str
 	/* Part 1 */
 	tmp_rule->production = (Production*) EXIP_MALLOC(sizeof(Production)*DEFAULT_PROD_ARRAY_DIM);
 	if(tmp_rule->production == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 
 	/* The part 1 productions get added later... */
 	tmp_rule->pCount = 0;
@@ -173,7 +173,7 @@ errorCode createBuiltInElementGrammar(EXIGrammar* elementGrammar, EXIStream* str
 	/* Part 1 */
 	tmp_rule->production = (Production*) EXIP_MALLOC(sizeof(Production)*DEFAULT_PROD_ARRAY_DIM);
 	if(tmp_rule->production == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 
 	/* EE	                  0 */
 	SET_PROD_EXI_EVENT(tmp_rule->production[0].content, EVENT_EE);
@@ -182,10 +182,11 @@ errorCode createBuiltInElementGrammar(EXIGrammar* elementGrammar, EXIStream* str
 	tmp_rule->production[0].qnameId.uriId = URI_MAX;
 	tmp_rule->production[0].qnameId.lnId = LN_MAX;
 	tmp_rule->pCount = 1;
+	tmp_rule->meta = 0;
 	tmp_rule->prodDim = DEFAULT_PROD_ARRAY_DIM;
 	/* More part 1 productions get added later... */
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode insertZeroProduction(DynGrammarRule* rule, EventType eventType, SmallIndex nonTermID, QNameID* qnameId, boolean hasSecondLevelProd)
@@ -194,7 +195,7 @@ errorCode insertZeroProduction(DynGrammarRule* rule, EventType eventType, SmallI
 	{
 		void* ptr = EXIP_REALLOC(rule->production, sizeof(Production)*(rule->prodDim + DEFAULT_PROD_ARRAY_DIM));
 		if(ptr == NULL)
-			return MEMORY_ALLOCATION_ERROR;
+			return EXIP_MEMORY_ALLOCATION_ERROR;
 
 		rule->production = ptr;
 		rule->prodDim += DEFAULT_PROD_ARRAY_DIM;
@@ -206,36 +207,32 @@ errorCode insertZeroProduction(DynGrammarRule* rule, EventType eventType, SmallI
 	rule->production[rule->pCount].qnameId = *qnameId;
 
 	rule->pCount += 1;
-	return ERR_OK;
+	return EXIP_OK;
 }
 #endif
 
-errorCode pushGrammar(EXIGrammarStack** gStack, EXIGrammar* grammar)
+errorCode pushGrammar(EXIGrammarStack** gStack, QNameID currQNameID, EXIGrammar* grammar)
 {
 	struct GrammarStackNode* node = (struct GrammarStackNode*)EXIP_MALLOC(sizeof(struct GrammarStackNode));
 	if(node == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 
 	node->grammar = grammar;
-	node->lastNonTermID = GR_VOID_NON_TERMINAL;
+	node->currNonTermID = GR_START_TAG_CONTENT;
+	node->currQNameID = currQNameID;
 	node->nextInStack = *gStack;
 	*gStack = node;
-	return ERR_OK;
+	return EXIP_OK;
 }
 
-void popGrammar(EXIGrammarStack** gStack, EXIGrammar** grammar)
+void popGrammar(EXIGrammarStack** gStack)
 {
 	struct GrammarStackNode* node = *gStack;
-	if((*gStack) == NULL)
-	{
-		(*grammar) = NULL;
-	}
-	else
+	if((*gStack) != NULL)
 	{
 		node = *gStack;
 		*gStack = (*gStack)->nextInStack;
 
-		(*grammar) = node->grammar;
 		EXIP_MFREE(node);
 	}
 }
@@ -248,7 +245,7 @@ errorCode createFragmentGrammar(EXIPSchema* schema, QNameID* elQnameArr, Index q
 	schema->docGrammar.props = 0;
 	schema->docGrammar.rule = (GrammarRule*) memManagedAllocate(&schema->memList, sizeof(GrammarRule)*DEF_FRAG_GRAMMAR_RULE_NUMBER);
 	if(schema->docGrammar.rule == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 
 	/* Rule for Fragment */
 	/* Fragment : SD FragmentContent	0 */
@@ -268,7 +265,7 @@ errorCode createFragmentGrammar(EXIPSchema* schema, QNameID* elQnameArr, Index q
 
 		tmp_rule->production = (Production*) memManagedAllocate(&schema->memList, sizeof(Production)*tmp_code1);
 		if(tmp_rule->production == NULL)
-			return MEMORY_ALLOCATION_ERROR;
+			return EXIP_MEMORY_ALLOCATION_ERROR;
 
 		/*
 		 * FragmentContent :
@@ -293,7 +290,7 @@ errorCode createFragmentGrammar(EXIPSchema* schema, QNameID* elQnameArr, Index q
 	{
 		tmp_rule->production = (Production*) memManagedAllocate(&schema->memList, sizeof(Production)*2);
 		if(tmp_rule->production == NULL)
-			return MEMORY_ALLOCATION_ERROR;
+			return EXIP_MEMORY_ALLOCATION_ERROR;
 
 		/* Productions further on... */
 		tmp_rule->pCount = 2;
@@ -317,59 +314,53 @@ errorCode createFragmentGrammar(EXIPSchema* schema, QNameID* elQnameArr, Index q
 	tmp_rule->production[1].qnameId.uriId = URI_MAX;
 	tmp_rule->production[1].qnameId.lnId = LN_MAX;
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
-unsigned int getBitsFirstPartCode(EXIOptions opts, EXIGrammar* grammar, GrammarRule* currentRule, SmallIndex currentRuleIndx, boolean isNilType)
+unsigned int getBitsFirstPartCode(EXIStream* strm, Index prodCount, SmallIndex currentRuleIndx)
 {
-	unsigned char secondLevelExists = 0;
+	boolean secondLevelExists = FALSE;
 
-	if(IS_BUILT_IN_ELEM(grammar->props))
+	if(IS_BUILT_IN_ELEM(strm->gStack->grammar->props))
 	{
 		// Built-in element grammar
 		// There is always a second level production
-		return getBitsNumber(currentRule->pCount);
+		secondLevelExists = TRUE;
 	}
-	else if(IS_DOCUMENT(grammar->props))
+	else if(IS_DOCUMENT(strm->gStack->grammar->props))
 	{
 		// Document grammar
-		if(IS_PRESERVED(opts.preserve, PRESERVE_COMMENTS) || IS_PRESERVED(opts.preserve, PRESERVE_PIS))
-			secondLevelExists = 1;
-		else if(currentRuleIndx == 0 && IS_PRESERVED(opts.preserve, PRESERVE_DTD))
-			secondLevelExists = 1;
-
-		return getBitsNumber(currentRule->pCount - 1 + secondLevelExists);
+		if(IS_PRESERVED(strm->header.opts.preserve, PRESERVE_COMMENTS) || IS_PRESERVED(strm->header.opts.preserve, PRESERVE_PIS))
+			secondLevelExists = TRUE;
+		else if(currentRuleIndx == 0 && IS_PRESERVED(strm->header.opts.preserve, PRESERVE_DTD))
+			secondLevelExists = TRUE;
 	}
-	else if(IS_FRAGMENT(grammar->props))
+	else if(IS_FRAGMENT(strm->gStack->grammar->props))
 	{
 		// Fragment grammar
-		if(IS_PRESERVED(opts.preserve, PRESERVE_COMMENTS) || IS_PRESERVED(opts.preserve, PRESERVE_PIS))
-			secondLevelExists = 1;
-		return getBitsNumber(currentRule->pCount - 1 + secondLevelExists);
+		if(IS_PRESERVED(strm->header.opts.preserve, PRESERVE_COMMENTS) || IS_PRESERVED(strm->header.opts.preserve, PRESERVE_PIS))
+			secondLevelExists = TRUE;
 	}
 	else
 	{
 		// Schema-informed element/type grammar
-		Index prodCount;
-
-		if(isNilType == FALSE)
-			prodCount = currentRule->pCount;
-		else
-			prodCount = RULE_GET_AT_COUNT(currentRule->meta) + RULE_CONTAIN_EE(currentRule->meta);
-
-		if(WITH_STRICT(opts.enumOpt))
+		if(WITH_STRICT(strm->header.opts.enumOpt))
 		{
 			// Strict mode
-			if(isNilType == FALSE && currentRuleIndx == 0 && (HAS_NAMED_SUB_TYPE_OR_UNION(grammar->props) || IS_NILLABLE(grammar->props)))
-				secondLevelExists = 1;
-			return getBitsNumber(prodCount - 1 + secondLevelExists);
+			if(strm->context.isNilType == FALSE && currentRuleIndx == 0)
+			{
+				if(IS_NILLABLE(strm->gStack->grammar->props) || HAS_NAMED_SUB_TYPE_OR_UNION(strm->gStack->grammar->props))
+					secondLevelExists = TRUE;
+			}
 		}
 		else // Non-strict mode
 		{
 			// There is always a second level production
-			return getBitsNumber(prodCount);
+			secondLevelExists = TRUE;
 		}
 	}
+
+	return getBitsNumber(prodCount - 1 + secondLevelExists);
 }
 
 #if EXIP_DEBUG == ON
@@ -391,7 +382,19 @@ static void writeValueTypeString(EXIType exiType)
 			DEBUG_MSG(INFO, EXIP_DEBUG, ("[dec]"));
 			break;
 		case VALUE_TYPE_DATE_TIME:
+			DEBUG_MSG(INFO, EXIP_DEBUG, ("[dateTime]"));
+			break;
+		case VALUE_TYPE_YEAR:
+			DEBUG_MSG(INFO, EXIP_DEBUG, ("[gYear]"));
+			break;
+		case VALUE_TYPE_DATE:
 			DEBUG_MSG(INFO, EXIP_DEBUG, ("[date]"));
+			break;
+		case VALUE_TYPE_MONTH:
+			DEBUG_MSG(INFO, EXIP_DEBUG, ("[month]"));
+			break;
+		case VALUE_TYPE_TIME:
+			DEBUG_MSG(INFO, EXIP_DEBUG, ("[time]"));
 			break;
 		case VALUE_TYPE_BOOLEAN:
 			DEBUG_MSG(INFO, EXIP_DEBUG, ("[bool]"));
@@ -507,7 +510,7 @@ errorCode printGrammarRule(SmallIndex nonTermID, GrammarRule* rule, EXIPSchema *
 				DEBUG_MSG(INFO, EXIP_DEBUG, (" "));
 				break;
 			default:
-				return UNEXPECTED_ERROR;
+				return EXIP_UNEXPECTED_ERROR;
 		}
 		DEBUG_MSG(INFO, EXIP_DEBUG, ("\t"));
 		if(GET_PROD_NON_TERM(tmpProd->content) != GR_VOID_NON_TERMINAL)
@@ -525,7 +528,7 @@ errorCode printGrammarRule(SmallIndex nonTermID, GrammarRule* rule, EXIPSchema *
 		}
 		DEBUG_MSG(INFO, EXIP_DEBUG, ("\n"));
 	}
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 #endif // EXIP_DEBUG

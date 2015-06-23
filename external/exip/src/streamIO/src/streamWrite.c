@@ -11,8 +11,8 @@
  *
  * @date Aug 23, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: streamWrite.c 242 2013-01-28 15:13:45Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: streamWrite.c 344 2014-11-17 16:08:37Z kjussakov $
  */
 
 #include "streamWrite.h"
@@ -26,10 +26,10 @@ errorCode writeNextBit(EXIStream* strm, boolean bit_val)
 	{
 		Index numBytesWritten = 0;
 		if(strm->buffer.ioStrm.readWriteToStream == NULL)
-			return BUFFER_END_REACHED;
+			return EXIP_BUFFER_END_REACHED;
 		numBytesWritten = strm->buffer.ioStrm.readWriteToStream(strm->buffer.buf, strm->buffer.bufLen, strm->buffer.ioStrm.stream);
 		if(numBytesWritten < strm->buffer.bufLen)
-			return BUFFER_END_REACHED;
+			return EXIP_BUFFER_END_REACHED;
 		strm->context.bitPointer = 0;
 		strm->context.bufferIndx = 0;
 	}
@@ -41,13 +41,7 @@ errorCode writeNextBit(EXIStream* strm, boolean bit_val)
 
 	moveBitPointer(strm, 1);
 	DEBUG_MSG(INFO, DEBUG_STREAM_IO, ("  @%u:%u", (unsigned int) strm->context.bufferIndx, strm->context.bitPointer));
-	return ERR_OK;
-}
-
-errorCode writeBits(EXIStream* strm, unsigned int bits_val)
-{
-	unsigned char nbits = getBitsNumber(bits_val);
-	return writeNBits(strm, nbits, bits_val);
+	return EXIP_OK;
 }
 
 errorCode writeNBits(EXIStream* strm, unsigned char nbits, unsigned int bits_val)
@@ -60,19 +54,10 @@ errorCode writeNBits(EXIStream* strm, unsigned char nbits, unsigned int bits_val
 	if(strm->buffer.bufLen <= strm->context.bufferIndx + numBytesToBeWritten)
 	{
 		// The buffer end is reached: there are fewer than nbits bits left in the buffer
-		char leftOverBits;
-		Index numBytesWritten = 0;
-		if(strm->buffer.ioStrm.readWriteToStream == NULL)
-			return BUFFER_END_REACHED;
+		// Flush the buffer if possible
+		errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 
-		leftOverBits = strm->buffer.buf[strm->context.bufferIndx];
-
-		numBytesWritten = strm->buffer.ioStrm.readWriteToStream(strm->buffer.buf, strm->context.bufferIndx, strm->buffer.ioStrm.stream);
-		if(numBytesWritten < strm->context.bufferIndx)
-			return BUFFER_END_REACHED;
-
-		strm->buffer.buf[0] = leftOverBits;
-		strm->context.bufferIndx = 0;
+		TRY(writeEncodedEXIChunk(strm));
 	}
 
 	while(numBitsWrite < nbits)
@@ -92,5 +77,5 @@ errorCode writeNBits(EXIStream* strm, unsigned char nbits, unsigned int bits_val
 	}
 	DEBUG_MSG(INFO, DEBUG_STREAM_IO, ("  @%u:%u\n", (unsigned int) strm->context.bufferIndx, strm->context.bitPointer));
 
-	return ERR_OK;
+	return EXIP_OK;
 }

@@ -10,8 +10,8 @@
  * @brief Implementation of functions for generating Schema-informed Grammar definitions
  * @date Nov 22, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: grammarGenerator.c 281 2013-04-09 14:18:05Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: grammarGenerator.c 352 2014-11-25 16:37:24Z kjussakov $
  */
 
 #include "grammarGenerator.h"
@@ -30,25 +30,29 @@ static int compareUri(const void* uriRow1, const void* uriRow2);
  */
 static void sortUriTable(UriTable* uriTable);
 
-errorCode generateSchemaInformedGrammars(BinaryBuffer* buffers, unsigned int bufCount, SchemaFormat schemaFormat, EXIOptions* opt, EXIPSchema* schema)
+errorCode generateSchemaInformedGrammars(BinaryBuffer* buffers, unsigned int bufCount, SchemaFormat schemaFormat, EXIOptions* opt, EXIPSchema* schema,
+		errorCode (*loadSchemaHandler) (String* namespace, String* schemaLocation, BinaryBuffer** buffers, unsigned int* bufCount, SchemaFormat* schemaFormat, EXIOptions** opt))
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	TreeTable* treeT;
+	SubstituteTable substituteTbl;
+	unsigned int treeTCount = bufCount;
 	unsigned int i = 0;
 
 	// TODO: again in error cases all the memory must be released
 
 	treeT = (TreeTable*) EXIP_MALLOC(sizeof(TreeTable)*bufCount);
 	if(treeT == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
+
+	/* Initialize the SubstituteTable in case there are substitution groups defined in the schema */
+	TRY(createDynArray(&substituteTbl.dynArray, sizeof(SubtGroupHead), 5));
 
 	for(i = 0; i < bufCount; i++)
 	{
 		TRY(initTreeTable(&treeT[i]));
 	}
 
-	/** Set the first tree table to be the main XSD */
-	treeT[0].globalDefs.isMain = TRUE;
 	TRY(initSchema(schema, INIT_SCHEMA_SCHEMA_ENABLED));
 
 	for(i = 0; i < bufCount; i++)
@@ -56,10 +60,12 @@ errorCode generateSchemaInformedGrammars(BinaryBuffer* buffers, unsigned int buf
 		TRY(generateTreeTable(buffers[i], schemaFormat, opt, &treeT[i], schema));
 	}
 
+	TRY(resolveIncludeImportReferences(schema, &treeT, &treeTCount, loadSchemaHandler));
+
 #if DEBUG_GRAMMAR_GEN == ON && EXIP_DEBUG_LEVEL == INFO
 	{
 		unsigned int j;
-		for(i = 0; i < bufCount; i++)
+		for(i = 0; i < treeTCount; i++)
 		{
 			DEBUG_MSG(INFO, DEBUG_GRAMMAR_GEN, ("\nElement tree %d before resolving:\n", i));
 			for(j = 0; j < treeT[i].count; j++)
@@ -96,19 +102,19 @@ errorCode generateSchemaInformedGrammars(BinaryBuffer* buffers, unsigned int buf
 	sortUriTable(&schema->uriTable);
 
 	// Find the correct targetNsId in the string tables for each TreeTable
-	for(i = 0; i < bufCount; i++)
+	for(i = 0; i < treeTCount; i++)
 	{
 		if(!lookupUri(&schema->uriTable, treeT[i].globalDefs.targetNs, &treeT[i].globalDefs.targetNsId))
-			return UNEXPECTED_ERROR;
+			return EXIP_UNEXPECTED_ERROR;
 	}
 
-	TRY(resolveTypeHierarchy(schema, treeT, bufCount));
+	TRY(resolveTypeHierarchy(schema, treeT, treeTCount, &substituteTbl));
 
 #if DEBUG_GRAMMAR_GEN == ON && EXIP_DEBUG_LEVEL == INFO
 	{
 		unsigned int j;
 
-		for(i = 0; i < bufCount; i++)
+		for(i = 0; i < treeTCount; i++)
 		{
 			DEBUG_MSG(INFO, DEBUG_GRAMMAR_GEN, ("\nElement tree %d after resolving:\n", i));
 			for(j = 0; j < treeT[i].count; j++)
@@ -120,12 +126,22 @@ errorCode generateSchemaInformedGrammars(BinaryBuffer* buffers, unsigned int buf
 	}
 #endif
 
-	TRY(convertTreeTablesToExipSchema(treeT, bufCount, schema));
+	TRY(convertTreeTablesToExipSchema(treeT, treeTCount, schema, &substituteTbl));
 
-	for(i = 0; i < bufCount; i++)
+	/* Destroy all tree tables */
+	for(i = 0; i < treeTCount; i++)
 	{
 		destroyTreeTable(&treeT[i]);
 	}
+
+	/* Destroy all substitution group heads if any */
+	for(i = 0; i < substituteTbl.count; i++)
+	{
+		destroyDynArray(&substituteTbl.head[i].dynArray);
+	}
+
+	/* Destroy the substitution group table */
+	destroyDynArray(&substituteTbl.dynArray);
 
 	EXIP_MFREE(treeT);
 
@@ -140,9 +156,7 @@ void destroySchema(EXIPSchema* schema)
 
 	for(i = 0; i < schema->uriTable.count; i++)
 	{
-		if(schema->uriTable.uri[i].pfxTable != NULL)
-			EXIP_MFREE(schema->uriTable.uri[i].pfxTable);
-
+		destroyDynArray(&schema->uriTable.uri[i].pfxTable.dynArray);
 		destroyDynArray(&schema->uriTable.uri[i].lnTable.dynArray);
 	}
 

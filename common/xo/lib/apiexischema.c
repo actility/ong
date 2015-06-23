@@ -125,14 +125,14 @@ static int my_strcut(char *str, char *tok, char **args, int szargs) {
 		cnt ++;
 	}
 
-	tmp_err_code = generateSchemaInformedGrammars(buffer, cnt, SCHEMA_FORMAT_XSD_EXI, NULL, &g_schema);
+	tmp_err_code = generateSchemaInformedGrammars(buffer, cnt, SCHEMA_FORMAT_XSD_EXI, NULL, &g_schema, NULL);
 
 	if	(tmp_err_code) {
 		fprintf (stderr,"[%s:%d] generateSchemaInformedGrammars with %d schemas => error %d\n",
 			__FILE__, __LINE__, cnt, tmp_err_code);
 	}
 
-	if(tmp_err_code != ERR_OK) {
+	if(tmp_err_code != EXIP_OK) {
 		g_schemaPtr	= NULL;
 	}
 	else {

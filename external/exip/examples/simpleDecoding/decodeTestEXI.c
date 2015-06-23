@@ -11,8 +11,8 @@
  *
  * @date Oct 13, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: decodeTestEXI.c 285 2013-05-07 09:03:04Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: decodeTestEXI.c 343 2014-11-14 17:28:18Z kjussakov $
  */
 #include "EXIParser.h"
 #include "stringManipulate.h"
@@ -66,13 +66,14 @@ static errorCode sample_floatData(Float fl_val, void* app_data);
 static errorCode sample_booleanData(boolean bool_val, void* app_data);
 static errorCode sample_dateTimeData(EXIPDateTime dt_val, void* app_data);
 static errorCode sample_binaryData(const char* binary_val, Index nbytes, void* app_data);
+static errorCode sample_qnameData(const QName qname, void* app_data);
 
-errorCode decode(EXIPSchema* schemaPtr, unsigned char outFlag, FILE *infile, size_t (*inputStream)(void* buf, size_t size, void* stream))
+errorCode decode(EXIPSchema* schemaPtr, unsigned char outFlag, FILE *infile, boolean outOfBandOpts, EXIOptions* opts, size_t (*inputStream)(void* buf, size_t size, void* stream))
 {
 	Parser testParser;
 	char buf[INPUT_BUFFER_SIZE];
 	BinaryBuffer buffer;
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	struct appData parsingData;
 
 	buffer.buf = buf;
@@ -85,7 +86,7 @@ errorCode decode(EXIPSchema* schemaPtr, unsigned char outFlag, FILE *infile, siz
 	buffer.ioStrm.stream = infile;
 
 	// II: Second, initialize the parser object
-	TRY(initParser(&testParser, buffer, &parsingData));
+	TRY(parse.initParser(&testParser, buffer, &parsingData));
 
 	// III: Initialize the parsing data and hook the callback handlers to the parser object.
 	//      If out-of-band options are defined use testParser.strm.header.opts to set them
@@ -94,6 +95,8 @@ errorCode decode(EXIPSchema* schemaPtr, unsigned char outFlag, FILE *infile, siz
 	parsingData.unclosedElement = 0;
 	parsingData.prefixesCount = 0;
 	parsingData.outputFormat = outFlag;
+	if(outOfBandOpts && opts != NULL)
+		testParser.strm.header.opts = *opts;
 
 	testParser.handler.fatalError = sample_fatalError;
 	testParser.handler.error = sample_fatalError;
@@ -109,10 +112,11 @@ errorCode decode(EXIPSchema* schemaPtr, unsigned char outFlag, FILE *infile, siz
 	testParser.handler.booleanData = sample_booleanData;
 	testParser.handler.dateTimeData = sample_dateTimeData;
 	testParser.handler.binaryData = sample_binaryData;
+	testParser.handler.qnameData = sample_qnameData;
 
 	// IV: Parse the header of the stream
 
-	TRY(parseHeader(&testParser, FALSE));
+	TRY(parse.parseHeader(&testParser, outOfBandOpts));
 
 	// IV.1: Set the schema to be used for parsing.
 	// The schemaID mode and schemaID field can be read at
@@ -120,21 +124,21 @@ errorCode decode(EXIPSchema* schemaPtr, unsigned char outFlag, FILE *infile, siz
 	// parser.strm.header.opts.schemaID respectively
 	// If schemaless mode, use setSchema(&parser, NULL);
 
-	TRY(setSchema(&testParser, schemaPtr));
+	TRY(parse.setSchema(&testParser, schemaPtr));
 
 	// V: Parse the body of the EXI stream
 
-	while(tmp_err_code == ERR_OK)
+	while(tmp_err_code == EXIP_OK)
 	{
-		tmp_err_code = parseNext(&testParser);
+		tmp_err_code = parse.parseNext(&testParser);
 	}
 
 	// VI: Free the memory allocated by the parser
 
-	destroyParser(&testParser);
+	parse.destroyParser(&testParser);
 
-	if(tmp_err_code == PARSING_COMPLETE)
-		return ERR_OK;
+	if(tmp_err_code == EXIP_PARSING_COMPLETE)
+		return EXIP_OK;
 	else
 		return tmp_err_code;
 }
@@ -153,7 +157,7 @@ static errorCode sample_startDocument(void* app_data)
 	else if(appD->outputFormat == OUT_XML)
 		printf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_endDocument(void* app_data)
@@ -164,7 +168,7 @@ static errorCode sample_endDocument(void* app_data)
 	else if(appD->outputFormat == OUT_XML)
 		printf("\n");
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_startElement(QName qname, void* app_data)
@@ -217,7 +221,7 @@ static errorCode sample_startElement(QName qname, void* app_data)
 		appD->unclosedElement = 1;
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_endElement(void* app_data)
@@ -237,7 +241,7 @@ static errorCode sample_endElement(void* app_data)
 		destroyElement(el);
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_attribute(QName qname, void* app_data)
@@ -264,7 +268,7 @@ static errorCode sample_attribute(QName qname, void* app_data)
 	}
 	appD->expectAttributeData = 1;
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_stringData(const String value, void* app_data)
@@ -302,41 +306,12 @@ static errorCode sample_stringData(const String value, void* app_data)
 		}
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_decimalData(Decimal value, void* app_data)
 {
-	struct appData* appD = (struct appData*) app_data;
-	if(appD->outputFormat == OUT_EXI)
-	{
-		if(appD->expectAttributeData)
-		{
-			printf("%.1f\"\n", (double) value);
-			appD->expectAttributeData = 0;
-		}
-		else
-		{
-			printf("CH %.1f \n", (double) value);
-		}
-	}
-	else if(appD->outputFormat == OUT_XML)
-	{
-		if(appD->expectAttributeData)
-		{
-			printf("%.1f \"", (double) value);
-			appD->expectAttributeData = 0;
-		}
-		else
-		{
-			if(appD->unclosedElement)
-				printf(">");
-			appD->unclosedElement = 0;
-			printf("%.1f", (double) value);
-		}
-	}
-
-	return ERR_OK;
+	return sample_floatData(value, app_data);
 }
 
 static errorCode sample_intData(Integer int_val, void* app_data)
@@ -379,7 +354,7 @@ static errorCode sample_intData(Integer int_val, void* app_data)
 		}
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_booleanData(boolean bool_val, void* app_data)
@@ -429,7 +404,7 @@ static errorCode sample_booleanData(boolean bool_val, void* app_data)
 		}
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_floatData(Float fl_val, void* app_data)
@@ -472,13 +447,14 @@ static errorCode sample_floatData(Float fl_val, void* app_data)
 		}
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_dateTimeData(EXIPDateTime dt_val, void* app_data)
 {
 	struct appData* appD = (struct appData*) app_data;
 	char fsecBuf[30];
+	char tzBuf[30];
 	int i;
 
 	if(IS_PRESENT(dt_val.presenceMask, FRACT_PRESENCE))
@@ -503,24 +479,40 @@ static errorCode sample_dateTimeData(EXIPDateTime dt_val, void* app_data)
 		fsecBuf[0] = '\0';
 	}
 
+	if(IS_PRESENT(dt_val.presenceMask, TZONE_PRESENCE))
+	{
+		if(dt_val.TimeZone < 0)
+			tzBuf[0] = '-';
+		else
+			tzBuf[0] = '+';
+		sprintf(tzBuf + 1, "%02d", dt_val.TimeZone/64);
+		tzBuf[3] = ':';
+		sprintf(tzBuf + 4, "%02d", dt_val.TimeZone%64);
+		tzBuf[6] = '\0';
+	}
+	else
+	{
+		tzBuf[0] = '\0';
+	}
+
 	if(appD->outputFormat == OUT_EXI)
 	{
 		if(appD->expectAttributeData)
 		{
-			printf("%04d-%02d-%02dT%02d:%02d:%02d%s", dt_val.dateTime.tm_year + 1900,
+			printf("%04d-%02d-%02dT%02d:%02d:%02d%s%s", dt_val.dateTime.tm_year + 1900,
 					dt_val.dateTime.tm_mon + 1, dt_val.dateTime.tm_mday,
 					dt_val.dateTime.tm_hour, dt_val.dateTime.tm_min,
-					dt_val.dateTime.tm_sec, fsecBuf);
+					dt_val.dateTime.tm_sec, fsecBuf, tzBuf);
 			printf("\"\n");
 			appD->expectAttributeData = 0;
 		}
 		else
 		{
 			printf("CH ");
-			printf("%04d-%02d-%02dT%02d:%02d:%02d%s", dt_val.dateTime.tm_year + 1900,
+			printf("%04d-%02d-%02dT%02d:%02d:%02d%s%s", dt_val.dateTime.tm_year + 1900,
 					dt_val.dateTime.tm_mon + 1, dt_val.dateTime.tm_mday,
 					dt_val.dateTime.tm_hour, dt_val.dateTime.tm_min,
-					dt_val.dateTime.tm_sec, fsecBuf);
+					dt_val.dateTime.tm_sec, fsecBuf, tzBuf);
 			printf("\n");
 		}
 	}
@@ -528,10 +520,10 @@ static errorCode sample_dateTimeData(EXIPDateTime dt_val, void* app_data)
 	{
 		if(appD->expectAttributeData)
 		{
-			printf("%04d-%02d-%02dT%02d:%02d:%02d%s", dt_val.dateTime.tm_year + 1900,
+			printf("%04d-%02d-%02dT%02d:%02d:%02d%s%s", dt_val.dateTime.tm_year + 1900,
 					dt_val.dateTime.tm_mon + 1, dt_val.dateTime.tm_mday,
 					dt_val.dateTime.tm_hour, dt_val.dateTime.tm_min,
-					dt_val.dateTime.tm_sec, fsecBuf);
+					dt_val.dateTime.tm_sec, fsecBuf, tzBuf);
 			printf("\"");
 			appD->expectAttributeData = 0;
 		}
@@ -540,14 +532,14 @@ static errorCode sample_dateTimeData(EXIPDateTime dt_val, void* app_data)
 			if(appD->unclosedElement)
 				printf(">");
 			appD->unclosedElement = 0;
-			printf("%04d-%02d-%02dT%02d:%02d:%02d%s", dt_val.dateTime.tm_year + 1900,
+			printf("%04d-%02d-%02dT%02d:%02d:%02d%s%s", dt_val.dateTime.tm_year + 1900,
 					dt_val.dateTime.tm_mon + 1, dt_val.dateTime.tm_mday,
 					dt_val.dateTime.tm_hour, dt_val.dateTime.tm_min,
-					dt_val.dateTime.tm_sec, fsecBuf);
+					dt_val.dateTime.tm_sec, fsecBuf, tzBuf);
 		}
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_binaryData(const char* binary_val, Index nbytes, void* app_data)
@@ -586,7 +578,53 @@ static errorCode sample_binaryData(const char* binary_val, Index nbytes, void* a
 		}
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
+}
+
+static errorCode sample_qnameData(const QName qname, void* app_data)
+{
+	struct appData* appD = (struct appData*) app_data;
+	if(appD->outputFormat == OUT_EXI)
+	{
+		if(appD->expectAttributeData)
+		{
+			printString(qname.uri);
+			printf(":");
+			printString(qname.localName);
+			printf("\"\n");
+			appD->expectAttributeData = 0;
+		}
+		else
+		{
+			printf("QNAME ");
+			printString(qname.uri);
+			printf(":");
+			printString(qname.localName);
+			printf("\n");
+		}
+	}
+	else if(appD->outputFormat == OUT_XML)
+	{
+		if(appD->expectAttributeData)
+		{
+			printString(qname.uri);
+			printf(":");
+			printString(qname.localName);
+			printf("\"");
+			appD->expectAttributeData = 0;
+		}
+		else
+		{
+			if(appD->unclosedElement)
+				printf(">");
+			appD->unclosedElement = 0;
+			printString(qname.uri);
+			printf(":");
+			printString(qname.localName);
+		}
+	}
+
+	return EXIP_OK;
 }
 
 // Stuff needed for the OUT_XML Output Format

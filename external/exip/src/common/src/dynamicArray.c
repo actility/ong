@@ -11,8 +11,8 @@
  *
  * @date Jan 25, 2011
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: dynamicArray.c 280 2013-04-09 09:45:22Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: dynamicArray.c 352 2014-11-25 16:37:24Z kjussakov $
  */
 
 #include "dynamicArray.h"
@@ -25,14 +25,14 @@ errorCode createDynArray(DynArray* dynArray, size_t entrySize, uint16_t chunkEnt
 
 	*base = EXIP_MALLOC(entrySize*chunkEntries);
 	if(*base == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 
 	dynArray->entrySize = entrySize;
 	*count = 0;
 	dynArray->chunkEntries = chunkEntries;
 	dynArray->arrayEntries = chunkEntries;
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode addEmptyDynEntry(DynArray* dynArray, void** entry, Index* entryID)
@@ -41,18 +41,30 @@ errorCode addEmptyDynEntry(DynArray* dynArray, void** entry, Index* entryID)
 	Index* count;
 
 	if(dynArray == NULL)
-		return NULL_POINTER_REF;
+		return EXIP_NULL_POINTER_REF;
 
 	base = (void **)(dynArray + 1);
 	count = (Index*)(base + 1);
 	if(dynArray->arrayEntries == *count)   // The dynamic array must be extended first
 	{
-		void* ptr = EXIP_REALLOC(*base, dynArray->entrySize * (*count + dynArray->chunkEntries));
-		if(ptr == NULL)
-			return MEMORY_ALLOCATION_ERROR;
+		size_t addedEntries;
 
-		*base = ptr;
-		dynArray->arrayEntries = dynArray->arrayEntries + dynArray->chunkEntries;
+		addedEntries = (dynArray->chunkEntries == 0)?DEFAULT_NUMBER_CHUNK_ENTRIES:dynArray->chunkEntries;
+
+		if(*base == NULL)
+		{
+			*base = EXIP_MALLOC(dynArray->entrySize * addedEntries);
+			if(*base == NULL)
+				return EXIP_MEMORY_ALLOCATION_ERROR;
+		}
+		else
+		{
+			*base = EXIP_REALLOC(*base, dynArray->entrySize * (*count + addedEntries));
+			if(*base == NULL)
+				return EXIP_MEMORY_ALLOCATION_ERROR;
+		}
+
+		dynArray->arrayEntries = dynArray->arrayEntries + addedEntries;
 	}
 
 	*entry = (void*)((unsigned char *)(*base) + (*count * dynArray->entrySize));
@@ -60,7 +72,7 @@ errorCode addEmptyDynEntry(DynArray* dynArray, void** entry, Index* entryID)
 	*entryID = *count;
 
 	*count += 1;
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode addDynEntry(DynArray* dynArray, void* entry, Index* entryID)
@@ -71,7 +83,7 @@ errorCode addDynEntry(DynArray* dynArray, void* entry, Index* entryID)
 	TRY(addEmptyDynEntry(dynArray, &emptyEntry, entryID));
 
 	memcpy(emptyEntry, entry, dynArray->entrySize);
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode delDynEntry(DynArray* dynArray, Index entryID)
@@ -80,7 +92,7 @@ errorCode delDynEntry(DynArray* dynArray, Index entryID)
 	Index* count;
 
 	if(dynArray == NULL)
-		return NULL_POINTER_REF;
+		return EXIP_NULL_POINTER_REF;
 
 	base = (void **)(dynArray + 1);
 	count = (Index*)(base + 1);
@@ -98,9 +110,9 @@ errorCode delDynEntry(DynArray* dynArray, Index entryID)
 		*count -= 1;
 	}
 	else
-		return OUT_OF_BOUND_BUFFER;
+		return EXIP_OUT_OF_BOUND_BUFFER;
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 void destroyDynArray(DynArray* dynArray)

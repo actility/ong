@@ -14,8 +14,8 @@
  *
  * @date Oct 25, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: memManagement.h 218 2012-10-16 07:21:10Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: memManagement.h 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #ifndef MEMMANAGEMENT_H_

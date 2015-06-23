@@ -11,8 +11,8 @@
  *
  * @date Nov 28, 2011
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: initSchemaInstance.c 281 2013-04-09 14:18:05Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: initSchemaInstance.c 348 2014-11-21 12:34:51Z kjussakov $
  */
 
 #include "initSchemaInstance.h"
@@ -33,7 +33,7 @@
 
 errorCode initSchema(EXIPSchema* schema, InitSchemaType initializationType)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 
 	TRY(initAllocList(&schema->memList));
 
@@ -70,7 +70,6 @@ errorCode initSchema(EXIPSchema* schema, InitSchemaType initializationType)
 
 		// Must be done after createBuiltInTypesDefinitions()
 		TRY_CATCH(generateBuiltInTypesGrammars(schema), freeAllocList(&schema->memList));
-
 		schema->staticGrCount = SIMPLE_TYPE_COUNT;
 	}
 
@@ -100,10 +99,9 @@ errorCode generateBuiltInTypesGrammars(EXIPSchema* schema)
 		if(HAS_TYPE_FACET(schema->simpleTypeTable.sType[typeId].content, TYPE_FACET_NAMED_SUBTYPE_UNION))
 			SET_NAMED_SUB_TYPE_OR_UNION(grammar.props);
 
-		// One more rule slot for grammar augmentation when strict == FASLE
-		grammar.rule = (GrammarRule*)memManagedAllocate(&schema->memList, sizeof(GrammarRule)*(grammar.count + 1));
+		grammar.rule = (GrammarRule*) memManagedAllocate(&schema->memList, sizeof(GrammarRule)*(grammar.count));
 		if(grammar.rule == NULL)
-			return MEMORY_ALLOCATION_ERROR;
+			return EXIP_MEMORY_ALLOCATION_ERROR;
 
 		if(typeId == SIMPLE_TYPE_ANY_TYPE)
 		{
@@ -112,7 +110,7 @@ errorCode generateBuiltInTypesGrammars(EXIPSchema* schema)
 
 			grammar.rule[0].production = memManagedAllocate(&schema->memList, sizeof(Production)*4);
 			if(grammar.rule[0].production == NULL)
-				return MEMORY_ALLOCATION_ERROR;
+				return EXIP_MEMORY_ALLOCATION_ERROR;
 
 			SET_PROD_EXI_EVENT(grammar.rule[0].production[3].content, EVENT_AT_ALL);
 			SET_PROD_NON_TERM(grammar.rule[0].production[3].content, 0);
@@ -139,10 +137,12 @@ errorCode generateBuiltInTypesGrammars(EXIPSchema* schema)
 			grammar.rule[0].production[0].qnameId.lnId = LN_MAX;
 
 			grammar.rule[0].pCount = 4;
+			grammar.rule[0].meta = 0;
+			RULE_SET_CONTAIN_EE(grammar.rule[0].meta);
 
 			grammar.rule[1].production = memManagedAllocate(&schema->memList, sizeof(Production)*3);
 			if(grammar.rule[1].production == NULL)
-				return MEMORY_ALLOCATION_ERROR;
+				return EXIP_MEMORY_ALLOCATION_ERROR;
 
 			SET_PROD_EXI_EVENT(grammar.rule[1].production[2].content, EVENT_SE_ALL);
 			SET_PROD_NON_TERM(grammar.rule[1].production[2].content, 1);
@@ -163,12 +163,14 @@ errorCode generateBuiltInTypesGrammars(EXIPSchema* schema)
 			grammar.rule[1].production[0].qnameId.lnId = LN_MAX;
 
 			grammar.rule[1].pCount = 3;
+			grammar.rule[1].meta = 0;
+			RULE_SET_CONTAIN_EE(grammar.rule[1].meta);
 		}
 		else // a regular simple type
 		{
 			grammar.rule[0].production = memManagedAllocate(&schema->memList, sizeof(Production));
 			if(grammar.rule[0].production == NULL)
-				return MEMORY_ALLOCATION_ERROR;
+				return EXIP_MEMORY_ALLOCATION_ERROR;
 
 			SET_PROD_EXI_EVENT(grammar.rule[0].production[0].content, EVENT_CH);
 			SET_PROD_NON_TERM(grammar.rule[0].production[0].content, 1);
@@ -176,10 +178,11 @@ errorCode generateBuiltInTypesGrammars(EXIPSchema* schema)
 			grammar.rule[0].production[0].qnameId.uriId = URI_MAX;
 			grammar.rule[0].production[0].qnameId.lnId = LN_MAX;
 			grammar.rule[0].pCount = 1;
+			grammar.rule[0].meta = 0;
 
 			grammar.rule[1].production = memManagedAllocate(&schema->memList, sizeof(Production));
 			if(grammar.rule[1].production == NULL)
-				return MEMORY_ALLOCATION_ERROR;
+				return EXIP_MEMORY_ALLOCATION_ERROR;
 
 			SET_PROD_EXI_EVENT(grammar.rule[1].production[0].content, EVENT_EE);
 			SET_PROD_NON_TERM(grammar.rule[1].production[0].content, GR_VOID_NON_TERMINAL);
@@ -187,6 +190,8 @@ errorCode generateBuiltInTypesGrammars(EXIPSchema* schema)
 			grammar.rule[1].production[0].qnameId.uriId = URI_MAX;
 			grammar.rule[1].production[0].qnameId.lnId = LN_MAX;
 			grammar.rule[1].pCount = 1;
+			grammar.rule[1].meta = 0;
+			RULE_SET_CONTAIN_EE(grammar.rule[1].meta);
 		}
 
 		/** Add the grammar to the schema grammar table */
@@ -194,12 +199,12 @@ errorCode generateBuiltInTypesGrammars(EXIPSchema* schema)
 		schema->uriTable.uri[3].lnTable.ln[i].typeGrammar = dynArrId;
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode createBuiltInTypesDefinitions(SimpleTypeTable* simpleTypeTable, AllocList* memList)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	SimpleType sType;
 	Index elID;
 
@@ -350,7 +355,7 @@ errorCode createBuiltInTypesDefinitions(SimpleTypeTable* simpleTypeTable, AllocL
 
 	// date
 	sType.content = 0;
-	SET_EXI_TYPE(sType.content, VALUE_TYPE_DATE_TIME);
+	SET_EXI_TYPE(sType.content, VALUE_TYPE_DATE);
 	sType.max = 0;
 	sType.min = 0;
 	sType.length = 0;
@@ -399,7 +404,7 @@ errorCode createBuiltInTypesDefinitions(SimpleTypeTable* simpleTypeTable, AllocL
 
 	// gDay
 	sType.content = 0;
-	SET_EXI_TYPE(sType.content, VALUE_TYPE_DATE_TIME);
+	SET_EXI_TYPE(sType.content, VALUE_TYPE_MONTH);
 	sType.max = 0;
 	sType.min = 0;
 	sType.length = 0;
@@ -407,7 +412,7 @@ errorCode createBuiltInTypesDefinitions(SimpleTypeTable* simpleTypeTable, AllocL
 
 	// gMonth
 	sType.content = 0;
-	SET_EXI_TYPE(sType.content, VALUE_TYPE_DATE_TIME);
+	SET_EXI_TYPE(sType.content, VALUE_TYPE_MONTH);
 	sType.max = 0;
 	sType.min = 0;
 	sType.length = 0;
@@ -415,7 +420,7 @@ errorCode createBuiltInTypesDefinitions(SimpleTypeTable* simpleTypeTable, AllocL
 
 	// gMonthDay
 	sType.content = 0;
-	SET_EXI_TYPE(sType.content, VALUE_TYPE_DATE_TIME);
+	SET_EXI_TYPE(sType.content, VALUE_TYPE_MONTH);
 	sType.max = 0;
 	sType.min = 0;
 	sType.length = 0;
@@ -423,7 +428,7 @@ errorCode createBuiltInTypesDefinitions(SimpleTypeTable* simpleTypeTable, AllocL
 
 	// gYear
 	sType.content = 0;
-	SET_EXI_TYPE(sType.content, VALUE_TYPE_DATE_TIME);
+	SET_EXI_TYPE(sType.content, VALUE_TYPE_YEAR);
 	sType.max = 0;
 	sType.min = 0;
 	sType.length = 0;
@@ -431,7 +436,7 @@ errorCode createBuiltInTypesDefinitions(SimpleTypeTable* simpleTypeTable, AllocL
 
 	// gYearMonth
 	sType.content = 0;
-	SET_EXI_TYPE(sType.content, VALUE_TYPE_DATE_TIME);
+	SET_EXI_TYPE(sType.content, VALUE_TYPE_DATE);
 	sType.max = 0;
 	sType.min = 0;
 	sType.length = 0;
@@ -549,7 +554,7 @@ errorCode createBuiltInTypesDefinitions(SimpleTypeTable* simpleTypeTable, AllocL
 
 	// time
 	sType.content = 0;
-	SET_EXI_TYPE(sType.content, VALUE_TYPE_DATE_TIME);
+	SET_EXI_TYPE(sType.content, VALUE_TYPE_TIME);
 	sType.max = 0;
 	sType.min = 0;
 	sType.length = 0;
@@ -605,5 +610,5 @@ errorCode createBuiltInTypesDefinitions(SimpleTypeTable* simpleTypeTable, AllocL
 	sType.length = 0;
 	TRY(addDynEntry(&simpleTypeTable->dynArray, &sType, &elID));
 
-	return ERR_OK;
+	return EXIP_OK;
 }

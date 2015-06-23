@@ -66,17 +66,19 @@ EXIPSchema *XoExiLoadSchema(char *schemaID);
 
 //#define DEBUG
 
-#ifdef DEBUG
-#define PRINT	printf
-#define FWRITE	fwrite
-#else
-#define PRINT _XX
-#define FWRITE _XX
-static inline void _XX() { }
-#endif
+#define FWRITE fwrite
 
 
-static	char	*xo_file	= __FILE__;
+static char    *xo_file        = __FILE__;
+
+#define PRINT(...) { \
+  char msg[256]; \
+  snprintf(msg, 256, __VA_ARGS__); \
+  xoerr(xo_file, __LINE__, msg, 0); \
+}
+
+
+#define EXIP_VERSION 294
 
 
 #if	0	// PCA
@@ -121,15 +123,16 @@ typedef	struct
 static	int32	xowritobj(xmlTextWriterPtr writer,t_wctxt *ctxt,void *obj,int32 level);
 
 static void writeString(String str) {
-	FWRITE(str.str, sizeof(CharType), str.length, stdout);
+	PRINT("%s", str.str);
+	// FWRITE(str.str, sizeof(CharType), str.length, stdout);
 }
 
 static void writeQName(QName qname) {
-	PRINT ("QName=(");
+	PRINT("QName=(");
 	writeString (*qname.uri);
-	PRINT (":");
+	PRINT(":");
 	writeString (*qname.localName);
-	PRINT (")");
+	PRINT(")");
 }
 
 /*
@@ -146,7 +149,7 @@ typedef struct {
 } memoryStream_t;
 
 static size_t writeMemoryOutputStream(void* buf, size_t readSize, void* stream) {
-	PRINT ("writeMemoryOutputStream %d\n", readSize);
+	PRINT("writeMemoryOutputStream %d\n", readSize);
 	memoryStream_t *ms = (memoryStream_t *)stream;
 	if	(!ms->data)
 		ms->data	= malloc(readSize + 1);
@@ -160,7 +163,7 @@ static size_t writeMemoryOutputStream(void* buf, size_t readSize, void* stream) 
 
 static size_t writeFileOutputStream(void* buf, size_t writeSize, void* stream) {
 	FILE *outfile = (FILE*) stream;
-	PRINT ("writeFileOutputStream %d\n", writeSize);
+	PRINT("writeFileOutputStream %d\n", writeSize);
 	return fwrite(buf, 1, writeSize, outfile);
 }
 
@@ -389,7 +392,7 @@ static t_elt *currentContext() {
 static int xmlTextWriterStartDocument(EXIStream *stream, char *p1, char *p2, char *p3) {
 	pile_init ();
 
-	PRINT ("serialize.startDocument\n");
+	PRINT("serialize.startDocument\n");
 	if	(serialize.startDocument(stream))
 		return	-1;
 
@@ -411,7 +414,7 @@ static int xmlTextWriterStartDocument(EXIStream *stream, char *p1, char *p2, cha
  * @return 0 if success, -1 else
  */
 static int xmlTextWriterEndDocument(xmlTextWriterPtr writer) {
-	PRINT ("serialize.endDocument\n");
+	PRINT("serialize.endDocument\n");
 	if	(serialize.endDocument(writer))
 		return	-1;
 	if	(serialize.closeEXIStream(writer))
@@ -462,9 +465,9 @@ static int xmlTextWriterStartElement(xmlTextWriterPtr writer, char *elem) {
 	localName.str	= lname;
 	localName.length = strlen(lname);
 
-	PRINT ("serialize.startElement ");
+	PRINT("serialize.startElement ");
 	writeQName(qname);
-	PRINT ("\n");
+	PRINT("\n");
 
 	EXITypeClass valueType;
 	ret = serialize.startElement(writer, qname, &valueType);
@@ -485,7 +488,7 @@ static int xmlTextWriterStartElement(xmlTextWriterPtr writer, char *elem) {
  */
 static int xmlTextWriterEndElement(xmlTextWriterPtr writer) {
 	pop ();
-	PRINT ("serialize.endElement\n");
+	PRINT("serialize.endElement\n");
 	if (serialize.endElement(writer))
 		return	-1;
 	return	0;
@@ -515,7 +518,7 @@ void serializeXSITYPE(EXIStream *strm, char *value) {
 	String	ln;
 	QName	qxsi	= {&uri,&ln};
 
-	PRINT ("serialize.qnameData %s\n", value);
+	PRINT("serialize.qnameData %s\n", value);
 
 	cutQName (value, s_uri, s_ln);
 	asciiToString(s_uri, &uri, &strm->memList, FALSE);
@@ -538,7 +541,7 @@ static int xmlTextWriterWriteAttribute(xmlTextWriterPtr writer, char*name, char 
 	int	ret = 0;
 	int	type = 0;
 
-	PRINT ("AT %s=%s\n", name, value);
+	PRINT("AT %s=%s\n", name, value);
 
 	if	(strcmp(name,"xsi:type") == 0)
 	{
@@ -553,12 +556,11 @@ static int xmlTextWriterWriteAttribute(xmlTextWriterPtr writer, char*name, char 
 	if	(lname) {
 		pfx	= name;
 		*lname++	= 0;
-		pfx	= getNamespaceByPrefix(pfx);
-		uri.str	= pfx;
-		uri.length = strlen(pfx);
+		uri.str	= getNamespaceByPrefix(pfx);
+		uri.length = strlen(uri.str);
 	}
 	else {
-		//pfx	= "";
+		pfx	= "";
 /* XXX
 		uri.str	= g_NsDefault;
 		uri.length = strlen(g_NsDefault);
@@ -584,25 +586,38 @@ static int xmlTextWriterWriteAttribute(xmlTextWriterPtr writer, char*name, char 
 		}
 	}
 	else {
-		EXITypeClass valueType;
+		if      (!strcmp(pfx, "xmlns")) {
+			PRINT("serialize.namespaceDeclaration ");
+			writeQName(qname);
+                        PRINT("\n");
 
-		PRINT ("serialize.attribute ");
-		writeQName(qname);
-		PRINT ("\n");
-
-		ret += serialize.attribute(writer, qname, TRUE, &valueType);
-		if (ret) {
-			free(name);return -1;
-		}
-
-		// xsi:type
-		if	(type == VALUE_TYPE_QNAME_CLASS) {
-			serializeXSITYPE(writer, value);
+                        String ns = { value, strlen(value) };
+			ret += serialize.namespaceDeclaration(writer, ns, localName, TRUE);
+                        if (ret) {
+                                free(name);return -1;
+                        }
 		}
 		else {
-			ret += asciiToString((char *)value, &chVal, &writer->memList, FALSE);
-			PRINT ("serialize.stringData (%s)\n", value);
-			ret += serialize.stringData(writer, chVal);
+			EXITypeClass valueType;
+
+			PRINT("serialize.attribute ");
+			writeQName(qname);
+			PRINT("\n");
+
+			ret += serialize.attribute(writer, qname, TRUE, &valueType);
+			if (ret) {
+				free(name);return -1;
+			}
+
+			// xsi:type
+			if	(type == VALUE_TYPE_QNAME_CLASS) {
+				serializeXSITYPE(writer, value);
+			}
+			else {
+				ret += asciiToString((char *)value, &chVal, &writer->memList, FALSE);
+				PRINT("serialize.stringData (%s)\n", value);
+				ret += serialize.stringData(writer, chVal);
+			}
 		}
 	}
 	free (name);
@@ -618,7 +633,7 @@ static int xmlTextWriterWriteAttribute(xmlTextWriterPtr writer, char*name, char 
  */
 static int xmlTextWriterWriteString(xmlTextWriterPtr writer, const xmlChar *content) {
 	int	ret = 0;
-	PRINT ("CH [%s] (%d)\n", (char *)content, strlen((char *)content));
+	PRINT("CH [%s] (%d)\n", (char *)content, strlen((char *)content));
 
 	if	(g_schemaPtr) {
 		String uri = {NULL,0};
@@ -631,7 +646,7 @@ static int xmlTextWriterWriteString(xmlTextWriterPtr writer, const xmlChar *cont
 	{
 		String chVal;
 		ret += asciiToString((char *)content, &chVal, &writer->memList, FALSE);
-		PRINT ("serialize.stringData (%s)\n", (char *)content);
+		PRINT("serialize.stringData (%s)\n", (char *)content);
 		ret += serialize.stringData(writer, chVal);
 	}
 	if	(ret)	return -1;
@@ -654,7 +669,7 @@ static int xmlTextWriterWriteBase64(xmlTextWriterPtr writer,
 	int rc = xmlTextWriterWriteString(writer, XCAST(to));
 	free (to);
 */
-	PRINT ("serialize.binaryData\n");
+	PRINT("serialize.binaryData\n");
 	serialize.binaryData(writer, data+start, len);
 	return	0;
 }
@@ -716,7 +731,7 @@ void iso8601_to_EXIP(char *iso, EXIPDateTime *dt) {
 
 	memset (dt, 0, sizeof(EXIPDateTime));
 
-	dt->presenceMask = YEAR_PRESENCE | MON_PRESENCE | MDAY_PRESENCE | HOUR_PRESENCE | MIN_PRESENCE | SEC_PRESENCE;
+	dt->presenceMask = 0;
 	dt->dateTime.tm_year	= (iso[0]-'0')*1000 + (iso[1]-'0')*100 + (iso[2]-'0')*10 + (iso[3]-'0') - BASE_YEAR;
 	dt->dateTime.tm_mon	= (iso[5]-'0')*10 + (iso[6]-'0') - 1;
 	dt->dateTime.tm_mday	= (iso[8]-'0')*10 + (iso[9]-'0');
@@ -760,26 +775,24 @@ void iso8601_to_EXIP(char *iso, EXIPDateTime *dt) {
 
 void EXIP_to_iso8601(EXIPDateTime *dt, char *avalue) {
 	*avalue = 0;
-	if	(dt->presenceMask & YEAR_PRESENCE) {
-		sprintf (avalue+strlen(avalue), "%04d-%02d-%02d",
-			dt->dateTime.tm_year + BASE_YEAR,
-			dt->dateTime.tm_mon + 1,
-			dt->dateTime.tm_mday);
+	sprintf (avalue+strlen(avalue), "%04d-%02d-%02d",
+		dt->dateTime.tm_year + BASE_YEAR,
+		dt->dateTime.tm_mon + 1,
+		dt->dateTime.tm_mday);
+	
+	if	(dt->presenceMask & FRACT_PRESENCE) {
+		double sec = dt->dateTime.tm_sec;
+		sec += (double)dt->fSecs.value * pow(10, -(dt->fSecs.offset + 1));
+		sprintf (avalue+strlen(avalue), "T%02d:%02d:%05.3f",
+			dt->dateTime.tm_hour,
+			dt->dateTime.tm_min, sec);
 	}
-	if	(dt->presenceMask & HOUR_PRESENCE) {
-		if	(dt->presenceMask & FRACT_PRESENCE) {
-			double sec = dt->dateTime.tm_sec;
-			sec += (double)dt->fSecs.value * pow(10, -(dt->fSecs.offset + 1));
-			sprintf (avalue+strlen(avalue), "T%02d:%02d:%05.3f",
-				dt->dateTime.tm_hour,
-				dt->dateTime.tm_min, sec);
-		}
-		else {
-			sprintf (avalue+strlen(avalue), "T%02d:%02d:%02d",
-				dt->dateTime.tm_hour,
-				dt->dateTime.tm_min, dt->dateTime.tm_sec);
-		}
+	else {
+		sprintf (avalue+strlen(avalue), "T%02d:%02d:%02d",
+			dt->dateTime.tm_hour,
+			dt->dateTime.tm_min, dt->dateTime.tm_sec);
 	}
+	
 	if	(dt->presenceMask & TZONE_PRESENCE) {
 		int h, m, tz;
 		char sign;
@@ -798,13 +811,13 @@ void EXIP_to_iso8601(EXIPDateTime *dt, char *avalue) {
 
 static int ExiSerialize(EXIStream *strm, QName qname, char *value, boolean isAttr, EXITypeClass t) {
 	EXITypeClass valueType = VALUE_TYPE_STRING_CLASS;
-	errorCode tmp_err_code = ERR_OK;
+	errorCode tmp_err_code = EXIP_OK;
 	String chVal;
 
 	if	(isAttr) {
-		PRINT ("serialize.attribute ");
+		PRINT("serialize.attribute ");
 		writeQName(qname);
-		PRINT ("\n");
+		PRINT("\n");
 		tmp_err_code = serialize.attribute(strm, qname, TRUE, &valueType);
 		if (tmp_err_code)
 			return -1;
@@ -824,11 +837,11 @@ static int ExiSerialize(EXIStream *strm, QName qname, char *value, boolean isAtt
 	case VALUE_TYPE_STRING_CLASS :
 	case VALUE_TYPE_NONE_CLASS :
 		tmp_err_code += asciiToString(value, &chVal, &strm->memList, FALSE);
-		PRINT ("serialize.stringData (%s)\n", value);
+		PRINT("serialize.stringData (%s)\n", value);
 		tmp_err_code += serialize.stringData(strm, chVal);
 		break;
 	case VALUE_TYPE_INTEGER_CLASS :
-		PRINT ("serialize.intData\n");
+		PRINT("serialize.intData\n");
 		tmp_err_code += serialize.intData(strm, atoll(value));
 		break;
 	case VALUE_TYPE_BOOLEAN_CLASS :
@@ -836,13 +849,13 @@ static int ExiSerialize(EXIStream *strm, QName qname, char *value, boolean isAtt
 		boolean b = FALSE;
 		if	(!strcasecmp(value, "true") || !strcmp(value, "1"))
 			b	= TRUE;
-		PRINT ("serialize.booleanData\n");
+		PRINT("serialize.booleanData\n");
 		tmp_err_code += serialize.booleanData(strm, b);
 		break;
 		}
 	case VALUE_TYPE_DECIMAL_CLASS :
 #if	0
-		PRINT ("serialize.decimalData\n");
+		PRINT("serialize.decimalData\n");
 		tmp_err_code += serialize.decimalData(strm, (Decimal)atof(value));
 #else
 		printf("XO/EXI Type Decimal not supported '%s':%d\n",
@@ -853,7 +866,7 @@ static int ExiSerialize(EXIStream *strm, QName qname, char *value, boolean isAtt
 		{
 		Float	fl_val;
 		fl_val.mantissa = normalize_float(value, &fl_val.exponent);
-		PRINT ("serialize.floatData\n");
+		PRINT("serialize.floatData\n");
 		tmp_err_code += serialize.floatData(strm, fl_val);
 		}
 		break;
@@ -866,7 +879,7 @@ static int ExiSerialize(EXIStream *strm, QName qname, char *value, boolean isAtt
 		EXIPDateTime dt;
 		iso8601_to_EXIP(temp, &dt);
 		free (temp);
-		PRINT ("serialize.dateTimeData %s\n", value);
+		PRINT("serialize.dateTimeData %s\n", value);
 		tmp_err_code += serialize.dateTimeData(strm, dt);
 		}
 		break;
@@ -1492,12 +1505,13 @@ dropattr :
  * @brief Encode a XO object in memory, using EXI
  * @param obj The XO object
  * @param flags
- * @param bufout Null terminated output buffer
+ * @param bufout output buffer
+ * @param len output buffer length
  * @param schemaID Force schemaID
  * @param useRootObj Use the name of the rootobj as the schemaID
  * @return A pointer to the allocated memory structure to be freed
  */
-/*DEF*/	void	*XoWritExiMem(void *obj,int32 flags,char **bufout,char *schemaID, int useRootObj)
+/*DEF*/	void	*XoWritExiMem(void *obj,int32 flags,char **bufout,int *len,char *schemaID, int useRootObj)
 {
 	xmlBufferPtr	buf;
 	xmlTextWriterPtr writer;
@@ -1583,6 +1597,7 @@ dropattr :
 
 	memoryStream_t *outMemory = (memoryStream_t *)writer->buffer.ioStrm.stream;
 //printf ("outMemory-> %d\n", outMemory->len);
+	*len = outMemory->len;
 	*bufout	= (char *)outMemory->data;
 
 	return	(char *)buf ;

@@ -43,6 +43,8 @@
 
 //#define DEBUG
 
+#define EXIP_VERSION 294
+
 #ifdef DEBUG
 #define PRINT	printf
 #define FWRITE	fwrite
@@ -100,6 +102,7 @@ static errorCode sample_startDocument(void* app_data);
 static errorCode sample_endDocument(void* app_data);
 static errorCode sample_startElement(QName qname, void* app_data);
 static errorCode sample_endElement(void* app_data);
+static errorCode sample_namespaceDeclaration(const String ns, const String prefix, boolean isLocalElementNS, void* app_data);
 static errorCode sample_attribute(QName qname, void* app_data);
 static errorCode sample_stringData(const String value, void* app_data);
 static errorCode sample_decimalData(Decimal value, void* app_data);
@@ -190,7 +193,7 @@ static void *XoReadExiCommon(struct ioStream *ioStr, char *roottype,int flags,in
 	struct appData parsingData;
 	char buf[INPUT_BUFFER_SIZE];
 	BinaryBuffer buffer;
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 
 	memset	(&parsingData,0,sizeof(parsingData));
 	parsingData.ctxt.roottype	= roottype;
@@ -214,7 +217,7 @@ static void *XoReadExiCommon(struct ioStream *ioStr, char *roottype,int flags,in
 #if EXIP_VERSION>=289
 	tmp_err_code = initParser(&testParser, buffer, &parsingData);
 #endif
-	if(tmp_err_code != ERR_OK) {
+	if(tmp_err_code != EXIP_OK) {
 		_XoFreeCtxt(&parsingData.ctxt);
 		return NULL;
 	}
@@ -231,6 +234,7 @@ static void *XoReadExiCommon(struct ioStream *ioStr, char *roottype,int flags,in
 	testParser.handler.startDocument = sample_startDocument;
 	testParser.handler.endDocument = sample_endDocument;
 	testParser.handler.startElement = sample_startElement;
+	testParser.handler.namespaceDeclaration = sample_namespaceDeclaration;
 	testParser.handler.attribute = sample_attribute;
 	testParser.handler.stringData = sample_stringData;
 	testParser.handler.endElement = sample_endElement;
@@ -263,7 +267,7 @@ static void *XoReadExiCommon(struct ioStream *ioStr, char *roottype,int flags,in
 
 	// V: Parse the body of the EXI stream
 
-	while(tmp_err_code == ERR_OK)
+	while(tmp_err_code == EXIP_OK)
 	{
 		tmp_err_code = parseNext(&testParser);
 		PRINT ("parseNext ret=%d\n", tmp_err_code);
@@ -427,7 +431,7 @@ static EXIPSchema *sample_retrieveSchema(void* app_data) {
  */
 static errorCode sample_startDocument(void* app_data) {
 	PRINT ("SD\n");
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 /**
@@ -437,7 +441,7 @@ static errorCode sample_startDocument(void* app_data) {
  */
 static errorCode sample_endDocument(void* app_data) {
 	PRINT ("ED\n");
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 /**
@@ -494,7 +498,7 @@ static errorCode sample_startElement(QName qname, void* app_data) {
 	push(&(appD->stack), createElement(appD->nameBuf));
 
 	appD->unclosedElement = 1;
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 /**
@@ -518,7 +522,7 @@ static errorCode sample_endElement(void* app_data) {
 	el = pop(&(appD->stack));
 	destroyElement(el);
 	_XoFreeAttributesWith (&appD->ctxt,free);
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static void putValue(struct appData* appD, char *avalue) {
@@ -543,6 +547,24 @@ static void putValue(struct appData* appD, char *avalue) {
 }
 
 /**
+ * @brief Callback called when the EXIP library has found an xmlns attribute declaration
+ * @param ns The qualified name of the attribute
+ * @param app_data Pointer to the struct appData passed to initParser()
+ * @return EXIP_HANDLER_OK if success, or EXIP_HANDLER_STOP if need to stop the parser
+ */
+static errorCode sample_namespaceDeclaration(const String ns, const String prefix, boolean isLocalElementNS, void* app_data) {
+	QName qname;
+	String xmlns = { "xmlns", strlen("xmlns") };
+	qname.uri = &xmlns;
+	qname.localName = (String*) &prefix;
+
+	errorCode ret = sample_attribute(qname, app_data);
+	if (!ret) return ret;
+
+	return sample_stringData(ns, app_data);
+}
+
+/**
  * @brief Callback called when the EXIP library has found an attribute
  * @param qname The qualified name of the attribute
  * @param app_data Pointer to the struct appData passed to initParser()
@@ -556,7 +578,7 @@ static errorCode sample_attribute(QName qname, void* app_data) {
 	char *attr = QNameStrdup(&qname);
 	appD->attribute = attr;
 	appD->expectAttributeData = 1;
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_qnameData(const QName qname, void* app_data) {
@@ -566,7 +588,7 @@ static errorCode sample_qnameData(const QName qname, void* app_data) {
 	char *avalue = QNameStrdup(&qname);
 	putValue ((struct appData*) app_data, avalue);
 	free (avalue);
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 /**
@@ -581,7 +603,7 @@ static errorCode sample_stringData(const String value, void* app_data) {
 	char	*avalue = StringStrdup(&value);
 	putValue ((struct appData*) app_data, avalue);
 	free (avalue);
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_decimalData(Decimal value, void* app_data) {
@@ -593,26 +615,26 @@ static errorCode sample_decimalData(Decimal value, void* app_data) {
 	printf("XO/EXI Type Decimal not supported '%s':%d\n",
 				__FILE__,__LINE__);
 #endif
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_intData(Integer int_val, void* app_data) {
 	char	avalue[40];
 	sprintf (avalue, "%lld", int_val);
 	putValue ((struct appData*) app_data, avalue);
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_booleanData(boolean bool_val, void* app_data) {
 	putValue ((struct appData*) app_data, bool_val ? "true":"false");
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_floatData(Float fl_val, void* app_data) {
 	char	avalue[40];
 	sprintf(avalue, "%lldE%d", fl_val.mantissa, fl_val.exponent);
 	putValue ((struct appData*) app_data, avalue);
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 extern void EXIP_to_iso8601 (EXIPDateTime *dt, char *str);
@@ -621,7 +643,7 @@ static errorCode sample_dateTimeData(EXIPDateTime dt_val, void* app_data) {
 	char	avalue[200];
 	EXIP_to_iso8601 (&dt_val, avalue);
 	putValue ((struct appData*) app_data, avalue);
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode sample_binaryData(const char* binary_val, Index nbytes, void* app_data) {
@@ -637,7 +659,7 @@ static errorCode sample_binaryData(const char* binary_val, Index nbytes, void* a
 
 	if (curAtr->ar_type == XoBuffer)
 		_XoSetBasicValue(curObj, curAtr, (char **)&binary_val, nbytes);
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static void push(struct element** stack, struct element* el)

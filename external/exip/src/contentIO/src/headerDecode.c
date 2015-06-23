@@ -11,8 +11,8 @@
  *
  * @date Aug 23, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: headerDecode.c 294 2013-06-11 15:28:43Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: headerDecode.c 348 2014-11-21 12:34:51Z kjussakov $
  */
 
 #include "headerDecode.h"
@@ -52,7 +52,7 @@ struct ops_AppData
 
 errorCode decodeHeader(EXIStream* strm, boolean outOfBandOpts)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	unsigned int bits_val = 0;
 	boolean boolVal = FALSE;
 
@@ -67,26 +67,26 @@ errorCode decodeHeader(EXIStream* strm, boolean outOfBandOpts)
 	{
 		TRY(readBits(strm, 6, &bits_val));
 		if(bits_val != 36)
-			return INVALID_EXI_HEADER;
+			return EXIP_INVALID_EXI_HEADER;
 		TRY(readBits(strm, 8, &bits_val));
 		if(bits_val != 69)   // ASCII code for E = 01000101  (69)
-			return INVALID_EXI_HEADER;
+			return EXIP_INVALID_EXI_HEADER;
 		TRY(readBits(strm, 8, &bits_val));
 		if(bits_val != 88)   // ASCII code for X = 01011000  (88)
-			return INVALID_EXI_HEADER;
+			return EXIP_INVALID_EXI_HEADER;
 		TRY(readBits(strm, 8, &bits_val));
 		if(bits_val != 73)   // ASCII code for I = 01001001  (73)
-			return INVALID_EXI_HEADER;
+			return EXIP_INVALID_EXI_HEADER;
 
 		strm->header.has_cookie = 1;
 		DEBUG_MSG(INFO, DEBUG_CONTENT_IO, (">EXI cookie detected\n"));
 		TRY(readBits(strm, 2, &bits_val));
 		if(bits_val != 2)  // The header Distinguishing Bits are required
-			return INVALID_EXI_HEADER;
+			return EXIP_INVALID_EXI_HEADER;
 	}
 	else
 	{
-		return INVALID_EXI_HEADER;
+		return EXIP_INVALID_EXI_HEADER;
 	}
 
 	// Read the Presence Bit for EXI Options
@@ -113,7 +113,7 @@ errorCode decodeHeader(EXIStream* strm, boolean outOfBandOpts)
 		if(outOfBandOpts == FALSE)
 		{
 			DEBUG_MSG(ERROR, DEBUG_CONTENT_IO, (">No EXI options in the header and no out-of-band options specified. \n"));
-			return HEADER_OPTIONS_MISMATCH;
+			return EXIP_HEADER_OPTIONS_MISMATCH;
 		}
 	}
 
@@ -167,14 +167,14 @@ errorCode decodeHeader(EXIStream* strm, boolean outOfBandOpts)
 		TRY_CATCH(setSchema(&optionsParser, (EXIPSchema*) &ops_schema), destroyParser(&optionsParser));
 		TRY_CATCH(createValueTable(&optionsParser.strm.valueTable), destroyParser(&optionsParser));
 
-		while(tmp_err_code == ERR_OK)
+		while(tmp_err_code == EXIP_OK)
 		{
 			tmp_err_code = parseNext(&optionsParser);
 		}
 
 		destroyParser(&optionsParser);
 
-		if(tmp_err_code != PARSING_COMPLETE)
+		if(tmp_err_code != EXIP_PARSING_COMPLETE)
 			return tmp_err_code;
 
 		strm->buffer.bufContent = optionsParser.strm.buffer.bufContent;
@@ -205,24 +205,24 @@ static errorCode ops_fatalError(const errorCode code, const char* msg, void* app
 static errorCode ops_startDocument(void* app_data)
 {
 	DEBUG_MSG(INFO, DEBUG_CONTENT_IO, (">Start parsing the EXI Options\n"));
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode ops_endDocument(void* app_data)
 {
 	DEBUG_MSG(INFO, DEBUG_CONTENT_IO, (">Complete parsing the EXI Options\n"));
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode ops_startElement(QName qname, void* app_data)
 {
 	struct ops_AppData* o_appD = (struct ops_AppData*) app_data;
 
-	if(o_appD->o_strm->context.currElem.uriId == 4) // URI == http://www.w3.org/2009/exi
+	if(o_appD->o_strm->gStack->currQNameID.uriId == 4) // URI == http://www.w3.org/2009/exi
 	{
 		o_appD->prevElementUriID = 4;
 
-		switch(o_appD->o_strm->context.currElem.lnId)
+		switch(o_appD->o_strm->gStack->currQNameID.lnId)
 		{
 			case 33:	// strict
 				SET_STRICT(o_appD->parsed_ops->enumOpt);
@@ -277,53 +277,6 @@ static errorCode ops_startElement(QName qname, void* app_data)
 			break;
 			case 36:	// uncommon
 				o_appD->prevElementLnID = 36;
-#if EXI_PROFILE_DEFAULT
-				{
-				// If the EXI Profile default behaviour is followed, then we expect
-				// SE(*) <p/> indicating default EXI Profile parameters
-				// If this is not the case rise an error
-				// SE(*) has event code 5 in the uncommon grammar
-				unsigned int tmp_bits_val;
-				UnsignedInteger lnLen = 0;
-				errorCode tmp_err_code = UNEXPECTED_ERROR;
-				String lnStr;
-				QNameID qnameId = {URI_MAX, LN_MAX};
-
-				// Next event code must be SE(*)
-				TRY(decodeNBitUnsignedInteger(o_appD->o_strm, 3, &tmp_bits_val));
-				if(tmp_bits_val != 5)
-				{
-					DEBUG_MSG(ERROR, DEBUG_CONTENT_IO, (">EXI Profile default active but <p> element missing\n"));
-					return INVALID_EXIP_CONFIGURATION;
-				}
-				// The <p> element QName must be "http://www.w3.org/2009/exi:p"
-				TRY(decodeUri(o_appD->o_strm, &qnameId.uriId));
-				TRY(decodeUnsignedInteger(o_appD->o_strm, &lnLen));
-				if(lnLen == 0) // local-name table hit -> should not be the case to have "p" in the local string table
-					return INVALID_EXIP_CONFIGURATION;
-
-				TRY(allocateStringMemoryManaged(&(lnStr.str),(Index) (lnLen - 1), &o_appD->o_strm->memList));
-				TRY(decodeStringOnly(o_appD->o_strm, (Index)lnLen - 1, &lnStr));
-				// NOTE: the "p" local name is in purpose not added to the
-				// local name table of the http://www.w3.org/2009/exi uri, although it should be.
-				// If there are more strings (24 or more) added there in the future
-				// or the <p> element is encoded more than once - both are highly unlikely,
-				// then there will be a problem with the encoding.
-
-				if(qnameId.uriId != 4 || !stringEqualToAscii(lnStr, "p"))
-				{
-					DEBUG_MSG(ERROR, DEBUG_CONTENT_IO, (">EXI Profile default active but <p> element missing\n"));
-					return INVALID_EXIP_CONFIGURATION;
-				}
-				// The next event code must be EE -> 0.0
-				TRY(decodeNBitUnsignedInteger(o_appD->o_strm, 2, &tmp_bits_val));
-				if(tmp_bits_val != 0)
-				{
-					DEBUG_MSG(ERROR, DEBUG_CONTENT_IO, (">EXI Profile default active but <p> element is not empty\n"));
-					return INVALID_EXIP_CONFIGURATION;
-				}
-				}
-#endif
 			break;
 		}
 	}
@@ -340,12 +293,12 @@ static errorCode ops_startElement(QName qname, void* app_data)
 		// Handle here the user defined meta-data that follows! http://www.w3.org/TR/2011/REC-exi-20110310/#key-userMetaData
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode ops_endElement(void* app_data)
 {
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode ops_attribute(QName qname, void* app_data)
@@ -377,7 +330,7 @@ static errorCode ops_attribute(QName qname, void* app_data)
 		// Handle here the user defined meta-data that follows! http://www.w3.org/TR/2011/REC-exi-20110310/#key-userMetaData
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode ops_stringData(const String value, void* app_data)
@@ -400,7 +353,7 @@ static errorCode ops_stringData(const String value, void* app_data)
 			else
 			{
 				o_appD->parsed_ops->schemaIDMode = SCHEMA_ID_SET;
-				if(cloneStringManaged(&value, &o_appD->parsed_ops->schemaID, o_appD->permanentAllocList) != ERR_OK)
+				if(cloneStringManaged(&value, &o_appD->parsed_ops->schemaID, o_appD->permanentAllocList) != EXIP_OK)
 				{
 					DEBUG_MSG(ERROR, DEBUG_CONTENT_IO, (">Memory error\n"));
 					return EXIP_HANDLER_STOP;
@@ -413,14 +366,14 @@ static errorCode ops_stringData(const String value, void* app_data)
 		// Handle here the user defined meta-data that follows! http://www.w3.org/TR/2011/REC-exi-20110310/#key-userMetaData
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode ops_intData(Integer int_val, void* app_data)
 {
 	struct ops_AppData* o_appD = (struct ops_AppData*) app_data;
 
-	switch(o_appD->o_strm->context.currElem.lnId)
+	switch(o_appD->o_strm->gStack->currQNameID.lnId)
 	{
 		case 37:	// valueMaxLength
 			o_appD->parsed_ops->valueMaxLength = (unsigned int) int_val;
@@ -432,7 +385,7 @@ static errorCode ops_intData(Integer int_val, void* app_data)
 			o_appD->parsed_ops->blockSize = (unsigned int) int_val;
 		break;
 	}
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode ops_boolData(boolean bool_val, void* app_data)
@@ -449,5 +402,5 @@ static errorCode ops_boolData(boolean bool_val, void* app_data)
 		// Handle here the user defined meta-data that follows! http://www.w3.org/TR/2011/REC-exi-20110310/#key-userMetaData
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
