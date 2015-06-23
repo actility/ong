@@ -6,7 +6,6 @@
 # README for terms of use. 
 
 # the library's version
-include $(ROOTACT)/rtbase/base/makefile.def
 VERSION:=2.0.0
 
 # tools

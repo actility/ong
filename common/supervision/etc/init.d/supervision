@@ -1,0 +1,401 @@
+#!(SHELL)
+# v3.4.3
+# supervision:  Starts the SUPERVISION
+
+CURRENT_DIR=$(dirname $0)
+. $CURRENT_DIR/../acy.cfg
+. $CURRENT_DIR/../functions
+
+source $ROOTACT/etc/supervision/supervision.cfg
+
+SPV_DATA=$ROOTACT/usr/data/supervision
+INIT=0
+
+SERVICE="SUPERVISION"
+PIDFILE=$SPV_DATA/supervision.pid
+STOPFILE=$SPV_DATA/stop
+STOPLOOPFILE=$SPV_DATA/stoploop
+EMAIL_MSG_FILE=$SPV_DATA/email-notif.txt
+BACKUP_DIR=$SPV_DATA/backups
+FORCE="0"
+
+# google DNS (to check if there is a network problem)
+SAFE_IP=8.8.8.8
+# the number of (ping/service health)  retries
+RETRY_COUNT=5
+# the delay of a second (ping/service health) when the previous one gets and error
+[ -z "$RETRY_TIMER" ] && RETRY_TIMER=10
+# the delay to test an alternate host to ping in case of problem
+RETRY_ALTERNATE_HOST_TIMER=10
+# the delay between 2 polling phases in seconds
+[ -z "$LOOP_TIMER" ] && LOOP_TIMER=60
+# the delay that ping will wait for an answer in seconds
+PING_TIMEOUT=5
+# minimum uptime before atempting a reboot n seconds (10 mn)
+UPTIME_LIMIT=$((10*60))
+# the delay of a second to wait after a service restart
+RESTART_TIMER=60
+
+PROGNAME=supervision
+REBOOT_CMD="/sbin/reboot"
+STDIN_LOGGER_CMD="$ROOTACT/bin/stdin-logger $ROOTACT/var/log/supervision/ supervision 2048 2 1 1 0"
+PS_CMD="ps -eLFww"
+SAR_CMD="sar -A"
+
+usage() {
+    echo "Usage: supervision [<options>] {start|stop|status|restart}"
+    echo "  Where options are:"
+    echo "   -f|--force         Force shutdown"
+    echo "   -h|--help          Print this help message"
+    echo "   -i|--init          Re-initialize framework"
+}
+
+#WE MUST BE ROOT
+MYUID=$(id -u)
+if [ "$MYUID" != "0" ]
+then
+  echo "you must be root"
+  echo "you must be root" | $STDIN_LOGGER_CMD
+  exit 1
+fi
+
+# Called before starting the service
+# Can be use to init and prepare the startService function (which occurs in a child process)
+# Available parameters:
+#  * SERVICE_NAME (in) = name that is used to start the service
+#  * OPTIONS (out) = options that will be passed to _startService function
+preStart() {
+  #FOLDERS MUST BE CREATED
+  if [ ! -d $ROOTACT/var/log/supervision ]; then
+    mkdir -p $ROOTACT/var/log/supervision
+  fi
+  if [ ! -d $SPV_DATA ]; then
+    mkdir -p $SPV_DATA
+  fi
+  if [ ! -d $BACKUP_DIR ]; then
+    mkdir -p $BACKUP_DIR
+  fi
+  echo "Starting $SERVICE service" | $STDIN_LOGGER_CMD
+}
+
+preStop() {
+  echo "Stopping $SERVICE service" | $STDIN_LOGGER_CMD
+}
+
+# Prints the service command that will be executed through a respawn script. This function is called in a child process
+# Available parameters:
+#  * <empty>
+serviceCommand() {
+  echo "$ROOTACT/etc/init.d/$PROGNAME loop | $STDIN_LOGGER_CMD 2>&1"
+}
+
+checkUptime() {
+   uptime=$(cat /proc/uptime)
+   upSeconds=${uptime%%.*}
+   echo "current uptime is $upSeconds s"
+   echo "uptime limit is $UPTIME_LIMIT s"
+   if [ $upSeconds -lt $UPTIME_LIMIT ] ; then
+      echo "our uptime too low, need to wait"
+      return 1
+   fi
+    echo "our uptime is good"
+   return 0
+}
+
+gatherInfos() {
+  RESTORING_DATE=$1
+  echo "Gather information on system"
+
+  echo "------------------------------------------------------"
+  echo "- ps ($PS_CMD)"
+  eval $PS_CMD
+
+  echo "------------------------------------------------------"
+  echo "- sar ($SAR_CMD)"
+  eval $SAR_CMD
+
+  BACKUP_FILE="$BACKUP_DIR/spv-log-backup-$RESTORING_DATE.tgz"
+  echo "------------------------------------------------------"
+  echo "Then back up logs in $BACKUP_FILE"
+  tar zcvf $BACKUP_FILE $ROOTACT/var/log 2>&1
+
+  # clean older backup files
+  NB_BACKED_UP_FILES=$(cd $BACKUP_DIR/ && ls -1 spv-log-backup-*.tgz | wc -l)
+  if [ $NB_BACKED_UP_FILES -gt 10 ]; then
+    (     
+    cd $BACKUP_DIR/
+    rm -f $(ls -t -1 spv-log-backup-*.tgz | tail -n $(($NB_BACKED_UP_FILES - 10)))
+    )
+  fi
+}
+
+
+infoService() {
+  RESTORING_DATE=$(date "+%Y%m%d-%Hh%M")
+  echo "------------------------------------------------------"
+  echo "INFO: Monitoring unstable on $*"
+  for SERVICE in $*
+  do
+    if [ -f $ROOTACT/etc/init.d/$SERVICE ]; then
+      $ROOTACT/etc/init.d/$SERVICE printInfos
+    fi
+  done
+
+  # get the last log entries
+  TEMP_FILE=/tmp/$(basename $0).$RANDOM.log
+  tail -n 30 $ROOTACT/var/log/supervision/supervision_0.log > $TEMP_FILE 
+
+  gatherInfos $RESTORING_DATE
+
+  # send an email
+  if [ -n "$ADMIN_EMAILS" ]
+  then
+    echo "Subject: [Info] [$(hostname):$ROOTACT] Monitoring unstable for: $* on $(hostname)" > $EMAIL_MSG_FILE
+    echo "Monitoring unstable for: $* on $(hostname) ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
+    echo "Logs have been backed up in $BACKUP_FILE."  >> $EMAIL_MSG_FILE
+    echo "--------------------------" >> $EMAIL_MSG_FILE
+    echo "Excerpt from log file:" >> $EMAIL_MSG_FILE
+    cat $TEMP_FILE >> $EMAIL_MSG_FILE
+    echo  >> $EMAIL_MSG_FILE
+    sendmail -v $ADMIN_EMAILS < $EMAIL_MSG_FILE
+  fi
+  echo "------------------------------------------------------"
+  rm -f $TEMP_FILE
+
+}
+
+alertService() {
+  STRATEGY=$1
+  shift
+  RESTORING_DATE=$(date "+%Y%m%d-%Hh%M")
+  echo "------------------------------------------------------"
+  echo "ALERT: $STRATEGY is required ($*)"
+  for SERVICE in $*
+  do
+    if [ -f $ROOTACT/etc/init.d/$SERVICE ]; then
+      $ROOTACT/etc/init.d/$SERVICE printInfos
+      $ROOTACT/etc/init.d/$SERVICE dumpState $BACKUP_FILE $RESTORING_DATE
+    fi
+  done
+
+  # get the last log entries
+  TEMP_FILE=/tmp/$(basename $0).$RANDOM.log
+  tail -n 30 $ROOTACT/var/log/supervision/supervision_0.log > $TEMP_FILE 
+
+  gatherInfos $RESTORING_DATE
+
+  # send an email
+  if [ -n "$ADMIN_EMAILS" ]
+  then
+    if [ "$STRATEGY" == "alert" ]; then
+      echo "Subject: [Alert] [$(hostname):$ROOTACT] Monitoring failed for: $* on $(hostname)" > $EMAIL_MSG_FILE
+      echo "Monitoring failed for: $* on $(hostname) ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
+    elif [ "$STRATEGY" == "restart" ]; then
+      echo "Subject: [Alert] [Restart] [$(hostname):$ROOTACT] Monitoring failed for: $* on $(hostname)" > $EMAIL_MSG_FILE
+      echo "Monitoring failed for: $* on $(hostname) ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
+      echo "Restart all problematic services." >> $EMAIL_MSG_FILE
+    elif [ "$STRATEGY" == "reboot" ]; then
+      echo "Subject: [Alert] [Reboot] [$(hostname):$ROOTACT] Monitoring failed for: $* on $(hostname)" > $EMAIL_MSG_FILE
+      echo "Monitoring failed for: $* on $(hostname) ($RESTORING_DATE)." >> $EMAIL_MSG_FILE
+      echo "Reboot machine." >> $EMAIL_MSG_FILE
+    fi
+    echo "Logs have been backed up in $BACKUP_FILE."  >> $EMAIL_MSG_FILE
+    echo "--------------------------" >> $EMAIL_MSG_FILE
+    echo "Excerpt from log file:" >> $EMAIL_MSG_FILE
+    cat $TEMP_FILE >> $EMAIL_MSG_FILE
+    echo  >> $EMAIL_MSG_FILE
+    sendmail -v $ADMIN_EMAILS < $EMAIL_MSG_FILE
+  fi
+
+  if [ "$STRATEGY" == "restart" ]; then
+    echo "Then restart"
+    for SERVICE in $*
+    do
+      if [ -f $ROOTACT/etc/init.d/$SERVICE ]; then
+        $ROOTACT/etc/init.d/$SERVICE restart 2>&1
+      fi
+    done
+
+    # give enough time to the service for restarting
+    echo "wait restart for $RESTART_TIMER seconds"
+    sleep $RESTART_TIMER
+  elif [ "$STRATEGY" == "reboot" ]; then
+    checkUptime
+    if [ $? -eq 0 ] ; then
+      echo "Then reboot"
+      $REBOOT_CMD
+    fi
+  fi
+  echo "------------------------------------------------------"
+  rm -f $TEMP_FILE
+}
+
+checkNsLookup() {
+  if [ -n "$(nslookup $1 | tail -n+5 | sed -n "s|^Address:[ \t]*\(.*\)$|\1|p" | grep $2)" ]
+  then
+    echo "DNS lookup success for node $1"
+    return 0
+  fi
+  echo "WARNING: DNS lookup FAILED for node $1"
+  return 1
+}
+
+checkPing() {
+  ping -c 1 $1 -w $PING_TIMEOUT> /dev/null
+  if [ $? -eq 0 ] ; then
+    echo "Ping success for node $1"
+    return 0
+  fi
+  echo "WARNING: Ping FAILURE for node $1"
+  return 1
+}
+
+strategyToPriority() {
+  if [ "$1" == "reboot" ]; then
+    echo -n "3"
+  elif [ "$1" == "restart" ]; then
+    echo -n "2"
+  elif [ "$1" == "alert" ]; then
+    echo -n "1"
+  else
+    echo -n "0"
+  fi
+}
+
+computeStrategy() {
+  currentPriority=$(strategyToPriority $1)
+  newPriority=$(strategyToPriority $2)
+  if [ "$newPriority" -gt "$currentPriority" ]; then
+    echo -n "$2"
+  else
+    echo -n "$1"
+  fi 
+}
+
+loop() {
+  echo "Start loop"
+
+  while [ 1 == 1 ] ; do
+    echo "Supervision loop"
+    # loop on services
+    COUNTER=0
+    STRATEGY="alert"
+    DOWN_SERVICES=""
+    DOWN=1
+    while [ "$DOWN" == "1" -a "$COUNTER" -lt "$RETRY_COUNT" ] ; do
+      if [ "$DOWN" == "1" -a "$COUNTER" != "0" ]
+      then
+        echo "Wait retry for $RETRY_TIMER seconds"
+        sleep $RETRY_TIMER
+      fi
+      COUNTER=$(expr $COUNTER + 1)
+      DOWN=0
+
+      echo "Supervision tentative $COUNTER"
+
+      for ping in $PINGS
+      do
+        pingHost=$(echo -n $ping | cut -d':' -f1)
+        pingIp=$(echo -n $ping | cut -d':' -f2)
+        pingStrategy=$(echo -n $ping | cut -d':' -f3)
+        checkNsLookup $pingHost $pingIp
+        if [ "$?" -eq "1" ] ; then
+          checkPing $SAFE_IP
+          if [ "$?" -eq "1" ] ; then
+            STRATEGY=$(computeStrategy $STRATEGY $NETWORK_DOWN_STRATEGY)
+            DOWN_SERVICES="$DOWN_SERVICES ping:$SAFE_IP"
+          else
+            STRATEGY=$(computeStrategy $STRATEGY $pingStrategy)
+          fi
+          DOWN=1
+          DOWN_SERVICES="$DOWN_SERVICES lookup:$pingHost"
+        fi
+      done
+
+      for service in $(ls $ROOTACT/etc/init.d/)
+      do
+        if [ -f "$ROOTACT/etc/init.d/$service" ]
+        then
+          $ROOTACT/etc/init.d/$service health test
+          if [ "$?" -eq "0" ] ; then
+            $ROOTACT/etc/init.d/$service health
+            if [ "$?" -eq "1" ] ; then
+              echo "WARNING: the service $service has encountered troubles"
+              SERVICE_STRATEGY="restart"
+              if $ROOTACT/etc/init.d/$service downStrategy test ; then
+                SERVICE_STRATEGY=$($ROOTACT/etc/init.d/$service downStrategy)
+              fi
+              STRATEGY=$(computeStrategy $STRATEGY $SERVICE_STRATEGY)
+              DOWN=1
+              DOWN_SERVICES="$DOWN_SERVICES $service"
+            fi
+          fi
+        fi
+      done
+    done
+
+    DOWN_SERVICES=$(echo -n $DOWN_SERVICES | tr -s ' ' '\n' | sort | uniq | tr -s '\n' ' ')
+    if [ "$DOWN" == "1" ]
+    then
+      alertService $STRATEGY $DOWN_SERVICES
+    elif [ -n "$DOWN_SERVICES" ]
+    then
+      infoService $DOWN_SERVICES
+    else
+      echo -n "All services OK; "
+    fi
+
+    echo "Wait loop for $LOOP_TIMER seconds"
+    sleep $LOOP_TIMER
+  done
+}
+
+# Called for stopping the service
+# Available parameters:
+#  * SERVICE_NAME (in) = name that is used to start the service
+#  * SERVICE_PID (in) = pid of the child process which has started the service
+stopService() {
+  ALL_PIDS=$($ROOTACT/etc/pids $SERVICE_PID | tr -s '\n' ' ')
+  if [ -n "$ALL_PIDS" ]; then
+    for pid in $ALL_PIDS; do
+      PID_PRGM_NAME=$(cat /proc/$pid/stat 2> /dev/null | cut -d " " -f2)
+      if [ -n "$PID_PRGM_NAME" -a "$PID_PRGM_NAME" == "(supervision)" ]; then
+        kill -TERM $pid
+      fi
+    done
+  fi
+}
+
+abortService() {
+  ALL_PIDS=$($ROOTACT/etc/pids $SERVICE_PID | tr -s '\n' ' ')
+  if [ -n "$ALL_PIDS" ]; then
+    kill -KILL $ALL_PIDS
+  fi
+}
+
+GETOPTTEMP=$(getopt -o fhi --long force,help,init -- $@)
+if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
+eval set -- "$GETOPTTEMP"
+
+# Read the arguments OPTIONS variable will be pass later to startService if the the command is "start"
+while [ -n "$1" ]
+do
+  case "$1" in
+    "-f"|"--force") FORCE=1; OPTIONS=$OPTIONS" -f";;
+    "-h"|"--help") usage; exit;;
+    "-i"|"--init") INIT=1; OPTIONS=$OPTIONS" -i";;
+    "--") shift; break ;;
+    * ) echo "Internal error ($*)!"; exit 1;;
+  esac
+  shift
+done
+
+if [ "$1" == "loop" ]
+then
+    loop
+else
+    handleParams $*
+fi
+
+exit $?
+

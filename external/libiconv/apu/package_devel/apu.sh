@@ -15,8 +15,8 @@ buildApuImage()
   mkdir -p apu/data/ && \
   mkdir -p apu/control && \
   ICONV_VERSION=`projectVersion` \
-  cp -r libiconv/include apu/data/ && \
-  cp -r libiconv/lib apu/data/
+  cp -r include apu/data/ && \
+  cp -r lib apu/data/
 }
 
 projectGroupId()

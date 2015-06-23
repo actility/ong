@@ -3,7 +3,7 @@ buildProject()
 {
   cd exip
 
-  mkdir -p $ROOTACT/shlib
+  mkdir -p $ROOTACT/lib
 
   ./MAKE clean
   ./MAKE
@@ -19,7 +19,7 @@ buildApuImage()
 
   EXIP_VERSION=$(projectVersion)
 
-  cp $ROOTACT/shlib/libexip.so.$EXIP_VERSION apu/data/lib/
+  cp $ROOTACT/lib/libexip.so.$EXIP_VERSION apu/data/lib/
   
   echo "cd \$ROOTACT/lib" > apu/control/postinst
   echo "ln -sf libexip.so.$EXIP_VERSION libexip.so" >> apu/control/postinst

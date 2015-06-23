@@ -1,20 +1,89 @@
-include $(ROOTACT)/rtbase/base/makefile.def
+#
+# Copyright   Actility, SA. All Rights Reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version
+# 2 only, as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License version 2 for more details (a copy is
+# included at /legal/license.txt).
+#
+# You should have received a copy of the GNU General Public License
+# version 2 along with this work; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA
+#
+# Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+# or visit www.actility.com if you need additional
+# information or have any questions.
+#
+# id $Id$  
+# author $Author$
+# version $Revision$
+# lastrevision $Date$
+# modifiedby $LastChangedBy$
+# lastmodified $LastChangedDate$
 
-CFLAGS+=-fPIC -I$(ROOTACT)/libcoap -I$(ROOTACT)/rtbase/include -I$(ROOTACT)/libdIa
-LDFLAGS+=-L$(ROOTACT)/shlib
-LIBCOAP=$(ROOTACT)/libcoap/libcoap.a
-OBJS=getaddrinfo.o
+###############################################################################
 
-all : getaddrinfo.x dnscache.x
 
-getaddrinfo.x : $(OBJS)
-	$(CC) $(LDFLAGS) -o getaddrinfo.x $(OBJS)
+ROOTACT ?= $(shell cd ../.. && pwd)
+OUTPUT_PATH ?= $(ROOTACT)
+export OUTPUT_PATH
 
-dnscache.x : dnscache.o
-	$(CC) $(LDFLAGS) -o dnscache.x dnscache.o -ldIa -lrtbase
+BIN_TARGET ?= $(OUTPUT_PATH)/bin/
 
-%.o     : %.c
-	$(CC) $(CFLAGS) -c $<
+PROJECTS_DIR = $(ROOTACT)/
+REL_PROJ_PATH = libdIa/getaddrinfo
+CURRENT_PROJ_DIR = $(ROOTACT)/$(REL_PROJ_PATH)
+TARGET_PROJ_DIR = $(OUTPUT_PATH)/$(REL_PROJ_PATH)
 
-clean   :
-	@(rm *.x *.o core 2>/dev/null || exit 0)
+SRC_PATH = $(CURRENT_PROJ_DIR)/
+EXE_TARGET = $(TARGET_PROJ_DIR)/bin/
+OBJS_TARGET = $(TARGET_PROJ_DIR)/obj/
+
+# Executable name
+EXENAME = $(EXE_TARGET)/dnscache.x $(EXE_TARGET)/getaddrinfo.x 
+
+LASTACTIONS =
+
+STATIC_LIBS=-L$(ROOTACT)/libcoap/libcoap.a
+
+DYNAMIC_LIBS= \
+-L$(OUTPUT_PATH)/libdIa/lib -ldIa \
+-L$(ROOTACT)/lib -lrtbase
+
+CFLAGS += -Wall -Werror
+
+# List of object file needed for the final program
+OBJS = \
+$(OBJS_TARGET)/dnscache.o \
+$(OBJS_TARGET)/getaddrinfo.o
+
+INCLUDES = \
+$(SRC_PATH) \
+$(ROOTACT)/libcoap/ \
+$(ROOTACT)/rtbase/include/ \
+$(ROOTACT)/libdIa/
+
+DEFINES = _LINUX_ 
+PROJ_DEFINES = 
+
+ifeq ($(TARGET),centos6-x86_64)
+EXTRA_CFLAGS=-DLINUX_64
+export EXTRA_CFLAGS
+endif
+
+include $(ROOTACT)/Makefile.common.compilation
+include $(ROOTACT)/Makefile.common.binexe
+
+$(EXE_TARGET)/dnscache.x : build_dependencies $(OBJS_TARGET)/dnscache.o
+	$(CC) -o $@ $(CFLAGS) $+ $(STATIC_LIBS) $(DYNAMIC_LIBS)
+
+$(EXE_TARGET)/getaddrinfo.x : build_dependencies $(OBJS_TARGET)/getaddrinfo.o
+	$(CC) -o $@ $(CFLAGS) $+
+

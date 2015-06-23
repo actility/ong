@@ -1,6 +1,19 @@
 -------------------------------------------------------------------------------
 System version changelog
 -------------------------------------------------------------------------------
+Version: 4.4.5
+Date: 2015-01-08
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - "etc/ong" script is no more provided by ong-onstaller. "etc/acy" is
+   provided instead, by acy-init apu. Change sources accordingly.
+
+-------------------------------------------------------------------------------
 Version: 4.4.4
 Date: 2014-10-31
 

@@ -1,9 +1,7 @@
 
 buildProject()
 {
-  cd stdin-logger/
-  rm -rf .svn
-  make clean TARGET=$1
+  cd stdin-logger/ && \
   make clean
 
   return $?
@@ -11,31 +9,15 @@ buildProject()
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data
-  mkdir -p apu/control
-
+  rm -rf apu && \
+  mkdir -p apu/data && \
+  mkdir -p apu/control && \
   cp -r stdin-logger apu/data/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "stdin-logger-src"
-}
-
-projectVersion()
-{
-  cat stdin-logger/Version
-}
-
-projectApuRev()
-{
-  cat stdin-logger/apu/revision
 }
 
 projectDescription()

@@ -43,8 +43,8 @@ CURRENT_PROJ_DIR = $(ROOTACT)/$(REL_PROJ_PATH)
 TARGET_PROJ_DIR = $(OUTPUT_PATH)/$(REL_PROJ_PATH)
 
 SRC_PATH = $(CURRENT_PROJ_DIR)/
-EXE_TARGET = $(TARGET_PROJ_DIR)/$(ARCH)/bin/
-OBJS_TARGET = $(TARGET_PROJ_DIR)/$(ARCH)/obj/
+EXE_TARGET = $(TARGET_PROJ_DIR)/bin/
+OBJS_TARGET = $(TARGET_PROJ_DIR)/obj/
 
 # Executable name
 EXENAME = $(EXE_TARGET)/TesterSongOverHttp.x
@@ -56,7 +56,7 @@ cp -vf $(EXENAME) $(BIN_TARGET)
 DYNAMIC_LIBS= \
 -L$(ROOTACT)/lib -lSongOverHttp \
 -L$(ROOTACT)/lib -lcurl -lmicrohttpd \
--L$(ROOTACT)/shlib -lrtbase
+-L$(ROOTACT)/lib -lrtbase
 
 CFLAGS += -Wall -Werror
 

@@ -39,11 +39,12 @@
 .PHONY: preliminaryAction lastAction
 .PHONY: $(foreach subdirdep,$(SUBDIRS_DEP),_depbuild_$(subdirdep) _depclean_$(subdirdep))
 
-all: preliminaryAction build_so_target build_o_target $(SONAME) lastAction
+all: preliminaryAction build_so_target build_a_target build_o_target $(SONAME) $(LIBNAME) lastAction
+	@ echo -e "\033[0;1m$(SONAME) done\033[0m"
 
 noaction:
 
-preliminaryAction:
+preliminaryAction: $(PRELIMINARY_DEP)
 	@echo "Preliminary actions"
 	@$(PRELIMINARY)
 
@@ -55,7 +56,10 @@ build_so_target:
 	@echo "Building .so target"
 	@ ( [ -n "$(SO_TARGET)" ] && [ ! -e $(SO_TARGET) ] && mkdir -vp $(SO_TARGET) ) || [ true ]
 
-lastAction:
+build_a_target:
+	@ ( [ -n "$(A_TARGET)" ] && [ ! -e $(A_TARGET) ] && mkdir -vp $(A_TARGET) ) || [ true ]
+
+lastAction: $(LASTACTIONS_DEP)
 	@echo "Last actions"
 	@$(LASTACTIONS)
 

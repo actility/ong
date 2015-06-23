@@ -17,24 +17,9 @@ buildApuImage()
   cp -r storageReader/ apu/data/
 }
 
-projectGroupId()
-{
-  echo "com.actility"
-}
-
 projectName()
 {
   echo "storageReader-src"
-}
-
-projectVersion()
-{
-  cat storageReader/Version
-}
-
-projectApuRev()
-{
-  cat storageReader/apu/revision
 }
 
 projectDescription()

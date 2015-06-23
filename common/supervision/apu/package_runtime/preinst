@@ -1,0 +1,2 @@
+[ -f $ROOTACT/etc/supervision/supervision.cfg ] && \
+cp -f $ROOTACT/etc/supervision/supervision.cfg $ROOTACT/etc/supervision/supervision.cfg.preinst

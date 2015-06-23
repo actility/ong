@@ -739,7 +739,10 @@ public class RemoteOngInstaller implements Runnable {
         res = true;
         preInstallScripts = new ArrayList<MyFileEntry>();
         for (ModuleConfig module : modules) {
-            preInstallScripts.addAll(myJarFile.getSubFiles("common/" + module.getName() + "/control/preinst"));
+        	
+            //preInstallScripts.addAll(myJarFile.getSubFiles("common/" + module.getName() + "/control/preinst"));
+            preInstallScripts.addAll(myJarFile.getSubFiles("modules/" + module.getName() + "/control/preinst"));
+            
             preInstallScripts.addAll(myJarFile.getSubFiles("arch/" + ongConfig.getArch().getName() + "/" + module.getName()
                     + "/control/preinst"));
         }
@@ -845,7 +848,7 @@ public class RemoteOngInstaller implements Runnable {
     protected boolean stopOng() throws JSchException, IOException {
         log.println(">>> Stopping ONG");
         String cmdOutput = sshHandler.runRemoteCommand(ongConfig.getArch().getRetrieveEnvCmd()
-                + " && echo $ROOTACT && export LD_LIBRARY_PATH=$ROOTACT/lib && $ROOTACT/etc/ong stop ");
+                + " && echo $ROOTACT && export LD_LIBRARY_PATH=$ROOTACT/lib && $ROOTACT/etc/acy stop ");
         log.println("<<< Result: " + cmdOutput);
 
         if (sshHandler.getCmdResult(cmdOutput)) {

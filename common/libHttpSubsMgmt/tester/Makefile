@@ -43,8 +43,8 @@ CURRENT_PROJ_DIR = $(ROOTACT)/$(REL_PROJ_PATH)
 TARGET_PROJ_DIR = $(OUTPUT_PATH)/$(REL_PROJ_PATH)
 
 SRC_PATH = $(CURRENT_PROJ_DIR)/
-EXE_TARGET = $(TARGET_PROJ_DIR)/$(ARCH)/bin/
-OBJS_TARGET = $(TARGET_PROJ_DIR)/$(ARCH)/obj/
+EXE_TARGET = $(TARGET_PROJ_DIR)/bin/
+OBJS_TARGET = $(TARGET_PROJ_DIR)/obj/
 
 # Executable name
 EXENAME = $(EXE_TARGET)/TesterHttpSubsMgmt.x
@@ -54,9 +54,9 @@ mkdir -p $(BIN_TARGET) && \
 cp -vf $(EXENAME) $(BIN_TARGET)
 
 DYNAMIC_LIBS= \
--L$(ROOTACT)/shlib -lrtbase \
+-L$(ROOTACT)/lib -lrtbase \
 -L$(ROOTACT)/lib -lxml2 \
--L$(ROOTACT)/shlib -lxo \
+-L$(ROOTACT)/lib -lxo \
 -L$(ROOTACT)/lib -lcurl -lmicrohttpd \
 -L$(ROOTACT)/lib -lSongOverHttp \
 -L$(ROOTACT)/lib -lHttpSubsMgmt

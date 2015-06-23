@@ -15,7 +15,7 @@ buildApuImage()
 
 projectGroupId()
 {
-  echo "com.actility"
+  echo "com.actility.m2m"
 }
 
 projectName()

@@ -3,7 +3,6 @@ then
 	Error "ROOTACT not specified"
 	exit 1
 fi
-source $ROOTACT/rtbase/base/system
 
 SELF=m2mxoref
 echo "#####"

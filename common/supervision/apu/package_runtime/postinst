@@ -1,0 +1,10 @@
+chmod 755 $ROOTACT/etc/init.d/supervision
+sed -i -e "s|(SHELL)|$SHELL|" $ROOTACT/etc/init.d/supervision
+[ -f $ROOTACT/etc/supervision/supervision.cfg.new ] && \
+rm -f $ROOTACT/etc/supervision/supervision.cfg.new 
+mv -f $ROOTACT/etc/supervision/supervision.cfg $ROOTACT/etc/supervision/supervision.cfg.new
+[ -f $ROOTACT/etc/supervision/supervision.cfg.preinst ] && \
+mv -f $ROOTACT/etc/supervision/supervision.cfg.preinst $ROOTACT/etc/supervision/supervision.cfg
+[ -f $ROOTACT/etc/supervision/supervision.cfg ] || \
+cp $ROOTACT/etc/supervision/supervision.cfg.new $ROOTACT/etc/supervision/supervision.cfg
+

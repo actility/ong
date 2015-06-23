@@ -1,40 +1,23 @@
 
 buildProject()
 {
-  cd AZAP
-  rm -rf .svn
-  ./MAKE clean
+  cd AZAP && \
+  make clean
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/
-  mkdir -p apu/control
-  
+  rm -rf apu && \
+  mkdir -p apu/data/ && \
+  mkdir -p apu/control && \
   cp -r AZAP/ apu/data/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "AZAP-src"
-}
-
-projectVersion()
-{
-  cat AZAP/Version
-}
-
-projectApuRev()
-{
-  cat AZAP/apu/revision
 }
 
 projectDescription()

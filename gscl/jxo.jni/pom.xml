@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.actility.m2m</groupId>
     <artifactId>java.cdc.pom</artifactId>
-    <version>3.0.0</version>
+    <version>[3.0.0,4)</version>
   </parent>
   <artifactId>jxo.jni</artifactId>
   <version>1.2.2-test2</version>
@@ -91,7 +91,7 @@
             </goals>
             <configuration>
               <environmentVariables>
-                <LD_LIBRARY_PATH>${rootact}/package_runtime/shlib</LD_LIBRARY_PATH>
+                <LD_LIBRARY_PATH>${rootact}/package_runtime/lib</LD_LIBRARY_PATH>
               </environmentVariables>
               <argLine>-Djava.library.path=${basedir}/src/main/target/resources/lib/${build.type}</argLine>
             </configuration>

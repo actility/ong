@@ -5,10 +5,10 @@
   <parent>
     <groupId>com.actility.m2m</groupId>
     <artifactId>java.cdc.pom</artifactId>
-    <version>3.0.0</version>
+    <version>[3.0.0,4)</version>
   </parent>
   <artifactId>system.version</artifactId>
-  <version>4.4.4</version>
+  <version>4.4.5</version>
   <packaging>bundle</packaging>
 
   <name>[Bnd] M2M Application - System version</name>

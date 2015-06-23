@@ -1,4 +1,4 @@
 
 eval $( grep ROOTACT $PROFILE )
 
-$ROOTACT/etc/ong $ONG_RESTART_OPTIONS start
+$ROOTACT/etc/acy $ONG_RESTART_OPTIONS start

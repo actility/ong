@@ -1,8 +1,7 @@
 
 buildProject()
 {
-  cd knx
-  rm -rf .svn
+  cd knx && \
   make clean
 
   return $?
@@ -10,31 +9,16 @@ buildProject()
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/
-  mkdir -p apu/control
-  
+  rm -rf apu && \
+  mkdir -p apu/data/ && \
+  mkdir -p apu/control && \
+  \
   cp -r knx/ apu/data/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "knx-src"
-}
-
-projectVersion()
-{
-  cat knx/Version
-}
-
-projectApuRev()
-{
-  cat knx/apu/revision
 }
 
 projectDescription()

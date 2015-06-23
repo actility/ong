@@ -1,0 +1,101 @@
+-------------------------------------------------------------------------------
+Supervision script
+-------------------------------------------------------------------------------
+Version: 3.4.3
+Date: 2015-04-20
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Changed 'ps' options so that allocated resources on processes are
+   displayed.
+ - Added hostname of the issuer machine in the emails sent by the supervision
+   service.
+
+-------------------------------------------------------------------------------
+Version: 3.4.2
+Date: 2014-12-17
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Backed up files were never cleaned up, which can lead to a disk usage
+   overload. Now only the 10 latest backups are kept.
+
+-------------------------------------------------------------------------------
+Version: 3.4.1
+Date: 2014-11-03
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Log done in "preStart" but folder may not exist yet. Fixed.
+ - Installation of the new "supervision.cfg" failed when file is not already 
+   installed on the system. Fixed.
+
+-------------------------------------------------------------------------------
+Version: 3.4.0
+Date: 2014-10-23
+
+New Features:
+-------------
+ - Add last 30 log entries in the alerting emails.
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.2.0
+Date: 2014-08-12
+
+New Features:
+-------------
+ - "supervision" is now generic to be installed on every Actility server.
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2014-08-12
+
+New Features:
+-------------
+ - Now use nslookup to check if local public IP is registered. This is to
+ replace the former ping check which was not relevant in case of multiple IPs
+ registered to the same hostname
+
+Bug Fixes:
+----------
+ - Changed start priority of supervision service in order to start after all
+ others services
+ - Fixed. Script was checking if service inode was a file using a relative
+ path instead of an absolute path
+
+-------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2014-06-20
+
+New Features:
+-------------
+ - New architecture based on hidden commands on services init script
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
+Version: 1.0.0
+Initial version
+

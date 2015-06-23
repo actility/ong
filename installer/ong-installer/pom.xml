@@ -36,13 +36,24 @@
   <parent>
     <groupId>com.actility.m2m</groupId>
     <artifactId>java.pom</artifactId>
-    <version>2.0.0</version>
+    <version>[2.0.0,3)</version>
   </parent>
   <artifactId>ong-installer</artifactId>
-  <version>3.4.2</version>
+  <version>3.6.0</version>
   <packaging>jar</packaging>
 
   <name>ONG Installer</name>
+
+  <properties>
+    <watteco.version>1.4.11-1</watteco.version>
+    <knx.version>1.0.3-1</knx.version>
+    <pthsem.version>2.0.8-2</pthsem.version>
+    <eibd.version>0.0.5-2</eibd.version>
+    <iec61131.version>1.0.36-1</iec61131.version>
+    <mxml.version>2.7-3</mxml.version>
+    <modbus.version>1.2.0-1</modbus.version>
+    <ntpclient.version>2010.365-9</ntpclient.version>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -70,630 +81,62 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>gscl</artifactId>
-      <version>2.4.2</version>
-      <classifier>ntc6200</classifier>
+      <version>2.4.3</version>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
-      <classifier>centos6-x86</classifier>
+      <version>1.4.14-1</version>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>drvcommon</artifactId>
-      <version>1.4.14-0</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-    </dependency>
-
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>watteco</artifactId>
-      <version>1.4.11-0</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-   </dependency>
 
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
-      <classifier>centos6-x86</classifier>
+      <version>1.8.5-1</version>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
+
     <dependency>
       <groupId>com.actility.m2m</groupId>
-      <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility.m2m</groupId>
-      <artifactId>zigbee</artifactId>
-      <version>1.8.5-0</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-   </dependency>
-
-    <dependency>
-      <groupId>com.actility</groupId>
       <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>wmbus</artifactId>
-      <version>1.2.4-0</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-    </dependency>
-
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>knx</artifactId>
-      <version>1.0.3-0</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>pthsem</artifactId>
-      <version>2.0.8-1</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>pthsem</artifactId>
-      <version>2.0.8-1</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>pthsem</artifactId>
-      <version>2.0.8-1</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>pthsem</artifactId>
-      <version>2.0.8-1</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>pthsem</artifactId>
-      <version>2.0.8-1</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>pthsem</artifactId>
-      <version>2.0.8-1</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>eibd</artifactId>
-      <version>0.0.5-1</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>eibd</artifactId>
-      <version>0.0.5-1</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>eibd</artifactId>
-      <version>0.0.5-1</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>eibd</artifactId>
-      <version>0.0.5-1</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>eibd</artifactId>
-      <version>0.0.5-1</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.gnu</groupId>
-      <artifactId>eibd</artifactId>
-      <version>0.0.5-1</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-    </dependency>
-
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>iec61131</artifactId>
-      <version>1.0.36-0</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.msweet</groupId>
-      <artifactId>mxml</artifactId>
-      <version>2.7-2</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.msweet</groupId>
-      <artifactId>mxml</artifactId>
-      <version>2.7-2</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.msweet</groupId>
-      <artifactId>mxml</artifactId>
-      <version>2.7-2</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.msweet</groupId>
-      <artifactId>mxml</artifactId>
-      <version>2.7-2</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.msweet</groupId>
-      <artifactId>mxml</artifactId>
-      <version>2.7-2</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.msweet</groupId>
-      <artifactId>mxml</artifactId>
-      <version>2.7-2</version>
-      <classifier>ntc6200</classifier>
-      <type>apu</type>
-    </dependency>
-
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>modbus</artifactId>
-      <version>1.2.0-0</version>
-      <classifier>ntc6200</classifier>
+      <version>1.2.4-1</version>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
       <groupId>org.tcpdump</groupId>
       <artifactId>tcpdump</artifactId>
-      <version>4.3.0-1</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.tcpdump</groupId>
-      <artifactId>tcpdump</artifactId>
-      <version>4.3.0-1</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.tcpdump</groupId>
-      <artifactId>tcpdump</artifactId>
-      <version>4.3.0-1</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.tcpdump</groupId>
-      <artifactId>tcpdump</artifactId>
-      <version>4.3.0-1</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.tcpdump</groupId>
-      <artifactId>tcpdump</artifactId>
-      <version>4.3.0-1</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.tcpdump</groupId>
-      <artifactId>tcpdump</artifactId>
-      <version>4.3.0-1</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>org.tcpdump</groupId>
-      <artifactId>tcpdump</artifactId>
-      <version>4.3.0-1</version>
-      <classifier>ntc6200</classifier>
+      <version>4.3.0-2</version>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
-      <classifier>centos6-x86</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
-      <classifier>centos6-x86_64</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
-      <classifier>lpv3</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
-      <classifier>rpib</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.actility</groupId>
-      <artifactId>tty_mapper</artifactId>
-      <version>1.0.1-0</version>
-      <classifier>ntc6200</classifier>
+      <version>1.0.1-1</version>
+      <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.icarus</groupId>
-      <artifactId>ntpclient</artifactId>
-      <version>2010.365-9</version>
-      <classifier>cov1</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.icarus</groupId>
-      <artifactId>ntpclient</artifactId>
-      <version>2010.365-9</version>
-      <classifier>cov2</classifier>
-      <type>apu</type>
-    </dependency>
-    <dependency>
-      <groupId>com.icarus</groupId>
-      <artifactId>ntpclient</artifactId>
-      <version>2010.365-9</version>
-      <classifier>rpib</classifier>
+      <groupId>com.actility.m2m</groupId>
+      <artifactId>supervision</artifactId>
+      <version>3.4.3-0</version>
       <type>apu</type>
     </dependency>
 
     <dependency>
-      <groupId>com.actility</groupId>
+      <groupId>com.actility.m2m</groupId>
       <artifactId>apu-install</artifactId>
-      <version>1.1-0</version>
+      <version>1.1-1</version>
       <type>apu</type>
     </dependency>
 
@@ -704,6 +147,398 @@
       <type>apu</type>
     </dependency>
   </dependencies>
+
+  <profiles>
+
+    <profile>
+      <id>centos6-x86</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>centos6-x86</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>watteco</artifactId>
+          <version>${watteco.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>knx</artifactId>
+          <version>${knx.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>pthsem</artifactId>
+          <version>${pthsem.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>eibd</artifactId>
+          <version>${eibd.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>iec61131</artifactId>
+          <version>${iec61131.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.msweet</groupId>
+          <artifactId>mxml</artifactId>
+          <version>${mxml.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>modbus</artifactId>
+          <version>${modbus.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>centos6-x86_64</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>centos6-x86_64</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>watteco</artifactId>
+          <version>${watteco.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>knx</artifactId>
+          <version>${knx.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>pthsem</artifactId>
+          <version>${pthsem.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>eibd</artifactId>
+          <version>${eibd.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>modbus</artifactId>
+          <version>${modbus.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>cov1</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>cov1</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.icarus</groupId>
+          <artifactId>ntpclient</artifactId>
+          <version>${ntpclient.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>cov2</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>cov2</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>watteco</artifactId>
+          <version>${watteco.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>knx</artifactId>
+          <version>${knx.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>pthsem</artifactId>
+          <version>${pthsem.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>eibd</artifactId>
+          <version>${eibd.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>iec61131</artifactId>
+          <version>${iec61131.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.msweet</groupId>
+          <artifactId>mxml</artifactId>
+          <version>${mxml.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>modbus</artifactId>
+          <version>${modbus.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.icarus</groupId>
+          <artifactId>ntpclient</artifactId>
+          <version>${ntpclient.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>lpv3</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>lpv3</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>watteco</artifactId>
+          <version>${watteco.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>knx</artifactId>
+          <version>${knx.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>pthsem</artifactId>
+          <version>${pthsem.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>eibd</artifactId>
+          <version>${eibd.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>iec61131</artifactId>
+          <version>${iec61131.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.msweet</groupId>
+          <artifactId>mxml</artifactId>
+          <version>${mxml.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>modbus</artifactId>
+          <version>${modbus.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>rpib</id>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>rpib</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>watteco</artifactId>
+          <version>${watteco.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>knx</artifactId>
+          <version>${knx.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>pthsem</artifactId>
+          <version>${pthsem.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>eibd</artifactId>
+          <version>${eibd.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>iec61131</artifactId>
+          <version>${iec61131.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.msweet</groupId>
+          <artifactId>mxml</artifactId>
+          <version>${mxml.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>modbus</artifactId>
+          <version>${modbus.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.icarus</groupId>
+          <artifactId>ntpclient</artifactId>
+          <version>${ntpclient.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>ntc6200</id>
+      <properties>
+      	<build.type>ntc6200</build.type>
+      </properties>
+      <activation>
+        <property>
+          <name>build.type</name>
+          <value>ntc6200</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>watteco</artifactId>
+          <version>${watteco.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>knx</artifactId>
+          <version>${knx.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>pthsem</artifactId>
+          <version>${pthsem.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.gnu</groupId>
+          <artifactId>eibd</artifactId>
+          <version>${eibd.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>iec61131</artifactId>
+          <version>${iec61131.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>org.msweet</groupId>
+          <artifactId>mxml</artifactId>
+          <version>${mxml.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+        <dependency>
+          <groupId>com.actility.m2m</groupId>
+          <artifactId>modbus</artifactId>
+          <version>${modbus.version}</version>
+          <classifier>${build.type}</classifier>
+          <type>apu</type>
+        </dependency>
+      </dependencies>
+    </profile>
+
+  </profiles>
 
   <build>
     <resources>
@@ -722,7 +557,28 @@
         <filtering>false</filtering>
       </resource>
     </resources>
+
     <plugins>
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-build.type</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireProperty>
+                  <property>build.type</property>
+                  <message>You must set a build.type property!</message>
+                </requireProperty>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -768,7 +624,7 @@
         <groupId>com.actility.m2m</groupId>
         <artifactId>cocoon-maven-plugin</artifactId>
         <configuration>
-          <excludeArchitectures>centos6-x86_64,lpv3,ntc6200</excludeArchitectures>
+          <includeArchitecture>${build.type}</includeArchitecture>
           <excludeProducts>ong-osgime</excludeProducts>
           <excludeModules>ong.osgime</excludeModules>
           <excludeTypes>pom</excludeTypes>
@@ -777,22 +633,22 @@
           <defaultModule>gscl.osgi</defaultModule>
           <modules>
             org.xmlsoft:libxml2:core,
-            com.actility:rtbase:core,
-            com.actility:xo:core,
-            com.actility:libdIa:core,
-            com.actility:m2mxoref:core,
-            com.actility:stdin-logger:core,
+            com.actility.m2m:rtbase:core,
+            com.actility.m2m:xo:core,
+            com.actility.m2m:libdIa:core,
+            com.actility.m2m:m2mxoref:core,
+            com.actility.m2m:stdin-logger:core,
             org.sqlite:sqlite:core,
-            com.actility:zigbee:zigbee,
-            com.actility:wmbus:wmbus,
-            com.actility:watteco:watteco,
-            com.actility:knx:knx,
+            com.actility.m2m:zigbee:zigbee,
+            com.actility.m2m:wmbus:wmbus,
+            com.actility.m2m:watteco:watteco,
+            com.actility.m2m:knx:knx,
             org.gnu:eibd:knx,
             org.gnu:pthsem:knx,
-            com.actility:modbus:modbus,
-            com.actility:iec61131:iec61131,
+            com.actility.m2m:modbus:modbus,
+            com.actility.m2m:iec61131:iec61131,
             org.msweet:mxml:iec61131,
-            com.actility:tty_mapper:tty_mapper,
+            com.actility.m2m:tty_mapper:tty_mapper,
             com.icarus:ntpclient:ntpclient,
             org.tcpdump:tcpdump:tcpdump,
           </modules>
@@ -810,7 +666,7 @@
     </plugins>
   </build>
 
-
+<!--
   <profiles>
     <profile>
       <id>full</id>
@@ -836,4 +692,5 @@
       </build>
     </profile>
   </profiles>
+ -->
 </project>

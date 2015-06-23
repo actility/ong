@@ -12,9 +12,9 @@
 # Makefile for "TTY mapper"
 ###############################################################################
 
-ROOT_PATH = ..
+ROOT_PATH ?= $(shell cd ../.. && pwd)
 OUTPUT_PATH ?= $(ROOT_PATH)/
-REL_PROJ_PATH = tty_mapper
+REL_PROJ_PATH = tty_mapper/tty_mapper
 CURRENT_PROJ_DIR = $(ROOT_PATH)/$(REL_PROJ_PATH)
 TARGET_PROJ_DIR = $(OUTPUT_PATH)/$(REL_PROJ_PATH)
 BIN_TARGET ?= $(OUTPUT_PATH)/bin/

@@ -52,10 +52,9 @@ EXENAME = $(EXE_TARGET)/MultiThreadTesterHttpClient.x
 LASTACTIONS = \
 mkdir -p $(BIN_TARGET) && \
 cp -vf $(EXENAME) $(BIN_TARGET) && \
-cp -vf $(ROOT_PATH)/lib/* $(BIN_TARGET) && \
-cp -vf $(ROOT_PATH)/shlib/* $(BIN_TARGET) 
+cp -vf $(ROOT_PATH)/lib/* $(BIN_TARGET) 
 
-DYNAMIC_LIBS=-L$(ROOT_PATH)/lib -lcurl -lHttpClient -L$(ROOT_PATH)/shlib -lrtbase
+DYNAMIC_LIBS=-L$(ROOT_PATH)/lib -lcurl -lHttpClient -L$(ROOT_PATH)/lib -lrtbase
 
 CFLAGS += -Wall -Werror -D_NATIVE_TESTER_
 export CFLAGS

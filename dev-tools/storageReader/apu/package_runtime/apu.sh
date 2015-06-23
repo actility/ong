@@ -2,7 +2,8 @@
 buildProject()
 {
   cd storageReader
-  make clean all
+  make clean && \
+  make
 
   return $?
 }
@@ -18,24 +19,9 @@ buildApuImage()
   cp storageReader/apu/$1/postinst apu/control/postinst
 }
 
-projectGroupId()
-{
-  echo "com.actility"
-}
-
 projectName()
 {
   echo "storageReader"
-}
-
-projectVersion()
-{
-  cat storageReader/Version
-}
-
-projectApuRev()
-{
-  cat storageReader/apu/revision
 }
 
 projectDescription()

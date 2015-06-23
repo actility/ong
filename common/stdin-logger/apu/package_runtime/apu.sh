@@ -1,41 +1,25 @@
 
 buildProject()
 {
-  cd stdin-logger/
-  make clean TARGET=$1
-  make TARGET=$1
+  cd stdin-logger/ && \
+  make clean && \
+  make
 
   return $?
 }
 
 buildApuImage()
 {
-  rm -rf apu
-  mkdir -p apu/data/bin
-  mkdir -p apu/control
-
-  cp stdin-logger/bin/stdin-logger apu/data/bin/
+  rm -rf apu && \
+  mkdir -p apu/data/bin && \
+  mkdir -p apu/control && \
+  cp stdin-logger/bin/stdin-logger apu/data/bin/ && \
   cp stdin-logger/apu/$1/postinst apu/control/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo "stdin-logger"
-}
-
-projectVersion()
-{
-  cat stdin-logger/Version
-}
-
-projectApuRev()
-{
-  cat stdin-logger/apu/revision
 }
 
 projectDescription()

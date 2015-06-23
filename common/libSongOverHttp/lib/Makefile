@@ -67,7 +67,7 @@ LASTACTIONS = \
  fi 
 
 DYNAMIC_LIBS=\
--L$(ROOTACT)/shlib -lrtbase \
+-L$(ROOTACT)/lib -lrtbase \
 -L$(ROOTACT)/lib/ -lcurl -lmicrohttpd 
 
 CFLAGS += -Wall -Werror

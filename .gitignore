@@ -1,3 +1,5 @@
 .apu_build
+.classpath
+.settings
 target
 target-native

@@ -18,24 +18,9 @@ buildApuImage()
   cp trans_pty/apu/$1/postinst apu/control/
 }
 
-projectGroupId()
-{
-  echo "com.actility"
-}
-
 projectName()
 {
   echo "trans_pty"
-}
-
-projectVersion()
-{
-  cat trans_pty/Version
-}
-
-projectApuRev()
-{
-  cat trans_pty/apu/revision
 }
 
 projectDescription()

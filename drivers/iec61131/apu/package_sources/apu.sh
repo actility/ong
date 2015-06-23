@@ -3,9 +3,8 @@ NAME=iec61131
 
 buildProject()
 {
-  cd $NAME
-  ./MAKE clean
-  rm -rf .svn
+  cd $NAME && \
+  make clean
 
   return $?
 }
@@ -13,29 +12,14 @@ buildProject()
 buildApuImage()
 {
   rm -rf apu && \
-  mkdir -p apu/data
+  mkdir -p apu/data && \
   mkdir -p apu/control/ && \
   cp -r $NAME/ apu/data/
-}
-
-projectGroupId()
-{
-  echo "com.actility"
 }
 
 projectName()
 {
   echo $NAME-src
-}
-
-projectVersion()
-{
-  cat $NAME/Version
-}
-
-projectApuRev()
-{
-  cat $NAME/apu/revision
 }
 
 projectDescription()
