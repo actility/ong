@@ -59,15 +59,15 @@ public class CisChildCreateOp implements TransientOp {
     }
 
     public void prepare() throws M2MException {
-        String oldTimerId = (String) manager.getM2MContext().getAttribute(path + "/instanceAgeTimer");
+        String oldTimerId = (String) manager.getM2MContext().getAttribute(path + Constants.AT_INSTANCE_AGE_TIMER_ID_SUFFIX);
         // TODO Should buffer next expiration for rollback !
         if (oldTimerId != null) {
             manager.getM2MContext().cancelTimer(oldTimerId);
         }
         timerId = manager.startResourceTimer(lastCiCreationDate.getTime() + maxInstanceAge - now.getTime(), path,
                 Constants.ID_RES_CONTENT_INSTANCES, null);
-        manager.getM2MContext().setAttribute(path + "/instanceAgeTimerId", timerId);
-        manager.getM2MContext().setAttribute(path + "/instanceAgeId", lastCiId);
+        manager.getM2MContext().setAttribute(path + Constants.AT_INSTANCE_AGE_TIMER_ID_SUFFIX, timerId);
+        manager.getM2MContext().setAttribute(path + Constants.AT_INSTANCE_AGE_ID_SUFFIX, lastCiId);
     }
 
     public void rollback() {

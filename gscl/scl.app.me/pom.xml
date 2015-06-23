@@ -36,10 +36,10 @@
   <parent>
     <groupId>com.actility.m2m</groupId>
     <artifactId>java.cdc.pom</artifactId>
-    <version>[3.0.0,4)</version>
+    <version>3.0.1</version>
   </parent>
   <artifactId>scl.app.me</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>[Bnd] M2M SCL Application (ME)</name>

@@ -219,16 +219,6 @@ public final class Subscription extends SclResource implements VolatileResource 
      * currentAccuCreates               NP (response O)
      * </pre>
      *
-     * @param manager
-     * @param subscription
-     * @param subsPath
-     * @param requestingEntity
-     * @param id
-     * @param creationDate
-     * @param representation
-     * @param transaction
-     * @throws XoException
-     * @throws M2MException
      */
     public boolean createResource(SclManager manager, String path, XoObject resource, String subsPath, URI requestingEntity,
             String id, Date creationDate, String creationTime, String contentType, XoObject representation,

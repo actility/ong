@@ -80,9 +80,10 @@ public interface ResourceController {
      * process continue to learn how many URIs cannot be added
      *
      * @param logId An ID that will be used to log messages
-     * @param resource The resource targeted by the current operation
+     * @param path The resource path targeted by the current operation
+     * @param resource The resource XO object targeted bu the current operation
      * @param requestingEntity The requesting entity for which DISCOVER right must be granted
-     * @param targetID The target ID of the discovery request
+     * @param targetId The target ID of the discovery request
      * @param appPath The song application root path
      * @param searchStrings The search strings to match in order to add a sub-URI
      * @param discoveryURIs The current list of discovery URIs

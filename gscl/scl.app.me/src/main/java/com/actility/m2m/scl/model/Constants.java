@@ -232,6 +232,9 @@ public interface Constants {
     String AT_REQUESTOR = "requestor";
     String AT_STATUS = "status";
 
+    String AT_INSTANCE_AGE_TIMER_ID_SUFFIX = "/instanceAgeTimerId";
+    String AT_INSTANCE_AGE_ID_SUFFIX = "/instanceAgeId";
+
     // ///////////////////////////////////////////////////////////////////////
     // Paths + names
     // ///////////////////////////////////////////////////////////////////////

@@ -43,6 +43,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -157,7 +158,7 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                 List conditions = new ArrayList();
                 conditions.add(ciCondition);
                 conditions.add(manager.getStorageContext().getStorageFactory()
-                        .createDateCondition(M2MConstants.ATTR_CREATION_TIME, Condition.ATTR_OP_STRICTLY_LOWER, limitDate));
+                        .createDateCondition(M2MConstants.ATTR_CREATION_TIME, Condition.ATTR_OP_LOWER_OR_EQUAL, limitDate));
                 Condition condition = manager.getStorageContext().getStorageFactory()
                         .createConjunction(Condition.COND_OP_AND, conditions);
 
@@ -170,7 +171,7 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                     try {
                         document = (Document) it.next();
                         ciToDelete = manager.getXoService().readBinaryXmlXoObject(document.getContent());
-                        currentByteSize -= Long.parseLong(resource.getStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE));
+                        currentByteSize -= Long.parseLong(ciToDelete.getStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE));
                         --currentNbOfInstances;
                         transaction.deleteResource(document.getPath());
                     } finally {
@@ -184,7 +185,7 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                 conditions.clear();
                 conditions.add(ciCondition);
                 conditions.add(manager.getStorageContext().getStorageFactory()
-                        .createDateCondition(M2MConstants.ATTR_CREATION_TIME, Condition.ATTR_OP_EQUAL, limitDate));
+                        .createDateCondition(M2MConstants.ATTR_CREATION_TIME, Condition.ATTR_OP_STRICTLY_GREATER, limitDate));
                 condition = manager.getStorageContext().getStorageFactory()
                         .createConjunction(Condition.COND_OP_AND, conditions);
                 searchResult = manager.getStorageContext().search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
@@ -197,8 +198,8 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                             M2MConstants.TAG_M2M_CREATION_TIME, Constants.ID_MODE_REQUIRED, -1L);
                     String timerId = manager.startResourceTimer(lastCiCreationTime.getTime() + maxInstanceAge - now.getTime(),
                             path, Constants.ID_RES_CONTENT_INSTANCES, null);
-                    manager.getM2MContext().setAttribute(path + "/instanceAgeTimer", timerId);
-                    manager.getM2MContext().setAttribute(path + "/instanceAgeId",
+                    manager.getM2MContext().setAttribute(path + Constants.AT_INSTANCE_AGE_TIMER_ID_SUFFIX, timerId);
+                    manager.getM2MContext().setAttribute(path + Constants.AT_INSTANCE_AGE_ID_SUFFIX,
                             lastCiResource.getStringAttribute(M2MConstants.ATTR_M2M_ID));
                 }
 
@@ -606,6 +607,58 @@ public final class ContentInstances extends SclResource implements SubscribedRes
             }
             // Check max instance age
             if (maxInstanceAge > 0L && maxInstanceAge != Constants.MAX_MAX_INSTANCE_AGE) {
+                boolean end = false;
+                while (!end) {
+                    if (lastCiCreationTimeToDelete != null) {
+                        List conditions = new ArrayList();
+                        conditions.add(ciCondition);
+                        conditions.add(manager
+                                .getStorageContext()
+                                .getStorageFactory()
+                                .createDateCondition(M2MConstants.ATTR_CREATION_TIME, Condition.ATTR_OP_STRICTLY_GREATER,
+                                        lastCiCreationTimeToDelete));
+                        condition = manager.getStorageContext().getStorageFactory()
+                                .createConjunction(Condition.COND_OP_AND, conditions);
+                    } else {
+                        condition = ciCondition;
+                    }
+
+                    SearchResult searchResult = storageContext.search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL, condition,
+                            StorageRequestExecutor.ORDER_ASC, 4, true, EmptyUtils.EMPTY_LIST);
+                    Iterator it = searchResult.getResults();
+                    end = !it.hasNext();
+                    XoObject ciToDelete = null;
+                    Entry entry = null;
+                    Date ciToDeleteCreationDate = null;
+                    while (it.hasNext() && !end) {
+                        try {
+                            entry = (Entry) it.next();
+                            ciToDelete = manager.getXoService().readBinaryXmlXoObject((byte[]) entry.getValue());
+                            ciToDeleteCreationDate = getAndCheckDateTime(ciToDelete, M2MConstants.TAG_M2M_CREATION_TIME,
+                                    Constants.ID_MODE_REQUIRED, -1L);
+                            if ((ciToDeleteCreationDate.getTime() + maxInstanceAge) <= now.getTime()) {
+                                currentByteSize -= Long.parseLong(ciToDelete
+                                        .getStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE));
+                                --currentNbOfInstances;
+                                if (LOG.isInfoEnabled()) {
+                                    LOG.info("Content-instance to delete because of maxInstanceAge limit: "
+                                            + (String) entry.getKey());
+                                }
+                                transaction.deleteResource((String) entry.getKey());
+                                lastCiCreationTimeToDelete = ciToDeleteCreationDate;
+                            } else {
+                                end = true;
+                            }
+                        } finally {
+                            if (ciToDelete != null) {
+                                ciToDelete.free(true);
+                                ciToDelete = null;
+                            }
+                        }
+                    }
+                }
+
+
                 if (lastCiCreationTimeToDelete != null) {
                     List conditions = new ArrayList();
                     conditions.add(ciCondition);
@@ -619,6 +672,7 @@ public final class ContentInstances extends SclResource implements SubscribedRes
                 } else {
                     condition = ciCondition;
                 }
+
                 SearchResult searchResult = storageContext.search(null, path, StorageRequestExecutor.SCOPE_ONE_LEVEL,
                         condition, StorageRequestExecutor.ORDER_ASC, 1, true, EmptyUtils.EMPTY_LIST);
                 Iterator it = searchResult.getResults();
@@ -1081,37 +1135,39 @@ public final class ContentInstances extends SclResource implements SubscribedRes
         SclTransaction transaction = new SclTransaction(manager.getStorageContext());
         XoObject resource = null;
         XoObject childResource = null;
-        String childPath = path + M2MConstants.URI_SEP + (String) manager.getM2MContext().getAttribute(path + "/instanceAgeId");
+        String childPath = path + M2MConstants.URI_SEP
+                + ((String) manager.getM2MContext().getAttribute(path + Constants.AT_INSTANCE_AGE_ID_SUFFIX));
         Date now = new Date();
         try {
             resource = manager.getXoResource(path);
             childResource = manager.getXoResource(childPath);
+            if (childResource != null) {
+                long ciContentSize = Long.parseLong(childResource.getStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE));
 
-            long ciContentSize = Long.parseLong(childResource.getStringAttribute(M2MConstants.TAG_M2M_CONTENT_SIZE));
+                long currentNbOfInstances = Long.parseLong(resource
+                        .getStringAttribute(M2MConstants.TAG_M2M_CURRENT_NR_OF_INSTANCES));
+                long currentByteSize = Long.parseLong(resource.getStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE));
 
-            long currentNbOfInstances = Long.parseLong(resource
-                    .getStringAttribute(M2MConstants.TAG_M2M_CURRENT_NR_OF_INSTANCES));
-            long currentByteSize = Long.parseLong(resource.getStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE));
+                --currentNbOfInstances;
+                currentByteSize -= ciContentSize;
 
-            --currentNbOfInstances;
-            currentByteSize -= ciContentSize;
+                resource.setStringAttribute(M2MConstants.TAG_M2M_CURRENT_NR_OF_INSTANCES, String.valueOf(currentNbOfInstances));
+                resource.setStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE, String.valueOf(currentByteSize));
+                resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME,
+                        FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE));
 
-            resource.setStringAttribute(M2MConstants.TAG_M2M_CURRENT_NR_OF_INSTANCES, String.valueOf(currentNbOfInstances));
-            resource.setStringAttribute(M2MConstants.TAG_M2M_CURRENT_BYTE_SIZE, String.valueOf(currentByteSize));
-            resource.setStringAttribute(M2MConstants.TAG_M2M_LAST_MODIFIED_TIME,
-                    FormatUtils.formatDateTime(now, UtilConstants.LOCAL_TIMEZONE));
+                transaction.deleteResource(childPath);
 
-            transaction.deleteResource(childPath);
-
-            transaction.addTransientOp(new CisChildDeleteOp(manager, childPath, childResource, now));
-            Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
-            document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
-                    FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
-            document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
-            document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES);
-            document.setContent(resource.saveBinary());
-            transaction.updateResource(document);
-            transaction.execute();
+                transaction.addTransientOp(new CisChildDeleteOp(manager, childPath, childResource, now));
+                Document document = manager.getStorageContext().getStorageFactory().createDocument(path);
+                document.setAttribute(M2MConstants.ATTR_CREATION_TIME,
+                        FormatUtils.parseDateTime(resource.getStringAttribute(M2MConstants.TAG_M2M_CREATION_TIME)));
+                document.setAttribute(M2MConstants.ATTR_LAST_MODIFIED_TIME, now);
+                document.setAttribute(Constants.ATTR_TYPE, Constants.TYPE_CONTENT_INSTANCES);
+                document.setContent(resource.saveBinary());
+                transaction.updateResource(document);
+                transaction.execute();
+            }
         } finally {
             if (resource != null) {
                 resource.free(true);
