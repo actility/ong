@@ -10,8 +10,8 @@
  * @brief API for encoding EXI stream body
  * @date Sep 7, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: bodyEncode.h 266 2013-02-22 15:01:58Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: bodyEncode.h 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #ifndef BODYENCODE_H_
@@ -26,10 +26,11 @@
  * @param[in] eventClass event class type to be looked up
  * @param[in] isSchemaType determine if the data type should be encoded as non-schema type
  * @param[in] qname element or attribute QName in case of SE or AT events; NULL otherwise
+ * @param[in] chTypeClass the type of the "value" content of CH EXI events; if not CH event then VALUE_TYPE_NONE_CLASS
  * @param[out] prodHit the matched grammar production
  * @return Error handling code
  */
-errorCode encodeProduction(EXIStream* strm, EventTypeClass eventClass, boolean isSchemaType, QName* qname, Production* prodHit);
+errorCode encodeProduction(EXIStream* strm, EventTypeClass eventClass, boolean isSchemaType, QName* qname, EXITypeClass chTypeClass, Production* prodHit);
 
 /**
  * @brief Encodes String value into EXI stream
@@ -96,9 +97,10 @@ errorCode encodePfx(EXIStream* strm, SmallIndex uriID, String* prefix);
  * @brief Encodes Integer value into EXI stream
  * @param[in, out] strm EXI stream
  * @param[in] int_val integer to be written
+ * @param[in] qnameID The uri/ln ids in the URI string table
  * @param[in] typeId index in the type table. It is used to determine the EXI int type and additional restrictions
  * @return Error handling code
  */
-errorCode encodeIntData(EXIStream* strm, Integer int_val, Index typeId);
+errorCode encodeIntData(EXIStream* strm, Integer int_val, QNameID qnameID, Index typeId);
 
 #endif /* BODYENCODE_H_ */

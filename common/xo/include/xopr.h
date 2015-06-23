@@ -288,7 +288,7 @@ void *XoReadExiEx(char *filename,char *roottype,int flags,int *err);
 
 
 /* apiexiwrit.c */
-void	*XoWritExiMem(void *obj,int32 flags,char **bufout,char *schemaID, int useRootObj);
+void	*XoWritExiMem(void *obj,int32 flags,char **bufout,int *len,char *schemaID, int useRootObj);
 void	XoWritExiFreeMem(void *buf);
 void	XoWritExiFreeCtxt(void *pbuf);
 int32	XoWritExiEx(char *filename,void *obj,int32 flags,char *schemaID, int useRootObj);

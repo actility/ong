@@ -1,0 +1,61 @@
+diff -ru exip-r294/build/gcc/Makefile exip-copy/build/gcc/Makefile
+--- exip-r294/build/gcc/Makefile	2014-12-02 12:14:21.251828703 +0100
++++ exip-copy/build/gcc/Makefile	2014-12-02 12:15:10.163815189 +0100
+@@ -148,6 +148,9 @@
+ dynlib: COMPILE += -fPIC
+ dynlib: clean all $(LIB_BIN_DIR)/libexip.so
+ 
++act_dynlib: COMPILE += -fPIC
++act_dynlib: all $(LIB_BIN_DIR)/libexip.so
++
+ # TARGET: Exacute the unit tests
+ check: all $(TESTS_BIN_DIR) $(CHECK_BINS)
+ 		for i in $(CHECK_BINS); do \
+diff -ru exip-r294/include/procTypes.h exip-copy/include/procTypes.h
+--- exip-r294/include/procTypes.h	2014-12-02 11:51:25.375193497 +0100
++++ exip-copy/include/procTypes.h	2014-12-02 12:03:38.979002895 +0100
+@@ -31,6 +31,8 @@
+ 	TRUE  = 1
+ };
+ 
++#define EXIP_VERSION 294
++
+ typedef enum boolean boolean;
+ 
+ #ifndef NULL
+@@ -169,6 +171,7 @@
+ 	 */
+ 	struct tm dateTime;
+ 	FractionalSecs fSecs;
++	int16_t TimeZone; // TZHours * 64 + TZMinutes
+ 
+ 	/**
+ 	 * Defines which fields of the DateTime are included.
+diff -ru exip-r294/src/streamIO/src/streamDecode.c exip-copy/src/streamIO/src/streamDecode.c
+--- exip-r294/src/streamIO/src/streamDecode.c	2014-12-02 11:51:28.160192793 +0100
++++ exip-copy/src/streamIO/src/streamDecode.c	2014-12-02 12:05:45.218969160 +0100
+@@ -291,7 +291,10 @@
+ 
+ 	if(presence)
+ 	{
+-		return NOT_IMPLEMENTED_YET;
++		unsigned int tzone = 0;
++		dt_val->presenceMask = dt_val->presenceMask | TZONE_PRESENCE;
++		TRY(decodeNBitUnsignedInteger(strm, 11, &tzone));
++		dt_val->TimeZone = tzone;
+ 	}
+ 
+ 	return ERR_OK;
+diff -ru exip-r294/src/streamIO/src/streamEncode.c exip-copy/src/streamIO/src/streamEncode.c
+--- exip-r294/src/streamIO/src/streamEncode.c	2014-12-02 11:51:28.161192792 +0100
++++ exip-copy/src/streamIO/src/streamEncode.c	2014-12-02 12:07:10.034946351 +0100
+@@ -299,7 +299,8 @@
+ 
+ 	if(IS_PRESENT(dt_val.presenceMask, TZONE_PRESENCE))
+ 	{
+-		return NOT_IMPLEMENTED_YET;
++		TRY(encodeBoolean(strm, TRUE));
++		TRY(encodeNBitUnsignedInteger(strm, 11, dt_val.TimeZone));
+ 	}
+ 	else
+ 	{

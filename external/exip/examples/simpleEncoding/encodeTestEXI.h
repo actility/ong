@@ -11,8 +11,8 @@
  *
  * @date Nov 5, 2012
  * @author Rumen Kyusakov
- * @version 0.4.1
- * @par[Revision] $Id: encodeTestEXI.h 227 2012-11-05 13:56:55Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: encodeTestEXI.h 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #ifndef ENCODETESTEXI_H_

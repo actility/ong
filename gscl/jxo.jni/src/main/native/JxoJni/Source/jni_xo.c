@@ -734,6 +734,7 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferBinaryToEx
     {
       // 3. save binary
       char *newBuffer = NULL;
+      int length;
       void *w;
       //int xoLength = 0;
       int flags = 0;
@@ -742,13 +743,12 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferBinaryToEx
         flags = XOML_PARSE_OBIX;
       }
 
-      w = XoWritExiMem(xoObject, flags, &newBuffer, "", 0);
+      w = XoWritExiMem(xoObject, flags, &newBuffer, &length, "", 0);
       XoFree(xoObject, 1);
       if (w)
       {
         // 4. set attribute
-        int newBufferLength = strlen(newBuffer);
-        XoNmSetAttr((void*) xoHandle, cAttributeName, newBuffer, newBufferLength);
+        XoNmSetAttr((void*) xoHandle, cAttributeName, newBuffer, length);
         XoWritExiFreeMem(w);
       }
       else
@@ -845,15 +845,14 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferXmlToExi64
     {
       // 3. save binary
       char *newBuffer = NULL;
-      int newBufferLength = 0;
+      int length;
 
-      w = XoWritExiMem(xoObject, flags, &newBuffer, "", 0);
+      w = XoWritExiMem(xoObject, flags, &newBuffer, &length, "", 0);
       XoFree(xoObject, 1);
       if (w)
       {
         // 4. set attribute
-        int newBufferLength = strlen(newBuffer);
-        XoNmSetAttr((void*) xoHandle, cAttributeName, newBuffer, newBufferLength);
+        XoNmSetAttr((void*) xoHandle, cAttributeName, newBuffer, length);
         XoWritExiFreeMem(w);
       }
       else
@@ -1074,22 +1073,22 @@ JNIEXPORT jbyteArray JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoWriteExiMem64
 (JNIEnv * env, jclass class, jlong xoHandle, jboolean obix)
 {
 #ifdef EXI
-  //void *XoWritExiMem(void *obj,int32 flags,char **bufout,char *schemaId,int useRootObj);
+  //void *XoWritExiMem(void *obj,int32 flags,char **bufout,int *len,char *schemaId,int useRootObj);
   jbyteArray rawObject = NULL;
   void *w;
   char *buffer;
+  int length;
 
   int flags = 0;
   if (obix == JNI_TRUE)
   {
     flags = XOML_PARSE_OBIX;
   }
-  w = XoWritExiMem((void*) xoHandle, flags, &buffer, "", 0);
+  w = XoWritExiMem((void*) xoHandle, flags, &buffer, &length, "", 0);
   if (w)
   {
-    int bufferLength = strlen(buffer);
-    rawObject = (*env)->NewByteArray(env, bufferLength);
-    (*env)->SetByteArrayRegion(env, rawObject, 0, bufferLength, (jbyte*) buffer);
+    rawObject = (*env)->NewByteArray(env, length);
+    (*env)->SetByteArrayRegion(env, rawObject, 0, length, (jbyte*) buffer);
     XoWritExiFreeMem(w);
   }
   else
@@ -1106,7 +1105,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoWritePartialEx
 (JNIEnv * env, jclass class, jlong xoHandle, jstring attributeName)
 {
 #ifdef EXI
-  //void *XoWritExiMem(void *obj,int32 flags,char **bufout,char *schemaId,int useRootObj);
+  //void *XoWritExiMem(void *obj,int32 flags,char **bufout,int *len,char *schemaId,int useRootObj);
   jbyteArray rawObject = NULL;
   void* xoObject = (void*) xoHandle;
   char* attr = (char*) (*env)->GetStringUTFChars(env, attributeName, 0);
@@ -1747,6 +1746,7 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferBinaryToEx
     {
       // 3. save binary
       char *newBuffer = NULL;
+      int length;
       void *w = NULL;
       int flags = 0;
       if (obix == JNI_TRUE)
@@ -1754,14 +1754,13 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferBinaryToEx
         flags = XOML_PARSE_OBIX;
       }
 
-      w = XoWritExiMem(xoObject, flags, &newBuffer, "", 0);
+      w = XoWritExiMem(xoObject, flags, &newBuffer, &length, "", 0);
       XoFree(xoObject, 1);
       if (w)
       {
         // 4. set attribute
-        int newBufferLength = strlen(newBuffer);
         XoNmSetAttr((void*) xoHandle, cAttributeName, newBuffer,
-            newBufferLength);
+            length);
         XoWritExiFreeMem(w);
       }
       else
@@ -1870,16 +1869,16 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferXmlToExi(
     {
       // 3. save binary
       char *newBuffer = NULL;
+      int length;
       void *w = NULL;
 
-      w = XoWritExiMem(xoObject, flags, &newBuffer, "", 0);
+      w = XoWritExiMem(xoObject, flags, &newBuffer, &length, "", 0);
       XoFree(xoObject, 1);
       if (w)
       {
         // 4. set attribute
-        int newBufferLength = strlen(newBuffer);
         XoNmSetAttr((void*) xoHandle, cAttributeName, newBuffer,
-            newBufferLength);
+            length);
         XoWritExiFreeMem(w);
       }
       else
@@ -2125,22 +2124,22 @@ JNIEXPORT jbyteArray JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoWriteExiMem(
     JNIEnv * env, jclass class, jint xoHandle, jboolean obix)
 {
 #ifdef EXI
-  //void *XoWritExiMem(void *obj,int32 flags,char **bufout,char *schemaId, int useRootObj);
+  //void *XoWritExiMem(void *obj,int32 flags,char **bufout,int *len,char *schemaId, int useRootObj);
   jbyteArray rawObject = NULL;
   void *w;
   char *buffer;
+  int length;
 
   int flags = 0;
   if (obix == JNI_TRUE)
   {
     flags = XOML_PARSE_OBIX;
   }
-  w = XoWritExiMem((void*) xoHandle, flags, &buffer, "", 0);
+  w = XoWritExiMem((void*) xoHandle, flags, &buffer, &length, "", 0);
   if (w)
   {
-    int bufferLength = strlen(buffer);
-    rawObject = (*env)->NewByteArray(env, bufferLength);
-    (*env)->SetByteArrayRegion(env, rawObject, 0, bufferLength,
+    rawObject = (*env)->NewByteArray(env, length);
+    (*env)->SetByteArrayRegion(env, rawObject, 0, length,
         (jbyte*) buffer);
     XoWritExiFreeMem(w);
   }
@@ -2158,7 +2157,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoWritePartialEx
     JNIEnv * env, jclass class, jint xoHandle, jstring attributeName)
 {
 #ifdef EXI
-  //void *XoWritExiMem(void *obj,int32 flags,char **bufout,char *schemaId, int useRootObj);
+  //void *XoWritExiMem(void *obj,int32 flags,char **bufout,int *len,char *schemaId, int useRootObj);
   jbyteArray rawObject = NULL;
   void* xoObject = (void*) xoHandle;
   char* attr = (char*) (*env)->GetStringUTFChars(env, attributeName, 0);

@@ -10,7 +10,7 @@
 # * @date Oct 8, 2010
 # * @author Rumen Kyusakov
 # * @version 0.4
-# * @par[Revision] $Id: Makefile 270 2013-02-26 11:01:58Z kjussakov $
+# * @par[Revision] $Id: Makefile 356 2014-11-27 11:29:23Z kjussakov $
 # */
 
 .PHONY : clean all dynlib check examples utils doc dist \
@@ -29,7 +29,7 @@ CFLAGS += $(DEBUGGING)
 CFLAGS += $(ADDITIONAL_CFLAGS)
 
 # Library version
-EXIP_VERSION = 0.5.r294
+EXIP_VERSION = 0.5.4
 
 # The project root directory
 PROJECT_ROOT = ../..
@@ -83,6 +83,9 @@ GRAMMAR_SRC = $(notdir $(wildcard $(PROJECT_ROOT)/src/grammar/src/*.c))
 
 # Source files for the grammar generation module
 GRAMMAR_GEN_SRC = $(notdir $(wildcard $(PROJECT_ROOT)/src/grammarGen/src/*.c))
+
+# Source files for the schema grammar generation module
+GRAMMAR_GEN_SCHEMA_SRC = $(notdir $(wildcard $(PROJECT_ROOT)/src/grammarGen/xmlSchema/*.c))
 		
 STREAM_IO_SRC =	$(notdir $(wildcard $(PROJECT_ROOT)/src/streamIO/src/*.c))
 
@@ -102,7 +105,12 @@ EXIPD_EXAMPLE_SRC = $(notdir $(wildcard $(PROJECT_ROOT)/examples/simpleDecoding/
 LIB_SOURCES = $(COMMON_SRC) $(CONTENT_IO_SRC) $(GRAMMAR_SRC) $(STREAM_IO_SRC) $(STRING_TABLES_SRC) $(notdir $(wildcard $(TARGET)/*.c))
 
 ifeq ($(INCLUDE_GRAMMAR_GENERATION), true)
-   LIB_SOURCES += $(GRAMMAR_GEN_SRC)
+  LIB_SOURCES += $(GRAMMAR_GEN_SRC)
+ifeq ($(INCLUDE_SCHEMA_EXI_GRAMMAR_GENERATION), true)
+  LIB_SOURCES += $(GRAMMAR_GEN_SCHEMA_SRC)
+  VPATH += $(PROJECT_ROOT)/src/grammarGen/xmlSchema
+  CFLAGS += -DGRAMMAR_GEN_SCHEMA
+endif
 endif
 
 EXIPE_OBJECTS=$(EXIPE_EXAMPLE_SRC:%.c=$(BIN_DIR)/%.o)
@@ -131,7 +139,7 @@ LDFLAGS += -L$(LIB_BIN_DIR)
 
 # Tests all targets by default. May override in environment to specify checks to run, for example:
 #   $make check CHECK_TARGETS="streamio strict_grammar"
-CHECK_TARGETS ?= streamIO stringTables grammar contentIO exip builtin_grammar strict_grammar emptyType xsi_type
+CHECK_TARGETS ?= streamIO stringTables grammar contentIO exip builtin_grammar strict_grammar emptyType xsi_type profile
 CHECK_BINS := $(foreach acheck, $(CHECK_TARGETS), $(TESTS_BIN_DIR)/test_$(acheck))
 
 EXAMPLE_BINS := $(EXAMPLES_BIN_DIR)/exipd $(EXAMPLES_BIN_DIR)/exipe
@@ -236,7 +244,10 @@ copy_headers: $(BIN_DIR)
 
 test_sets_copy_examples:
 		cp $(PROJECT_ROOT)/examples/simpleEncoding/exipe-test-xsd.exi $(EXAMPLES_BIN_DIR)/exipe-test-xsd.exi
+		cp $(PROJECT_ROOT)/examples/simpleEncoding/exipe-test-types-xsd.exi $(EXAMPLES_BIN_DIR)/exipe-test-types-xsd.exi
+		cp $(PROJECT_ROOT)/examples/simpleEncoding/exipe-test-nested-xsd.exi $(EXAMPLES_BIN_DIR)/exipe-test-nested-xsd.exi
 		cp $(PROJECT_ROOT)/examples/simpleDecoding/exipd-test-xsd.exi $(EXAMPLES_BIN_DIR)/exipd-test-xsd.exi
+		cp $(PROJECT_ROOT)/examples/simpleDecoding/exipd-test-schema-xsd.exi $(EXAMPLES_BIN_DIR)/exipd-test-schema-xsd.exi
 		cp $(PROJECT_ROOT)/examples/simpleDecoding/exipd-test.exi $(EXAMPLES_BIN_DIR)/exipd-test.exi
 		cp $(PROJECT_ROOT)/examples/simpleDecoding/exipd-test-schema.exi $(EXAMPLES_BIN_DIR)/exipd-test-schema.exi
 		

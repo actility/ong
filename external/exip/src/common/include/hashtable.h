@@ -1,5 +1,5 @@
 /* Copyright (C) 2002 Christopher Clark <firstname.lastname@cl.cam.ac.uk> */
-/* @par[Revision] $Id: hashtable.h 242 2013-01-28 15:13:45Z kjussakov $
+/* @par[Revision] $Id: hashtable.h 310 2013-08-05 09:43:03Z kjussakov $
  **/
 
 #ifndef __HASHTABLE_CWC22_H__
@@ -101,7 +101,7 @@ create_hashtable(unsigned int minsize,
  * @param   h   the hashtable to insert into
  * @param   k   the key - hashtable claims ownership and will free on removal
  * @param   v   the value - does not claim ownership
- * @return      ERR_OK for successful insertion
+ * @return      EXIP_OK for successful insertion
  *
  * This function will cause the table to expand if the insertion would take
  * the ratio of entries to table size over the maximum load factor.

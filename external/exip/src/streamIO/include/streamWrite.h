@@ -11,8 +11,8 @@
  *
  * @date Aug 23, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: streamWrite.h 242 2013-01-28 15:13:45Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: streamWrite.h 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #ifndef STREAMWRITE_H_
@@ -28,14 +28,6 @@
  * @return Error handling code
  */
 errorCode writeNextBit(EXIStream* strm, boolean bit_val);
-
-/**
- * @brief Writes an unsigned integer value to an EXI stream with the least possible bits
- * and moves the stream current bit pointer to the last bit written.
- * @param[out] strm EXI stream of bits
- * @param[in] bits_val resulting bits value
- */
-errorCode writeBits(EXIStream* strm, unsigned int bits_val);
 
 /**
  * @brief Writes an unsigned integer value to an EXI stream with nbits (possible 0 paddings)

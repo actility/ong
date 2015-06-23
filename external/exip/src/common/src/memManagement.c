@@ -10,8 +10,8 @@
  * @brief Implementation of handling memory operations - allocation, deallocation etc.
  * @date Oct 25, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: memManagement.c 286 2013-05-21 16:27:24Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: memManagement.c 352 2014-11-25 16:37:24Z kjussakov $
  */
 
 #include "memManagement.h"
@@ -24,12 +24,12 @@ errorCode initAllocList(AllocList* list)
 {
 	list->firstBlock = EXIP_MALLOC(sizeof(struct allocBlock));
 	if(list->firstBlock == NULL)
-		return MEMORY_ALLOCATION_ERROR;
+		return EXIP_MEMORY_ALLOCATION_ERROR;
 	list->firstBlock->nextBlock = NULL;
 	list->lastBlock = list->firstBlock;
 	list->currAllocSlot = 0;
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 void* memManagedAllocate(AllocList* list, size_t size)
@@ -110,9 +110,7 @@ void freeAllMem(EXIStream* strm)
 
 			for(i = 0; i < strm->schema->uriTable.count; i++)
 			{
-				if(strm->schema->uriTable.uri[i].pfxTable != NULL)
-					EXIP_MFREE(strm->schema->uriTable.uri[i].pfxTable);
-
+				destroyDynArray(&strm->schema->uriTable.uri[i].pfxTable.dynArray);
 				destroyDynArray(&strm->schema->uriTable.uri[i].lnTable.dynArray);
 			}
 
@@ -121,6 +119,23 @@ void freeAllMem(EXIStream* strm)
 			if(strm->schema->simpleTypeTable.sType != NULL)
 				destroyDynArray(&strm->schema->simpleTypeTable.dynArray);
 			freeAllocList(&strm->schema->memList);
+		}
+		else
+		{
+			// Possible additions of string table entries must be removed
+			for(i = 0; i < strm->schema->uriTable.dynArray.chunkEntries; i++)
+			{
+				strm->schema->uriTable.uri[i].pfxTable.count = strm->schema->uriTable.uri[i].pfxTable.dynArray.chunkEntries;
+				strm->schema->uriTable.uri[i].lnTable.count = strm->schema->uriTable.uri[i].lnTable.dynArray.chunkEntries;
+			}
+
+			for(i = strm->schema->uriTable.dynArray.chunkEntries; i < strm->schema->uriTable.count; i++)
+			{
+				destroyDynArray(&strm->schema->uriTable.uri[i].pfxTable.dynArray);
+				destroyDynArray(&strm->schema->uriTable.uri[i].lnTable.dynArray);
+			}
+
+			strm->schema->uriTable.count = strm->schema->uriTable.dynArray.chunkEntries;
 		}
 	}
 

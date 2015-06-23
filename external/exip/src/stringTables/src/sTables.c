@@ -10,8 +10,8 @@
  * @brief Implementation of functions describing EXI sting tables operations
  * @date Sep 21, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: sTables.c 286 2013-05-21 16:27:24Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: sTables.c 353 2014-11-25 16:43:28Z kjussakov $
  */
 
 #include "sTables.h"
@@ -155,19 +155,7 @@ errorCode createValueTable(ValueTable* valueTable)
 #if HASH_TABLE_USE
 	valueTable->hashTbl = NULL;
 #endif
-	return ERR_OK;
-}
-
-errorCode createPfxTable(PfxTable** pfxTable)
-{
-	// Due to the small size of the prefix table, there is no need to 
-	// use a DynArray
-	(*pfxTable) = (PfxTable*) EXIP_MALLOC(sizeof(PfxTable));
-	if(*pfxTable == NULL)
-		return MEMORY_ALLOCATION_ERROR;
-
-	(*pfxTable)->count = 0;
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode addUriEntry(UriTable* uriTable, String uriStr, SmallIndex* uriEntryId)
@@ -180,14 +168,15 @@ errorCode addUriEntry(UriTable* uriTable, String uriStr, SmallIndex* uriEntryId)
 
 	// Fill in URI entry
 	uriEntry->uriStr = uriStr;
-	// Prefix table is created independently
-	uriEntry->pfxTable = NULL;
+
+	// Create an empty prefix table
+	TRY(createDynArray(&uriEntry->pfxTable.dynArray, sizeof(String), DEFAULT_PFX_ENTRIES_NUMBER));
+
 	// Create local names table for this URI
-	// TODO RCC 20120201: Should this be separate (empty string URI has no local names)?
 	TRY(createDynArray(&uriEntry->lnTable.dynArray, sizeof(LnEntry), DEFAULT_LN_ENTRIES_NUMBER));
 
 	*uriEntryId = (SmallIndex)uriLEntryId;
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode addLnEntry(LnTable* lnTable, String lnStr, Index* lnEntryId)
@@ -205,12 +194,12 @@ errorCode addLnEntry(LnTable* lnTable, String lnStr, Index* lnEntryId)
 	// The Vx table is created on-demand (additions to value cross table are done when a value is inserted in the value table)
 	lnEntry->vxTable = NULL;
 #endif
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode addValueEntry(EXIStream* strm, String valueStr, QNameID qnameID)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	ValueEntry* valueEntry = NULL;
 	Index valueEntryId;
 
@@ -228,7 +217,7 @@ errorCode addValueEntry(EXIStream* strm, String valueStr, QNameID qnameID)
 		{
 			lnEntry->vxTable = memManagedAllocate(&strm->memList, sizeof(VxTable));
 			if(lnEntry->vxTable == NULL)
-				return MEMORY_ALLOCATION_ERROR;
+				return EXIP_MEMORY_ALLOCATION_ERROR;
 
 			// First value entry - create the vxTable
 			TRY(createDynArray(&lnEntry->vxTable->dynArray, sizeof(VxEntry), DEFAULT_VX_ENTRIES_NUMBER));
@@ -298,19 +287,21 @@ errorCode addValueEntry(EXIStream* strm, String valueStr, QNameID qnameID)
 	if(strm->valueTable.globalId == strm->header.opts.valuePartitionCapacity)
 		strm->valueTable.globalId = 0;
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode addPfxEntry(PfxTable* pfxTable, String pfxStr, SmallIndex* pfxEntryId)
 {
-	if(pfxTable->count >= MAXIMUM_NUMBER_OF_PREFIXES_PER_URI)
-		return TOO_MANY_PREFIXES_PER_URI;
+	errorCode tmp_err_code;
+	String* strEntry;
 
-	pfxTable->pfxStr[pfxTable->count].length = pfxStr.length;
-	pfxTable->pfxStr[pfxTable->count].str = pfxStr.str;
-	*pfxEntryId = pfxTable->count++;
+	TRY(addEmptyDynEntry(&pfxTable->dynArray, (void**)&strEntry, pfxEntryId));
 
-	return ERR_OK;
+	// Fill in local names entry
+	strEntry->length = pfxStr.length;
+	strEntry->str = pfxStr.str;
+
+	return EXIP_OK;
 }
 
 errorCode createUriTableEntry(UriTable* uriTable, const String uri, int createPfx, const String pfx, const String* lnBase, Index lnSize)
@@ -329,22 +320,18 @@ errorCode createUriTableEntry(UriTable* uriTable, const String uri, int createPf
 	uriEntry = &uriTable->uri[uriEntryId];
 
 	if(createPfx)
-	{
-		// Create the URI's prefix table and add the default prefix
-		TRY(createPfxTable(&uriEntry->pfxTable));
-		TRY(addPfxEntry(uriEntry->pfxTable, pfx, &pfxEntryId));
-	}
+		TRY(addPfxEntry(&uriEntry->pfxTable, pfx, &pfxEntryId));
 
 	for(i = 0; i < lnSize; i++)
 	{
 		TRY(addLnEntry(&uriEntry->lnTable, lnBase[i], &lnEntryId));
 	}
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode createUriTableEntries(UriTable* uriTable, boolean withSchema)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	String emptyStr;
 	getEmptyString(&emptyStr);
 
@@ -385,7 +372,7 @@ errorCode createUriTableEntries(UriTable* uriTable, boolean withSchema)
 										   URI_3_LN_SIZE));
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 boolean lookupUri(UriTable* uriTable, String uriStr, SmallIndex* uriEntryId)
@@ -427,12 +414,9 @@ boolean lookupPfx(PfxTable* pfxTable, String pfxStr, SmallIndex* pfxEntryId)
 {
 	SmallIndex i;
 
-	if(pfxTable == NULL)
-		return FALSE;
-
 	for(i = 0; i < pfxTable->count; i++)
 	{
-		if(stringEqual(pfxTable->pfxStr[i], pfxStr))
+		if(stringEqual(pfxTable->pfx[i], pfxStr))
 		{
 			*pfxEntryId = i;
 			return TRUE;

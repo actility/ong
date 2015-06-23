@@ -8,7 +8,7 @@
     <version>3.0.0</version>
   </parent>
   <artifactId>jxo.jni</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.2-test2</version>
   <packaging>bundle</packaging>
 
   <name>[Bnd] JXO Native Service (JNI)</name>

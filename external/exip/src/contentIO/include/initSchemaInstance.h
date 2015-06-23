@@ -11,8 +11,8 @@
  *
  * @date Nov 28, 2011
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: initSchemaInstance.h 242 2013-01-28 15:13:45Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: initSchemaInstance.h 348 2014-11-21 12:34:51Z kjussakov $
  */
 
 #ifndef INITSCHEMAINSTANCE_H_

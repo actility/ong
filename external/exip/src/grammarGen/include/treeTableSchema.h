@@ -12,8 +12,8 @@
  * @date Mar 13, 2012
  * @author Rumen Kyusakov
  * @author Robert Cragie
- * @version 0.4
- * @par[Revision] $Id: treeTableSchema.h 285 2013-05-07 09:03:04Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: treeTableSchema.h 332 2014-05-05 18:22:55Z kjussakov $
  */
 
 #ifndef TREETABLESCHEMA_H_
@@ -31,6 +31,17 @@
 #include "protoGrammars.h"
 #include "hashtable.h"
 #include "grammarGenerator.h"
+
+/**
+ * @page XMLSchemaID SchemaID of XML Schema files
+ *
+ * The value of the SchemaID field of the EXI header
+ * that should be used when processing EXI encoded XML schemas
+ * in schema mode by exip is the XML Schema target namespace:
+ * @code
+ *	http://www.w3.org/2001/XMLSchema
+ * @endcode
+ */
 
 /** Enumeration of elements found in the schema */
 enum ElemEnum
@@ -82,22 +93,25 @@ typedef enum ElemEnum ElemEnum;
 /** Codes for the attributes found in the schema */
 enum AttrEnum
 {
-	ATTRIBUTE_NAME           =0,
-	ATTRIBUTE_TYPE           =1,
-	ATTRIBUTE_REF            =2,
-	ATTRIBUTE_MIN_OCCURS     =3,
-	ATTRIBUTE_MAX_OCCURS     =4,
-	ATTRIBUTE_FORM           =5,
-	ATTRIBUTE_BASE           =6,
-	ATTRIBUTE_USE            =7,
-	ATTRIBUTE_NAMESPACE      =8,
-	ATTRIBUTE_PROC_CONTENTS  =9,
-	ATTRIBUTE_VALUE          =10,
-	ATTRIBUTE_NILLABLE       =11,
-	ATTRIBUTE_ITEM_TYPE      =12,
-	ATTRIBUTE_MEMBER_TYPES   =13,
-	ATTRIBUTE_MIXED          =14,
-	ATTRIBUTE_CONTEXT_ARRAY_SIZE =15
+	ATTRIBUTE_NAME               =0,
+	ATTRIBUTE_TYPE               =1,
+	ATTRIBUTE_REF                =2,
+	ATTRIBUTE_MIN_OCCURS         =3,
+	ATTRIBUTE_MAX_OCCURS         =4,
+	ATTRIBUTE_FORM               =5,
+	ATTRIBUTE_BASE               =6,
+	ATTRIBUTE_USE                =7,
+	ATTRIBUTE_NAMESPACE          =8,
+	ATTRIBUTE_PROC_CONTENTS      =9,
+	ATTRIBUTE_VALUE              =10,
+	ATTRIBUTE_NILLABLE           =11,
+	ATTRIBUTE_ITEM_TYPE          =12,
+	ATTRIBUTE_MEMBER_TYPES       =13,
+	ATTRIBUTE_MIXED              =14,
+	ATTRIBUTE_SCHEMA_LOCATION    =15,
+	ATTRIBUTE_SUBSTITUTION_GROUP =16,
+	ATTRIBUTE_ABSTRACT           =17,
+	ATTRIBUTE_CONTEXT_ARRAY_SIZE =18
 };
 
 typedef enum AttrEnum AttrEnum;
@@ -131,6 +145,26 @@ enum FormType
 
 typedef enum FormType FormType;
 
+/** uri/ln indices (QNameID) of an element in the string tables and the associated grammar index */
+struct QNameIDGrIndx
+{
+	QNameID qnameId;
+	Index grIndex;
+};
+
+typedef struct QNameIDGrIndx QNameIDGrIndx;
+
+/**
+ * A TreeTableEntry in particular TreeTable
+ * It is defined from which XML Schema file (TreeTable) it comes from */
+struct QualifiedTreeTableEntry
+{
+	struct TreeTable* treeT;
+	struct TreeTableEntry* entry;
+};
+
+typedef struct QualifiedTreeTableEntry QualifiedTreeTableEntry;
+
 /**
  * Represents a single definition (i.e XML element) from the XML schema.
  * For example:
@@ -145,11 +179,7 @@ struct TreeTableEntry
 	 * a local entry with type="..." (or ref="...") attribute is linked to a
 	 * global entry that defines the corresponding type or referenced element.
 	 * The linked global entry can be located in different tree (XSD file); */
-	struct
-	{
-		struct TreeTable* treeT;
-		struct TreeTableEntry* entry;
-	} child;
+	QualifiedTreeTableEntry child;
 
 	/** Next element in group. For example the
 	 * [element], [attribute], [sequence] are often sibling definitions in a complex type */
@@ -159,11 +189,7 @@ struct TreeTableEntry
 	 * In case of [extension] or [restriction] entries, this pointer links the
 	 * base type to the corresponding global type definition.
 	 * The linked global entry can be located in different tree (XSD file); */
-	struct
-	{
-		struct TreeTable* treeT;
-		struct TreeTableEntry* entry;
-	} supertype;
+	QualifiedTreeTableEntry supertype;
 
 	/** The XML schema element. Represented with the codes defined above */
 	ElemEnum element;
@@ -202,8 +228,6 @@ struct TreeTable
 
 	struct
 	{
-		/** Whether the tree corresponds to the main XSD of the schema definitions */
-		boolean isMain;
 		/** targetNamespace for that TreeTable */
 		String targetNs;
 		/** Identifies the target namespace in the EXIP Schema URI Table */
@@ -263,10 +287,35 @@ struct NsTable
 {
 	DynArray dynArray;
 	String *base;
-	size_t count;
+	Index count;
 };
 
 typedef struct NsTable NsTable;
+
+/** In case there are Substitution groups in the schema,
+ * this structure represents a Substitution group head. It has the
+ * head QName and an array of all its substitues as a pointer
+ * to their TreeTableEntry */
+struct SubtGroupHead
+{
+	DynArray dynArray;
+	QualifiedTreeTableEntry* substitutes;
+	Index count;
+	QNameID headId;
+};
+
+typedef struct SubtGroupHead SubtGroupHead;
+
+/** In case there are Substitution groups in the schema,
+ * this structure sotres all Substitution group heads. */
+struct SubstituteTable
+{
+	DynArray dynArray;
+	SubtGroupHead* head;
+	Index count;
+};
+
+typedef struct SubstituteTable SubstituteTable;
 
 /**
  * @brief Initialize a TreeTable object
@@ -307,6 +356,20 @@ void destroyTreeTable(TreeTable* treeT);
 errorCode generateTreeTable(BinaryBuffer buffer, SchemaFormat schemaFormat, EXIOptions* opt, TreeTable* treeT, EXIPSchema* schema);
 
 /**
+ * @brief Given a set of TreeTable instances, resolve the <include> or <import> dependencies
+ *
+ * @param[in, out] schema the EXIPSchema object
+ * @param[in, out] treeT a pointer to an array of tree table objects (can be RE-ALLOCED!)
+ * @param[in, out] count the number of tree table objects
+ * @param[in] loadSchemaHandler Call-back handler for loading <include>-ed or <import>-ed schema files; Can be left NULL
+ * if no <include> or <import> statements are used in the XML schema.
+ *
+ * @return Error handling code
+ */
+errorCode resolveIncludeImportReferences(EXIPSchema* schema, TreeTable** treeT, unsigned int* count,
+		errorCode (*loadSchemaHandler) (String* namespace, String* schemaLocation, BinaryBuffer** buffers, unsigned int* bufCount, SchemaFormat* schemaFormat, EXIOptions** opt));
+
+/**
  * @brief Links derived types to base types, elements to types and references to global elements
  * 
  * In case of:
@@ -316,13 +379,17 @@ errorCode generateTreeTable(BinaryBuffer buffer, SchemaFormat schemaFormat, EXIO
  *    child pointer of that entry
  * -# base="..." attribute - finds the corresponding type definition and links it to the
  *    supertype pointer of that entry
+ * -# substitutionGroup="..." attribute - finds the corresponding substituion group head
+ * and adds the head and the substitute in the SubstituteTable
  *
  * @param[in] schema the EXIPSchema object
  * @param[in, out] treeT an array of tree table objects
  * @param[in] count the number of tree table objects
+ * @param[in] subsTbl In case of substitutionGroups in the schema maps the heads of the
+ * substitutionGroups to their members
  * @return Error handling code
  */
-errorCode resolveTypeHierarchy(EXIPSchema* schema, TreeTable* treeT, unsigned int count);
+errorCode resolveTypeHierarchy(EXIPSchema* schema, TreeTable* treeT, unsigned int count, SubstituteTable* subsTbl);
 
 /**
  * @brief Given types resolved TreeTable objects that are created from a XML schema files,
@@ -331,9 +398,11 @@ errorCode resolveTypeHierarchy(EXIPSchema* schema, TreeTable* treeT, unsigned in
  * @param[in] treeT an array of tree table objects
  * @param[in] count the number of tree table objects
  * @param[out] schema schema information used for processing EXI streams in schema mode
+ * @param[in] subsTbl In case of substitutionGroups in the schema maps the heads of the
+ * substitutionGroups to their members
  * @return Error handling code
  */
-errorCode convertTreeTablesToExipSchema(TreeTable* treeT, unsigned int count, EXIPSchema* schema);
+errorCode convertTreeTablesToExipSchema(TreeTable* treeT, unsigned int count, EXIPSchema* schema, SubstituteTable* subsTbl);
 
 /**
  * @brief Given a type value encoded as QName string in the form "prefix:localname"

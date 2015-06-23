@@ -11,8 +11,8 @@
  *
  * @date Nov 5, 2012
  * @author Rumen Kyusakov
- * @version 0.4.1
- * @par[Revision] $Id: exipg.c 282 2013-04-30 12:59:59Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: exipg.c 352 2014-11-25 16:37:24Z kjussakov $
  */
 
 #include "createGrammars.h"
@@ -33,11 +33,15 @@ int main(int argc, char *argv[])
 	EXIPSchema schema;
 	unsigned char outputFormat = OUT_EXIP;
 	int argIndex = 1;
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	char prefix[20];
 	unsigned char mask = FALSE;
 	EXIOptions maskOpt;
+	Deviations dvis;
 
+	dvis.grammar = 0;
+	dvis.ln = 0;
+	dvis.url = 0;
 	makeDefaultOpts(&maskOpt);
 
 	if(argc == 1)
@@ -66,9 +70,25 @@ int main(int argc, char *argv[])
 		outputFormat = OUT_SRC_DYN;
 		argIndex++;
 	}
-	else if(strcmp(argv[argIndex], "-static") == 0)
+	else if(strlen(argv[argIndex]) >= 7 &&
+			argv[argIndex][0] == '-' &&
+			   argv[argIndex][1] == 's' &&
+			   argv[argIndex][2] == 't' &&
+			   argv[argIndex][3] == 'a' &&
+			   argv[argIndex][4] == 't' &&
+			   argv[argIndex][5] == 'i' &&
+			   argv[argIndex][6] == 'c')
 	{
 		outputFormat = OUT_SRC_STAT;
+		if(strlen(argv[argIndex]) >= 15 && argv[argIndex][7] == '=' )
+		{
+			char * pEnd;
+
+			dvis.url = (int) strtol (argv[argIndex] + 8, &pEnd, 10);
+			dvis.ln = (int) strtol (pEnd + 1, &pEnd, 10);
+			dvis.pfx = (int) strtol (pEnd + 1, &pEnd, 10);
+			dvis.grammar = (int) strtol (pEnd + 1, NULL, 10);
+		}
 		argIndex++;
 	}
 
@@ -78,7 +98,8 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	if(argv[argIndex][0] == '-' &&
+	if(strlen(argv[argIndex]) >= 5 &&
+	   argv[argIndex][0] == '-' &&
 	   argv[argIndex][1] == 'p' &&
 	   argv[argIndex][2] == 'f' &&
 	   argv[argIndex][3] == 'x' &&
@@ -98,7 +119,8 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	if(argv[argIndex][0] == '-' &&
+	if(strlen(argv[argIndex]) >= 5 &&
+	   argv[argIndex][0] == '-' &&
 	   argv[argIndex][1] == 'o' &&
 	   argv[argIndex][2] == 'p' &&
 	   argv[argIndex][3] == 's' &&
@@ -169,7 +191,7 @@ int main(int argc, char *argv[])
 			tmp_err_code = toEXIP(&schema, outfile);
 		break;
 		case OUT_SRC_STAT:
-			tmp_err_code = toStaticSrc(&schema, prefix, outfile);
+			tmp_err_code = toStaticSrc(&schema, prefix, outfile, dvis);
 		break;
 		case OUT_SRC_DYN:
 			tmp_err_code = toDynSrc(&schema, outfile);
@@ -182,7 +204,9 @@ int main(int argc, char *argv[])
 
 	destroySchema(&schema);
 
-	if(tmp_err_code != ERR_OK)
+	fclose(outfile);
+
+	if(tmp_err_code != EXIP_OK)
 	{
 		printf("\nError during grammar output!");
 		exit(1);
@@ -197,16 +221,21 @@ static void printfHelp()
     printf("  EXIP     Copyright (c) 2010 - 2012, EISLAB - Luleå University of Technology Version 0.5.1 \n");
     printf("           Author: Rumen Kyusakov\n");
     printf("  Usage:   exipg [options] -schema=<xsd_in> [grammar_out] \n\n");
-    printf("           Options: [-help | [[-exip | -text | -dynamic | -static] [-pfx=<prefix>] [-ops=<ops_mask>]] ] \n");
+    printf("           Options: [-help | [[-exip | -text | -dynamic | -static[=<deviations>]] [-pfx=<prefix>] [-ops=<ops_mask>]] ] \n");
     printf("           -help        :   Prints this help message\n");
     printf("           -exip        :   Format the output schema definitions in EXIP-specific format (Default)\n");
     printf("           -text        :   Format the output schema definitions in human readable text format\n");
     printf("           -dynamic     :   Create C code for the grammars defined. The output is a C function that dynamically generates the grammars\n");
     printf("           -static      :   Create C code for the grammars defined. The output is C structures describing the grammars\n");
+    printf("           deviations   :   When static C code is chosen for the output, this defines a static size of the possible extensions\n");
+    printf("                            for URI, Local names, prefixes, and build-in grammars. The format is: <uri>:<ln>:<pfx>:<grammars>\n");
+    printf("                            For example deviations -static=2:5:1:10 will allow for two non-schema namespaces, 5 new local names\n");
+    printf("                            per each schema namespace, 1 additional prefix per namespace, and 10 new built-in grammars.\n");
+    printf("                            The larger deviations the more memory is required.\n");
     printf("           -pfx         :   When in -dynamic or -static mode, this option allows you to specify a unique prefix for the\n");
     printf("                            generated global types. The default is \"prfx_\"\n");
     printf("           ops_mask     :   The format is: <STRICT><SELF_CONTAINED><dtd><prefixes><lexicalValues><comments><pis> := <0|1><0|1><0|1><0|1><0|1><0|1><0|1>\n");
-    printf("                            Use this argument only for specifying out-of-band options. That is if no options are specified in the header of the <xsd_in>");
+    printf("                            Use this argument only for specifying out-of-band options. That is if no options are specified in the header of the <xsd_in>\n");
     printf("                            EXI encoded schema files but some options are used during encoding.\n");
     printf("                            This argument is useful for generating the \"EXI Options\" grammar where STRICT is set and the rest are default options. \n");
     printf("                            In this way the bootstrapping of the code is easier. The mask to use for EXIOptions-xsd.exi is -ops=0001000 \n");
@@ -220,7 +249,7 @@ static void printfHelp()
 
 static void parseSchema(char* xsdList, EXIPSchema* schema, unsigned char mask, EXIOptions maskOpt)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	FILE *schemaFile;
 	BinaryBuffer buffer[MAX_XSD_FILES_COUNT]; // up to 10 XSD files
 	char schemaFileName[50];
@@ -275,14 +304,14 @@ static void parseSchema(char* xsdList, EXIPSchema* schema, unsigned char mask, E
 	}
 
 	// Generate the EXI grammars based on the schema information
-	tmp_err_code = generateSchemaInformedGrammars(buffer, schemaFilesCount, SCHEMA_FORMAT_XSD_EXI, opt, schema);
+	tmp_err_code = generateSchemaInformedGrammars(buffer, schemaFilesCount, SCHEMA_FORMAT_XSD_EXI, opt, schema, NULL);
 
 	for(i = 0; i < schemaFilesCount; i++)
 	{
 		free(buffer[i].buf);
 	}
 
-	if(tmp_err_code != ERR_OK)
+	if(tmp_err_code != EXIP_OK)
 	{
 		printf("\nGrammar generation error occurred: %d", tmp_err_code);
 		exit(1);

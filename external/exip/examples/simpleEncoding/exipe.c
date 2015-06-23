@@ -11,8 +11,8 @@
  *
  * @date Nov 5, 2012
  * @author Rumen Kyusakov
- * @version 0.4.1
- * @par[Revision] $Id: exipe.c 241 2013-01-25 14:43:14Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: exipe.c 337 2014-08-02 09:32:36Z kjussakov $
  */
 
 #include "encodeTestEXI.h"
@@ -26,9 +26,9 @@ static void parseSchema(char* xsdList, EXIPSchema* schema);
 
 int main(int argc, char *argv[])
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	FILE *outfile = stdout; // Default is the standard output
-	char sourceFile[100];
+	char sourceFile[500];
 	EXIPSchema schema;
 	EXIPSchema* schemaPtr = NULL;
 	int argIndex = 1;
@@ -72,18 +72,14 @@ int main(int argc, char *argv[])
 	if(schemaPtr != NULL)
 		destroySchema(schemaPtr);
 
-	if(tmp_err_code != ERR_OK)
-	{
+	if(tmp_err_code != EXIP_OK)
 		printf("\nError (code: %d) during encoding of: %s\n", tmp_err_code, sourceFile);
-		exit(1);
-	}
 	else
-	{
 		printf("\nSuccessful encoding in %s\n", sourceFile);
-		exit(1);
-	}
 
 	fclose(outfile);
+
+	return 0;
 }
 
 static void printfHelp()
@@ -110,10 +106,10 @@ size_t writeFileOutputStream(void* buf, size_t readSize, void* stream)
 
 static void parseSchema(char* xsdList, EXIPSchema* schema)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	FILE *schemaFile;
 	BinaryBuffer buffer[MAX_XSD_FILES_COUNT]; // up to 10 XSD files
-	char schemaFileName[50];
+	char schemaFileName[500];
 	unsigned int schemaFilesCount = 0;
 	unsigned int i;
 	char *token;
@@ -161,14 +157,14 @@ static void parseSchema(char* xsdList, EXIPSchema* schema)
 	}
 
 	// Generate the EXI grammars based on the schema information
-	tmp_err_code = generateSchemaInformedGrammars(buffer, schemaFilesCount, SCHEMA_FORMAT_XSD_EXI, NULL, schema);
+	tmp_err_code = generateSchemaInformedGrammars(buffer, schemaFilesCount, SCHEMA_FORMAT_XSD_EXI, NULL, schema, NULL);
 
 	for(i = 0; i < schemaFilesCount; i++)
 	{
 		free(buffer[i].buf);
 	}
 
-	if(tmp_err_code != ERR_OK)
+	if(tmp_err_code != EXIP_OK)
 	{
 		printf("\nGrammar generation error occurred: %d", tmp_err_code);
 		exit(1);

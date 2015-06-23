@@ -11,17 +11,25 @@
  *
  * @date Oct 13, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: createGrammars.h 229 2012-11-06 16:51:09Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: createGrammars.h 352 2014-11-25 16:37:24Z kjussakov $
  */
 #ifndef CREATEGRAMMARS_H_
 #define CREATEGRAMMARS_H_
 
 #include "procTypes.h"
 
+typedef struct
+{
+	unsigned int url;
+	unsigned int ln;
+	unsigned int grammar;
+	unsigned int pfx;
+} Deviations;
+
 errorCode toText(EXIPSchema* schemaPtr, FILE *outfile);
 
-errorCode toStaticSrc(EXIPSchema* schemaPtr, char* prefix, FILE *outfile);
+errorCode toStaticSrc(EXIPSchema* schemaPtr, char* prefix, FILE *outfile, Deviations dvis);
 
 errorCode toDynSrc(EXIPSchema* schemaPtr, FILE *outfile);
 

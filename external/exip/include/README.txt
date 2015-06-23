@@ -12,7 +12,7 @@
  * 
  * @date Feb 15, 2011
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: README.txt 270 2013-02-26 11:01:58Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: README.txt 328 2013-10-30 16:00:10Z kjussakov $
  * 
  */

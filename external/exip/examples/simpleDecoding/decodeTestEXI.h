@@ -11,8 +11,8 @@
  *
  * @date Nov 5, 2012
  * @author Rumen Kyusakov
- * @version 0.4.1
- * @par[Revision] $Id: decodeTestEXI.h 228 2012-11-05 16:06:43Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: decodeTestEXI.h 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #ifndef DECODETESTEXI_H_
@@ -23,6 +23,6 @@
 #define OUT_EXI 0
 #define OUT_XML 1
 
-errorCode decode(EXIPSchema* schemaPtr, unsigned char outFlag, FILE *infile, size_t (*inputStream)(void* buf, size_t size, void* stream));
+errorCode decode(EXIPSchema* schemaPtr, unsigned char outFlag, FILE *infile, boolean outOfBandOpts, EXIOptions* opts, size_t (*inputStream)(void* buf, size_t size, void* stream));
 
 #endif /* DECODETESTEXI_H_ */

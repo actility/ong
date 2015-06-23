@@ -11,8 +11,8 @@
  *
  * @date Jul 7, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: procTypes.h 295 2013-06-14 05:50:36Z denisfroschauer $
+ * @version 0.5
+ * @par[Revision] $Id: procTypes.h 352 2014-11-25 16:37:24Z kjussakov $
  */
 
 #ifndef PROCTYPES_H_
@@ -30,8 +30,6 @@ enum boolean
 	FALSE = 0,
 	TRUE  = 1
 };
-
-#define EXIP_VERSION 294
 
 typedef enum boolean boolean;
 
@@ -136,16 +134,6 @@ typedef enum SchemaIdMode SchemaIdMode;
 /**@}*/
 
 /**
- * The maximum allowed prefixes per namespace.
- * If there is a possibility that a document defines more than 4 prefixes per namespace
- * i.e. weird XML, MAXIMUM_NUMBER_OF_PREFIXES_PER_URI should be increased
- * @note This will require many changes - for example statically generated grammars from XML schemas needs to be rebuilt
- */
-#ifndef MAXIMUM_NUMBER_OF_PREFIXES_PER_URI
-# define MAXIMUM_NUMBER_OF_PREFIXES_PER_URI 4
-#endif
-
-/**
  * Fractional seconds = value * 10^-(offset+1) seconds;
  * Example:
  * offset = 4
@@ -168,17 +156,35 @@ struct EXIPDateTime
 {
 	/**
 	 * As defined in time.h
+	 * @note Decoding functions set negative values (INT_MIN) for the fields that are not available
+	 *
+	 * int    tm_sec   seconds [0,61]
+	 * int    tm_min   minutes [0,59]
+	 * int    tm_hour  hour [0,23]
+	 * int    tm_mday  day of month [1,31]
+	 * int    tm_mon   month of year [0,11]
+	 * int    tm_year  years since 1900
+	 * int    tm_wday  day of week [0,6] (Sunday = 0)
+	 * int    tm_yday  day of year [0,365]
+	 * int    tm_isdst daylight savings flag
 	 */
 	struct tm dateTime;
 	FractionalSecs fSecs;
-	int16_t TimeZone; // TZHours * 64 + TZMinutes
+	/**
+	 * TZHours * 64 + TZMinutes. Where:
+	 * TZHours is a value in the range [-14 .. 14] and represents the
+	 * standard notion of tize zone as an offset from UTC.
+	 * TZMinutes is a value in the range [-59 .. 59] and
+	 * could be used for minute based time zones.
+	 */
+	int16_t TimeZone;
 
 	/**
-	 * Defines which fields of the DateTime are included.
-	 * Use SEC_PRESENCE, MIN_PRESENCE etc. (*_PRESENCE) masks
-	 * and IS_PRESENT() macro
+	 * Whether to included fractional seconds and timeZone information
+	 * Use FRACT_PRESENCE and TZONE_PRESENCE masks
+	 * and IS_PRESENT() macro. Always initialize this to 0;
 	 */
-	uint16_t presenceMask;
+	uint8_t presenceMask;
 };
 
 typedef struct EXIPDateTime EXIPDateTime;
@@ -188,21 +194,12 @@ typedef struct EXIPDateTime EXIPDateTime;
  *
  * Example usage:
  * @code
- *   IS_PRESENT(presenceMask, YEAR_PRESENCE)
+ *   IS_PRESENT(presenceMask, FRACT_PRESENCE)
  * @endcode
  */
 /**@{*/
-#define SEC_PRESENCE       0x0001 // 0b0000000000000001
-#define MIN_PRESENCE       0x0002 // 0b0000000000000010
-#define HOUR_PRESENCE      0x0004 // 0b0000000000000100
-#define MDAY_PRESENCE      0x0008 // 0b0000000000001000
-#define MON_PRESENCE       0x0010 // 0b0000000000010000
-#define YEAR_PRESENCE      0x0020 // 0b0000000000100000
-#define WDAY_PRESENCE      0x0040 // 0b0000000001000000
-#define YDAY_PRESENCE      0x0080 // 0b0000000010000000
-#define DST_PRESENCE       0x0100 // 0b0000000100000000
-#define TZONE_PRESENCE     0x0200 // 0b0000001000000000
-#define FRACT_PRESENCE     0x0400 // 0b0000010000000000
+#define TZONE_PRESENCE     0x01 // 0b00000001
+#define FRACT_PRESENCE     0x02 // 0b00000010
 
 #define IS_PRESENT(p, mask) (((p) & (mask)) != 0)
 /**@}*/
@@ -220,8 +217,10 @@ typedef EXIP_UNSIGNED_INTEGER UnsignedInteger;
 typedef EXIP_INTEGER Integer;
 
 /**
+ * Represents base 10 (decimal) floating-point data.
  * The default Float representation in EXIP.
- * Maps directly to the EXI Float datatype
+ * Maps directly to the EXI Float datatype.
+ * Used for float and decimal data.
  *
  * @see http://www.w3.org/TR/2011/REC-exi-20110310/#encodingFloat
  */
@@ -239,13 +238,19 @@ typedef EXIP_FLOAT Float;
 
 /**
  * Used for the content handler interface for decimal values.
- * Application which require support for different type of decimal values can
- * override this macro.
+ * Application which require support for different type of decimal
+ * representation (IEEE 754 or ISO/IEC/IEEE 60559:2011 standards) can
+ * override this macro and re-define the decimal encoding/decoding
+ * functions (not recommended). Instead:
+ * On platforms supporting decimal floating types the conversion
+ * between EXIP_FLOAT and _Decimal64 or _Decimal128 should be done
+ * in the application code.
+ *
  * @see http://gcc.gnu.org/onlinedocs/gcc/Decimal-Float.html#Decimal-Float
  * @see http://speleotrove.com/decimal/
  */
 #ifndef EXIP_DECIMAL
-# define EXIP_DECIMAL _Decimal64
+# define EXIP_DECIMAL Float
 #endif
 
 typedef EXIP_DECIMAL Decimal;
@@ -273,6 +278,10 @@ typedef EXIP_SMALL_INDEX SmallIndex;
 #endif
 
 #define SMALL_INDEX_MAX EXIP_SMALL_INDEX_MAX
+
+#ifndef EXIP_IMPLICIT_DATA_TYPE_CONVERSION
+# define EXIP_IMPLICIT_DATA_TYPE_CONVERSION ON
+#endif
 
 /**
  * Defines the encoding used for characters.
@@ -382,7 +391,9 @@ struct dynArray {
 
 	/**
 	 * The initial size of the dynamic array (in number of entries), 
-	 * also the chunk of number of entries to be added each expansion time
+	 * also the chunk of number of entries to be added each expansion time.
+	 * This field holds the initial size of the url and local name
+	 * partitions in the EXIPSchema object.
 	 */
 	Index chunkEntries;
 
@@ -520,6 +531,14 @@ enum EXIType
 	VALUE_TYPE_FLOAT            =  20,
 	VALUE_TYPE_DECIMAL          =  30,
 	VALUE_TYPE_DATE_TIME        =  40,
+	/** Used for xs:gYear type*/
+	VALUE_TYPE_YEAR             =  41,
+	/** Used for xs:gYearMonth and xs:date types */
+	VALUE_TYPE_DATE             =  42,
+	/** Used for xs:gMonth, xs:gMonthDay and xs:gDay types */
+	VALUE_TYPE_MONTH            =  43,
+	/** Used for xs:time type */
+	VALUE_TYPE_TIME             =  44,
 	VALUE_TYPE_BOOLEAN          =  50,
 	VALUE_TYPE_BINARY           =  60,
 	VALUE_TYPE_LIST             =  70,
@@ -619,6 +638,7 @@ typedef struct EventCode EventCode;
 
 #define GR_START_TAG_CONTENT 0
 #define GR_ELEMENT_CONTENT   1
+#define GR_CONTENT_2 (GR_VOID_NON_TERMINAL-1)
 
 #define GR_FRAGMENT_CONTENT  0
 /**@}*/
@@ -634,19 +654,22 @@ struct GrammarRule
     /** The number of productions */
     Index pCount;
 
-    // TODO: Think about get rid of that meta info
     /** Meta information for the grammar rule:
      * - most significant 15 bits contain the number of AT(qname)[schema-typed value]  productions
-     * - least significant bit is used to indicate whether it has an EE production */
+     * - least significant bit is used to: (1) indicate whether the rule has an EE production
+     * in case of Schema grammar OR (2) whether the rule contain AT(xsi:type) production in
+     * case of Build-in element grammar */
     uint16_t meta;
 };
 
 typedef struct GrammarRule GrammarRule;
 
-#define RULE_CONTAIN_EE_MASK       0x01 // 0b0000000000000001
+#define RULE_CONTAIN_EE_OR_XSI_TYPE_MASK       0x01 // 0b0000000000000001
 
-#define RULE_CONTAIN_EE(meta) ((meta & RULE_CONTAIN_EE_MASK) != 0)
-#define RULE_SET_CONTAIN_EE(meta) (meta = meta | RULE_CONTAIN_EE_MASK)
+#define RULE_CONTAIN_EE(meta) ((meta & RULE_CONTAIN_EE_OR_XSI_TYPE_MASK) != 0)
+#define RULE_SET_CONTAIN_EE(meta) (meta = meta | RULE_CONTAIN_EE_OR_XSI_TYPE_MASK)
+#define RULE_CONTAIN_XSI_TYPE(meta) ((meta & RULE_CONTAIN_EE_OR_XSI_TYPE_MASK) != 0)
+#define RULE_SET_CONTAIN_XSI_TYPE(meta) (meta = meta | RULE_CONTAIN_EE_OR_XSI_TYPE_MASK)
 
 #define RULE_SET_AT_COUNT(meta, ac) (meta = meta | (ac<<1))
 #define RULE_GET_AT_COUNT(meta) (meta>>1)
@@ -748,7 +771,14 @@ typedef struct EXIGrammar EXIGrammar;
 struct GrammarStackNode
 {
 	EXIGrammar* grammar;
-	SmallIndex lastNonTermID; // Stores the last NonTermID before another grammar is added on top of the stack
+
+	/**
+	 * Current (left-hand side) non-terminal ID that identifies the current grammar rule.
+	 * Defines the context/processor state.
+	 */
+	SmallIndex currNonTermID;
+	/** The qname of the current element being parsed/serialized */
+	QNameID currQNameID;
 	struct GrammarStackNode* nextInStack;
 };
 
@@ -815,9 +845,11 @@ typedef struct ValueTable ValueTable;
 #endif
 
 struct PfxTable {
-	/** The number of entries */
-	SmallIndex count;
-	String pfxStr[MAXIMUM_NUMBER_OF_PREFIXES_PER_URI];
+#if DYN_ARRAY_USE == ON
+	DynArray dynArray;
+#endif
+	String* pfx;
+	Index count;
 };
 
 typedef struct PfxTable PfxTable;
@@ -853,7 +885,7 @@ typedef struct LnTable LnTable;
 
 struct UriEntry {
 	LnTable lnTable;
-	PfxTable* pfxTable;
+	PfxTable pfxTable;
 	String uriStr;
 };
 
@@ -1008,6 +1040,11 @@ struct SchemaGrammarTable {
 
 typedef struct SchemaGrammarTable SchemaGrammarTable;
 
+#if EXI_PROFILE_DEFAULT
+// The index of the EXI Profile stub grammar
+#  define EXI_PROFILE_STUB_GRAMMAR_INDX (INDEX_MAX-1)
+#endif
+
 /**
  * Stores the enum values for a particular simple type */
 struct enumDefinition
@@ -1089,15 +1126,6 @@ struct StreamContext
 	 * 7 is the least significant bit position in the byte.
 	 */
 	unsigned char bitPointer;
-
-	/**
-	 * Current (left-hand side) non-terminal ID that identifies the current grammar rule. 
-	 * Defines the context/processor state.
-	 */
-	SmallIndex currNonTermID;
-
-	/** The qname of the current element being parsed/serialized */
-	QNameID currElem;
 
 	/** The qname of the current attribute */
 	QNameID currAttr;
@@ -1239,7 +1267,10 @@ struct BinaryBuffer
 	Index bufLen;
 
 	/**
-	 * The size of the data stored in the buffer - number of bytes
+	 * The size of the data stored in the buffer - number of bytes.
+	 * When parsing, this is the EXI data in the buffer available for parsing.
+	 * When serializing, this is the size of the EXI data encoded in the buffer
+	 * which is set during the call to serialize.endDocument();
 	 */
 	Index bufContent;
 
@@ -1306,7 +1337,7 @@ void makeDefaultOpts(EXIOptions* opts);
  * @brief Check if the EXI options are set correctly
  *
  * @param[in] opts EXI options structure
- * @returns ERR_OK if the values are correct, otherwise HEADER_OPTIONS_MISMATCH
+ * @returns EXIP_OK if the values are correct, otherwise EXIP_HEADER_OPTIONS_MISMATCH
  */
 errorCode checkOptionValues(EXIOptions* opts);
 

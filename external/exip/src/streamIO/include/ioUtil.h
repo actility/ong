@@ -11,8 +11,8 @@
  *
  * @date Oct 26, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: ioUtil.h 236 2012-12-07 15:39:21Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: ioUtil.h 344 2014-11-17 16:08:37Z kjussakov $
  */
 
 #ifndef IOUTIL_H_
@@ -39,7 +39,6 @@ void moveBitPointer(EXIStream* strm, unsigned int bitPositions);
  */
 unsigned char getBitsNumber(uint64_t val);
 
-
 /**
  * @brief Log2 function. Used to determine the number of bits needed to encode a unsigned integer value
  * The code taken from: http://www-graphics.stanford.edu/~seander/bithacks.html#IntegerLog
@@ -48,5 +47,22 @@ unsigned char getBitsNumber(uint64_t val);
  * @return The number of bits needed
  */
 unsigned int log2INT(uint64_t val);
+
+/**
+ * @brief Reads an EXI stream chunk using buffer.ioStrm.readWriteToStream if available
+ * @param[in] strm EXI stream of bits
+ * @param[in] numBytesToBeRead the number of bytes that are requested for parsing
+ *
+ * @return The number of bits needed
+ */
+errorCode readEXIChunkForParsing(EXIStream* strm, unsigned int numBytesToBeRead);
+
+/**
+ * @brief Flushes the EXI buffer using buffer.ioStrm.readWriteToStream if available
+ * @param[in] strm EXI stream of bits
+ *
+ * @return The number of bits needed
+ */
+errorCode writeEncodedEXIChunk(EXIStream* strm);
 
 #endif /* IOUTIL_H_ */

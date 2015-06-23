@@ -11,8 +11,8 @@
  *
  * @date Aug 23, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: headerEncode.c 294 2013-06-11 15:28:43Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: headerEncode.c 352 2014-11-25 16:37:24Z kjussakov $
  */
 
 #include "headerEncode.h"
@@ -34,7 +34,7 @@ static errorCode serializeOptionsStream(EXIStream* options_strm, EXIOptions* opt
 
 errorCode encodeHeader(EXIStream* strm)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 
 	DEBUG_MSG(INFO, DEBUG_CONTENT_IO, (">Start EXI header encoding\n"));
 
@@ -69,6 +69,7 @@ errorCode encodeHeader(EXIStream* strm)
 	if(strm->header.has_options)
 	{
 		EXIStream options_strm;
+		QNameID emptyQnameID = {URI_MAX, LN_MAX};
 
 		makeDefaultOpts(&options_strm.header.opts);
 		SET_STRICT(options_strm.header.opts.enumOpt);
@@ -77,9 +78,6 @@ errorCode encodeHeader(EXIStream* strm)
 		options_strm.buffer = strm->buffer;
 		options_strm.context.bitPointer = strm->context.bitPointer;
 		options_strm.context.bufferIndx = strm->context.bufferIndx;
-		options_strm.context.currNonTermID = GR_DOC_CONTENT;
-		options_strm.context.currElem.lnId = LN_MAX;
-		options_strm.context.currElem.uriId = URI_MAX;
 		options_strm.context.currAttr.lnId = LN_MAX;
 		options_strm.context.currAttr.uriId = URI_MAX;
 		options_strm.context.expectATData = FALSE;
@@ -89,7 +87,7 @@ errorCode encodeHeader(EXIStream* strm)
 		options_strm.schema = (EXIPSchema*) &ops_schema;
 
 		TRY_CATCH(createValueTable(&options_strm.valueTable), closeOptionsStream(&options_strm));
-		TRY_CATCH(pushGrammar(&options_strm.gStack, (EXIGrammar*) &ops_schema.docGrammar), closeOptionsStream(&options_strm));
+		TRY_CATCH(pushGrammar(&options_strm.gStack, emptyQnameID, (EXIGrammar*) &ops_schema.docGrammar), closeOptionsStream(&options_strm));
 		TRY_CATCH(serializeOptionsStream(&options_strm, &strm->header.opts, &strm->schema->uriTable), closeOptionsStream(&options_strm));
 
 		strm->buffer.bufContent = options_strm.buffer.bufContent;
@@ -110,22 +108,21 @@ errorCode encodeHeader(EXIStream* strm)
 		closeOptionsStream(&options_strm);
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static void closeOptionsStream(EXIStream* strm)
 {
-	EXIGrammar* tmp;
 	while(strm->gStack != NULL)
 	{
-		popGrammar(&strm->gStack, &tmp);
+		popGrammar(&strm->gStack);
 	}
 	freeAllMem(strm);
 }
 
 static errorCode serializeOptionsStream(EXIStream* options_strm, EXIOptions* opts, UriTable* uriTbl)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	EventCode tmpEvCode;
 	boolean hasUncommon = FALSE;
 	boolean hasLesscommon = FALSE;
@@ -138,11 +135,6 @@ static errorCode serializeOptionsStream(EXIStream* options_strm, EXIOptions* opt
 	tmpEvCode.bits[0] = 1;
 	TRY(serializeEvent(options_strm, tmpEvCode, NULL)); // serialize.startElement <header>
 
-#if EXI_PROFILE_DEFAULT
-	// hasUncommon element for encoding the profile <p> parameters element
-	hasUncommon = TRUE;
-	hasLesscommon = TRUE;
-#else
 	// uncommon options
 	if(GET_ALIGNMENT(opts->enumOpt) != BIT_PACKED ||
 			WITH_SELF_CONTAINED(opts->enumOpt) ||
@@ -158,7 +150,6 @@ static errorCode serializeOptionsStream(EXIStream* options_strm, EXIOptions* opt
 		// lesscommon options
 		hasLesscommon = TRUE;
 	}
-#endif
 
 	if(hasLesscommon)
 	{
@@ -173,36 +164,6 @@ static errorCode serializeOptionsStream(EXIStream* options_strm, EXIOptions* opt
 			tmpEvCode.bits[0] = 2;
 			TRY(serializeEvent(options_strm, tmpEvCode, NULL)); // serialize.startElement <uncommon>
 			ruleContext = 0;
-#if EXI_PROFILE_DEFAULT
-			{
-			String pLn;
-			tmpEvCode.length = 1;
-			tmpEvCode.part[0] = 5;
-			tmpEvCode.bits[0] = 3;
-			// serialize SE(*)
-			TRY(writeEventCode(options_strm, tmpEvCode));
-			// serialize <p>
-			// first the EXI uri: http://www.w3.org/2009/exi
-			// It is with id 4 in the string table
-			TRY(encodeNBitUnsignedInteger(options_strm, getBitsNumber(options_strm->schema->uriTable.count), 4 + 1));
-			// then the p local name
-			{
-				TRY(asciiToString("p", &pLn, &options_strm->memList, TRUE));
-				TRY(encodeUnsignedInteger(options_strm, (UnsignedInteger)(pLn.length + 1)));
-				TRY(encodeStringOnly(options_strm, &pLn));
-				// NOTE: the "p" local name is in purpose not added to the
-				// local name table of the http://www.w3.org/2009/exi uri, although it should be.
-				// If there are more strings (24 or more) added there in the future
-				// or the <p> element is encoded more than once - both are highly unlikely,
-				// then there will be a problem with the encoding.
-			}
-			// serialize </p>
-			tmpEvCode.length = 1;
-			tmpEvCode.part[0] = 0;
-			tmpEvCode.bits[0] = 2;
-			TRY(writeEventCode(options_strm, tmpEvCode));
-			}
-#endif
 			if(GET_ALIGNMENT(opts->enumOpt) != BIT_PACKED)
 			{
 				tmpEvCode.length = 1;
@@ -276,7 +237,7 @@ static errorCode serializeOptionsStream(EXIStream* options_strm, EXIOptions* opt
 				TRY(serializeEvent(options_strm, tmpEvCode, NULL)); // serialize.startElement <datatypeRepresentationMap>
 				ruleContext = 5;
 				// TODO: not ready yet!
-				return NOT_IMPLEMENTED_YET;
+				return EXIP_NOT_IMPLEMENTED_YET;
 			}
 			tmpEvCode.length = 1;
 			tmpEvCode.part[0] = 6 - ruleContext - (ruleContext > 0);
@@ -425,7 +386,7 @@ static errorCode serializeOptionsStream(EXIStream* options_strm, EXIOptions* opt
 				QName nil;
 				nil.uri = &uriTbl->uri[XML_SCHEMA_INSTANCE_ID].uriStr;
 				nil.localName = &uriTbl->uri[XML_SCHEMA_INSTANCE_ID].lnTable.ln[XML_SCHEMA_INSTANCE_NIL_ID].lnStr;
-				nil.prefix = &uriTbl->uri[XML_SCHEMA_INSTANCE_ID].pfxTable->pfxStr[0];
+				nil.prefix = &uriTbl->uri[XML_SCHEMA_INSTANCE_ID].pfxTable.pfx[0];
 				tmpEvCode.length = 2;
 				tmpEvCode.part[0] = 1;
 				tmpEvCode.bits[0] = 1;

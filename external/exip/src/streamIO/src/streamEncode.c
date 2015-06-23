@@ -11,8 +11,8 @@
  *
  * @date Oct 26, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: streamEncode.c 295 2013-06-14 05:50:36Z denisfroschauer $
+ * @version 0.5
+ * @par[Revision] $Id: streamEncode.c 344 2014-11-17 16:08:37Z kjussakov $
  */
 
 #include "streamEncode.h"
@@ -32,56 +32,54 @@ errorCode encodeNBitUnsignedInteger(EXIStream* strm, unsigned char n, unsigned i
 	else
 	{
 		unsigned int byte_number = n / 8 + (n % 8 != 0);
-		int tmp_byte_buf = 0;
-		errorCode tmp_err_code = UNEXPECTED_ERROR;
-		unsigned int i = 0;
-		for(i = 0; i < byte_number; i++)
+		int tmp_byte_buf;
+		unsigned int i;
+
+		if(strm->buffer.bufLen < strm->context.bufferIndx + byte_number)
 		{
-			tmp_byte_buf = (int_val >> (i * 8)) & 0xFF;
-			TRY(writeNBits(strm, 8, tmp_byte_buf));
+			// The buffer end is reached: there are fewer than nbits bits left in the buffer
+			// Flush the buffer if possible
+			errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
+
+			TRY(writeEncodedEXIChunk(strm));
+		}
+
+		for(i = 0; i < byte_number*8; i += 8)
+		{
+			tmp_byte_buf = (int_val >> i) & 0xFF;
+			strm->buffer.buf[strm->context.bufferIndx] = tmp_byte_buf;
+			strm->context.bufferIndx++;
 		}
 	}
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode encodeBoolean(EXIStream* strm, boolean bool_val)
 {
 	//TODO:  when pattern facets are available in the schema datatype - handle it differently
 	DEBUG_MSG(INFO, DEBUG_STREAM_IO, (">> 0x%X (bool)", bool_val));
-	return writeNextBit(strm, bool_val);
+	return encodeNBitUnsignedInteger(strm, 1, bool_val);
 }
 
 errorCode encodeUnsignedInteger(EXIStream* strm, UnsignedInteger int_val)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
-	unsigned int nbits = getBitsNumber(int_val);
-	unsigned int nbyte7 = nbits / 7 + (nbits % 7 != 0);
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	unsigned int tmp_byte_buf = 0;
-	unsigned int i = 0;
 	
-#if DEBUG_STREAM_IO == ON
-	if (nbyte7 > 1)
-		DEBUG_MSG(INFO, DEBUG_STREAM_IO, (" Write %lu (unsigned)\n", (long unsigned int)int_val));
-#endif
-	if(nbyte7 == 0)
-		nbyte7 = 1;  // the 0 Unsigned Integer is encoded with one 7bit byte
-	for(i = 0; i < nbyte7; i++)
+	DEBUG_MSG(INFO, DEBUG_STREAM_IO, (" Write %lu (unsigned)\n", (long unsigned int)int_val));
+	do
 	{
-		tmp_byte_buf = (unsigned int) ((int_val >> (i * 7)) & 0x7F);
-		if(i == nbyte7 - 1)
-		{
-			DEBUG_MSG(INFO, DEBUG_STREAM_IO, (">> 0x%.2X", tmp_byte_buf & 0x7f));
-			writeNextBit(strm, 0);
-		}
-		else
-		{
-			DEBUG_MSG(INFO, DEBUG_STREAM_IO, (">> 0x%.2X", tmp_byte_buf | 0x80));
-			writeNextBit(strm, 1);
-		}
+		tmp_byte_buf = (unsigned int) (int_val & 0x7F);
+		int_val = int_val >> 7;
+		if(int_val)
+			tmp_byte_buf |= 0x80;
 
-		TRY(writeNBits(strm, 7, tmp_byte_buf));
+		DEBUG_MSG(INFO, DEBUG_STREAM_IO, (">> 0x%.2X", tmp_byte_buf));
+		TRY(writeNBits(strm, 8, tmp_byte_buf));
 	}
-	return ERR_OK;
+	while(int_val);
+
+	return EXIP_OK;
 }
 
 errorCode encodeString(EXIStream* strm, const String* string_val)
@@ -89,7 +87,7 @@ errorCode encodeString(EXIStream* strm, const String* string_val)
 	// Assume no Restricted Character Set is defined
 	//TODO: Handle the case when Restricted Character Set is defined
 
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 
 	DEBUG_MSG(INFO, DEBUG_STREAM_IO, (" Prepare to write string"));
 	TRY(encodeUnsignedInteger(strm, (UnsignedInteger)(string_val->length)));
@@ -102,7 +100,7 @@ errorCode encodeStringOnly(EXIStream* strm, const String* string_val)
 	// Assume no Restricted Character Set is defined
 	//TODO: Handle the case when Restricted Character Set is defined
 
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	uint32_t tmp_val = 0;
 	Index i = 0;
 	Index readerPosition = 0;
@@ -119,12 +117,12 @@ errorCode encodeStringOnly(EXIStream* strm, const String* string_val)
 		TRY(encodeUnsignedInteger(strm, (UnsignedInteger) tmp_val));
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode encodeBinary(EXIStream* strm, char* binary_val, Index nbytes)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	Index i = 0;
 
 	TRY(encodeUnsignedInteger(strm, (UnsignedInteger) nbytes));
@@ -135,12 +133,12 @@ errorCode encodeBinary(EXIStream* strm, char* binary_val, Index nbytes)
 		TRY(writeNBits(strm, 8, (unsigned int) binary_val[i]));
 	}
 	DEBUG_MSG(INFO, DEBUG_STREAM_IO, ("\n"));
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode encodeIntegerValue(EXIStream* strm, Integer sint_val)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	UnsignedInteger uval;
 	unsigned char sign;
 	if(sint_val >= 0)
@@ -162,157 +160,171 @@ errorCode encodeIntegerValue(EXIStream* strm, Integer sint_val)
 
 errorCode encodeDecimalValue(EXIStream* strm, Decimal dec_val)
 {
-	// TODO: Review this. Probably incorrect in some cases and not efficient. Depends on decimal floating point support!
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
-	boolean sign = FALSE;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
+	boolean sign;
 	UnsignedInteger integr_part = 0;
 	UnsignedInteger fract_part_rev = 0;
-	unsigned int i = 1;
-	unsigned int d = 0;
+	UnsignedInteger m;
+	int e = dec_val.exponent;
 
-	if(dec_val >= 0)
+	if(dec_val.mantissa >= 0)
+	{
 		sign = FALSE;
+		integr_part = (UnsignedInteger) dec_val.mantissa;
+	}
 	else
 	{
-		dec_val = -dec_val;
 		sign = TRUE;
+		integr_part = (UnsignedInteger) -dec_val.mantissa;
 	}
 
+	m = integr_part;
+
 	TRY(encodeBoolean(strm, sign));
-	integr_part = (UnsignedInteger) dec_val;
-	TRY(encodeUnsignedInteger(strm, integr_part));
 
-	dec_val = dec_val - integr_part;
-
-	while(dec_val - ((UnsignedInteger) dec_val) != 0)
+	if(dec_val.exponent > 0)
 	{
-		dec_val = dec_val * 10;
-		d = (unsigned int) dec_val;
-		fract_part_rev = fract_part_rev + d*i;
-		i = i*10;
-		dec_val = dec_val - (UnsignedInteger) dec_val;
+		while(e)
+		{
+			integr_part = integr_part*10;
+			e--;
+		}
+	}
+	else if(dec_val.exponent < 0)
+	{
+		while(e)
+		{
+			integr_part = integr_part/10;
+			e++;
+		}
+	}
+
+	TRY(encodeUnsignedInteger(strm, integr_part));
+	e = dec_val.exponent;
+	while(e < 0)
+	{
+		fract_part_rev = fract_part_rev*10 + m%10;
+		m = m/10;
+		e++;
 	}
 
 	TRY(encodeUnsignedInteger(strm, fract_part_rev));
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode encodeFloatValue(EXIStream* strm, Float fl_val)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 
 	DEBUG_MSG(ERROR, DEBUG_STREAM_IO, (">Float value: %ldE%d\n", (long int)fl_val.mantissa, fl_val.exponent));
 
 	TRY(encodeIntegerValue(strm, (Integer) fl_val.mantissa));	//encode mantissa
 	TRY(encodeIntegerValue(strm, (Integer) fl_val.exponent));	//encode exponent
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
-errorCode encodeDateTimeValue(EXIStream* strm, EXIPDateTime dt_val)
+errorCode encodeDateTimeValue(EXIStream* strm, EXIType dtType, EXIPDateTime dt_val)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 
-	// TODO: currently only the xs:dateTime is implemented.
-	//       The other types (gYear, gYearMonth, date, dateTime etc.)
-	//       must be known here for correct encoding.
-
-	if(IS_PRESENT(dt_val.presenceMask, YEAR_PRESENCE))
+	if(dtType == VALUE_TYPE_DATE_TIME || dtType == VALUE_TYPE_DATE || dtType == VALUE_TYPE_YEAR)
 	{
 		/* Year component */
-		TRY(encodeIntegerValue(strm, (Integer) dt_val.dateTime.tm_year + 100));
+		TRY(encodeIntegerValue(strm, (Integer) dt_val.dateTime.tm_year - 100));
 	}
 
-	if(IS_PRESENT(dt_val.presenceMask, MON_PRESENCE) || IS_PRESENT(dt_val.presenceMask, MDAY_PRESENCE))
+	if(dtType == VALUE_TYPE_DATE_TIME || dtType == VALUE_TYPE_DATE || dtType == VALUE_TYPE_MONTH)
 	{
 		/* MonthDay component */
 		unsigned int monDay = 0;
 
-		if(IS_PRESENT(dt_val.presenceMask, MON_PRESENCE))
-			monDay = dt_val.dateTime.tm_mon + 1;
-		else
-			monDay = 1;
-
+		monDay = dt_val.dateTime.tm_mon + 1;
 		monDay = monDay * 32;
 
-		if(IS_PRESENT(dt_val.presenceMask, MDAY_PRESENCE))
-			monDay += dt_val.dateTime.tm_mday;
-		else
-			monDay += 1;
+		monDay += dt_val.dateTime.tm_mday;
 
 		TRY(encodeNBitUnsignedInteger(strm, 9, monDay));
 	}
 
-	if(IS_PRESENT(dt_val.presenceMask, HOUR_PRESENCE) || IS_PRESENT(dt_val.presenceMask, MIN_PRESENCE) || IS_PRESENT(dt_val.presenceMask, SEC_PRESENCE))
+	if(dtType == VALUE_TYPE_DATE_TIME || dtType == VALUE_TYPE_TIME)
 	{
 		/* Time component */
 		unsigned int timeVal = 0;
 
-		if(IS_PRESENT(dt_val.presenceMask, HOUR_PRESENCE))
-			timeVal += dt_val.dateTime.tm_hour;
-
+		timeVal += dt_val.dateTime.tm_hour;
 		timeVal = timeVal * 64;
-
-		if(IS_PRESENT(dt_val.presenceMask, MIN_PRESENCE))
-			timeVal += dt_val.dateTime.tm_min;
-
+		timeVal += dt_val.dateTime.tm_min;
 		timeVal = timeVal * 64;
-
-		if(IS_PRESENT(dt_val.presenceMask, SEC_PRESENCE))
-			timeVal += dt_val.dateTime.tm_sec;
+		timeVal += dt_val.dateTime.tm_sec;
 
 		TRY(encodeNBitUnsignedInteger(strm, 17, timeVal));
-	}
 
-	if(IS_PRESENT(dt_val.presenceMask, FRACT_PRESENCE))
-	{
-		/* FractionalSecs component */
-		UnsignedInteger fSecs = 0;
-		unsigned int tmp;
-		unsigned int i = 1;
-		unsigned int j = 0;
-
-		tmp = dt_val.fSecs.value;
-
-		while(tmp != 0)
+		if(IS_PRESENT(dt_val.presenceMask, FRACT_PRESENCE))
 		{
-			fSecs = fSecs*i + (tmp % 10);
-			tmp = tmp / 10;
+			/* FractionalSecs component */
+			UnsignedInteger fSecs = 0;
+			unsigned int tmp;
+			unsigned int i = 1;
+			unsigned int j = 0;
 
-			i = 10;
-			j++;
+			tmp = dt_val.fSecs.value;
+
+			while(tmp != 0)
+			{
+				fSecs = fSecs*i + (tmp % 10);
+				tmp = tmp / 10;
+
+				i = 10;
+				j++;
+			}
+
+			for(i = 0; i < dt_val.fSecs.offset + 1 - j; j++)
+			{
+				fSecs = fSecs*10;
+			}
+
+			TRY(encodeBoolean(strm, TRUE));
+			TRY(encodeUnsignedInteger(strm, fSecs));
+		}
+		else
+		{
+			TRY(encodeBoolean(strm, FALSE));
 		}
 
-		for(i = 0; i < dt_val.fSecs.offset + 1 - j; j++)
-		{
-			fSecs = fSecs*10;
-		}
-
-		TRY(encodeBoolean(strm, TRUE));
-		TRY(encodeUnsignedInteger(strm, fSecs));
-	}
-	else
-	{
-		TRY(encodeBoolean(strm, FALSE));
 	}
 
 	if(IS_PRESENT(dt_val.presenceMask, TZONE_PRESENCE))
 	{
+		// 11-bit Unsigned Integer representing a signed integer offset by 896
+		unsigned int timeZone = 896;
 		TRY(encodeBoolean(strm, TRUE));
-		TRY(encodeNBitUnsignedInteger(strm, 11, dt_val.TimeZone));
+		if(dt_val.TimeZone < -896)
+		{
+			timeZone = 0;
+			DEBUG_MSG(WARNING, DEBUG_STREAM_IO, (">Invalid TimeZone value: %d\n", dt_val.TimeZone));
+		}
+		else if(dt_val.TimeZone > 955)
+		{
+			timeZone = 955;
+			DEBUG_MSG(WARNING, DEBUG_STREAM_IO, (">Invalid TimeZone value: %d\n", dt_val.TimeZone));
+		}
+		else
+			timeZone += dt_val.TimeZone;
+		TRY(encodeNBitUnsignedInteger(strm, 11, timeZone));
 	}
 	else
 	{
 		TRY(encodeBoolean(strm, FALSE));
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode writeEventCode(EXIStream* strm, EventCode ec)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	int i;
 
 	for(i = 0; i < ec.length; i++)
@@ -320,5 +332,5 @@ errorCode writeEventCode(EXIStream* strm, EventCode ec)
 		TRY(encodeNBitUnsignedInteger(strm, ec.bits[i], (unsigned int) ec.part[i]));
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }

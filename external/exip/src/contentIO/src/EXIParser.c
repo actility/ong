@@ -11,8 +11,8 @@
  *
  * @date Sep 30, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: EXIParser.c 285 2013-05-07 09:03:04Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: EXIParser.c 348 2014-11-21 12:34:51Z kjussakov $
  */
 
 #include "EXIParser.h"
@@ -24,17 +24,24 @@
 #include "grammars.h"
 #include "initSchemaInstance.h"
 
+/**
+ * The handler to be used by the applications to parse EXI streams
+ */
+const EXIParser parse ={initParser,
+						parseHeader,
+						setSchema,
+						parseNext,
+						pushEXIData,
+						destroyParser};
+
 errorCode initParser(Parser* parser, BinaryBuffer buffer, void* app_data)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	TRY(initAllocList(&parser->strm.memList));
 
 	parser->strm.buffer = buffer;
 	parser->strm.context.bitPointer = 0;
 	parser->strm.context.bufferIndx = 0;
-	parser->strm.context.currNonTermID = GR_DOC_CONTENT;
-	parser->strm.context.currElem.lnId = 0;
-	parser->strm.context.currElem.uriId = 0;
 	parser->strm.context.currAttr.lnId = 0;
 	parser->strm.context.currAttr.uriId = 0;
 	parser->strm.context.expectATData = FALSE;
@@ -53,15 +60,14 @@ errorCode initParser(Parser* parser, BinaryBuffer buffer, void* app_data)
 	parser->strm.valueTable.hashTbl = NULL;
 #endif
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode parseHeader(Parser* parser, boolean outOfBandOpts)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 
 	TRY(decodeHeader(&parser->strm, outOfBandOpts));
-
 
 	if(parser->strm.header.opts.valuePartitionCapacity > 0)
 	{
@@ -72,16 +78,15 @@ errorCode parseHeader(Parser* parser, boolean outOfBandOpts)
 	// TODO: Consider removing the startDocument all together instead of invoking it always here?
 	if(parser->handler.startDocument != NULL)
 	{
-		if(parser->handler.startDocument(parser->app_data) == EXIP_HANDLER_STOP)
-			return HANDLER_STOP_RECEIVED;
+		TRY(parser->handler.startDocument(parser->app_data));
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode setSchema(Parser* parser, EXIPSchema* schema)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 
 	if(parser->strm.header.opts.schemaIDMode == SCHEMA_ID_NIL)
 	{
@@ -91,7 +96,7 @@ errorCode setSchema(Parser* parser, EXIPSchema* schema)
 		parser->strm.schema = NULL;
 #if EXI_PROFILE_DEFAULT
 		DEBUG_MSG(ERROR, DEBUG_CONTENT_IO, ("\n> EXI Profile mode require schema mode processing"));
-		return INVALID_EXI_INPUT;
+		return EXIP_INVALID_EXI_INPUT;
 #endif
 #if DEBUG_CONTENT_IO == ON && EXIP_DEBUG_LEVEL <= WARNING
 		if(schema != NULL)
@@ -108,7 +113,7 @@ errorCode setSchema(Parser* parser, EXIPSchema* schema)
 #endif
 		parser->strm.schema = memManagedAllocate(&parser->strm.memList, sizeof(EXIPSchema));
 		if(parser->strm.schema == NULL)
-			return MEMORY_ALLOCATION_ERROR;
+			return EXIP_MEMORY_ALLOCATION_ERROR;
 
 		TRY(initSchema(parser->strm.schema, INIT_SCHEMA_BUILD_IN_TYPES));
 
@@ -128,7 +133,7 @@ errorCode setSchema(Parser* parser, EXIPSchema* schema)
 		{
 			/* Fragment document grammar */
 			// TODO: create a Schema-informed Fragment Grammar from the EXIP schema object
-			return NOT_IMPLEMENTED_YET;
+			return EXIP_NOT_IMPLEMENTED_YET;
 		}
 		else
 		{
@@ -142,17 +147,17 @@ errorCode setSchema(Parser* parser, EXIPSchema* schema)
 		if(parser->strm.header.opts.schemaIDMode == SCHEMA_ID_SET)
 		{
 			DEBUG_MSG(ERROR, DEBUG_CONTENT_IO, ("\n> Schema mode required, but NULL schema set"));
-			return INVALID_EXIP_CONFIGURATION;
+			return EXIP_INVALID_EXIP_CONFIGURATION;
 		}
 
 #if EXI_PROFILE_DEFAULT
 		DEBUG_MSG(ERROR, DEBUG_CONTENT_IO, ("\n> EXI Profile mode require schema mode processing"));
-		return INVALID_EXI_INPUT;
+		return EXIP_INVALID_EXI_INPUT;
 #endif
 
 		parser->strm.schema = memManagedAllocate(&parser->strm.memList, sizeof(EXIPSchema));
 		if(parser->strm.schema == NULL)
-			return MEMORY_ALLOCATION_ERROR;
+			return EXIP_MEMORY_ALLOCATION_ERROR;
 
 		TRY(initSchema(parser->strm.schema, INIT_SCHEMA_SCHEMA_LESS_MODE));
 
@@ -166,48 +171,77 @@ errorCode setSchema(Parser* parser, EXIPSchema* schema)
 		}
 	}
 
-	TRY(pushGrammar(&parser->strm.gStack, &parser->strm.schema->docGrammar));
+	{
+		QNameID emptyQNameID = {URI_MAX, LN_MAX};
+		TRY(pushGrammar(&parser->strm.gStack, emptyQNameID, &parser->strm.schema->docGrammar));
+	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode parseNext(Parser* parser)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	SmallIndex tmpNonTermID = GR_VOID_NON_TERMINAL;
+	StreamContext savedContext = parser->strm.context;
 
-	TRY(processNextProduction(&parser->strm, &tmpNonTermID, &parser->handler, parser->app_data));
+	tmp_err_code = processNextProduction(&parser->strm, &tmpNonTermID, &parser->handler, parser->app_data);
+	if(tmp_err_code == EXIP_BUFFER_END_REACHED)
+		parser->strm.context = savedContext;
+
+	if(tmp_err_code != EXIP_OK)
+	{
+		DEBUG_MSG(ERROR, EXIP_DEBUG, ("\n>Error %s:%d at %s, line %d", GET_ERR_STRING(tmp_err_code), tmp_err_code, __FILE__, __LINE__));
+		return tmp_err_code;
+	}
 
 	if(tmpNonTermID == GR_VOID_NON_TERMINAL)
 	{
-		EXIGrammar* grammar;
-		popGrammar(&(parser->strm.gStack), &grammar);
+		popGrammar(&(parser->strm.gStack));
 		if(parser->strm.gStack == NULL) // There is no more grammars in the stack
 		{
-			parser->strm.context.currNonTermID = GR_VOID_NON_TERMINAL; // The stream is parsed
-		}
-		else
-		{
-			parser->strm.context.currNonTermID = parser->strm.gStack->lastNonTermID;
+			return EXIP_PARSING_COMPLETE; // The stream is parsed
 		}
 	}
 	else
 	{
-		parser->strm.context.currNonTermID = tmpNonTermID;
+		parser->strm.gStack->currNonTermID = tmpNonTermID;
 	}
 
-	if(parser->strm.context.currNonTermID == GR_VOID_NON_TERMINAL)
-		return PARSING_COMPLETE;
+	return EXIP_OK;
+}
 
-	return ERR_OK;
+errorCode pushEXIData(char* inBuf, unsigned int bufSize, unsigned int* bytesRead, Parser* parser)
+{
+	Index bytesCopied = parser->strm.buffer.bufContent - parser->strm.context.bufferIndx;
+
+	*bytesRead = parser->strm.buffer.bufLen - bytesCopied;
+	if(*bytesRead > bufSize)
+		*bytesRead = bufSize;
+
+	/* Checks for possible overlaps when copying the left Over Bits,
+	 * normally should not happen when the size of strm->buffer is set
+	 * reasonably and not too small */
+	if(2*bytesCopied > parser->strm.buffer.bufLen)
+	{
+		DEBUG_MSG(ERROR, DEBUG_CONTENT_IO, ("\n> The size of strm->buffer is too small! Set to at least: %d", 2*bytesCopied));
+		return EXIP_INCONSISTENT_PROC_STATE;
+	}
+
+	memcpy(parser->strm.buffer.buf, parser->strm.buffer.buf + parser->strm.context.bufferIndx, bytesCopied);
+	memcpy(parser->strm.buffer.buf + bytesCopied, inBuf, *bytesRead);
+
+	parser->strm.context.bufferIndx = 0;
+	parser->strm.buffer.bufContent = bytesCopied + *bytesRead;
+
+	return EXIP_OK;
 }
 
 void destroyParser(Parser* parser)
 {
-	EXIGrammar* tmp;
 	while(parser->strm.gStack != NULL)
 	{
-		popGrammar(&parser->strm.gStack, &tmp);
+		popGrammar(&parser->strm.gStack);
 	}
 
 	freeAllMem(&parser->strm);

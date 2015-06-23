@@ -10,8 +10,8 @@
  * @brief API for decoding EXI stream body
  * @date Sep 7, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: bodyDecode.h 236 2012-12-07 15:39:21Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: bodyDecode.h 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #ifndef BODYDECODE_H_

@@ -5,7 +5,7 @@ COMPILER = gcc
 ARCHIVER = ar
 
 # Debug flags if any
-DEBUGGING = -O3 -g
+DEBUGGING = -O0 -g #-fno-stack-protector
 
 # Warning flags
 WARNING = -Wpacked -Wall
@@ -15,3 +15,7 @@ ADDITIONAL_CFLAGS =
 
 # Whether to include the grammar generation module in the build
 INCLUDE_GRAMMAR_GENERATION = true
+
+# In case INCLUDE_GRAMMAR_GENERATION equals true; whether to
+# support parsing of schema-mode EXI encoded XML Schemas
+INCLUDE_SCHEMA_EXI_GRAMMAR_GENERATION = true

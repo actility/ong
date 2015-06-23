@@ -13,8 +13,8 @@
  * If you want to use SAX API you should wrap this interface.
  * @date Sep 7, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: contentHandler.h 281 2013-04-09 14:18:05Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: contentHandler.h 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 #ifndef CONTENTHANDLER_H_

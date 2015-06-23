@@ -11,8 +11,8 @@
  *
  * @date Oct 26, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: ioUtil.c 236 2012-12-07 15:39:21Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: ioUtil.c 346 2014-11-18 15:01:14Z kjussakov $
  */
 
 #include "ioUtil.h"
@@ -96,4 +96,53 @@ unsigned int log2INT(uint64_t val)
 	  }
 	}
 	return r;
+}
+
+errorCode readEXIChunkForParsing(EXIStream* strm, unsigned int numBytesToBeRead)
+{
+	Index bytesCopied = strm->buffer.bufContent - strm->context.bufferIndx;
+	Index bytesRead = 0;
+
+	if(strm->buffer.ioStrm.readWriteToStream == NULL)
+		return EXIP_BUFFER_END_REACHED;
+
+	/* Checks for possible overlaps when copying the left Over Bits,
+	 * normally should not happen when the size of strm->buffer is set
+	 * reasonably and not too small */
+	if(2*bytesCopied > strm->buffer.bufLen)
+	{
+		DEBUG_MSG(ERROR, DEBUG_STREAM_IO, ("\n> The size of strm->buffer is too small! Set to at least: %d", 2*bytesCopied));
+		return EXIP_INCONSISTENT_PROC_STATE;
+	}
+
+	memcpy(strm->buffer.buf, strm->buffer.buf + strm->context.bufferIndx, bytesCopied);
+
+	bytesRead = strm->buffer.ioStrm.readWriteToStream(strm->buffer.buf + bytesCopied, strm->buffer.bufLen - bytesCopied, strm->buffer.ioStrm.stream);
+	strm->buffer.bufContent = bytesCopied + bytesRead;
+	if(strm->buffer.bufContent < numBytesToBeRead)
+		return EXIP_UNEXPECTED_ERROR;
+
+	strm->context.bufferIndx = 0;
+
+	return EXIP_OK;
+}
+
+errorCode writeEncodedEXIChunk(EXIStream* strm)
+{
+	char leftOverBits;
+	Index numBytesWritten = 0;
+
+	if(strm->buffer.ioStrm.readWriteToStream == NULL)
+		return EXIP_BUFFER_END_REACHED;
+
+	leftOverBits = strm->buffer.buf[strm->context.bufferIndx];
+
+	numBytesWritten = strm->buffer.ioStrm.readWriteToStream(strm->buffer.buf, strm->context.bufferIndx, strm->buffer.ioStrm.stream);
+	if(numBytesWritten < strm->context.bufferIndx)
+		return EXIP_UNEXPECTED_ERROR;
+
+	strm->buffer.buf[0] = leftOverBits;
+	strm->context.bufferIndx = 0;
+
+	return EXIP_OK;
 }

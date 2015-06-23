@@ -11,8 +11,8 @@
  *
  * @date Aug 23, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: headerEncode.h 205 2012-09-04 11:19:04Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: headerEncode.h 328 2013-10-30 16:00:10Z kjussakov $
  */
 
 

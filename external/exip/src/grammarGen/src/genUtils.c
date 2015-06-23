@@ -10,8 +10,8 @@
  * @brief Implementation of utility functions for generating Schema-informed Grammar definitions
  * @date Nov 23, 2010
  * @author Rumen Kyusakov
- * @version 0.4
- * @par[Revision] $Id: genUtils.c 281 2013-04-09 14:18:05Z kjussakov $
+ * @version 0.5
+ * @par[Revision] $Id: genUtils.c 332 2014-05-05 18:22:55Z kjussakov $
  */
 
 #include "genUtils.h"
@@ -31,7 +31,7 @@ static errorCode addProductionsToARule(ProtoGrammar* left, Index ruleIndxL, Prot
 
 errorCode concatenateGrammars(ProtoGrammar* left, ProtoGrammar* right)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	unsigned int ruleIterL = 0;
 	unsigned int ruleIterR = 0;
 	unsigned int prodIterL = 0;
@@ -43,7 +43,7 @@ errorCode concatenateGrammars(ProtoGrammar* left, ProtoGrammar* right)
 	assert(left);
 
 	if(right == NULL)
-		return ERR_OK;
+		return EXIP_OK;
 
 	/* 
 	 * Concatentation works as follows:
@@ -125,13 +125,13 @@ errorCode concatenateGrammars(ProtoGrammar* left, ProtoGrammar* right)
 		}
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 static errorCode addProductionsToARule(ProtoGrammar* left, Index ruleIndxL, ProtoGrammar* right, Index ruleIndxR,
 									   unsigned int* currRuleIndex, unsigned int initialLeftRulesCount)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	unsigned int prodIterL = 0;
 	unsigned int prodIterR = 0;
 	boolean rProdFoundInLeft = FALSE;
@@ -261,6 +261,12 @@ static errorCode addProductionsToARule(ProtoGrammar* left, Index ruleIndxL, Prot
 					{
 						// Collision: equal terminals and non-equal non-terminals
 						// We have a collision detected - must be traced why it happens
+						// From analysis of the spec, the only way that to happen is in
+						// <sequence> definition.
+						// When there are adjacent same definitions such as:
+						// <sequence><any> <any></sequence> or
+						// <sequence><element name="test"> <element name="test"></sequence>
+						// TODO: solve that!
 						assert(FALSE);
 					}
 				}
@@ -280,12 +286,12 @@ static errorCode addProductionsToARule(ProtoGrammar* left, Index ruleIndxL, Prot
 										 nonTermRight));
 		}
 	}
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode createSimpleTypeGrammar(Index typeId, ProtoGrammar* simpleGrammar)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	QNameID qnameID = {URI_MAX, LN_MAX};
 	ProtoRuleEntry* pRuleEntry;
 
@@ -296,13 +302,13 @@ errorCode createSimpleTypeGrammar(Index typeId, ProtoGrammar* simpleGrammar)
 	TRY(addProtoRule(simpleGrammar, 2, &pRuleEntry));
 	TRY(addEEProduction(pRuleEntry));
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode createComplexTypeGrammar(ProtoGrammarArray* attrUseArray, ProtoGrammar* contentTypeGrammar,
 							boolean isMixedContent, ProtoGrammar* complexGrammar)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	unsigned int i;
 
 	if(isMixedContent && contentTypeGrammar != NULL)
@@ -347,18 +353,18 @@ errorCode createComplexTypeGrammar(ProtoGrammarArray* attrUseArray, ProtoGrammar
 		complexGrammar->contentIndex = 0;
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode createComplexUrTypeGrammar(ProtoGrammar* result)
 {
-	return NOT_IMPLEMENTED_YET;
+	return EXIP_NOT_IMPLEMENTED_YET;
 }
 
 errorCode createAttributeUseGrammar(boolean required, Index typeId,
 									ProtoGrammar* attrGrammar, QNameID qnameID)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	ProtoRuleEntry* pRuleEntry;
 
 	TRY(createProtoGrammar(2, attrGrammar));
@@ -374,13 +380,13 @@ errorCode createAttributeUseGrammar(boolean required, Index typeId,
 	TRY(addProtoRule(attrGrammar, 4, &pRuleEntry));
 	TRY(addEEProduction(pRuleEntry));
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode createParticleGrammar(int minOccurs, int maxOccurs,
 								ProtoGrammar* termGrammar, ProtoGrammar* particleGrammar)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	ProtoRuleEntry* pRuleEntry;
 	int i;
 
@@ -467,28 +473,33 @@ errorCode createParticleGrammar(int minOccurs, int maxOccurs,
 		}
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
-errorCode createElementTermGrammar(ProtoGrammar* elemGrammar, QNameID qnameID, Index grIndex)
+errorCode createElementTermGrammar(ProtoGrammar* elemGrammar, QNameIDGrIndx* qnameGrArr, Index count)
 {
-	//TODO: enable support for {substitution group affiliation} property of the elements
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	ProtoRuleEntry* pRuleEntry;
+	Index i;
+
+	assert(qnameGrArr != NULL);
 
 	TRY(createProtoGrammar(2, elemGrammar));
+	TRY(addProtoRule(elemGrammar, 5, &pRuleEntry));
+	for(i = 0; i < count; i++)
+	{
+		TRY(addProduction(pRuleEntry, EVENT_SE_QNAME, qnameGrArr[i].grIndex, qnameGrArr[i].qnameId, 1));
+	}
 
-	TRY(addProtoRule(elemGrammar, 3, &pRuleEntry));
-	TRY(addProduction(pRuleEntry, EVENT_SE_QNAME, grIndex, qnameID, 1));
 	TRY(addProtoRule(elemGrammar, 3, &pRuleEntry));
 	TRY(addEEProduction(pRuleEntry));
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode createWildcardTermGrammar(String* wildcardArray, Index wildcardArraySize, UriTable* uriT, ProtoGrammar* wildcardGrammar)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	ProtoRuleEntry* pRuleEntry;
 	QNameID qnameID;
 
@@ -513,22 +524,22 @@ errorCode createWildcardTermGrammar(String* wildcardArray, Index wildcardArraySi
 		for(i = 0; i < wildcardArraySize; i++)
 		{
 			if(!lookupUri(uriT, wildcardArray[i], &qnameID.uriId))
-			 	return UNEXPECTED_ERROR;
+			 	return EXIP_UNEXPECTED_ERROR;
 			TRY(addProduction(pRuleEntry, EVENT_SE_URI, INDEX_MAX, qnameID, 1));
 		}
 	}
 	else
-		return UNEXPECTED_ERROR;
+		return EXIP_UNEXPECTED_ERROR;
 
 	TRY(addProtoRule(wildcardGrammar, 2, &pRuleEntry));
 	TRY(addEEProduction(pRuleEntry));
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode createSequenceModelGroupsGrammar(ProtoGrammar** grArray, unsigned int arrSize, ProtoGrammar* seqGrammar)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	ProtoRuleEntry* pRuleEntry;
 
 	if(arrSize == 0)
@@ -550,12 +561,12 @@ errorCode createSequenceModelGroupsGrammar(ProtoGrammar** grArray, unsigned int 
 			TRY(concatenateGrammars(seqGrammar, grArray[i]));
 		}
 	}
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode createChoiceModelGroupsGrammar(ProtoGrammarArray* pgArray, ProtoGrammar* modGrpGrammar)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	Index i;
 	unsigned int ruleIterTerm = 0;
 	unsigned int prodIterTerm = 0;
@@ -571,7 +582,7 @@ errorCode createChoiceModelGroupsGrammar(ProtoGrammarArray* pgArray, ProtoGramma
 
 	tmpGrammar = pgArray->pg[0];
 	if(tmpGrammar == NULL)
-		return NULL_POINTER_REF;
+		return EXIP_NULL_POINTER_REF;
 
 	TRY(concatenateGrammars(modGrpGrammar, tmpGrammar));
 
@@ -581,7 +592,7 @@ errorCode createChoiceModelGroupsGrammar(ProtoGrammarArray* pgArray, ProtoGramma
 		tmpGrammar = pgArray->pg[i];
 
 		if(tmpGrammar == NULL)
-			return NULL_POINTER_REF;
+			return EXIP_NULL_POINTER_REF;
 
 		initialResultRulesCount = modGrpGrammar->count;
 
@@ -629,17 +640,17 @@ errorCode createChoiceModelGroupsGrammar(ProtoGrammarArray* pgArray, ProtoGramma
 		}
 	}
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 errorCode createAllModelGroupsGrammar(ProtoGrammar* pTermArray, unsigned int pTermArraySize, ProtoGrammar* modGrpGrammar)
 {
-	return NOT_IMPLEMENTED_YET;
+	return EXIP_NOT_IMPLEMENTED_YET;
 }
 
 errorCode addEEProduction(ProtoRuleEntry* rule)
 {
-	errorCode tmp_err_code = UNEXPECTED_ERROR;
+	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	Production *prod;
 	Index prodId;
 
@@ -651,7 +662,7 @@ errorCode addEEProduction(ProtoRuleEntry* rule)
 	prod->qnameId.uriId = URI_MAX;
 	prod->qnameId.lnId = LN_MAX;
 
-	return ERR_OK;
+	return EXIP_OK;
 }
 
 int compareQNameID(const void* qnameID1, const void* qnameID2, UriTable* uriTbl)
