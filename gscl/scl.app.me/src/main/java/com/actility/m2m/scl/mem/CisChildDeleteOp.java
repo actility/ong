@@ -65,9 +65,9 @@ public class CisChildDeleteOp implements TransientOp {
     }
 
     public void prepare() throws StorageException, XoException, M2MException {
-        String lastCiId = (String) manager.getM2MContext().getAttribute(path + "/instanceAgeId");
+        String lastCiId = (String) manager.getM2MContext().getAttribute(path + Constants.AT_INSTANCE_AGE_ID_SUFFIX);
         if (lastCiId != null && lastCiId.equals(childResource.getStringAttribute(M2MConstants.ATTR_M2M_ID))) {
-            String oldTimerId = (String) manager.getM2MContext().getAttribute(path + "/instanceAgeTimerId");
+            String oldTimerId = (String) manager.getM2MContext().getAttribute(path + Constants.AT_INSTANCE_AGE_TIMER_ID_SUFFIX);
             manager.getM2MContext().cancelTimer(oldTimerId);
             Date childCreationTime = SclResource.getAndCheckDateTime(childResource, M2MConstants.TAG_M2M_CREATION_TIME,
                     Constants.ID_MODE_REQUIRED, -1L);
@@ -95,8 +95,8 @@ public class CisChildDeleteOp implements TransientOp {
                     timerId = manager.startResourceTimer(
                             lastCiCreationTime.getTime() + (maxInstanceAge * 1000L) - now.getTime(), path,
                             Constants.ID_RES_CONTENT_INSTANCES, null);
-                    manager.getM2MContext().setAttribute(path + "/instanceAgeTimer", timerId);
-                    manager.getM2MContext().setAttribute(path + "/instanceAgeId",
+                    manager.getM2MContext().setAttribute(path + Constants.AT_INSTANCE_AGE_TIMER_ID_SUFFIX, timerId);
+                    manager.getM2MContext().setAttribute(path + Constants.AT_INSTANCE_AGE_ID_SUFFIX,
                             lastCi.getStringAttribute(M2MConstants.ATTR_M2M_ID));
                 } finally {
                     if (lastCi != null) {

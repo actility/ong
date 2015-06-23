@@ -79,14 +79,16 @@ public interface ResourceController {
      * Appends discovery URIs to the list of discovery URIs until limit is reached. In case, the limit is reached the counting
      * process continue to learn how many URIs cannot be added
      *
-     * @param logId An ID that will be used to log messages
-     * @param resource The resource targeted by the current operation
+     * @param transactionId An ID that will be used to log messages
+     * @param manager The SCL manager
+     * @param refPath The reference path to the resource targeted by the current operation
+     * @param xoObject The XO object of the resource targeted by the current operation
      * @param requestingEntity The requesting entity for which DISCOVER right must be granted
      * @param targetID The target ID of the discovery request
      * @param appPath The song application root path
-     * @param searchStrings The search strings to match in order to add a sub-URI
-     * @param discoveryURIs The current list of discovery URIs
-     * @param remainingURIs The remaining number of URIs which can be added (it can be negative in which case no URI must be
+     * @param searchString The search strings to match in order to add a sub-URI
+     * @param discoveryUriList The current list of discovery URIs
+     * @param urisCount The remaining number of URIs which can be added (it can be negative in which case no URI must be
      *            added)
      * @return The remaining number of URIs minus the number of matching URIs (URIs must be counted even if there are not
      *         added). So, if the number is negative it means that this negative number of URIs were not added

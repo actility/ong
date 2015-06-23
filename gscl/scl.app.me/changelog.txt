@@ -1,6 +1,19 @@
 -------------------------------------------------------------------------------
 SCL App for Micro Edition changelog
 -------------------------------------------------------------------------------
+Version: 2.0.9
+Date: 2015-xx-xx
+
+New Features:
+-------------
+ - N/A
+
+Bug Fixes:
+----------
+ - Fixed #0002099 Fail to create CIs when maxInstanceAge of latest content
+   instance is over
+
+-------------------------------------------------------------------------------
 Version: 2.0.8
 Date: 2014-10-22
 
