@@ -95,13 +95,13 @@ public final class URIUtils {
     /**
      * Low bitmask for URL reserved characters:
      * <p>
-     * reserved = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | "," | "[" | "]"
+     * reserved = ";" | "/" | "?" | ":" | "@" | "&amp;" | "=" | "+" | "$" | "," | "[" | "]"
      */
     public static final long L_RESERVED = CharacterUtils.lowMask(";/?:@&=+$,[]");
     /**
      * High bitmask for URL reserved characters:
      * <p>
-     * reserved = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | "," | "[" | "]"
+     * reserved = ";" | "/" | "?" | ":" | "@" | "&amp;" | "=" | "+" | "$" | "," | "[" | "]"
      */
     public static final long H_RESERVED = CharacterUtils.highMask(";/?:@&=+$,[]");
 
@@ -121,13 +121,13 @@ public final class URIUtils {
     /**
      * Low bitmask for URI characters without '/':
      * <p>
-     * uric_no_slash = unreserved | escaped | ";" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","
+     * uric_no_slash = unreserved | escaped | ";" | "?" | ":" | "@" | "&amp;" | "=" | "+" | "$" | ","
      */
     public static final long L_URIC_NO_SLASH = L_UNRESERVED | CharacterUtils.L_ESCAPED | CharacterUtils.lowMask(";?:@&=+$,");
     /**
      * High bitmask for URI characters without '/':
      * <p>
-     * uric_no_slash = unreserved | escaped | ";" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","
+     * uric_no_slash = unreserved | escaped | ";" | "?" | ":" | "@" | "&amp;" | "=" | "+" | "$" | ","
      */
     public static final long H_URIC_NO_SLASH = H_UNRESERVED | CharacterUtils.H_ESCAPED | CharacterUtils.highMask(";?:@&=+$,");
 
@@ -147,26 +147,26 @@ public final class URIUtils {
     /**
      * Low bitmask for registration based authority characters:
      * <p>
-     * reg_name = 1*( unreserved | escaped | "$" | "," | ";" | ":" | "@" | "&" | "=" | "+" )
+     * reg_name = 1*( unreserved | escaped | "$" | "," | ";" | ":" | "@" | "&amp;" | "=" | "+" )
      */
     public static final long L_REG_NAME = L_UNRESERVED | CharacterUtils.L_ESCAPED | CharacterUtils.lowMask("$,;:@&=+");
     /**
      * High bitmask for registration based authority characters:
      * <p>
-     * reg_name = 1*( unreserved | escaped | "$" | "," | ";" | ":" | "@" | "&" | "=" | "+" )
+     * reg_name = 1*( unreserved | escaped | "$" | "," | ";" | ":" | "@" | "&amp;" | "=" | "+" )
      */
     public static final long H_REG_NAME = H_UNRESERVED | CharacterUtils.H_ESCAPED | CharacterUtils.highMask("$,;:@&=+");
 
     /**
      * Low bitmask for user-info characters:
      * <p>
-     * userinfo = *( unreserved | escaped | ";" | ":" | "&" | "=" | "+" | "$" | "," )
+     * userinfo = *( unreserved | escaped | ";" | ":" | "&amp;" | "=" | "+" | "$" | "," )
      */
     public static final long L_USERINFO = L_UNRESERVED | CharacterUtils.L_ESCAPED | CharacterUtils.lowMask(";:&=+$,");
     /**
      * High bitmask for user-info characters:
      * <p>
-     * userinfo = *( unreserved | escaped | ";" | ":" | "&" | "=" | "+" | "$" | "," )
+     * userinfo = *( unreserved | escaped | ";" | ":" | "&amp;" | "=" | "+" | "$" | "," )
      */
     public static final long H_USERINFO = H_UNRESERVED | CharacterUtils.H_ESCAPED | CharacterUtils.highMask(";:&=+$,");
 
@@ -188,13 +188,13 @@ public final class URIUtils {
     /**
      * Low bitmask for path segment characters:
      * <p>
-     * pchar = unreserved | escaped | ":" | "@" | "&" | "=" | "+" | "$" | ","
+     * pchar = unreserved | escaped | ":" | "@" | "&amp;" | "=" | "+" | "$" | ","
      */
     public static final long L_PCHAR = L_UNRESERVED | CharacterUtils.L_ESCAPED | CharacterUtils.lowMask(":@&=+$,");
     /**
      * High bitmask for path segment characters:
      * <p>
-     * pchar = unreserved | escaped | ":" | "@" | "&" | "=" | "+" | "$" | ","
+     * pchar = unreserved | escaped | ":" | "@" | "&amp;" | "=" | "+" | "$" | ","
      */
     public static final long H_PCHAR = H_UNRESERVED | CharacterUtils.H_ESCAPED | CharacterUtils.highMask(":@&=+$,");
 
@@ -313,7 +313,7 @@ public final class URIUtils {
     /**
      * Encodes a string in the query-segment part of a query.
      * <p>
-     * scheme://[authority]?query-segment=query-segment&query-segment=query-segment...
+     * scheme://[authority]?query-segment=query-segment&amp;query-segment=query-segment...
      *
      * @param value The query-segment part
      * @return The encoded query-segment part

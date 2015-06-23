@@ -59,7 +59,7 @@ public final class ArrayUtils {
      * <p>
      * Example:
      * <p>
-     * { 10, 5, 3 } with prefix "[", suffix "]" and separator "-" => [10-5-3]
+     * { 10, 5, 3 } with prefix "[", suffix "]" and separator "-" : [10-5-3]
      *
      * @param array The array from which to generate a string
      * @param prefix The prefix of the generated string
@@ -90,7 +90,7 @@ public final class ArrayUtils {
      * <p>
      * Example:
      * <p>
-     * { 0x00, 0xA0, 0x10 } with prefix "[", suffix "]" and separator "-" => [10-5-3]
+     * { 0x00, 0xA0, 0x10 } with prefix "[", suffix "]" and separator "-" : [10-5-3]
      *
      * @param bytes The byte array from which to generate a string
      * @param prefix The prefix of the generated string

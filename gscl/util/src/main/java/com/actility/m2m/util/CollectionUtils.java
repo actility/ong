@@ -48,7 +48,7 @@ public final class CollectionUtils {
      * <p>
      * Example:
      * <p>
-     * { 10, 5, 3 } with prefix "[", suffix "]" and separator "-" => [10-5-3]
+     * { 10, 5, 3 } with prefix "[", suffix "]" and separator "-" : [10-5-3]
      *
      * @param collection The collection from which to generate a string
      * @param prefix The prefix of the generated string

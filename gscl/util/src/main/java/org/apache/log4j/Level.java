@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 /**
  * Defines the minimum set of levels recognized by the system, that is <code>OFF</code>, <code>FATAL</code>, <code>ERROR</code>,
- * <code>WARN</code>, <code>INFO</code, <code>DEBUG</code> and <code>ALL</code>.
+ * <code>WARN</code>, <code>INFO</code>, <code>DEBUG</code> and <code>ALL</code>.
  */
 public final class Level extends Priority implements Serializable {
 
@@ -83,7 +83,7 @@ public final class Level extends Priority implements Serializable {
     public static final Level DEBUG = new Level(DEBUG_INT, "DEBUG", 7);
 
     /**
-     * The <code>TRACE</code> Level designates finer-grained informational events than the <code>DEBUG</code level.
+     * The <code>TRACE</code> Level designates finer-grained informational events than the <code>DEBUG</code> level.
      *
      * @since 1.2.12
      */

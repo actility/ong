@@ -158,7 +158,7 @@ public final class CharacterUtils {
     /**
      * Determines if the specified character is ISO-LATIN-1 white space. This method returns <code>true</code> for the following
      * five characters only:
-     * <table>
+     * <table summary="">
      * <tr>
      * <td><code>'\t'</code></td>
      * <td><code>'&#92;u0009'</code></td>
