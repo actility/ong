@@ -64,7 +64,7 @@ OTHER_EXE_BASENAME += xordexi
 endif
 
 ifeq ($(TARGET),centos6-x86)
-STATIC_LIBS=
+STATIC_LIBS= \
 $(ROOTACT)/xo/libexi/lib/libxoexi.a \
 $(ROOTACT)/rtbase/lib/librtbase.a
 DYNAMIC_LIBS= \
