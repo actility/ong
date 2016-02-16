@@ -21,12 +21,12 @@ if [ $? != 0 ] ; then usage>&2 ; exit 1 ; fi
 eval set -- "$GETOPTTEMP"
 
 while true ; do
-       case "$1" in
-               -h|--help) usage; exit;;
-               -n|--no-installer) BUILD_INTALLER=0 ; shift ;;
-               --) shift ; break ;;
-               *) echo "Internal error!" ; exit 1 ;;
-        esac
+  case "$1" in
+    -h|--help) usage; exit;;
+    -n|--no-installer) BUILD_INTALLER=0 ; shift ;;
+    --) shift ; break ;;
+    *) echo "Internal error!" ; exit 1 ;;
+  esac
 done
 
 if [ $# -ne 1 ]; then
@@ -120,56 +120,56 @@ export PATH=$(pwd)/dev-tools/apu-tools/:$PATH
 source $HOME/.apu/apu-tools.conf
 
 case "$HOST_TARGET" in
-	"centos6-x86")
-		if [ -z "$($APU_MAKE ls-targets | grep ^centos6-x86$)" ]; then
-			build targets/target-centos6-x86 noarch
-			apuInstallTarget centos6-x86
-		fi
-		;;
-	"centos6-x86_64")
-		if [ -z "$($APU_MAKE ls-targets | grep ^centos6-x86_64$)" ]; then
-			build targets/target-centos6-x86_64 noarch
-			apuInstallTarget centos6-x86_64
-		fi
-		;;
-	*)
-		abortWithMsg "Unsupported HOST_TARGET in $HOME/.apu/apu-tools.conf ($HOST_TARGET)"
-		;;
+  "centos6-x86")
+    if [ -z "$($APU_MAKE ls-targets | grep ^centos6-x86$)" ]; then
+      build targets/target-centos6-x86 noarch
+      apuInstallTarget centos6-x86
+    fi
+    ;;
+  "centos6-x86_64")
+    if [ -z "$($APU_MAKE ls-targets | grep ^centos6-x86_64$)" ]; then
+      build targets/target-centos6-x86_64 noarch
+      apuInstallTarget centos6-x86_64
+    fi
+    ;;
+  *)
+    abortWithMsg "Unsupported HOST_TARGET in $HOME/.apu/apu-tools.conf ($HOST_TARGET)"
+    ;;
 esac
 
 case "$TARGET" in
 
-	"centos6-x86")
-		if [ "$HOST_TARGET" = "centos6-x86_64" ] && [ -z "$($APU_MAKE ls-targets | grep ^cross-centos6-x86$)" ]; then
-			build targets/target-cross-centos6-x86 noarch
-			apuInstallTarget centos6-x86
-		fi
-		;;
+  "centos6-x86")
+    if [ "$HOST_TARGET" = "centos6-x86_64" ] && [ -z "$($APU_MAKE ls-targets | grep ^cross-centos6-x86$)" ]; then
+      build targets/target-cross-centos6-x86 noarch
+      apuInstallTarget centos6-x86
+    fi
+    ;;
 
-	"centos6-x86_64")
-		# nothing to do
-		;;
+  "centos6-x86_64")
+    # nothing to do
+    ;;
 
-	"cov1")
-		if [ -z "$($APU_MAKE ls-targets | grep ^cross-cov1$)" ]; then
-			build targets/target-cross-cov1 noarch
-			apuInstallTarget cov1
-		fi
-		;;
+  "cov1")
+    if [ -z "$($APU_MAKE ls-targets | grep ^cross-cov1$)" ]; then
+      build targets/target-cross-cov1 noarch
+      apuInstallTarget cov1
+    fi
+    ;;
 
-	"cov2")
-		if [ -z "$($APU_MAKE ls-targets | grep ^cross-cov2$)" ]; then
-			build targets/target-cross-cov2 noarch
-			apuInstallTarget cov2
-		fi
-		;;
+  "cov2")
+    if [ -z "$($APU_MAKE ls-targets | grep ^cross-cov2$)" ]; then
+      build targets/target-cross-cov2 noarch
+      apuInstallTarget cov2
+    fi
+    ;;
 
-	"rpib")
-		if [ -z "$($APU_MAKE ls-targets | grep ^cross-rpib$)" ]; then
-			build targets/target-cross-rpib noarch
-			apuInstallTarget rpib
-		fi
-		;;
+  "rpib")
+    if [ -z "$($APU_MAKE ls-targets | grep ^cross-rpib$)" ]; then
+      build targets/target-cross-rpib noarch
+      apuInstallTarget rpib
+    fi
+    ;;
 
   "ntc6200")
     if [ -z "$($APU_MAKE ls-targets | grep ^cross-ntc6200$)" ]; then
@@ -178,9 +178,9 @@ case "$TARGET" in
     fi
     ;;
 
-	*)
-		abortWithMsg "Unsupported TARGET ($TARGET)"
-		;;
+  *)
+    abortWithMsg "Unsupported TARGET ($TARGET)"
+    ;;
 
 esac
 
@@ -208,12 +208,12 @@ build external/cproto $HOST_TARGET
 build external/libmicrohttpd $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build external/jni $TARGET
 build external/exip $TARGET "{centos6-x86}"
-build external/phoneme-advanced-mr2 $TARGET "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
-PHONEME_VERSION=$(cat external/phoneme-advanced-mr2/Version)-$(cat external/phoneme-advanced-mr2/apu/revision)
-export PHONEME_TARGET_DIR=$CURRENT/.build/$TARGET/phoneme
-PHONEME_APU=$HOME/.m2/repository/com/sun/phoneme-advanced-mr2/$PHONEME_VERSION/phoneme-advanced-mr2-$PHONEME_VERSION-$TARGET.apu
-apuInstall $PHONEME_APU $PHONEME_TARGET_DIR
-export PHONEME_HOME=$PHONEME_TARGET_DIR/bin/phoneme
+#build external/phoneme-advanced-mr2 $TARGET "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
+#PHONEME_VERSION=$(cat external/phoneme-advanced-mr2/Version)-$(cat external/phoneme-advanced-mr2/apu/revision)
+#export PHONEME_TARGET_DIR=$CURRENT/.build/$TARGET/phoneme
+#PHONEME_APU=$HOME/.m2/repository/com/sun/phoneme-advanced-mr2/$PHONEME_VERSION/phoneme-advanced-mr2-$PHONEME_VERSION-$TARGET.apu
+#apuInstall $PHONEME_APU $PHONEME_TARGET_DIR
+#export PHONEME_HOME=$PHONEME_TARGET_DIR/bin/phoneme
 
 
 build common/java.pom
@@ -302,4 +302,4 @@ if [ $BUILD_INTALLER -eq 1 ]; then
 fi
 
 echo "done"
- 
+
