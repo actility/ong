@@ -88,9 +88,6 @@ DYNAMIC_LIBS = \
 ifeq ($(TARGET),centos6-x86)
 DYNAMIC_LIBS += -lxoexi
 CFLAGS += -DEXI
-else ifeq ($(TARGET),centos6-x86_64)
-DYNAMIC_LIBS += -lxoexi
-CFLAGS += -DEXI
 else
 DYNAMIC_LIBS += -lxo
 endif

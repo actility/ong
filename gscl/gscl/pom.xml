@@ -127,7 +127,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>scl.app.me</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.actility.m2m</groupId>
@@ -211,8 +211,9 @@
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.sqlite</artifactId>
       <version>1.0.0</version>
+      <classifier>${build.type}</classifier>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.driver.sqlite.ni.api</artifactId>
       <version>2.0.0</version>
@@ -222,7 +223,7 @@
       <artifactId>storage.driver.sqlite.jni</artifactId>
       <version>2.0.1</version>
       <classifier>${build.type}</classifier>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>system.version</artifactId>
