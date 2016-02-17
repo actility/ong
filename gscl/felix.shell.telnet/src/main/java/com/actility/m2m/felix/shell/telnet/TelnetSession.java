@@ -253,31 +253,36 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
     }
 
     /**
-     * Get the character mask This is to support binary mode, that is 7 or 8 bit data in the output data stream
+     * Get the character mask. This is to support binary mode, that is 7 or 8 bit data in the output data stream
+     *
+     * @return The mask character
      */
-
     public char getMask() {
         return mask;
     }
 
     /**
      * Get all instantiated commands in this session
+     *
+     * @return The array of telnet commands in this session
      */
-
     public TelnetCommand[] getCommands() {
         return telnetCommands;
     }
 
     /**
      * Get the TelnetOutputStream
+     *
+     * @return The telnet ouput stream
      */
-
     public TelnetOutputStream getTelnetOutputStream() {
         return telnetOutputStream;
     }
 
     /**
      * Method to do echo to the output stream This also looks at the enableEcho flag
+     *
+     * @param character The character to write in the telnet output stream
      */
     public void echoChar(int character) {
         TelnetCommand tc = telnetCommands[TelnetCommandCodes.ECHO];
@@ -340,16 +345,10 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
     }
 
     /**
-     * Execution of standard telnet negotiation commmands DO, DONT, WILL and WONT and also the execution of the command via SB
-     * code .... SE option command structure.
-     */
-
-    /**
      * DONT
      *
-     * @parameter code, the optional command code
+     * @param code the optional command code
      */
-
     public void execDONT(int code) {
         String response = execCommand(TelnetCommandCodes.DONT, code, null);
         try {
@@ -362,9 +361,8 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
     /**
      * DO
      *
-     * @parameter code, the optional command code
+     * @param code the optional command code
      */
-
     public void execDO(int code) {
         String response = execCommand(TelnetCommandCodes.DO, code, null);
         try {
@@ -377,9 +375,8 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
     /**
      * WONT
      *
-     * @parameter code, the optional command code
+     * @param code the optional command code
      */
-
     public void execWONT(int code) {
         String response = execCommand(TelnetCommandCodes.WONT, code, null);
         try {
@@ -392,9 +389,8 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
     /**
      * WILL
      *
-     * @parameter code, the optional command code
+     * @param code the optional command code
      */
-
     public void execWILL(int code) {
         String response = execCommand(TelnetCommandCodes.WILL, code, null);
         try {
@@ -407,10 +403,9 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
     /**
      * On SE command, execute optional sub negotiated command.
      *
-     * @parameter code, the optional command code.
-     * @parameter param, the optional parameters.
+     * @param code the optional command code.
+     * @param param the optional parameters.
      */
-
     public void execSE(int code, byte[] param) {
         String response = execCommand(TelnetCommandCodes.SE, code, param);
         try {
@@ -426,11 +421,10 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
      * Execute optional sub command. In the case that there is no support for the option, the WILL and DO will be responded with
      * DONT and WONT respectively, to inform the requestor that the option is not supported.
      *
-     * @parameter action, the negotiation code
-     * @parameter code, the optional command code
-     * @parameter params, the optional parameters
+     * @param action the negotiation code
+     * @param code the optional command code
+     * @param params the optional parameters
      */
-
     private String execCommand(int action, int code, byte[] params) {
         String response = null;
         TelnetCommand tc = telnetCommands[code];
@@ -452,8 +446,8 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
     /**
      * A login procedure (primitive and ugly).
      *
-     * @parameter in Telnetreader
-     * @parameter out Printwriter
+     * @param in Telnetreader
+     * @param out Printwriter
      * @return a TelnetLogin object with the result of the login process.
      */
 
@@ -499,8 +493,7 @@ public class TelnetSession implements Runnable, ServiceTrackerCustomizer {
     /**
      * Initial option setup
      *
-     * @parameter in,
-     * @parameter out,
+     * @param tos The telnet output stream
      */
     private void initialNegotiation(TelnetOutputStream tos) {
         try {

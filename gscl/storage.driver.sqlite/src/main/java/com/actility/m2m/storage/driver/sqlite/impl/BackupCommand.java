@@ -19,7 +19,6 @@ public final class BackupCommand implements Command {
     /**
      * Class constructor
      *
-     * @param context
      * @param driver the sqlite manager
      */
     public BackupCommand(SQLiteRequestExecutor driver) {

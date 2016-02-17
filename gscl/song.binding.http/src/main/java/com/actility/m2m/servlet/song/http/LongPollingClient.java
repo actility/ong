@@ -122,7 +122,11 @@ public final class LongPollingClient implements Runnable {
      * @param remoteAddress The long polling remote host address
      * @param remotePort The long polling remote port
      * @param longPollingURI The long polling URI
-     * @param cc Whether this is a <communicationChannel> (otherwise this is a <notificationChannel>)
+     * @param requestingEntity The requesting entity to use in long polling requests
+     * @param relatedRequestingEntity Only relevant for &lt;notificationChannel&gt;. The requesting entity to use when generating the SONG request from the received &lt;notification&gt;
+     * @param relatedTargetID Only relevant for &lt;notificationChannel&gt;. The target ID to use when generating the SONG request from the received &lt;notification&gt;
+     * @param channelListener A listener that will receive events on the current channel lifecycle
+     * @param cc Whether this is a &lt;communicationChannel&gt; (otherwise this is a &lt;notificationChannel&gt;)
      */
     public LongPollingClient(SongHttpBinding songHttpBinding, Timer timerService, HttpClient httpClient,
             InetAddress remoteAddress, int remotePort, String longPollingURI, String requestingEntity,

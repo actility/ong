@@ -92,12 +92,12 @@ public final class ResourcesManager implements MonitoringListener, Serializable 
     /**
      * Constructor
      *
-     * @param appSession
-     * @param factory
-     * @param xoService
-     * @param timerService
-     * @param configuration
-     * @param monitoringLauncher
+     * @param appSession The Servlet application session
+     * @param factory The SONG factory to create SONG requests
+     * @param xoService The XO service in charge of serializing objects
+     * @param timerService The timer service in charge of managing timers
+     * @param configuration The configuration object
+     * @param monitoringLauncher A listener responsible of starting the Monitoring service
      */
     public ResourcesManager(ApplicationSession appSession, SongFactory factory, XoService xoService, TimerService timerService,
             Configuration configuration, MonitoringServiceLauncher monitoringLauncher) {
@@ -383,8 +383,8 @@ public final class ResourcesManager implements MonitoringListener, Serializable 
     /**
      * Executes a profile reloading operation
      *
-     * @param request
-     * @throws IOException
+     * @param request The SONG request
+     * @throws IOException If any IO problem occurs
      */
     public void reloadProfile(SongServletRequest request) throws IOException {
         reloadProfileRequest = null;
@@ -481,8 +481,8 @@ public final class ResourcesManager implements MonitoringListener, Serializable 
     /**
      * This method is called when the response of the profile's reloading is received
      *
-     * @param response
-     * @throws IOException
+     * @param response The SONG response
+     * @throws IOException If any IO problem occurs
      */
     public void onReloadProfileResponse(SongServletResponse response) throws IOException {
         if (reloadProfileRequest != null) {
@@ -539,7 +539,7 @@ public final class ResourcesManager implements MonitoringListener, Serializable 
     /**
      * Returns true if m2m resources have been initialized
      *
-     * @return
+     * @return Whether it is initialized
      */
     public boolean isInitialized() {
         return initialized;

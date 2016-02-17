@@ -1,7 +1,7 @@
 package com.actility.m2m.servlet.song;
 
 /**
- * Listener to receive events from <notificationChannel> or <communicationChannel>
+ * Listener to receive events from &lt;notificationChannel&gt; or &lt;communicationChannel&gt;
  */
 public interface ChannelServerListener {
     /**

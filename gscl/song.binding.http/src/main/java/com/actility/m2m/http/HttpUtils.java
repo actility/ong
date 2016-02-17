@@ -239,7 +239,7 @@ public interface HttpUtils {
      * along the request/response chain. All pragma directives specify optional behavior from the viewpoint of the protocol;
      * however, some systems MAY require that behavior be consistent with the directives.
      * <p>
-     * <code>Pragma = "Pragma" ":" 1#pragma-directive pragma-directive = "no-cache" | extension-pragma<br />
+     * <code>Pragma = "Pragma" ":" 1#pragma-directive pragma-directive = "no-cache" | extension-pragma<br>
      * extension-pragma = token [ "="
      * ( token | quoted-string ) ]</code>
      * <p>
@@ -297,11 +297,11 @@ public interface HttpUtils {
      * analogous to the "Received" field of RFC 822 [9] and is intended to be used for tracking message forwards, avoiding
      * request loops, and identifying the protocol capabilities of all senders along the request/response chain.
      * <p>
-     * <code>Via = "Via" ":" 1#( received-protocol received-by [ comment ] )<br />
-     * received-protocol = [ protocol-name "/" ] protocol-version<br/>
-     * protocol-name = token<br />
-     * protocol-version = token<br />
-     * received-by = ( host [ ":" port ] ) | pseudonym<br/>
+     * <code>Via = "Via" ":" 1#( received-protocol received-by [ comment ] )<br>
+     * received-protocol = [ protocol-name "/" ] protocol-version<br>
+     * protocol-name = token<br>
+     * protocol-version = token<br>
+     * received-by = ( host [ ":" port ] ) | pseudonym<br>
      * pseudonym = token</code>
      * <p>
      * <code>Via: 1.0 fred, 1.1 nowhere.com (Apache/1.1)</code>
@@ -317,13 +317,13 @@ public interface HttpUtils {
      * <p>
      * Warning headers are sent with responses using:
      * <p>
-     * <code>Warning = "Warning" ":" 1#warning-value<br/>
-     * warning-value = warn-code SP warn-agent SP warn-text [SP warn-date]<br/>
-     * warn-code = 3DIGIT<br/>
+     * <code>Warning = "Warning" ":" 1#warning-value<br>
+     * warning-value = warn-code SP warn-agent SP warn-text [SP warn-date]<br>
+     * warn-code = 3DIGIT<br>
      * warn-agent = ( host [ ":" port ] ) | pseudonym ; the name or pseudonym of the server adding ; the
-     * Warning header, for use in debugging<br />
-     * warn-text = quoted-string<br />
-     * warn-date = <> HTTP-date <></code>
+     * Warning header, for use in debugging<br>
+     * warn-text = quoted-string<br>
+     * warn-date = HTTP-date</code>
      *
      * @since HTTP/1.1
      */
@@ -368,7 +368,7 @@ public interface HttpUtils {
      * acceptable in the response.
      * <p>
      * <code>Accept-Encoding = "Accept-Encoding" ":"
-     *    1#( codings [ ";" "q" "=" qvalue ] )<br />
+     *    1#( codings [ ";" "q" "=" qvalue ] )<br>
      * codings          = ( content-coding | "*" )</code>
      * <p>
      * Example: <code>Accept-Encoding: gzip;q=1.0, identity; q=0.5, *;q=0</code>
@@ -407,11 +407,11 @@ public interface HttpUtils {
     /**
      * The Expect request-header field is used to indicate that particular server behaviors are required by the client.
      * <p>
-     * <code>Expect = "Expect" ":" 1#expectation<br />
-     * expectation = "100-continue" | expectation-extension<br />
-     * expectation-extension = token [ "=" ( token | quoted-string )<br />
-     * *expect-params ]<br />
-     * expect-params = ";" token [ "=" ( token | quoted-string ) ]
+     * <code>Expect = "Expect" ":" 1#expectation<br>
+     * expectation = "100-continue" | expectation-extension<br>
+     * expectation-extension = token [ "=" ( token | quoted-string )<br>
+     * *expect-params ]<br>
+     * expect-params = ";" token [ "=" ( token | quoted-string ) ]</code>
      *
      * @since HTTP/1.1
      */
@@ -442,11 +442,11 @@ public interface HttpUtils {
      * <code>Host = "Host" ":" host [ ":" port ]</code>
      * <p>
      * A "host" without any trailing port information implies the default port for the service requested (e.g., "80" for an HTTP
-     * URL). For example, a request on the origin server for <http://www.w3.org/pub/WWW/> would properly include:
+     * URL). For example, a request on the origin server for &lt;http://www.w3.org/pub/WWW/&gt; would properly include:
      * <p>
      * Example:
      * <p>
-     * <code>GET /pub/WWW/ HTTP/1.1<br />
+     * <code>GET /pub/WWW/ HTTP/1.1<br>
      * Host: www.w3.org</code>
      *
      * @since HTTP/1.1
@@ -703,7 +703,7 @@ public interface HttpUtils {
      * <p>
      * Example:
      * <p>
-     * <code>Retry-After: Fri, 31 Dec 1999 23:59:59 GMT<br />
+     * <code>Retry-After: Fri, 31 Dec 1999 23:59:59 GMT<br>
      * Retry-After: 120</code>
      *
      * @since HTTP/1.1
@@ -832,8 +832,8 @@ public interface HttpUtils {
      * providing an end-to-end message integrity check (MIC) of the entity-body. (Note: a MIC is good for detecting accidental
      * modification of the entity-body in transit, but is not proof against malicious attacks.)
      * <p>
-     * <code>Content-MD5 = "Content-MD5" ":" md5-digest<br />
-     * md5-digest = &lt;base64 of 128 bit MD5 digest as per RFC 1864></code>
+     * <code>Content-MD5 = "Content-MD5" ":" md5-digest<br>
+     * md5-digest = &lt;base64 of 128 bit MD5 digest as per RFC 1864&gt;</code>
      *
      * @since HTTP/1.1
      */
@@ -843,14 +843,14 @@ public interface HttpUtils {
      * The Content-Range entity-header is sent with a partial entity-body to specify where in the full entity-body the partial
      * body should be applied. Range units are defined in section 3.12.
      * <p>
-     * <code>Content-Range = "Content-Range" ":" content-range-spec<br/>
-     * content-range-spec = byte-content-range-spec<br/>
-     * byte-content-range-spec = bytes-unit SP<br />
-     * byte-range-resp-spec "/"<br/>
-     * ( instance-length | "*" )<br />
-     * byte-range-resp-spec = (first-byte-pos "-" last-byte-pos)<br />
-     * | "*"<br />
-     * instance-length = 1*DIGIT
+     * <code>Content-Range = "Content-Range" ":" content-range-spec<br>
+     * content-range-spec = byte-content-range-spec<br>
+     * byte-content-range-spec = bytes-unit SP<br>
+     * byte-range-resp-spec "/"<br>
+     * ( instance-length | "*" )<br>
+     * byte-range-resp-spec = (first-byte-pos "-" last-byte-pos)<br>
+     * | "*"<br>
+     * instance-length = 1*DIGIT</code>
      *
      * @since HTTP/1.1
      */

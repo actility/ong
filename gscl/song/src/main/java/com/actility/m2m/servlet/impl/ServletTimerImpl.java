@@ -68,6 +68,7 @@ public final class ServletTimerImpl implements ServletTimer, Runnable {
      * @param info Information about the timer
      * @param delay Delay until execution
      * @param listener Listener that will get timeout events.
+     * @param appSession The application session in which this timer is started
      */
     public ServletTimerImpl(Serializable info, long delay, TimerListener listener, ApplicationSessionImpl appSession) {
         this(info, delay, false, 0, listener, appSession);
@@ -81,6 +82,7 @@ public final class ServletTimerImpl implements ServletTimer, Runnable {
      * @param fixedDelay Whether fixed delay mode should be used
      * @param period Period between execution
      * @param listener Listener that will get timeout events.
+     * @param appSession The application session in which this timer is started
      */
     public ServletTimerImpl(Serializable info, long delay, boolean fixedDelay, long period, TimerListener listener,
             ApplicationSessionImpl appSession) {

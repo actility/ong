@@ -36,8 +36,7 @@ import javax.servlet.ServletRequest;
 /**
  * Represents SONG request messages. When receiving an incoming SONG request the container creates a SongServletRequest and
  * passes it to the handling servlet. For outgoing, locally initiated requests, applications call
- * {@link SongFactory#createRequest(com.actility.servlet.ApplicationSession, String, String, String)} to obtain a
- * SongServletRequest that can then be modified and sent.
+ * {@link SongFactory} to create a SongServletRequest that can then be modified and sent.
  */
 public interface SongServletRequest extends SongServletMessage, ServletRequest {
     /**

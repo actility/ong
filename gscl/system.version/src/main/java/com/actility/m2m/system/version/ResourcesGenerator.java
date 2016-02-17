@@ -46,8 +46,8 @@ public final class ResourcesGenerator {
     /**
      * Constructor
      *
-     * @param xoService
-     * @param configuration
+     * @param xoService The XO service in charge of serializing objects
+     * @param configuration The configuration object
      */
     public ResourcesGenerator(XoService xoService, Configuration configuration) {
         this.xoService = xoService;

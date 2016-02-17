@@ -78,42 +78,42 @@ import com.actility.m2m.xo.XoService;
  * <p>
  * Several patterns exists in the servlet communication:
  * <p>
- * <b>Service Servlet => Binding Servlet</b><br/>
+ * <b>Service Servlet =&gt; Binding Servlet</b><br>
  *
  * <pre>
- * LocalRequest             => LocalWrappedRequest<br/>RemoteWrappedResponse    <= RemoteResponse
+ * LocalRequest             =&gt; LocalWrappedRequest<br>RemoteWrappedResponse    &lt;= RemoteResponse
  * </pre>
  *
  * <pre>
- * LocalForwardedRequest    => LocalWrappedRequest<br/>RemoteWrappedResponse    <= RemoteResponse
- * </pre>
- * <p>
- * <b>Binding Servlet => Service Servlet</b><br/>
- *
- * <pre>
- * RemoteRequest            => RemoteWrappedRequest<br/>LocalWrappedResponse     <= LocalResponse
- * </pre>
- *
- * <pre>
- * RemoteRequest            => RemoteWrappedRequest<br/>LocalWrappedResponse     <= LocalForwardedResponse
+ * LocalForwardedRequest    =&gt; LocalWrappedRequest<br>RemoteWrappedResponse    &lt;= RemoteResponse
  * </pre>
  * <p>
- * <b>Service Servlet => Service Servlet</b><br/>
+ * <b>Binding Servlet =&gt; Service Servlet</b><br>
  *
  * <pre>
- * LocalRequest             => RemoteForwardedRequest<br/>RemoteForwardedResponse  <= LocalResponse
+ * RemoteRequest            =&gt; RemoteWrappedRequest<br>LocalWrappedResponse     &lt;= LocalResponse
  * </pre>
  *
  * <pre>
- * LocalForwardedRequest    => RemoteForwardedRequest<br/>RemoteForwardedResponse  <= LocalResponse
+ * RemoteRequest            =&gt; RemoteWrappedRequest<br>LocalWrappedResponse     &lt;= LocalForwardedResponse
+ * </pre>
+ * <p>
+ * <b>Service Servlet =&gt; Service Servlet</b><br>
+ *
+ * <pre>
+ * LocalRequest             =&gt; RemoteForwardedRequest<br>RemoteForwardedResponse  &lt;= LocalResponse
  * </pre>
  *
  * <pre>
- * LocalRequest             => RemoteForwardedRequest<br/>RemoteForwardedResponse  <= LocalForwardedResponse
+ * LocalForwardedRequest    =&gt; RemoteForwardedRequest<br>RemoteForwardedResponse  &lt;= LocalResponse
  * </pre>
  *
  * <pre>
- * LocalForwardedRequest    => RemoteForwardedRequest<br/>RemoteForwardedResponse  <= LocalForwardedResponse
+ * LocalRequest             =&gt; RemoteForwardedRequest<br>RemoteForwardedResponse  &lt;= LocalForwardedResponse
+ * </pre>
+ *
+ * <pre>
+ * LocalForwardedRequest    =&gt; RemoteForwardedRequest<br>RemoteForwardedResponse  &lt;= LocalForwardedResponse
  * </pre>
  *
  */

@@ -55,10 +55,10 @@ public abstract class TelnetCommand {
     /**
      * Parameters in the constructor:
      *
-     * @parameter ts TelnetSession, to provide callback to the telnet session
-     * @parameter int commandCode
-     * @parameter boolean doStatus, if true the command has been asked to be active
-     * @parameter boolean show, if true the commands is shown
+     * @param ts provide callback to the telnet session
+     * @param commandCode the command code
+     * @param doStatus if true the command has been asked to be active
+     * @param show if true the commands is shown
      */
     public TelnetCommand(TelnetSession ts, int commandCode, boolean doStatus, boolean show) {
         this.ts = ts;
@@ -67,26 +67,39 @@ public abstract class TelnetCommand {
         this.show = show;
     }
 
-    /** WILL string of command */
-
+    /**
+     * WILL string of command
+     *
+     * @return The WILL command as a string
+     */
     public String getWILL() {
         return TelnetCommandCodes.IAC_string + TelnetCommandCodes.WILL_string + String.valueOf((char) commandCode);
     }
 
-    /** WONT string of command */
-
+    /**
+     * WONT string of command
+     *
+     * @return The WONT command as a string
+     */
     public String getWONT() {
         return TelnetCommandCodes.IAC_string + TelnetCommandCodes.WONT_string + String.valueOf((char) commandCode);
     }
 
-    /** DONT string of command */
+    /**
+     * DONT string of command
+     *
+     * @return The DONT command as a string
+     */
 
     public String getDONT() {
         return TelnetCommandCodes.IAC_string + TelnetCommandCodes.DONT_string + String.valueOf((char) commandCode);
     }
 
-    /** DO string of command */
-
+    /**
+     * DO string of command
+     *
+     * @return The DO command as a string
+     */
     public String getDO() {
         return TelnetCommandCodes.IAC_string + TelnetCommandCodes.DO_string + String.valueOf((char) commandCode);
     }
@@ -104,17 +117,21 @@ public abstract class TelnetCommand {
     }
 
     /**
-     * * Get all registered commands from the session
+     * Get all registered commands from the session
+     *
+     * @return The array of commands registered in this session
      */
-
     public TelnetCommand[] getCommands() {
         return ts.getCommands();
     }
 
     /**
-     * * Debug printout
+     * Debug printout
+     *
+     * @param action one of the telnet protocol basic actions DO, DONT, WILL, WONT or SE
+     * @param optionCode the option code
+     * @param parameters a byte array with optional parameters, addition data to the option command.
      */
-
     void printCommand(int action, int optionCode, byte[] parameters) {
         System.out.print("Telnet Command code: " + String.valueOf(action) + " option: " + String.valueOf(optionCode)
                 + " status now: " + String.valueOf(doStatus));
@@ -134,9 +151,9 @@ public abstract class TelnetCommand {
      * a response but if trying to enter a mode that we are already in, no response is returned. This is essential to prevent
      * negotiation loops.
      *
-     * @parameter action, one of the telnet protocol basic actions DO, DONT, WILL, WONT or SE
-     * @parameter optionCode, the option code
-     * @parameter parameters, a byte array with optional parameters, addition data to the option command.
+     * @param action, one of the telnet protocol basic actions DO, DONT, WILL, WONT or SE
+     * @param optionCode, the option code
+     * @param parameters, a byte array with optional parameters, addition data to the option command.
      *
      * @return a String with the response of the command.
      */

@@ -36,6 +36,9 @@ public final class StorageRequestDriverExecutorImpl implements StorageRequestDri
 
     /**
      * Class constructor.
+     *
+     * @param config The bundle configuration
+     * @throws StorageException If any problem occurs while initializing the class
      */
     public StorageRequestDriverExecutorImpl(Dictionary config) throws StorageException {
         sqlite = new SQLiteRequestExecutor(config);

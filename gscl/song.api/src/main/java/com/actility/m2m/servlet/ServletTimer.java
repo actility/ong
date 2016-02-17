@@ -69,7 +69,7 @@ public interface ServletTimer {
      * performing the scheduled activity:
      * <code>
      * public void run() {
-     *   if (System.currentTimeMillis() - scheduledExecutionTime() >= MAX_TARDINESS)
+     *   if (System.currentTimeMillis() - scheduledExecutionTime() &gt;= MAX_TARDINESS)
      *     return; // Too late; skip this execution.
      *             // Perform the task
      * }
@@ -83,7 +83,7 @@ public interface ServletTimer {
 
     /**
      * Get the number of milliseconds that will elapse before the next scheduled timer expiration. For a one-time timer that has
-     * already expired (i.e., current time > scheduled expiry time) this method will return the time remaining as a negative
+     * already expired (i.e., current time &gt; scheduled expiry time) this method will return the time remaining as a negative
      * value.
      *
      * @return the number of milliseconds that will elapse before the next scheduled timer expiration.

@@ -423,6 +423,7 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      * Builds the HTTP SONG Binding.
      *
      * @param xoService Service use to generate M2M error messages when needed
+     * @param m2mService The M2M service in charge of managing M2M requests above SONG container
      * @param httpClient HTTP client used to send HTTP requests to remote servers
      * @param localAddress The local address on which the HTTP server is running
      * @param localPort The local port on which the HTTP server is running
@@ -1091,7 +1092,8 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      * The method is in charge to generate a contact and long polling URI for the created connection.
      *
      * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
-     *            {@link LongPollURIs}
+     *            {@link LongPollingURIs}
+     * @param listener A listener that will receive events on the &lt;notificationChannel&gt; lifecycle
      * @return The contact and long polling URI of the long polling connection
      */
     public LongPollingURIs createServerNotificationChannel(SongURI serverURI, ChannelServerListener listener) {
@@ -1144,6 +1146,7 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      *
      * @param contactURI The contact URI to use in the long polling connection
      * @param longPollingURI The long polling URI to use in the long polling connection
+     * @param listener A listener that will receive events on the &lt;notificationChannel&gt; lifecycle
      * @throws ServletException If the binding cannot manage the given contact and long polling URIs
      */
     public void createServerNotificationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
@@ -1242,6 +1245,10 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
+     * @param requestingEntity The requesting entity to use in &lt;notificationChannel&gt; requests
+     * @param relatedRequestingEntity The requesting entity to use when generating the SONG request from the received &lt;notification&gt;
+     * @param relatedTargetID The target ID to use when generating the SONG request from the received &lt;notification&gt;
+     * @param listener A listener that will receive events on &lt;notificationChannel&gt; lifecycle
      * @throws ServletException If a long polling connection if already opened for the given contact and long polling URIs
      */
     public void createClientNotificationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
@@ -1307,7 +1314,8 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      * The method is in charge to generate a contact and long polling URI for the created connection.
      *
      * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
-     *            {@link LongPollURIs}
+     *            {@link LongPollingURIs}
+     * @param listener A listener that will receive events on &lt;communicationChannel&gt; lifecycle
      * @return The contact and long polling URI of the long polling connection
      */
     public LongPollingURIs createServerCommunicationChannel(SongURI serverURI, ChannelServerListener listener) {
@@ -1360,6 +1368,7 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      *
      * @param contactURI The contact URI to use in the long polling connection
      * @param longPollingURI The long polling URI to use in the long polling connection
+     * @param listener A listener that will receive events on &lt;communicationChannel&gt; lifecycle
      * @throws ServletException If the binding cannot manage the given contact and long polling URIs
      */
     public void createServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
@@ -1458,6 +1467,8 @@ public final class SongHttpBinding extends SongServlet implements HttpServerHand
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
+     * @param requestingEntity The requesting entity to use in &lt;communicationChannel&gt; requests
+     * @param listener A listener that will receive events on &lt;communicationChannel&gt; lifecycle
      * @throws ServletException If a long polling connection if already opened for the given contact and long polling URIs
      */
     public void createClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,

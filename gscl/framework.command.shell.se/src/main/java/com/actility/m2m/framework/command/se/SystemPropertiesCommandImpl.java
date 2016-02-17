@@ -38,8 +38,8 @@ import java.util.StringTokenizer;
 import org.apache.felix.shell.Command;
 
 /**
- * Command to display, set and modify system properties Usage: sysprop -> displays all the system properties sysprop [key] ->
- * displays the [key] property sysprop -r [key] -> removes the [key] property sysprop [key] [value] -> set the property [key] to
+ * Command to display, set and modify system properties Usage: sysprop -&gt; displays all the system properties sysprop [key] -&gt;
+ * displays the [key] property sysprop -r [key] -&gt; removes the [key] property sysprop [key] [value] -&gt; set the property [key] to
  * [value]
  */
 public class SystemPropertiesCommandImpl implements Command {

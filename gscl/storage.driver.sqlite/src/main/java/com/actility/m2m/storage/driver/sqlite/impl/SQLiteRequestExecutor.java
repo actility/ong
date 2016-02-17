@@ -56,7 +56,6 @@ public final class SQLiteRequestExecutor {
     /**
      * Class constructor
      *
-     * @param bundleContext
      * @param config storage configuration to apply
      * @throws StorageException if any problem occurs while activate the driver
      */
@@ -968,10 +967,10 @@ public final class SQLiteRequestExecutor {
      * <p>
      * If scope is specified to:
      * <ul>
-     * <li>{@link #SCOPE_ONE_LEVEL}: deletes documents one level below the given path (this excludes the exact path). Delete do
+     * <li>{@link StorageRequestExecutor#SCOPE_ONE_LEVEL}: deletes documents one level below the given path (this excludes the exact path). Delete do
      * not manage concurrency and any created document created ONE_LEVEL below the given document during the deletion process
      * will not be deleted</li>
-     * <li>{@link #SCOPE_SUB_TREE}: deletes documents reachable from the root document pointed by the given path (this includes
+     * <li>{@link StorageRequestExecutor#SCOPE_SUB_TREE}: deletes documents reachable from the root document pointed by the given path (this includes
      * the exact path). Delete SUB_TREE deletes the root document at the end to ensure it is not possible to re-create a
      * sub-tree while deleting it. So after the delete sub-tree operation you are sure there is no documents in that path
      * anymore</li>
@@ -981,7 +980,7 @@ public final class SQLiteRequestExecutor {
      *
      * @param config storage configuration to apply
      * @param document The document which serves as a root for the deletion. Only id or path are used
-     * @param scope a constant ({@link #SCOPE_ONE_LEVEL} or {@link #SCOPE_SUB_TREE})
+     * @param scope a constant ({@link StorageRequestExecutor#SCOPE_ONE_LEVEL} or {@link StorageRequestExecutor#SCOPE_SUB_TREE})
      * @param condition condition that must be fulfilled in order to perform the operation
      * @return Whether the delete has succeeded. If the delete fails, it means the document does not exist or the condition is
      *         not fulfilled
@@ -1119,17 +1118,17 @@ public final class SQLiteRequestExecutor {
      * <p>
      * If scope is specified to:
      * <ul>
-     * <li>{@link #SCOPE_ONE_LEVEL}: searches documents one level below the given path (this excludes the exact path)</li>
-     * <li>{@link #SCOPE_SUB_TREE}: searches documents reachable from the root document pointed by the given path (this includes
+     * <li>{@link StorageRequestExecutor#SCOPE_ONE_LEVEL}: searches documents one level below the given path (this excludes the exact path)</li>
+     * <li>{@link StorageRequestExecutor#SCOPE_SUB_TREE}: searches documents reachable from the root document pointed by the given path (this includes
      * the exact path)</li>
      * </ul>
      *
      * @param config storage configuration to apply
-     * @param path document path from which search is performed (it must not end with a slash and must be normalized)
-     * @param scope a constant ({@link #SCOPE_ONE_LEVEL} or {@link #SCOPE_SUB_TREE})
+     * @param basePath document path from which search is performed (it must not end with a slash and must be normalized)
+     * @param scope a constant ({@link StorageRequestExecutor#SCOPE_ONE_LEVEL} or {@link StorageRequestExecutor#SCOPE_SUB_TREE})
      * @param condition condition that filters documents
-     * @param order ordering of the results ({@link #ORDER_UNKNOWN}, {@link #ORDER_ASC}, {@link #ORDER_DESC})
-     * @param limit maximum number of results returned ({@link #NO_LIMIT} means any number of values)
+     * @param order ordering of the results ({@link StorageRequestExecutor#ORDER_UNKNOWN}, {@link StorageRequestExecutor#ORDER_ASC}, {@link StorageRequestExecutor#ORDER_DESC})
+     * @param limit maximum number of results returned ({@link StorageRequestExecutor#NO_LIMIT} means any number of values)
      * @param withContent whether to return the document content in result set
      * @param withAttributes List of attributes names. If null, return all document attributes in result set. Else if empty, do
      *            not return attributes in result set. Else, return only specified attributes in result set

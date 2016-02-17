@@ -164,6 +164,7 @@ public final class Util {
      * Build a string representation of a list of conditions.
      *
      * @param conditions the list of conditions to represent
+     * @param operator The operator id to use between conditions. Can be either {@link Condition#COND_OP_AND} or {@link Condition#COND_OP_OR}
      * @return the resulting string representation.
      */
     public static String listConditionsToString(List conditions, int operator) {

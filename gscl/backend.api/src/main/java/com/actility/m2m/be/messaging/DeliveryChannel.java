@@ -131,7 +131,7 @@ public interface DeliveryChannel {
      * @param exchange message exchange to send
      * @param timeoutMS timeout period, in milliseconds (0 means no timeout)
      * @return <code>true</code> if the exchange has been returned, or <code>false</code> if the method timed out while waiting
-     * @throws IllegalArgumentException if <code>timeoutMS</code> < 0
+     * @throws IllegalArgumentException if <code>timeoutMS</code> &lt; 0
      * @throws MessagingException unable to send exchange, or no response is expected from the <code>send()</code> operation
      *             (i.e., the <code>MessageExchange</code> is being used to convey an <code>ExchangeStatus</code>)
      * @throws MessagingException when the blocked thread is interrupted

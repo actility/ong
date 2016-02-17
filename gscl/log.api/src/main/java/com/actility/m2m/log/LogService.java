@@ -35,7 +35,7 @@ package com.actility.m2m.log;
  * This LogService provides an extra method for querying the service about the
  * current log level. Log entries that are less severe than the current log
  * level will be discarded by the log.
- * <p/>
+ * <p>
  * The log levels have the following hierarchy:
  * <ol>
  * <li><code>LOG_ERROR</code></li>

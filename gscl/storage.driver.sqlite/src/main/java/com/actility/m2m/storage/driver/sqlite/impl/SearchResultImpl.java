@@ -12,7 +12,7 @@ public final class SearchResultImpl implements SearchResult {
     /**
      * Class constructor.
      *
-     * @param iterator
+     * @param iterator The iterator on search result
      */
     public SearchResultImpl(Iterator iterator) {
         this.iterator = iterator;

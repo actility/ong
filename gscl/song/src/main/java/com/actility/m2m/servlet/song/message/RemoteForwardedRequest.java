@@ -72,6 +72,7 @@ public final class RemoteForwardedRequest extends HCCopyOnWrite implements Outgo
      * @param contextPath The context path of the application that receives the request
      * @param servletPath The path registered by a Service Servlet that was used to route this request
      * @param pathInfo Extra path info after servletPath in the request targetID
+     * @param poc The point of contact to which this request must be sent. Can be <code>null</code>
      */
     public RemoteForwardedRequest(EndpointNode node, InternalMessage request, ExtApplicationSession appSession,
             String contextPath, String servletPath, String pathInfo, SongURI poc) {

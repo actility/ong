@@ -115,11 +115,10 @@ public final class SystemVersionServlet extends SongServlet implements Monitorin
     /**
      * Constructor
      *
-     * @param obixService the oBIX service for resource handling.
-     * @param context
-     * @param resourcesAccessorService
-     * @param xoService
-     * @param config
+     * @param context The bundle context
+     * @param resourcesAccessorService The resources accessor service to access low level resources
+     * @param xoService The XO service in charge of serializing objects
+     * @param configuration The configuration object
      */
     public SystemVersionServlet(BundleContext context, ResourcesAccessorService resourcesAccessorService, XoService xoService,
             Configuration configuration) {

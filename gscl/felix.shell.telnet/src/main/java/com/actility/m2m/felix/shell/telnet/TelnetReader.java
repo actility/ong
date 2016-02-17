@@ -96,7 +96,10 @@ public class TelnetReader {
     }
 
     /**
-     * * Read input data until CR or LF found;
+     * Read input data until CR or LF found;
+     *
+     * @return The complete line read from telnet session
+     * @throws IOException If any IO problem occurs
      */
     public String readLine() throws IOException {
         LinkedList buffer = telnetSession.getCurrentLine();

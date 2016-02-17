@@ -50,20 +50,32 @@ public class TelnetStateMachine {
         this.telnetSession = telnetSession;
     }
 
-    /** Return state of command state machine */
+    /**
+     * Return state of command state machine
+     *
+     * @return The state id
+     */
     public int getState() {
         return state;
     }
 
-    /** Set state of command state machine */
+    /**
+     * Set state of command state machine
+     *
+     * @param s The state id to set
+     */
     public void setState(int s) {
         state = s;
     }
 
     /**
-     * * Telnet parser, a state machine * to extract telnet commands from an input stream.
+     * Telnet parser, a state machine
+     * to extract telnet commands from an input stream.
+     *
+     * @param state The state ID
+     * @param code The telnet command code
+     * @return The next state ID
      */
-
     public int nextState(int state, int code) {
         int newState = 0;
 

@@ -51,7 +51,7 @@ public class OsgiEventListener implements FrameworkListener, BundleListener, Ser
     /**
      * The framework event callback method inserts all framework events into the log. Events of type <code>error</code> are
      * logged at the error level other event types are logged on the info level.
-     * <p/>
+     * <p>
      * FrameworkListener callback.
      *
      * @param fe the framework event that has occurred.

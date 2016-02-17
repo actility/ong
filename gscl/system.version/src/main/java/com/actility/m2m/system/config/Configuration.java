@@ -59,6 +59,8 @@ public final class Configuration {
      * Constructor
      *
      * @param bundleName the name of the current bundle
+     * @param configAdmin The configuration admin service
+     * @param config The configuration dictionary as received from configuration admin service
      */
     public Configuration(String bundleName, ConfigurationAdmin configAdmin, Dictionary config) {
         if (LOG.isInfoEnabled()) {
@@ -70,9 +72,9 @@ public final class Configuration {
     }
 
     /**
-     * This method was called when a new configuration was loaded
+     * This method is called when a new configuration is loaded
      *
-     * @param config
+     * @param config The new configuration
      */
     public void update(Dictionary config) {
         LOG.info("The config has changed");
@@ -178,6 +180,8 @@ public final class Configuration {
 
     /**
      * Saves the configuration into the disk
+     *
+     * @param xoUrlList The configuration in the form of an XO list object
      */
     public void saveConfig(List xoUrlList) {
         Dictionary dict = new Hashtable();
@@ -195,33 +199,33 @@ public final class Configuration {
     }
 
     /**
-     * Gives the configuration from its name
+     * Gives the configuration value from its key name
      *
-     * @param name
-     * @return
+     * @param name The configuration key name
+     * @return The configuration value
      */
     public Object getValue(String name) {
         return this.getValue(name, Configuration.Name.getTypeForKey(name), null);
     }
 
     /**
-     * Gives the configuration from its name
+     * Gives the configuration from its key name using a default value if not found
      *
-     * @param name
-     * @param defaultValue
-     * @return
+     * @param name The configuration key name
+     * @param defaultValue The default value in case key name does not exist
+     * @return The configuration value or the defaultValue if no value is found
      */
     public Object getValue(String name, Object defaultValue) {
         return this.getValue(name, Configuration.Name.getTypeForKey(name), defaultValue);
     }
 
     /**
-     * Gives the configuration from its name and verifies its type
+     * Gives the configuration from its key name and verifies its type
      *
-     * @param name
-     * @param type
-     * @param defaultValue
-     * @return
+     * @param name The configuration key name
+     * @param type The configuration value type
+     * @param defaultValue The default value in case key name does not exist
+     * @return The configuration value or the defaultValue if no value is found
      */
     private Object getValue(String name, Class type, Object defaultValue) {
         Object result = defaultValue;
@@ -241,9 +245,6 @@ public final class Configuration {
 
     /**
      * This class gives all configuration names allowed
-     *
-     * @author qdesrame
-     *
      */
     public static class Name {
         public static final String HIGH_RATE_LOGGING_SIZE = "highRateLoggingSize";
@@ -272,8 +273,8 @@ public final class Configuration {
         /**
          * Verifies if the configration key is allowed
          *
-         * @param key
-         * @return
+         * @param key The configuration key
+         * @return Whether the configuration key is valid
          */
         public static boolean isKeyValid(String key) {
             if (key == null) {
@@ -295,8 +296,8 @@ public final class Configuration {
         /**
          * Gives the type of configuration from the key
          *
-         * @param key
-         * @return
+         * @param key The configuration key
+         * @return The configuration value type
          */
         public static Class getTypeForKey(String key) {
             if (key == null) {

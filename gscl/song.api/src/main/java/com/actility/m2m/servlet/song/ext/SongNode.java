@@ -41,7 +41,7 @@ public interface SongNode {
     /**
      * Gets the target of the current node as a string.
      * <p>
-     * The target is the name of a {@link SongServlet} with the following format {ApplicationName}.{ServletName}</li>
+     * The target is the name of a {@link SongServlet} with the following format {ApplicationName}.{ServletName}
      * 
      * @return The target of the node
      */

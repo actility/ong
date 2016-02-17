@@ -58,6 +58,9 @@ public final class ContactWaitingResponseNotifyRequest extends TimerTask {
     /**
      * Builds a long polling waiting request.
      *
+     * @param songHttpBinding The container that manages the SONG HTTP binding
+     * @param lpServer The long polling that manages this waiting contact request
+     * @param transactionId The transaction ID which uniquely identifies this waiting contact request
      * @param request The SONG request which is waiting in the long polling connection
      */
     public ContactWaitingResponseNotifyRequest(SongHttpBinding songHttpBinding, LongPollingServer lpServer, String transactionId,

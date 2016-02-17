@@ -151,6 +151,18 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
 
     /**
      * Default constructor for the SONG Container.
+     *
+     * @param servletService The generic servlet service
+     * @param backendService The Backend service in charge of managing threads, message passing and queuing
+     * @param xoService The XO service in charge of serializing objects
+     * @param resourcesAccessorService The resources accessor service in charge of accessing low level resources
+     * @param transportLoggerService The transport logger service in charge of logging SONG messages and compute statistics
+     * @param routesConfiguration Defines IP routes on which the application is server capable or not
+     * @param hostName The local host name
+     * @param domainName The local domain name
+     * @param maxRemoteRequests The maximum number of concurrent remote requests
+     * @throws BackendException If any problem occurs while registering to the Bacnkend service
+     * @throws UnknownHostException If a problem occurs while trying to detect the local hostname if not given
      */
     public SongContainer(ExtServletService servletService, BackendService backendService, XoService xoService,
             ResourcesAccessorService resourcesAccessorService, TransportLoggerService transportLoggerService,

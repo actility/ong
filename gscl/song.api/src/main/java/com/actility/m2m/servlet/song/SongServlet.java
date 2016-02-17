@@ -98,6 +98,10 @@ public abstract class SongServlet extends GenericServlet {
     /**
      * Invoked to handle incoming requests. This method dispatched requests to one of the doXxx methods where Xxx is the Song
      * method used in the request. Servlets will not usually need to override this method.
+     *
+     * @param req The SONG servlet request
+     * @throws javax.servlet.ServletException If there is a problem during the request handling
+     * @throws java.io.IOException If there is an IO problem during the request handling
      */
     protected void doRequest(final SongServletRequest req) throws javax.servlet.ServletException, java.io.IOException {
         final String m = req.getMethod();
@@ -117,6 +121,10 @@ public abstract class SongServlet extends GenericServlet {
     /**
      * Invoked to handle incoming responses. This method dispatched responses to one of the , , . Servlets will not usually need
      * to override this method.
+     *
+     * @param resp The SONG servlet response
+     * @throws javax.servlet.ServletException If there is a problem during the request handling
+     * @throws java.io.IOException If there is an IO problem during the request handling
      */
     protected void doResponse(final SongServletResponse resp) throws javax.servlet.ServletException, java.io.IOException {
         final int status = resp.getStatus();
@@ -177,6 +185,7 @@ public abstract class SongServlet extends GenericServlet {
      * Invoked by the server (via the doResponse method) to handle incoming 202 responses. The default implementation is
      * empty and must be overridden by subclasses to do something useful.
      *
+     * @param resp The SONG servlet provisional response
      * @throws javax.servlet.ServletException If there is a problem during the response handling
      * @throws java.io.IOException If there is an IO problem during the response handling
      */
@@ -189,6 +198,7 @@ public abstract class SongServlet extends GenericServlet {
      * Invoked by the server (via the doResponse method) to handle incoming 2xx class responses. The default implementation is
      * empty and must be overridden by subclasses to do something useful.
      *
+     * @param resp The SONG servlet success response
      * @throws javax.servlet.ServletException If there is a problem during the response handling
      * @throws java.io.IOException If there is an IO problem during the response handling
      */
@@ -200,6 +210,7 @@ public abstract class SongServlet extends GenericServlet {
      * Invoked by the server (via the doResponse method) to handle incoming 3xx - 6xx class responses. The default
      * implementation is empty and must be overridden by subclasses to do something useful.
      *
+     * @param resp The SONG servlet error response
      * @throws javax.servlet.ServletException If there is a problem during the response handling
      * @throws java.io.IOException If there is an IO problem during the response handling
      */
@@ -209,6 +220,8 @@ public abstract class SongServlet extends GenericServlet {
 
     /**
      * Writes the specified message to a servlet log file. See {link ServletContext#log(String)}.
+     *
+     * @param message The message to log
      */
     public void log(final java.lang.String message) {
         getServletContext().log(message);
@@ -217,6 +230,9 @@ public abstract class SongServlet extends GenericServlet {
     /**
      * Writes an explanatory message and a stack trace for a given Throwable exception to the servlet log file. See
      * ServletContext.log(String, Throwable).
+     *
+     * @param message The message to log
+     * @param t The throwable to log
      */
     public void log(final java.lang.String message, final java.lang.Throwable t) {
         getServletContext().log(message, t);
@@ -226,6 +242,11 @@ public abstract class SongServlet extends GenericServlet {
      * Invoked to handle incoming Song messages: requests or responses. Exactly one of the arguments is null: if the event is a
      * request the response argument is null, and vice versa, if the event is a response the request argument is null. This
      * method dispatched to doRequest() or doResponse() as appropriate. Servlets will not usually need to override this method.
+     *
+     * @param req The SONG servlet request
+     * @param resp The SONG servlet response
+     * @throws javax.servlet.ServletException If there is a problem during the response handling
+     * @throws java.io.IOException If there is an IO problem during the response handling
      */
     public void service(final javax.servlet.ServletRequest req, final javax.servlet.ServletResponse resp)
             throws javax.servlet.ServletException, java.io.IOException {

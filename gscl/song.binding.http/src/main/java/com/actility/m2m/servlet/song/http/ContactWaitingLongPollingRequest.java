@@ -60,6 +60,7 @@ public final class ContactWaitingLongPollingRequest extends TimerTask {
     /**
      * Builds a long polling waiting request.
      *
+     * @param lpServer The long polling server which queues this contact request
      * @param request The SONG request which is waiting for the long polling connection to be ready
      */
     public ContactWaitingLongPollingRequest(LongPollingServer lpServer, SongServletRequest request) {

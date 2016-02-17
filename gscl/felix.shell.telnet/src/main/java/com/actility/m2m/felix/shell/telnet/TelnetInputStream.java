@@ -41,6 +41,7 @@ import java.io.InputStream;
  * <p>
  * The following transformations are made in the data part of the input stream:<br>
  * <table>
+ * <caption>Transformation mappings</caption>
  * <tr>
  * <th>From</th>
  * <th>To</th>

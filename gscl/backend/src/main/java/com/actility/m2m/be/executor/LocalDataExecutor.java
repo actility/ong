@@ -44,7 +44,7 @@ import com.actility.m2m.util.concurrent.CircularArray;
 import com.actility.m2m.util.log.OSGiLogger;
 
 /**
- * Implementation of a thread for {@link DistinctExecutor}. This reads message exchanges from its local queue to send them for
+ * Implementation of a thread for {@link BackendExecutor}. This reads message exchanges from its local queue to send them for
  * execution to the managed {@link BackendEndpoint}.
  *
  */
@@ -60,6 +60,7 @@ public final class LocalDataExecutor extends Thread implements BackendExecutor {
      *
      * @param id The id of the endpoint that this thread is managing
      * @param endpoint The concrete endpoint that this thread is managing
+     * @param queueSize Maximum queue size
      */
     public LocalDataExecutor(Integer id, BackendEndpoint endpoint, int queueSize) {
         super("BEndpoint-" + id);

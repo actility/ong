@@ -88,24 +88,26 @@ public interface SongDynamicRouter {
     void removePath(String path);
 
     /**
-     * Creates a server <notificationChannel> connection with the given URI.
+     * Creates a server &lt;notificationChannel&gt; connection with the given URI.
      * <p>
      * The method is in charge to generate a contact and long polling URI for the created connection.
      *
      * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
      *            {@link LongPollingURIs}
+     * @param listener A listener that will receive events related to the &lt;notificationChannel&gt;
      * @return The contact and long polling URI of the long polling connection
      * @throws ServletException If no binding exists for the given URI scheme
      */
     LongPollingURIs createServerNotificationChannel(SongURI serverURI, ChannelServerListener listener) throws ServletException;
 
     /**
-     * Creates a server <notificationChannel> connection on the given URI.
+     * Creates a server &lt;notificationChannel&gt; connection on the given URI.
      * <p>
      * The method is in charge to generate a contact and long polling URI for the created connection.
      *
      * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
      *            {@link LongPollingURIs}
+     * @param listener A listener that will receive events related to the &lt;notificationChannel&gt;
      * @return The contact and long polling URI of the long polling connection
      * @throws URISyntaxException If the given server URI has an incorrect syntax
      * @throws ServletException If no binding exists for the given URI scheme
@@ -114,24 +116,26 @@ public interface SongDynamicRouter {
             throws URISyntaxException, ServletException;
 
     /**
-     * Creates a server <notificationChannel> connection with the given contact and long polling URIs.
+     * Creates a server &lt;notificationChannel&gt; connection with the given contact and long polling URIs.
      * <p>
      * The container is allowed to reject the given URIs if it cannot managed them.
      *
      * @param contactURI The contact URI to use in the long polling connection
      * @param longPollingURI The long polling URI to use in the long polling connection
+     * @param listener A listener that will receive events related to the &lt;notificationChannel&gt;
      * @throws ServletException If no binding exists for the given URIs scheme or the container rejects the given URIs
      */
     void createServerNotificationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
             throws ServletException;
 
     /**
-     * Creates a server <notificationChannel> connection with the given contact and long polling URIs.
+     * Creates a server &lt;notificationChannel&gt; connection with the given contact and long polling URIs.
      * <p>
      * The container is allowed to reject the given URIs if it cannot managed them.
      *
      * @param contactURI The contact URI to use in the long polling connection
      * @param longPollingURI The long polling URI to use in the long polling connection
+     * @param listener A listener that will receive events related to the &lt;notificationChannel&gt;
      * @throws URISyntaxException If the given server URI has an incorrect syntax
      * @throws ServletException If no binding exists for the given URIs scheme or the container rejects the given URIs
      */
@@ -139,7 +143,7 @@ public interface SongDynamicRouter {
             throws URISyntaxException, ServletException;
 
     /**
-     * Deletes a server <notificationChannel> connection given its contact and long polling URI.
+     * Deletes a server &lt;notificationChannel&gt; connection given its contact and long polling URI.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
@@ -147,7 +151,7 @@ public interface SongDynamicRouter {
     void deleteServerNotificationChannel(SongURI contactURI, SongURI longPollingURI);
 
     /**
-     * Deletes a server <notificationChannel> connection given its contact and long polling URI.
+     * Deletes a server &lt;notificationChannel&gt; connection given its contact and long polling URI.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
@@ -155,13 +159,17 @@ public interface SongDynamicRouter {
     void deleteServerNotificationChannel(String contactURI, String longPollingURI);
 
     /**
-     * Creates a client <notificationChannel> connection from the given contact and long polling URIs.
+     * Creates a client &lt;notificationChannel&gt; connection from the given contact and long polling URIs.
      * <p>
      * This will trigger the connection creation on the long polling URI. An entry will also be added to the container external
      * aliases route table mapping the contact URI to the current application.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
+     * @param requestingEntity The requesting entity to use for the &lt;notificationChannel&gt; requests
+     * @param relatedRequestingEntity The requesting entity to use for &lt;notification&gt; received in the channel
+     * @param relatedTargetID The target ID to use for &lt;notification&gt; received in the channel
+     * @param listener A listener that will receive events related to the &lt;notificationChannel&gt;
      * @throws ServletException If no binding exists for the given URIs scheme or if a long polling connection if already opened
      *             for the given contact and long polling URIs
      */
@@ -169,13 +177,17 @@ public interface SongDynamicRouter {
             SongURI relatedRequestingEntity, SongURI relatedTargetID, ChannelClientListener listener) throws ServletException;
 
     /**
-     * Creates a client <notificationChannel> connection from the given contact and long polling URIs.
+     * Creates a client &lt;notificationChannel&gt; connection from the given contact and long polling URIs.
      * <p>
      * This will trigger the connection creation on the long polling URI. An entry will also be added to the container external
      * aliases route table mapping the contact URI to the current application.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
+     * @param requestingEntity The requesting entity to use for the &lt;notificationChannel&gt; requests
+     * @param relatedRequestingEntity The requesting entity to use for &lt;notification&gt; received in the channel
+     * @param relatedTargetID The target ID to use for &lt;notification&gt; received in the channel
+     * @param listener A listener that will receive events related to the &lt;notificationChannel&gt;
      * @throws URISyntaxException If the given server URI has an incorrect syntax
      * @throws ServletException If no binding exists for the given URIs scheme or if a long polling connection if already opened
      *             for the given contact and long polling URIs
@@ -185,7 +197,7 @@ public interface SongDynamicRouter {
             ServletException;
 
     /**
-     * Deletes a client <notificationChannel> connection given its contact and long polling URI.
+     * Deletes a client &lt;notificationChannel&gt; connection given its contact and long polling URI.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
@@ -193,7 +205,7 @@ public interface SongDynamicRouter {
     void deleteClientNotificationChannel(SongURI contactURI, SongURI longPollingURI);
 
     /**
-     * Deletes a client <notificationChannel> connection given its contact and long polling URI.
+     * Deletes a client &lt;notificationChannel&gt; connection given its contact and long polling URI.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
@@ -201,24 +213,26 @@ public interface SongDynamicRouter {
     void deleteClientNotificationChannel(String contactURI, String longPollingURI);
 
     /**
-     * Creates a server <communicationChannel> connection with the given URI.
+     * Creates a server &lt;communicationChannel&gt; connection with the given URI.
      * <p>
      * The method is in charge to generate a contact and long polling URI for the created connection.
      *
      * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
      *            {@link LongPollingURIs}
+     * @param listener A listener that will receive events related to the &lt;notificationChannel&gt;
      * @return The contact and long polling URI of the long polling connection
      * @throws ServletException If no binding exists for the given URI scheme
      */
     LongPollingURIs createServerCommunicationChannel(SongURI serverURI, ChannelServerListener listener) throws ServletException;
 
     /**
-     * Creates a server <communicationChannel> connection on the given URI.
+     * Creates a server &lt;communicationChannel&gt; connection on the given URI.
      * <p>
      * The method is in charge to generate a contact and long polling URI for the created connection.
      *
      * @param serverURI The URI that is the base to build the server long polling connection and which allows to build the
      *            {@link LongPollingURIs}
+     * @param listener A listener that will receive events related to the &lt;notificationChannel&gt;
      * @return The contact and long polling URI of the long polling connection
      * @throws URISyntaxException If the given server URI has an incorrect syntax
      * @throws ServletException If no binding exists for the given URI scheme
@@ -227,24 +241,26 @@ public interface SongDynamicRouter {
             throws URISyntaxException, ServletException;
 
     /**
-     * Creates a server <communicationChannel> connection with the given contact and long polling URIs.
+     * Creates a server &lt;communicationChannel&gt; connection with the given contact and long polling URIs.
      * <p>
      * The container is allowed to reject the given URIs if it cannot managed them.
      *
      * @param contactURI The contact URI to use in the long polling connection
      * @param longPollingURI The long polling URI to use in the long polling connection
+     * @param listener A listener that will receive events related to the &lt;notificationChannel&gt;
      * @throws ServletException If no binding exists for the given URIs scheme or the container rejects the given URIs
      */
     void createServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
             throws ServletException;
 
     /**
-     * Creates a server <communicationChannel> connection with the given contact and long polling URIs.
+     * Creates a server &lt;communicationChannel&gt; connection with the given contact and long polling URIs.
      * <p>
      * The container is allowed to reject the given URIs if it cannot managed them.
      *
      * @param contactURI The contact URI to use in the long polling connection
      * @param longPollingURI The long polling URI to use in the long polling connection
+     * @param listener A listener that will receive events related to the &lt;notificationChannel&gt;
      * @throws URISyntaxException If the given server URI has an incorrect syntax
      * @throws ServletException If no binding exists for the given URIs scheme or the container rejects the given URIs
      */
@@ -252,7 +268,7 @@ public interface SongDynamicRouter {
             throws URISyntaxException, ServletException;
 
     /**
-     * Deletes a server <communicationChannel> connection given its contact and long polling URI.
+     * Deletes a server &lt;communicationChannel&gt; connection given its contact and long polling URI.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
@@ -260,7 +276,7 @@ public interface SongDynamicRouter {
     void deleteServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI);
 
     /**
-     * Deletes a server <communicationChannel> connection given its contact and long polling URI.
+     * Deletes a server &lt;communicationChannel&gt; connection given its contact and long polling URI.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
@@ -268,13 +284,15 @@ public interface SongDynamicRouter {
     void deleteServerCommunicationChannel(String contactURI, String longPollingURI);
 
     /**
-     * Creates a client <communicationChannel> connection from the given contact and long polling URIs.
+     * Creates a client &lt;communicationChannel&gt; connection from the given contact and long polling URIs.
      * <p>
      * This will trigger the connection creation on the long polling URI. An entry will also be added to the container external
      * aliases route table mapping the contact URI to the current application.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
+     * @param requestingEntity The requesting entity to use for the &lt;communicationChannel&gt; requests
+     * @param listener A listener that will receive events related to the &lt;communicationChannel&gt;
      * @throws ServletException If no binding exists for the given URIs scheme or if a long polling connection if already opened
      *             for the given contact and long polling URIs
      */
@@ -282,13 +300,15 @@ public interface SongDynamicRouter {
             ChannelClientListener listener) throws ServletException;
 
     /**
-     * Creates a client <communicationChannel> connection from the given contact and long polling URIs.
+     * Creates a client &lt;communicationChannel&gt; connection from the given contact and long polling URIs.
      * <p>
      * This will trigger the connection creation on the long polling URI. An entry will also be added to the container external
      * aliases route table mapping the contact URI to the current application.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
+     * @param requestingEntity The requesting entity to use for the &lt;communicationChannel&gt; requests
+     * @param listener A listener that will receive events related to the &lt;communicationChannel&gt;
      * @throws URISyntaxException If the given server URI has an incorrect syntax
      * @throws ServletException If no binding exists for the given URIs scheme or if a long polling connection if already opened
      *             for the given contact and long polling URIs
@@ -297,7 +317,7 @@ public interface SongDynamicRouter {
             ChannelClientListener listener) throws URISyntaxException, ServletException;
 
     /**
-     * Deletes a client <communicationChannel> connection given its contact and long polling URI.
+     * Deletes a client &lt;communicationChannel&gt; connection given its contact and long polling URI.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection
@@ -305,7 +325,7 @@ public interface SongDynamicRouter {
     void deleteClientCommunicationChannel(SongURI contactURI, SongURI longPollingURI);
 
     /**
-     * Deletes a client <communicationChannel> connection given its contact and long polling URI.
+     * Deletes a client &lt;communicationChannel&gt; connection given its contact and long polling URI.
      *
      * @param contactURI The contact URI of the long polling connection
      * @param longPollingURI The long polling URI of the long polling connection

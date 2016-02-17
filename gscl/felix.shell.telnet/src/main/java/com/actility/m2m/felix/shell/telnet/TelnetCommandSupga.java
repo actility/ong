@@ -46,9 +46,9 @@ public class TelnetCommandSupga extends TelnetCommand {
      * followed by a response but if trying to enter a mode * that we are already in, no response is returned. * * This is
      * essential to prevent negotiation loops. * *
      *
-     * @parameter action, one of the telnet protocol basic actions * DO, DONT, WILL, WONT or SE *
-     * @parameter optionCode, the option code *
-     * @parameter parameters, a string with optional parameters to the option code. * *
+     * @param action one of the telnet protocol basic actions * DO, DONT, WILL, WONT or SE *
+     * @param optionCode the option code *
+     * @param parameters a string with optional parameters to the option code. * *
      * @return a String with the response to the command.
      */
 

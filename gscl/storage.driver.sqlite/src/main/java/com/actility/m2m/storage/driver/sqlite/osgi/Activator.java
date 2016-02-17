@@ -70,8 +70,8 @@ public final class Activator implements BundleActivator, ManagedService {
     /**
      * Creates a new database if the existing doesn't exists and checks the database version of the database.
      *
-     * @param bundleContext
-     * @param config
+     * @param context The bundle context
+     * @throws Exception If any problem occurs while initializing the class
      */
     public void start(BundleContext context) throws Exception {
         this.context = context;

@@ -141,7 +141,9 @@ public final class ApplicationSessionImpl implements ExtApplicationSession, Seri
     /**
      * Constructor of the Application Session.
      *
+     * @param id The application session id
      * @param context The servlet context of the application that has created this application session
+     * @param handlers A Map of {@link ExtProtocolSession}
      */
     public ApplicationSessionImpl(String id, ServletContextImpl context, Map handlers) {
         this.id = id;

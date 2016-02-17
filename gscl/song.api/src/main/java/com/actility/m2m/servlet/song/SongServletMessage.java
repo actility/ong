@@ -89,7 +89,7 @@ public interface SongServletMessage {
      * the response.
      * <p>
      * <code>Accept-Encoding = "Accept-Encoding" ":"
-     *    1#( codings [ ";" "q" "=" qvalue ] )<br />
+     *    1#( codings [ ";" "q" "=" qvalue ] )<br>
      * codings          = ( content-coding | "*" )</code>
      * <p>
      * Example: <code>Accept-Encoding: gzip;q=1.0, identity; q=0.5, *;q=0</code>
@@ -239,7 +239,7 @@ public interface SongServletMessage {
      * <p>
      * Example:
      * <p>
-     * <code>Retry-After: Fri, 31 Dec 1999 23:59:59 GMT<br />
+     * <code>Retry-After: Fri, 31 Dec 1999 23:59:59 GMT<br>
      * Retry-After: 120</code>
      *
      * @since SONG/1.0
@@ -312,8 +312,8 @@ public interface SongServletMessage {
      * providing an end-to-end message integrity check (MIC) of the entity-body. (Note: a MIC is good for detecting accidental
      * modification of the entity-body in transit, but is not proof against malicious attacks.)
      * <p>
-     * <code>Content-MD5 = "Content-MD5" ":" md5-digest<br />
-     * md5-digest = &lt;base64 of 128 bit MD5 digest as per RFC 1864></code>
+     * <code>Content-MD5 = "Content-MD5" ":" md5-digest<br>
+     * md5-digest = &lt;base64 of 128 bit MD5 digest as per RFC 1864&gt;</code>
      *
      * @since SONG/1.0
      */
@@ -553,7 +553,7 @@ public interface SongServletMessage {
     /**
      * Returns the IP address of the next upstream/downstream hop from which this message was received.
      *
-     * <br/>
+     * <br>
      * If the message was internally routed (from one application to the next within the same container), then this method
      * returns the address of the container's protocol interface.
      *
@@ -562,7 +562,7 @@ public interface SongServletMessage {
     java.lang.String getRemoteAddr();
 
     /**
-     * Returns the port number of the next upstream/downstream hop from which this message was received. <br/>
+     * Returns the port number of the next upstream/downstream hop from which this message was received. <br>
      * If the message was internally routed (from one application to the next within the same container), then this method
      * returns a valid port number chosen by the container or the host TCP/IP stack.
      *

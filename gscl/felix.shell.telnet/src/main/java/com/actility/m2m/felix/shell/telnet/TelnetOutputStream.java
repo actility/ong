@@ -101,7 +101,8 @@ public class TelnetOutputStream extends FilterOutputStream {
     /**
      * * Write a telnet command in the output stream. * *
      *
-     * @parameter tc, command string to write
+     * @param tc command string to write
+     * @throws IOException If any IO error occurs
      */
     public synchronized void writeCommand(String tc) throws IOException {
         if (tc != null) {

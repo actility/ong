@@ -46,6 +46,7 @@ public class LogUtils {
     /**
      * Converts from a numeric log severity level to a left justified string of at least the given length.
      *
+     * @param sb The string buffer in which to append the log
      * @param level is the log severity level.
      * @param padding Padding that determine the final level length
      */
