@@ -208,13 +208,12 @@ build external/cproto $HOST_TARGET
 build external/libmicrohttpd $TARGET "{cov2|rpib|lpv3|ntc6200|centos6-x86|centos6-x86_64}"
 build external/jni $TARGET
 build external/exip $TARGET "{centos6-x86}"
-#build external/phoneme-advanced-mr2 $TARGET "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
-#PHONEME_VERSION=$(cat external/phoneme-advanced-mr2/Version)-$(cat external/phoneme-advanced-mr2/apu/revision)
-#export PHONEME_TARGET_DIR=$CURRENT/.build/$TARGET/phoneme
-#PHONEME_APU=$HOME/.m2/repository/com/sun/phoneme-advanced-mr2/$PHONEME_VERSION/phoneme-advanced-mr2-$PHONEME_VERSION-$TARGET.apu
-#apuInstall $PHONEME_APU $PHONEME_TARGET_DIR
-#export PHONEME_HOME=$PHONEME_TARGET_DIR/bin/phoneme
-
+build external/phoneme-advanced-mr2 $TARGET "{cov1|cov2|rpib|lpv3|ntc6200|centos6-x86}"
+PHONEME_VERSION=$(cat external/phoneme-advanced-mr2/Version)-$(cat external/phoneme-advanced-mr2/apu/revision)
+export PHONEME_TARGET_DIR=$CURRENT/.build/$TARGET/phoneme
+PHONEME_APU=$HOME/.m2/repository/com/sun/phoneme-advanced-mr2/$PHONEME_VERSION/phoneme-advanced-mr2-$PHONEME_VERSION-$TARGET.apu
+apuInstall $PHONEME_APU $PHONEME_TARGET_DIR
+export PHONEME_HOME=$PHONEME_TARGET_DIR/bin/phoneme
 
 build common/java.pom
 build common/java.cdc.pom
