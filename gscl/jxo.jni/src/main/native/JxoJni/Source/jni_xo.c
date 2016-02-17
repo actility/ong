@@ -757,7 +757,7 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferBinaryToXm
 }
 
 JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferBinaryToExi64
-(JNIEnv * env, jclass class, jlong xoHandle, jstring path, jboolean obix)
+(JNIEnv * env, jclass class, jlong xoHandle, jstring attributeName, jboolean obix)
 {
 #ifdef EXI
   // 1. get attribute
@@ -854,7 +854,7 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferXmlToBinar
 }
 
 JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferXmlToExi64
-(JNIEnv * env, jclass class, jlong xoHandle, jstring path, jboolean obix)
+(JNIEnv * env, jclass class, jlong xoHandle, jstring attributeName, jboolean obix)
 {
 #ifdef EXI
   // 1. get attribute
@@ -885,6 +885,7 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferXmlToExi64
       // 3. save binary
       char *newBuffer = NULL;
       int length;
+      void* w = NULL;
 
       w = XoWritExiMem(xoObject, flags, &newBuffer, &length, "", 0);
       XoFree(xoObject, 1);
@@ -905,7 +906,7 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferXmlToExi64
 }
 
 JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferExiToBinary64
-(JNIEnv * env, jclass class, jlong xoHandle, jstring path, jboolean obix)
+(JNIEnv * env, jclass class, jlong xoHandle, jstring attributeName, jboolean obix)
 {
 #ifdef EXI
   // 1. get attribute
@@ -956,7 +957,7 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferExiToBinar
 }
 
 JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferExiToXml64
-(JNIEnv * env, jclass class, jlong xoHandle, jstring path, jboolean obix)
+(JNIEnv * env, jclass class, jlong xoHandle, jstring attributeName, jboolean obix)
 {
 #ifdef EXI
   // 1. get attribute
@@ -986,7 +987,7 @@ JNIEXPORT void JNICALL Java_com_actility_m2m_xo_jni_JniXo_xoNmXoBufferExiToXml64
     {
       // 3. save binary
       char *newBuffer = NULL;
-      int newBufferLength = 0;
+      void* w = NULL;
 
       w = XoWritXmlMem(xoObject, flags, &newBuffer, "");
       XoFree(xoObject, 1);
