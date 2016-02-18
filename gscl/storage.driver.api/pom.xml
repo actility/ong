@@ -11,7 +11,7 @@
   <version>1.0.0</version>
   <packaging>bundle</packaging>
 
-  <name>[API] Storage driveri Service</name>
+  <name>[API] Storage driver Service</name>
 
   <dependencies>
     <dependency>
