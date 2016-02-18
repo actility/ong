@@ -93,6 +93,14 @@ public interface StorageFactory {
     public Document createDocument(String path);
 
     /**
+     * Creates a document to interact with the storage API.
+     *
+     * @param id The internal id for this document
+     * @return The created document
+     */
+    public Document createDocumentFromId(String id);
+
+    /**
      * Builds an attribute operation to modify a single attribute in a document
      *
      * @param type The operation type (either SET or UNSET)

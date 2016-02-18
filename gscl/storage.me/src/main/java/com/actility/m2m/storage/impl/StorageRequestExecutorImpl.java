@@ -22,7 +22,8 @@ public class StorageRequestExecutorImpl implements StorageRequestExecutor {
     private final DriverManager driverManager;
     private final StorageFactoryImpl storageFactory;
 
-    public StorageRequestExecutorImpl(String defaultDriverName, Map/* <String, StorageRequestDriverExecutor> */drivers) {
+    public StorageRequestExecutorImpl(String defaultDriverName,
+            Map/* <String, StorageRequestDriverExecutor> */ drivers) {
         this.driverManager = new DriverManager(defaultDriverName, drivers);
         this.storageFactory = new StorageFactoryImpl(driverManager);
     }
@@ -58,9 +59,9 @@ public class StorageRequestExecutorImpl implements StorageRequestExecutor {
         return document;
     }
 
-    public Document retrieve(Map config, Object id, Condition condition) throws StorageException {
+    public Document retrieveFromId(Map config, String id, Condition condition) throws StorageException {
         if (Profiler.getInstance().isTraceEnabled()) {
-            Profiler.getInstance().trace(">>> Retrieve path: " + id);
+            Profiler.getInstance().trace(">>> Retrieve Id: " + id);
         }
         StorageRequestDriverExecutor driverExecutor = driverManager.resolveDriver(config);
 
@@ -68,9 +69,9 @@ public class StorageRequestExecutorImpl implements StorageRequestExecutor {
             throw new StorageException("Storage driver not found: "
                     + ((config != null) ? config.get(CONFIG_DRIVER_NAME) : driverManager.getDefaultDriverName()));
         }
-        Document document = driverExecutor.retrieve(config, id, condition);
+        Document document = driverExecutor.retrieveFromId(config, id, condition);
         if (Profiler.getInstance().isTraceEnabled()) {
-            Profiler.getInstance().trace("<<< Retrieve path: " + id);
+            Profiler.getInstance().trace("<<< Retrieve Id: " + id);
         }
         return document;
     }
@@ -93,8 +94,8 @@ public class StorageRequestExecutorImpl implements StorageRequestExecutor {
         return result;
     }
 
-    public boolean partialUpdate(Map/* <String, String> */config, Document document, byte[] content,
-            List/* <AttributeOperation> */attrOps, Condition condition) throws StorageException {
+    public boolean partialUpdate(Map/* <String, String> */ config, Document document, byte[] content,
+            List/* <AttributeOperation> */ attrOps, Condition condition) throws StorageException {
         if (Profiler.getInstance().isTraceEnabled()) {
             Profiler.getInstance().trace(">>> Partial update path: " + document.getPath());
         }
@@ -112,7 +113,7 @@ public class StorageRequestExecutorImpl implements StorageRequestExecutor {
         return result;
     }
 
-    public boolean create(Map/* <String, String> */config, Document document) throws StorageException {
+    public boolean create(Map/* <String, String> */ config, Document document) throws StorageException {
         if (Profiler.getInstance().isTraceEnabled()) {
             Profiler.getInstance().trace(">>> Create path: " + document.getPath());
         }
@@ -166,8 +167,8 @@ public class StorageRequestExecutorImpl implements StorageRequestExecutor {
         return result;
     }
 
-    public SearchResult search(Map/* <String, String> */config, String path, int scope, Condition condition, int order,
-            int limit, boolean withContent, List/* <String> */withAttributes) throws StorageException {
+    public SearchResult search(Map/* <String, String> */ config, String path, int scope, Condition condition, int order,
+            int limit, boolean withContent, List/* <String> */ withAttributes) throws StorageException {
         if (Profiler.getInstance().isTraceEnabled()) {
             Profiler.getInstance().trace(">>> Search path: " + path);
         }
@@ -178,7 +179,8 @@ public class StorageRequestExecutorImpl implements StorageRequestExecutor {
                     + ((config != null) ? config.get(CONFIG_DRIVER_NAME) : driverManager.getDefaultDriverName()));
         }
 
-        SearchResult result = driverExecutor.search(config, path, scope, condition, order, limit, withContent, withAttributes);
+        SearchResult result = driverExecutor.search(config, path, scope, condition, order, limit, withContent,
+                withAttributes);
         if (Profiler.getInstance().isTraceEnabled()) {
             Profiler.getInstance().trace("<<< Search path: " + path);
         }

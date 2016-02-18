@@ -8,7 +8,7 @@
     <version>[3.0.0,4)</version>
   </parent>
   <artifactId>storage.driver.api</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>[API] Storage driver Service</name>
@@ -17,7 +17,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.api</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

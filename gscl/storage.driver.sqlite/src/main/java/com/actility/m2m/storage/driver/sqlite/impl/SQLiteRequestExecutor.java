@@ -31,7 +31,6 @@ import com.actility.m2m.storage.StorageException;
 import com.actility.m2m.storage.StorageRequestExecutor;
 import com.actility.m2m.storage.driver.Transaction;
 
-
 public final class SQLiteRequestExecutor {
     private final static Logger LOG = Logger.getLogger(SQLiteRequestExecutor.class);
     private final static SimpleDateFormat FORMATER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -39,7 +38,7 @@ public final class SQLiteRequestExecutor {
     private String actualDBFileName;
     private InternalAttribute[] attributesJavaBackup;
     private InternalAttrOperation[] operationsJavaBackup;
-    private List/* <InternalCondition> */conditionsJavaBackup;
+    private List/* <InternalCondition> */ conditionsJavaBackup;
     private int internalConditionLength = 0;
     private DeletionHandler deletionHandler;
     public SqliteDB openedDB;
@@ -47,7 +46,8 @@ public final class SQLiteRequestExecutor {
     /**
      * Class constructor
      *
-     * @param openedConnToDB the sqlite database
+     * @param openedConnToDB
+     *            the sqlite database
      */
     public SQLiteRequestExecutor(SqliteDB openedConnToDB) {
         this.openedDB = openedConnToDB;
@@ -56,8 +56,10 @@ public final class SQLiteRequestExecutor {
     /**
      * Class constructor
      *
-     * @param config storage configuration to apply
-     * @throws StorageException if any problem occurs while activate the driver
+     * @param config
+     *            storage configuration to apply
+     * @throws StorageException
+     *             if any problem occurs while activate the driver
      */
     public SQLiteRequestExecutor(Dictionary config) throws StorageException {
         if (LOG.isInfoEnabled()) {
@@ -78,14 +80,25 @@ public final class SQLiteRequestExecutor {
         LOG.info(new StringBuffer("dbFile: ").append(dbFile.getAbsolutePath()));
         if (!dbExists) {
             LOG.warn(new StringBuffer("creating database ").append(actualDBFileName));
-             if(actualDBFileName.lastIndexOf('/')!=-1){
-                 File folder = new File(actualDBFileName.substring(0, actualDBFileName.lastIndexOf('/')));
-                 if(!folder.exists() || !folder.isDirectory()){
-                     LOG.error("Directory of database file not exist or is not a directory "/*+folder.getAbsolutePath()*/);
-                 throw new
-                 StorageException("Directory of database file not exist or is not a directory "/*+folder.getAbsolutePath()*/);
-                 }
-             }
+            if (actualDBFileName.lastIndexOf('/') != -1) {
+                File folder = new File(actualDBFileName.substring(0, actualDBFileName.lastIndexOf('/')));
+                if (!folder.exists() || !folder.isDirectory()) {
+                    LOG.error("Directory of database file not exist or is not a directory "/*
+                                                                                            * +folder
+                                                                                            * .
+                                                                                            * getAbsolutePath
+                                                                                            * (
+                                                                                            * )
+                                                                                            */);
+                    throw new StorageException("Directory of database file not exist or is not a directory "/*
+                                                                                                             * +folder
+                                                                                                             * .
+                                                                                                             * getAbsolutePath
+                                                                                                             * (
+                                                                                                             * )
+                                                                                                             */);
+                }
+            }
         }
         openedDB = sqlitedriver.SqliteOpen(actualDBFileName);
         if (openedDB == null) {
@@ -95,7 +108,8 @@ public final class SQLiteRequestExecutor {
         try {
             // read and execute script
             if (!dbExists) {
-                // make a copy of the database model and execute the sql script of creation
+                // make a copy of the database model and execute the sql script
+                // of creation
                 readSqlScript();
             }
         } catch (IOException e) {
@@ -124,7 +138,8 @@ public final class SQLiteRequestExecutor {
     /**
      * Convert a list of conditions to a tab of conditions readable in C
      *
-     * @param conditions a list of conditions
+     * @param conditions
+     *            a list of conditions
      * @return internal condition table
      */
     private SWIGTYPE_p_p_InternalCondition convertToInternalCondition(List conditions) {
@@ -143,7 +158,8 @@ public final class SQLiteRequestExecutor {
     /**
      * Convert a condition to a condition readable in C
      *
-     * @param conditions the document condition
+     * @param conditions
+     *            the document condition
      * @return internal condition
      */
     private InternalCondition convertToInternalCondition(Condition condition, boolean firstTime) {
@@ -183,11 +199,14 @@ public final class SQLiteRequestExecutor {
     /**
      * Convert an iterator of attributes to a tab of attributes readable in C
      *
-     * @param searchAttributes the iterator of attributes
+     * @param searchAttributes
+     *            the iterator of attributes
      * @return the internal table of attributes
-     * @throws StorageException if any problem occurs while convert attributes
+     * @throws StorageException
+     *             if any problem occurs while convert attributes
      */
-    private SWIGTYPE_p_p_InternalAttribute convertToInternalAttributes(Iterator searchAttributes) throws StorageException {
+    private SWIGTYPE_p_p_InternalAttribute convertToInternalAttributes(Iterator searchAttributes)
+            throws StorageException {
         List listInternal = new LinkedList();
         int index = 0;
         while (searchAttributes.hasNext()) {
@@ -222,8 +241,9 @@ public final class SQLiteRequestExecutor {
                             attribute.setDate_value(FORMATER.format(((Date) attributeList.get(i))));
                             attribute.setType(Util.ATTR_TYPE_LIST_DATE);
                         } else {
-                            throw new StorageException("Search attributes embed an object which is not a valid attribute: "
-                                    + attributeList.get(i) + " (" + attributeList.get(i).getClass() + ")");
+                            throw new StorageException(
+                                    "Search attributes embed an object which is not a valid attribute: "
+                                            + attributeList.get(i) + " (" + attributeList.get(i).getClass() + ")");
                         }
                         listInternal.add(attribute);
                         index++;
@@ -240,8 +260,8 @@ public final class SQLiteRequestExecutor {
                     }
                 }
             } else {
-                throw new StorageException("Search attributes embed an object which is not a pair: " + searchAttribute + " ("
-                        + searchAttribute.getClass() + ")");
+                throw new StorageException("Search attributes embed an object which is not a pair: " + searchAttribute
+                        + " (" + searchAttribute.getClass() + ")");
             }
         }
         SWIGTYPE_p_p_InternalAttribute attributes = sqlitedriver.new_attribute_array(index);
@@ -260,7 +280,8 @@ public final class SQLiteRequestExecutor {
     /**
      * Convert a map of storage configuration to an object readable in C
      *
-     * @param config storage configuration to apply
+     * @param config
+     *            storage configuration to apply
      * @return the object readable in C
      */
     private ConfigList internalGetConfigList(Map config) {
@@ -293,7 +314,8 @@ public final class SQLiteRequestExecutor {
     /**
      * Convert a list of operations to a table of operations readable in C
      *
-     * @param operations the list operations to convert
+     * @param operations
+     *            the list operations to convert
      * @return the table of operations readable in C
      */
     private SWIGTYPE_p_p_InternalAttrOperation convertAttributeOperationToInternal(List operations) {
@@ -369,13 +391,15 @@ public final class SQLiteRequestExecutor {
     /**
      * Convert a result of a search to document
      *
-     * @param subResult the result of a search
+     * @param subResult
+     *            the result of a search
      * @return The document
-     * @throws ParseException if any problem occurs while convert attributes
+     * @throws ParseException
+     *             if any problem occurs while convert attributes
      */
     private Document convertSubSearchResultToDocument(subSearchResult subResult) throws ParseException {
-        Document doc = new DocumentImpl(new Long(subResult.getId()), new StringBuffer(subResult.getPath()).append(
-                subResult.getName()).toString());
+        Document doc = new DocumentImpl(Long.toString(subResult.getId()),
+                new StringBuffer(subResult.getPath()).append(subResult.getName()).toString());
         doc.setContent(subResult.getContent().length == 0 ? null : subResult.getContent());
         SWIGTYPE_p_p_InternalAttribute attributes = subResult.getAttributes();
         if (subResult.getAttr_count() == 0) {
@@ -432,10 +456,16 @@ public final class SQLiteRequestExecutor {
     /**
      * Reserves space for the creation of future documents
      *
-     * @param config StorageConfiguration to apply
-     * @param path path under which documents are going to be created
-     * @param docNumber maximum number of documents that can be created in reserved space
-     * @param docSize maximum size of documents that can be created in reserved space
+     * @param config
+     *            StorageConfiguration to apply
+     * @param path
+     *            path under which documents are going to be created
+     * @param docNumber
+     *            maximum number of documents that can be created in reserved
+     *            space
+     * @param docSize
+     *            maximum size of documents that can be created in reserved
+     *            space
      * @return A reservation code
      */
     public String reserveSpace(Map config, String path, String docNumber, double docSize) {
@@ -446,7 +476,8 @@ public final class SQLiteRequestExecutor {
      * Begin a transaction. Raises an exception if transaction cannot be opened
      *
      * @return an instance of class Transaction
-     * @throws StorageException if transaction cannot be opened
+     * @throws StorageException
+     *             if transaction cannot be opened
      */
     public Transaction beginTransaction() throws StorageException {
         if (LOG.isInfoEnabled()) {
@@ -460,9 +491,11 @@ public final class SQLiteRequestExecutor {
     }
 
     /**
-     * Create an SQL transaction. Manage the writable access of the SQLite database
+     * Create an SQL transaction. Manage the writable access of the SQLite
+     * database
      *
-     * @throws StorageException if the transaction cannot be created
+     * @throws StorageException
+     *             if the transaction cannot be created
      */
     public void createTransaction() throws StorageException {
         if (LOG.isInfoEnabled()) {
@@ -479,7 +512,8 @@ public final class SQLiteRequestExecutor {
     /**
      * Commit the SQL transaction.
      *
-     * @throws StorageException if the transaction cannot be commit
+     * @throws StorageException
+     *             if the transaction cannot be commit
      */
     public void commitTransaction() throws StorageException {
         if (LOG.isInfoEnabled()) {
@@ -496,7 +530,8 @@ public final class SQLiteRequestExecutor {
     /**
      * Rollback the SQL transaction.
      *
-     * @throws StorageException if the transaction cannot be rollback.
+     * @throws StorageException
+     *             if the transaction cannot be rollback.
      */
     public void rollbackTransaction() throws StorageException {
         if (LOG.isInfoEnabled()) {
@@ -528,7 +563,8 @@ public final class SQLiteRequestExecutor {
     /**
      * Link the deletionHandler to the delete function
      *
-     * @param deletionHandler to link
+     * @param deletionHandler
+     *            to link
      */
     public void bindDeletionHandler(DeletionHandler deletionHandler) {
         this.deletionHandler = deletionHandler;
@@ -537,7 +573,8 @@ public final class SQLiteRequestExecutor {
     /**
      * UnLink the deletionHandler to the delete function
      *
-     * @param deletionHandler to unlink
+     * @param deletionHandler
+     *            to unlink
      */
     public void unbindDeletionHandler(DeletionHandler deletionHandler) {
         if (this.deletionHandler == deletionHandler) {
@@ -548,7 +585,8 @@ public final class SQLiteRequestExecutor {
     /**
      * Read the SQL file which can generate the database
      *
-     * @throws IOException if any problem occurs while read the SQL script
+     * @throws IOException
+     *             if any problem occurs while read the SQL script
      */
     private void readSqlScript() throws IOException {
         LOG.debug("Executing db creation script");
@@ -573,7 +611,8 @@ public final class SQLiteRequestExecutor {
     /**
      * Check if the database has the last version number and if not, upgrade it
      *
-     * @throws StorageException if any problem occurs
+     * @throws StorageException
+     *             if any problem occurs
      */
     private void checkDBVersion() throws StorageException {
         int[] major = { 0 };
@@ -619,12 +658,20 @@ public final class SQLiteRequestExecutor {
     /**
      * Retrieves a document
      *
-     * @param config storage configuration to apply
-     * @param path the full (absolute) path of the document (it must not end with a slash and must be normalized)
-     * @param id Internal id of the document to retrieve
-     * @param condition condition that must be fulfilled in order to perform the operation
-     * @return The retrieved document or <code>null</code> if the document does not exist or the condition is not fulfilled
-     * @throws StorageException if any problem occurs while retrieving the document
+     * @param config
+     *            storage configuration to apply
+     * @param path
+     *            the full (absolute) path of the document (it must not end with
+     *            a slash and must be normalized)
+     * @param id
+     *            Internal id of the document to retrieve
+     * @param condition
+     *            condition that must be fulfilled in order to perform the
+     *            operation
+     * @return The retrieved document or <code>null</code> if the document does
+     *         not exist or the condition is not fulfilled
+     * @throws StorageException
+     *             if any problem occurs while retrieving the document
      */
     private Document retrieve(Map config, String path, long id, Condition condition) throws StorageException {
         if (LOG.isDebugEnabled()) {
@@ -698,28 +745,41 @@ public final class SQLiteRequestExecutor {
     /**
      * Retrieves a document
      *
-     * @param config storage configuration to apply
-     * @param path the full (absolute) path of the document (it must not end with a slash and must be normalized)
-     * @param condition condition that must be fulfilled in order to perform the operation
-     * @return The retrieved document or <code>null</code> if the document does not exist or the condition is not fulfilled
-     * @throws StorageException if any problem occurs while retrieving the document
+     * @param config
+     *            storage configuration to apply
+     * @param path
+     *            the full (absolute) path of the document (it must not end with
+     *            a slash and must be normalized)
+     * @param condition
+     *            condition that must be fulfilled in order to perform the
+     *            operation
+     * @return The retrieved document or <code>null</code> if the document does
+     *         not exist or the condition is not fulfilled
+     * @throws StorageException
+     *             if any problem occurs while retrieving the document
      */
     public Document retrieve(Map config, String path, Condition condition) throws StorageException {
-        return retrieve(config, path, 0, condition);
+        return retrieve(config, path, 0L, condition);
     }
 
     /**
      * Retrieves a document
      *
-     * @param config storage configuration to apply
-     * @param id Internal id of the document to retrieve
-     * @param condition condition that must be fulfilled in order to perform the operation
-     * @return The retrieved document or <code>null</code> if the document does not exist or the condition is not fulfilled
-     * @throws StorageException if any problem occurs while retrieving the document
+     * @param config
+     *            storage configuration to apply
+     * @param id
+     *            Internal id of the document to retrieve
+     * @param condition
+     *            condition that must be fulfilled in order to perform the
+     *            operation
+     * @return The retrieved document or <code>null</code> if the document does
+     *         not exist or the condition is not fulfilled
+     * @throws StorageException
+     *             if any problem occurs while retrieving the document
      */
-    public Document retrieve(Map config, Object id, Condition condition) throws StorageException {
+    public Document retrieveFromId(Map config, String id, Condition condition) throws StorageException {
         try {
-            long _id = ((Long) id).longValue();
+            long _id = Long.parseLong(id);
             return retrieve(config, null, _id, condition);
         } catch (ClassCastException e) {
             throw new StorageException(e.getMessage());
@@ -732,12 +792,18 @@ public final class SQLiteRequestExecutor {
      * <p>
      * Raises an exception if the document does not exist.
      *
-     * @param config storage configuration to apply
-     * @param document the new representation of the document
-     * @param condition condition that must be fulfilled in order to perform the operation
-     * @return Whether the update has succeeded. If the update fails, it means the document does not exist in the storage or the
-     *         condition is not fulfilled
-     * @throws StorageException if any problem occurs while retrieving the document
+     * @param config
+     *            storage configuration to apply
+     * @param document
+     *            the new representation of the document
+     * @param condition
+     *            condition that must be fulfilled in order to perform the
+     *            operation
+     * @return Whether the update has succeeded. If the update fails, it means
+     *         the document does not exist in the storage or the condition is
+     *         not fulfilled
+     * @throws StorageException
+     *             if any problem occurs while retrieving the document
      */
     public boolean update(Map config, Document document, Condition condition) throws StorageException {
         if (document == null) {
@@ -773,8 +839,7 @@ public final class SQLiteRequestExecutor {
         boolean res = false;
 
         try {
-
-            id = (document.getId() == null ? 0 : ((Long) document.getId()).longValue());
+            id = (document.getId() == null ? 0L : Long.parseLong(document.getId()));
         } catch (ClassCastException e) {
             throw new StorageException(e.getMessage());
         }
@@ -795,8 +860,8 @@ public final class SQLiteRequestExecutor {
         ConfigList configList = internalGetConfigList(config);
         InternalCondition cond = convertToInternalCondition(condition, true);
         int numberOfAffectedRows = sqlitedriver.sqliteUpdate(openedDB, configList, fullPath, id,
-                (document.getContent() == null ? new byte[] {} : document.getContent()), (document.getContent() == null ? -1
-                        : document.getContent().length), attrs, attrsLength, cond);
+                (document.getContent() == null ? new byte[] {} : document.getContent()),
+                (document.getContent() == null ? -1 : document.getContent().length), attrs, attrsLength, cond);
 
         if (numberOfAffectedRows < 0) {
             throw new StorageException("There isn't such a document");
@@ -814,14 +879,24 @@ public final class SQLiteRequestExecutor {
      * <p>
      * Raises an exception if the document does not exist.
      *
-     * @param config storage configuration to apply
-     * @param document the document to partially update. Only id or path are used
-     * @param content the new content for the document (if <code>null</code>, do not update the content)
-     * @param attrOps operations to perform on the document attributes (if <code>null</code> or empty, do not update attributes)
-     * @param condition condition that must be fulfilled in order to perform the operation
-     * @return Whether the partial update has succeeded. If the partial update fails, it means the document does not exist or
-     *         the condition is not fulfilled
-     * @throws StorageException if any problem occurs while retrieving the document
+     * @param config
+     *            storage configuration to apply
+     * @param document
+     *            the document to partially update. Only id or path are used
+     * @param content
+     *            the new content for the document (if <code>null</code>, do not
+     *            update the content)
+     * @param attrOps
+     *            operations to perform on the document attributes (if
+     *            <code>null</code> or empty, do not update attributes)
+     * @param condition
+     *            condition that must be fulfilled in order to perform the
+     *            operation
+     * @return Whether the partial update has succeeded. If the partial update
+     *         fails, it means the document does not exist or the condition is
+     *         not fulfilled
+     * @throws StorageException
+     *             if any problem occurs while retrieving the document
      */
     public boolean partialUpdate(Map config, Document document, byte[] content, List attrOps, Condition condition)
             throws StorageException {
@@ -861,7 +936,7 @@ public final class SQLiteRequestExecutor {
         }
 
         try {
-            id = (document.getId() == null ? 0 : ((Long) document.getId()).longValue());
+            id = (document.getId() == null ? 0L : Long.parseLong(document.getId()));
         } catch (ClassCastException e) {
             throw new StorageException(e.getMessage());
         }
@@ -882,8 +957,8 @@ public final class SQLiteRequestExecutor {
 
         byte[] internalContent = (content == null ? new byte[] {} : content);
         int numberOfAffectedRows = sqlitedriver.sqlitePartialUpdate(openedDB, configList, fullPath, id, internalContent,
-                (content == null ? -1 : content.length), internalAttrOps, (attrOps == null ? 0 : operationsJavaBackup.length),
-                cond);
+                (content == null ? -1 : content.length), internalAttrOps,
+                (attrOps == null ? 0 : operationsJavaBackup.length), cond);
 
         if (numberOfAffectedRows < 0) {
             throw new StorageException("There isn't such a document");
@@ -901,10 +976,14 @@ public final class SQLiteRequestExecutor {
      * <p>
      * Raises an exception if the document already exists.
      *
-     * @param config storage configuration to apply
-     * @param document the representation of the document
-     * @return Whether the create has succeeded. If the create fails, it means the document already exists
-     * @throws StorageException if any problem occurs while retrieving the document
+     * @param config
+     *            storage configuration to apply
+     * @param document
+     *            the representation of the document
+     * @return Whether the create has succeeded. If the create fails, it means
+     *         the document already exists
+     * @throws StorageException
+     *             if any problem occurs while retrieving the document
      */
     public boolean create(Map config, Document document) throws StorageException {
         if (document == null) {
@@ -949,15 +1028,16 @@ public final class SQLiteRequestExecutor {
         ConfigList configList = internalGetConfigList(config);
         long[] doc_id = { 0 };
         sqlCode = sqlitedriver.sqliteCreate(openedDB, configList, document.getPath(),
-                (document.getContent() == null ? new byte[] {} : document.getContent()), (document.getContent() == null ? -1
-                        : document.getContent().length), attrs, attrsLength, doc_id);
+                (document.getContent() == null ? new byte[] {} : document.getContent()),
+                (document.getContent() == null ? -1 : document.getContent().length), attrs, attrsLength, doc_id);
 
         if (sqlCode != 101 && sqlCode != 0) {
             throw new StorageException(new StringBuffer().append("Sqlite code: ").append(sqlCode).toString());
         }
 
         if (LOG.isInfoEnabled()) {
-            LOG.info(new StringBuffer().append("End of create(").append(document.getPath()).append(", ...)").toString());
+            LOG.info(
+                    new StringBuffer().append("End of create(").append(document.getPath()).append(", ...)").toString());
         }
         return (sqlCode == 101);
     }
@@ -967,24 +1047,35 @@ public final class SQLiteRequestExecutor {
      * <p>
      * If scope is specified to:
      * <ul>
-     * <li>{@link StorageRequestExecutor#SCOPE_ONE_LEVEL}: deletes documents one level below the given path (this excludes the exact path). Delete do
-     * not manage concurrency and any created document created ONE_LEVEL below the given document during the deletion process
-     * will not be deleted</li>
-     * <li>{@link StorageRequestExecutor#SCOPE_SUB_TREE}: deletes documents reachable from the root document pointed by the given path (this includes
-     * the exact path). Delete SUB_TREE deletes the root document at the end to ensure it is not possible to re-create a
-     * sub-tree while deleting it. So after the delete sub-tree operation you are sure there is no documents in that path
-     * anymore</li>
+     * <li>{@link StorageRequestExecutor#SCOPE_ONE_LEVEL}: deletes documents one
+     * level below the given path (this excludes the exact path). Delete do not
+     * manage concurrency and any created document created ONE_LEVEL below the
+     * given document during the deletion process will not be deleted</li>
+     * <li>{@link StorageRequestExecutor#SCOPE_SUB_TREE}: deletes documents
+     * reachable from the root document pointed by the given path (this includes
+     * the exact path). Delete SUB_TREE deletes the root document at the end to
+     * ensure it is not possible to re-create a sub-tree while deleting it. So
+     * after the delete sub-tree operation you are sure there is no documents in
+     * that path anymore</li>
      * </ul>
      * <p>
      * Raises an exception if the document does not exist.
      *
-     * @param config storage configuration to apply
-     * @param document The document which serves as a root for the deletion. Only id or path are used
-     * @param scope a constant ({@link StorageRequestExecutor#SCOPE_ONE_LEVEL} or {@link StorageRequestExecutor#SCOPE_SUB_TREE})
-     * @param condition condition that must be fulfilled in order to perform the operation
-     * @return Whether the delete has succeeded. If the delete fails, it means the document does not exist or the condition is
-     *         not fulfilled
-     * @throws StorageException if any problem occurs while retrieving the document
+     * @param config
+     *            storage configuration to apply
+     * @param document
+     *            The document which serves as a root for the deletion. Only id
+     *            or path are used
+     * @param scope
+     *            a constant ({@link StorageRequestExecutor#SCOPE_ONE_LEVEL} or
+     *            {@link StorageRequestExecutor#SCOPE_SUB_TREE})
+     * @param condition
+     *            condition that must be fulfilled in order to perform the
+     *            operation
+     * @return Whether the delete has succeeded. If the delete fails, it means
+     *         the document does not exist or the condition is not fulfilled
+     * @throws StorageException
+     *             if any problem occurs while retrieving the document
      */
     public boolean delete(Map config, Document document, int scope, Condition condition) throws StorageException {
         if (document == null) {
@@ -1012,7 +1103,7 @@ public final class SQLiteRequestExecutor {
         long id = 0;
 
         try {
-            id = (document.getId() == null ? 0 : ((Long) document.getId()).longValue());
+            id = (document.getId() == null ? 0L : Long.parseLong(document.getId()));
         } catch (ClassCastException e) {
             throw new StorageException(e.getMessage());
         }
@@ -1033,8 +1124,8 @@ public final class SQLiteRequestExecutor {
             verif = true;
         }
         if (verif == true) {
-            SearchResult deleteResult = this.search(config, document.getPath(), scope, null, StorageRequestExecutor.ORDER_ASC,
-                    StorageRequestExecutor.NO_LIMIT, true, null);
+            SearchResult deleteResult = this.search(config, document.getPath(), scope, null,
+                    StorageRequestExecutor.ORDER_ASC, StorageRequestExecutor.NO_LIMIT, true, null);
             Iterator deleteIterator = deleteResult.getResults();
             while (deleteIterator.hasNext()) {
                 Document returnDoc = (Document) deleteIterator.next();
@@ -1050,7 +1141,8 @@ public final class SQLiteRequestExecutor {
             }
             deleteResult.close();
         }
-        numberOfAffectedRows = sqlitedriver.sqliteDeleteCascade(openedDB, configList, document.getPath(), id, scope, cond);
+        numberOfAffectedRows = sqlitedriver.sqliteDeleteCascade(openedDB, configList, document.getPath(), id, scope,
+                cond);
 
         if (numberOfAffectedRows < 0) {
             throw new StorageException(new StringBuffer("Error in delete ").append(numberOfAffectedRows).toString());
@@ -1063,12 +1155,17 @@ public final class SQLiteRequestExecutor {
      * <p>
      * Raises an exception if the document does not exist.
      *
-     * @param config storage configuration to apply
-     * @param document The document to delete. Only id or path are used
-     * @param condition condition that must be fulfilled in order to perform the operation
-     * @return Whether the delete has succeeded. If the delete fails, it means the document does not exist or the condition is
-     *         not fulfilled
-     * @throws StorageException if any problem occurs while retrieving the document
+     * @param config
+     *            storage configuration to apply
+     * @param document
+     *            The document to delete. Only id or path are used
+     * @param condition
+     *            condition that must be fulfilled in order to perform the
+     *            operation
+     * @return Whether the delete has succeeded. If the delete fails, it means
+     *         the document does not exist or the condition is not fulfilled
+     * @throws StorageException
+     *             if any problem occurs while retrieving the document
      */
     public boolean delete(Map config, Document document, Condition condition) throws StorageException {
         long id = 0;
@@ -1095,7 +1192,7 @@ public final class SQLiteRequestExecutor {
             }
         }
         try {
-            id = (document.getId() == null ? 0 : ((Long) document.getId()).longValue());
+            id = (document.getId() == null ? 0L : Long.parseLong(document.getId()));
         } catch (ClassCastException e) {
             throw new StorageException(e.getMessage());
         }
@@ -1118,22 +1215,42 @@ public final class SQLiteRequestExecutor {
      * <p>
      * If scope is specified to:
      * <ul>
-     * <li>{@link StorageRequestExecutor#SCOPE_ONE_LEVEL}: searches documents one level below the given path (this excludes the exact path)</li>
-     * <li>{@link StorageRequestExecutor#SCOPE_SUB_TREE}: searches documents reachable from the root document pointed by the given path (this includes
+     * <li>{@link StorageRequestExecutor#SCOPE_ONE_LEVEL}: searches documents
+     * one level below the given path (this excludes the exact path)</li>
+     * <li>{@link StorageRequestExecutor#SCOPE_SUB_TREE}: searches documents
+     * reachable from the root document pointed by the given path (this includes
      * the exact path)</li>
      * </ul>
      *
-     * @param config storage configuration to apply
-     * @param basePath document path from which search is performed (it must not end with a slash and must be normalized)
-     * @param scope a constant ({@link StorageRequestExecutor#SCOPE_ONE_LEVEL} or {@link StorageRequestExecutor#SCOPE_SUB_TREE})
-     * @param condition condition that filters documents
-     * @param order ordering of the results ({@link StorageRequestExecutor#ORDER_UNKNOWN}, {@link StorageRequestExecutor#ORDER_ASC}, {@link StorageRequestExecutor#ORDER_DESC})
-     * @param limit maximum number of results returned ({@link StorageRequestExecutor#NO_LIMIT} means any number of values)
-     * @param withContent whether to return the document content in result set
-     * @param withAttributes List of attributes names. If null, return all document attributes in result set. Else if empty, do
-     *            not return attributes in result set. Else, return only specified attributes in result set
+     * @param config
+     *            storage configuration to apply
+     * @param basePath
+     *            document path from which search is performed (it must not end
+     *            with a slash and must be normalized)
+     * @param scope
+     *            a constant ({@link StorageRequestExecutor#SCOPE_ONE_LEVEL} or
+     *            {@link StorageRequestExecutor#SCOPE_SUB_TREE})
+     * @param condition
+     *            condition that filters documents
+     * @param order
+     *            ordering of the results (
+     *            {@link StorageRequestExecutor#ORDER_UNKNOWN},
+     *            {@link StorageRequestExecutor#ORDER_ASC},
+     *            {@link StorageRequestExecutor#ORDER_DESC})
+     * @param limit
+     *            maximum number of results returned (
+     *            {@link StorageRequestExecutor#NO_LIMIT} means any number of
+     *            values)
+     * @param withContent
+     *            whether to return the document content in result set
+     * @param withAttributes
+     *            List of attributes names. If null, return all document
+     *            attributes in result set. Else if empty, do not return
+     *            attributes in result set. Else, return only specified
+     *            attributes in result set
      * @return a list containing the matching documents
-     * @throws StorageException if any problem occurs while retrieving the document
+     * @throws StorageException
+     *             if any problem occurs while retrieving the document
      */
     public SearchResult search(Map config, String basePath, int scope, Condition condition, int order, int limit,
             boolean withContent, List withAttributes) throws StorageException {
@@ -1157,8 +1274,9 @@ public final class SQLiteRequestExecutor {
         }
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("search (path:" + basePath + ") (scope:" + scope + ") (condition:" + Util.conditionToString(condition)
-                    + ") (order:" + order + ") (limit:" + limit + ") (withContent:" + withContent + ")");
+            LOG.info("search (path:" + basePath + ") (scope:" + scope + ") (condition:"
+                    + Util.conditionToString(condition) + ") (order:" + order + ") (limit:" + limit + ") (withContent:"
+                    + withContent + ")");
         }
 
         InternalCondition internalCondition = convertToInternalCondition(condition, true);
@@ -1170,8 +1288,8 @@ public final class SQLiteRequestExecutor {
             attr = (String[]) withAttributes.toArray(new String[withAttributes.size()]);
         }
 
-        SearchReturn returnedData = sqlitedriver.search(openedDB, configList, basePath, scope, internalCondition, order, limit,
-                (withContent ? 1 : 0), attr, attr_length);
+        SearchReturn returnedData = sqlitedriver.search(openedDB, configList, basePath, scope, internalCondition, order,
+                limit, (withContent ? 1 : 0), attr, attr_length);
         if (returnedData == null) {
             throw new StorageException("search return is null");
         }

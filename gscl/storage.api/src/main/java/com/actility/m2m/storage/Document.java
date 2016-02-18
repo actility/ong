@@ -31,7 +31,7 @@ public interface Document {
      *
      * @return The internal ID
      */
-    Object getId();
+    String getId();
 
     /**
      * Gets the path associated with the document.

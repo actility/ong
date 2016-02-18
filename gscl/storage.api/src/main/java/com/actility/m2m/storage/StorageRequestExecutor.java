@@ -48,18 +48,23 @@ public interface StorageRequestExecutor {
     String CONFIG_TRANSACTIONAL_UPDATE = "transacUpdate";
 
     /**
-     * Retrieves a document
-     *
+     * Storage configuration attribute to log on debug instead of info for the concerned operation
+     */
+    String CONFIG_DEBUG = "debug";
+
+    /**
+     * Retrieves a document from its path
+     * 
      * @param config storage configuration to apply
      * @param path the full (absolute) path of the document (it must not end with a slash and must be normalized)
      * @param condition condition that must be fulfilled in order to perform the operation
      * @return The retrieved document or <code>null</code> if the document does not exist or the condition is not fulfilled
      * @throws StorageException if any problem occurs while retrieving the document
      */
-    public Document retrieve(Map/* <String, String> */config, String path, Condition condition) throws StorageException;
+    Document retrieve(Map/* <String, String> */config, String path, Condition condition) throws StorageException;
 
     /**
-     * Retrieves a document
+     * Retrieves a document from its internal ID
      *
      * @param config storage configuration to apply
      * @param id Internal id of the document to retrieve
@@ -67,13 +72,13 @@ public interface StorageRequestExecutor {
      * @return The retrieved document or <code>null</code> if the document does not exist or the condition is not fulfilled
      * @throws StorageException if any problem occurs while retrieving the document
      */
-    public Document retrieve(Map/* <String, String> */config, Object id, Condition condition) throws StorageException;
+    Document retrieveFromId(Map/* <String, String> */config, String id, Condition condition) throws StorageException;
 
     /**
      * Updates an existing document.
      * <p>
      * Raises an exception if the document does not exist.
-     *
+     * 
      * @param config storage configuration to apply
      * @param document the new representation of the document
      * @param condition condition that must be fulfilled in order to perform the operation
@@ -81,13 +86,13 @@ public interface StorageRequestExecutor {
      *         condition is not fulfilled
      * @throws StorageException if any problem occurs while retrieving the document
      */
-    public boolean update(Map/* <String, String> */config, Document document, Condition condition) throws StorageException;
+    boolean update(Map/* <String, String> */config, Document document, Condition condition) throws StorageException;
 
     /**
      * Updates partially an existing document.
      * <p>
      * Raises an exception if the document does not exist.
-     *
+     * 
      * @param config storage configuration to apply
      * @param document the document to partially update. Only id or path are used
      * @param content the new content for the document (if <code>null</code>, do not update the content)
@@ -97,20 +102,20 @@ public interface StorageRequestExecutor {
      *         the condition is not fulfilled
      * @throws StorageException if any problem occurs while retrieving the document
      */
-    public boolean partialUpdate(Map/* <String, String> */config, Document document, byte[] content,
+    boolean partialUpdate(Map/* <String, String> */config, Document document, byte[] content,
             List/* <AttributeOperation> */attrOps, Condition condition) throws StorageException;
 
     /**
      * Creates a new document.
      * <p>
      * Raises an exception if the document already exists.
-     *
+     * 
      * @param config storage configuration to apply
      * @param document the representation of the document
      * @return Whether the create has succeeded. If the create fails, it means the document already exists
      * @throws StorageException if any problem occurs while retrieving the document
      */
-    public boolean create(Map/* <String, String> */config, Document document) throws StorageException;
+    boolean create(Map/* <String, String> */config, Document document) throws StorageException;
 
     /**
      * Deletes a document.
@@ -127,7 +132,7 @@ public interface StorageRequestExecutor {
      * </ul>
      * <p>
      * Raises an exception if the document does not exist.
-     *
+     * 
      * @param config storage configuration to apply
      * @param document The document which serves as a root for the deletion. Only id or path are used
      * @param scope a constant ({@link #SCOPE_ONE_LEVEL} or {@link #SCOPE_SUB_TREE})
@@ -136,14 +141,13 @@ public interface StorageRequestExecutor {
      *         not fulfilled
      * @throws StorageException if any problem occurs while retrieving the document
      */
-    public boolean delete(Map/* <String, String> */config, Document document, int scope, Condition condition)
-            throws StorageException;
+    boolean delete(Map/* <String, String> */config, Document document, int scope, Condition condition) throws StorageException;
 
     /**
      * Deletes a document.
      * <p>
      * Raises an exception if the document does not exist.
-     *
+     * 
      * @param config storage configuration to apply
      * @param document The document to delete. Only id or path are used
      * @param condition condition that must be fulfilled in order to perform the operation
@@ -151,7 +155,7 @@ public interface StorageRequestExecutor {
      *         not fulfilled
      * @throws StorageException if any problem occurs while retrieving the document
      */
-    public boolean delete(Map/* <String, String> */config, Document document, Condition condition) throws StorageException;
+    boolean delete(Map/* <String, String> */config, Document document, Condition condition) throws StorageException;
 
     /**
      * Searches for a document in a specified path.
@@ -162,7 +166,7 @@ public interface StorageRequestExecutor {
      * <li>{@link #SCOPE_SUB_TREE}: searches documents reachable from the root document pointed by the given path (this includes
      * the exact path)</li>
      * </ul>
-     *
+     * 
      * @param config storage configuration to apply
      * @param path document path from which search is performed (it must not end with a slash and must be normalized)
      * @param scope a constant ({@link #SCOPE_ONE_LEVEL} or {@link #SCOPE_SUB_TREE})
@@ -175,12 +179,12 @@ public interface StorageRequestExecutor {
      * @return a list containing the matching documents
      * @throws StorageException if any problem occurs while retrieving the document
      */
-    public SearchResult search(Map/* <String, String> */config, String path, int scope, Condition condition, int order,
-            int limit, boolean withContent, List/* <String> */withAttributes) throws StorageException;
+    SearchResult search(Map/* <String, String> */config, String path, int scope, Condition condition, int order, int limit,
+            boolean withContent, List/* <String> */withAttributes) throws StorageException;
 
     /**
      * Reserves space for the creation of future documents
-     *
+     * 
      * @param config StorageConfiguration to apply
      * @param path path under which documents are going to be created
      * @param docNumber maximum number of documents that can be created in reserved space
@@ -188,13 +192,12 @@ public interface StorageRequestExecutor {
      * @return A reservation code
      * @throws StorageException if any problem occurs while reserving space
      */
-    public String reserveSpace(Map/* <String, String> */config, String path, String docNumber, double docSize)
-            throws StorageException;
+    String reserveSpace(Map/* <String, String> */config, String path, String docNumber, double docSize) throws StorageException;
 
     /**
      * Gets the storage factory that allows applications to build storage objects.
-     *
+     * 
      * @return The storage factory
      */
-    public StorageFactory getStorageFactory();
+    StorageFactory getStorageFactory();
 }

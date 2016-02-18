@@ -77,9 +77,9 @@ public final class StorageRequestDriverExecutorImpl implements StorageRequestDri
         return doc;
     }
 
-    public Document retrieve(Map config, Object id, Condition condition) throws StorageException {
+    public Document retrieveFromId(Map config, String id, Condition condition) throws StorageException {
         Document doc;
-        doc = sqlite.retrieve(config,id, condition);
+        doc = sqlite.retrieveFromId(config, id, condition);
         return doc;
     }
 

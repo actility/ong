@@ -2,7 +2,7 @@
 Storage Driver SQLite changelog
 -------------------------------------------------------------------------------
 Version: 1.0.0
-Date: 2013-11-19
+Date: 2016-xx-xx
 
 New Features:
 -------------

@@ -10,17 +10,19 @@ import com.actility.m2m.storage.Document;
 
 public final class DocumentImpl implements Document {
 
+    private final String id;
     private final String path;
     private final Map/* <String, Object> */ attributes;
     private byte[] content;
 
-    public DocumentImpl(String path) {
+    public DocumentImpl(String id, String path) {
+        this.id = id;
         this.path = path;
         this.attributes = new HashMap/* <String, Object> */();
     }
 
-    public Object getId() {
-        return null;
+    public String getId() {
+        return id;
     }
 
     public String getPath() {

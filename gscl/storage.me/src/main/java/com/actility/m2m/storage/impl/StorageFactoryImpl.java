@@ -41,12 +41,16 @@ public final class StorageFactoryImpl implements StorageFactory {
         return new ConditionImpl(attributeName, operator, operandValue, true);
     }
 
-    public Condition createConjunction(int operation, List/* <Condition> */conditions) {
+    public Condition createConjunction(int operation, List/* <Condition> */ conditions) {
         return new ConditionImpl(operation, conditions);
     }
 
     public Document createDocument(String path) {
-        return new DocumentImpl(path);
+        return new DocumentImpl(null, path);
+    }
+
+    public Document createDocumentFromId(String id) {
+        return new DocumentImpl(id, null);
     }
 
     public AttributeOperation createAttributeOperation(int type, String name, Object value) {

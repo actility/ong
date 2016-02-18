@@ -25,7 +25,7 @@ public interface StorageRequestDriverExecutor {
     Document retrieve(Map/* <String, String> */config, String path, Condition condition) throws StorageException;
 
     /**
-     * Retrieves a document
+     * Retrieves a document from its internal ID
      *
      * @param config storage configuration to apply
      * @param id Internal id of the document to retrieve
@@ -33,7 +33,7 @@ public interface StorageRequestDriverExecutor {
      * @return The retrieved document or <code>null</code> if the document does not exist or the condition is not fulfilled
      * @throws StorageException if any problem occurs while retrieving the document
      */
-    Document retrieve(Map/* <String, String> */config, Object id, Condition condition) throws StorageException;
+    Document retrieveFromId(Map/* <String, String> */config, String id, Condition condition) throws StorageException;
 
     /**
      * Updates an existing document.
