@@ -33,6 +33,7 @@ package com.actility.m2m.util.log;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -42,10 +43,12 @@ import org.osgi.framework.ServiceReference;
 
 import com.actility.m2m.log.LogService;
 import com.actility.m2m.util.ByteArrayOutputStream;
+import com.actility.m2m.util.FormatUtils;
+import com.actility.m2m.util.UtilConstants;
 
 /**
  * Utils class use to log messages with the Log4J API while using the OSGi LogService in the backend
- *
+ * 
  */
 public final class BundleStaticLogger implements ServiceListener {
 
@@ -74,14 +77,14 @@ public final class BundleStaticLogger implements ServiceListener {
 
     // private final CalendarThreadLocal localCalendar;
 
-     public BundleStaticLogger() {
-         // localCalendar = new CalendarThreadLocal();
-         init(null);
-     }
+    public BundleStaticLogger() {
+        // localCalendar = new CalendarThreadLocal();
+        init(null);
+    }
 
     /**
      * Initializes the log stack for a bundle given its {@link BundleContext}.
-     *
+     * 
      * @param bc The BundleContext of the bundle which is initializing the log stack
      */
     public synchronized void init(BundleContext bc) {
@@ -128,7 +131,7 @@ public final class BundleStaticLogger implements ServiceListener {
 
     /**
      * Sends a message to the LogService if possible.
-     *
+     * 
      * @param msg Human readable string describing the log.
      * @param levelName The log level as a string
      * @param level The severity of the message (Should be one of the four predefined severities).
@@ -169,24 +172,23 @@ public final class BundleStaticLogger implements ServiceListener {
             if (e != null) {
                 log.log(null, level, getStackTrace(e), null);
             }
+        } else if (bc != null) {
+            System.out.print(levelName);
+            System.out.print(' ');
+            // System.out.print(FormatUtils.formatDateTime(new Date(), (Calendar) localCalendar.get()));
+            System.out.print(FormatUtils.formatDateTime(new Date(), UtilConstants.LOCAL_TIMEZONE));
+            System.out.print(' ');
+            System.out.print(bundleName);
+            System.out.print(" - ");
+            System.out.print(msg);
+            if (e != null) {
+                System.out.print(" (");
+                System.out.print(e.toString());
+                System.out.print(')');
+                e.printStackTrace();
+            }
+            System.out.println();
         }
-//        else if (bc != null) {
-//            System.out.print(levelName);
-//            System.out.print(' ');
-//            // System.out.print(FormatUtils.formatDateTime(new Date(), (Calendar) localCalendar.get()));
-//            System.out.print(FormatUtils.formatDateTime(new Date(), UtilConstants.LOCAL_TIMEZONE));
-//            System.out.print(' ');
-//            System.out.print(bundleName);
-//            System.out.print(" - ");
-//            System.out.print(msg);
-//            if (e != null) {
-//                System.out.print(" (");
-//                System.out.print(e.toString());
-//                System.out.print(')');
-//                e.printStackTrace();
-//            }
-//            System.out.println();
-//        }
     }
 
     private String getStackTrace(Throwable t) {
@@ -209,7 +211,7 @@ public final class BundleStaticLogger implements ServiceListener {
     /**
      * Returns the current log level. There is no use to generate log entries with a severity level less than this value since
      * such entries will be thrown away by the log.
-     *
+     * 
      * @return the current severity log level for this bundle.
      */
     public int getLogLevel() {
@@ -221,7 +223,7 @@ public final class BundleStaticLogger implements ServiceListener {
 
     /**
      * Returns true if messages with severity debug or higher are saved by the log.
-     *
+     * 
      * @return <code>true</code> if messages with severity LOG_DEBUG or higher are included in the log, otherwise
      *         <code>false</code>.
      */
@@ -231,7 +233,7 @@ public final class BundleStaticLogger implements ServiceListener {
 
     /**
      * Returns true if messages with severity warning or higher are saved by the log.
-     *
+     * 
      * @return <code>true</code> if messages with severity LOG_WARNING or higher are included in the log, otherwise
      *         <code>false</code>.
      */
@@ -241,7 +243,7 @@ public final class BundleStaticLogger implements ServiceListener {
 
     /**
      * Returns true if messages with severity info or higher are saved by the log.
-     *
+     * 
      * @return <code>true</code> if messages with severity LOG_INFO or higher are included in the log, otherwise
      *         <code>false</code>.
      */
@@ -251,7 +253,7 @@ public final class BundleStaticLogger implements ServiceListener {
 
     /**
      * Returns true if messages with severity error or higher are saved by the log.
-     *
+     * 
      * @return <code>true</code> if messages with severity LOG_ERROR or higher are included in the log, otherwise
      *         <code>false</code>.
      */

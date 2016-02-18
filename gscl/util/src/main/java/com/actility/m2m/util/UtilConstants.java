@@ -62,4 +62,14 @@ public interface UtilConstants {
      * Default OS shell OSGi framework property name
      */
     String FW_PROP_OS_SHELL = "com.actility.m2m.framework.config.os.shell";
+
+    /**
+     * Instance ID of OSGi framework property name
+     */
+    String FW_PROP_INSTANCE_ID = "com.actility.m2m.framework.config.instanceId";
+
+    /**
+     * Service Provider domain name of OSGi framework property name
+     */
+    String FW_PROP_SP_DOMAIN_NAME = "com.actility.m2m.framework.config.spDomainName";
 }

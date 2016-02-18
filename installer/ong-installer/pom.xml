@@ -81,7 +81,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>gscl</artifactId>
-      <version>3.0.0</version>
+      <version>3.0.1-SNAPSHOT</version>
       <classifier>${build.type}</classifier>
       <type>apu</type>
     </dependency>

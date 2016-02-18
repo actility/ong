@@ -199,6 +199,16 @@ public class FormatUtilsTest extends TestCase {
         assertEquals("9999-12-31T08:59:59.999Z", FormatUtils.formatDateTime(new Date(FormatUtils.MAX_DATE), utcTimeZone));
     }
 
+    public void testParseDateTime15() {
+        try {
+            assertEquals("9999-12-31T08:59:59.999Z",
+                    FormatUtils.formatDateTime(FormatUtils.parseDateTime("9999-12-31T09:59:59.999+01:00"), utcTimeZone));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
     public void testParseDate1() {
         try {
             assertEquals("2000-01-05Z", FormatUtils.formatDate(FormatUtils.parseDate("2000-01-05Z"), utcTimeZone));
@@ -255,9 +265,9 @@ public class FormatUtilsTest extends TestCase {
 
     /**
      * Launch the test.
-     *
+     * 
      * @param args the command line arguments
-     *
+     * 
      * @generatedBy CodePro at 10/5/11 11:27 PM
      */
     public static void main(String[] args) {
