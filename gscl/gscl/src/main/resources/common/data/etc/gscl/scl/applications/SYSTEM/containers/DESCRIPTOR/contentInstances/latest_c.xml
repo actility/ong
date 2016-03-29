@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<obix:obj href="/SYSTEM" xmlns:obix="http://obix.org/ns/schema/1.1" xmlns:zb="http://uri.etsi.org/m2m/zigbee/obix">
-
+<obj href="/SYSTEM" xmlns="http://obix.org/ns/schema/1.1">
   <str name="thingletID" val="SYSTEM" />
   <list name="versions" href="/m2m/applications/SYSTEM/retargeting1/versions" />
   <op name="openSshTunnel" href="/m2m/applications/SYSTEM/retargeting1/openSshTunnel" />
   <op name="closeSshTunnel" href="/m2m/applications/SYSTEM/retargeting1/closeSshTunnel" />
-</obix:obj>
+</obj>
