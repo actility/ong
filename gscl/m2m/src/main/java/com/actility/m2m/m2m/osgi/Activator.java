@@ -39,6 +39,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import com.actility.m2m.framework.resources.ResourcesAccessorService;
 import com.actility.m2m.m2m.M2MService;
 import com.actility.m2m.m2m.impl.M2MServiceImpl;
 import com.actility.m2m.m2m.log.BundleLogger;
@@ -53,12 +54,16 @@ public final class Activator implements BundleActivator {
     private ServiceRegistration m2mServiceRegistration;
     private XoService xoService;
     private SongService songService;
+    private ResourcesAccessorService resourcesAccessorService;
 
     // BundleContext
     private BundleContext context;
     // ServiceTracker for ConfigurationAdmin
     private ServiceTracker xoServiceTracker;
     private ServiceTracker songServiceTracker;
+
+    // ServiceTracker for ConfigAdmin
+    private ServiceTracker resourcesAccessorServiceTracker;
 
     public void start(BundleContext context) throws Exception {
         BundleLogger.getStaticLogger().init(context);
@@ -80,6 +85,13 @@ public final class Activator implements BundleActivator {
         songServiceTracker = new ServiceTracker(context, SongService.class.getName(), new SongServiceCustomizer());
         songServiceTracker.open();
 
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Starting tracker for " + ResourcesAccessorService.class.getName() + " service...");
+        }
+        resourcesAccessorServiceTracker = new ServiceTracker(context, ResourcesAccessorService.class.getName(),
+                new ResourcesAccessorServiceCustomizer());
+        resourcesAccessorServiceTracker.open();
+
     }
 
     public void stop(BundleContext context) throws Exception {
@@ -92,20 +104,26 @@ public final class Activator implements BundleActivator {
             LOG.info("Stopping tracker for " + SongService.class.getName() + " service...");
         }
         songServiceTracker.close();
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Stopping tracker for " + ResourcesAccessorService.class.getName() + " service...");
+        }
+        resourcesAccessorServiceTracker.close();
         xoService = null;
         songService = null;
         xoServiceTracker = null;
         songServiceTracker = null;
+        resourcesAccessorService = null;
+        resourcesAccessorServiceTracker = null;
         stopM2MService();
         BundleLogger.getStaticLogger().init(null);
     }
 
     private synchronized void startM2MService() {
-        if (m2mService == null && songService != null && xoService != null) {
+        if (m2mService == null && songService != null && xoService != null && resourcesAccessorService != null) {
             if (LOG.isInfoEnabled()) {
                 LOG.info("Registering service " + M2MService.class.getName() + "...");
             }
-            m2mService = new M2MServiceImpl(songService, xoService);
+            m2mService = new M2MServiceImpl(songService, xoService, resourcesAccessorService);
             m2mServiceRegistration = context.registerService(M2MService.class.getName(), m2mService, null);
         }
     }
@@ -185,6 +203,39 @@ public final class Activator implements BundleActivator {
             if (service == songService) {
                 stopM2MService();
                 songService = null;
+            }
+        }
+    }
+
+    // customizer that handles tracked service
+    // registration/modification/unregistration events
+    private class ResourcesAccessorServiceCustomizer implements ServiceTrackerCustomizer {
+
+        public Object addingService(ServiceReference reference) {
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Adding service " + ResourcesAccessorService.class.getName() + "...");
+            }
+            if (resourcesAccessorService != null) {
+                return null;
+            }
+            resourcesAccessorService = (ResourcesAccessorService) context.getService(reference);
+
+            // Do something with the service
+            startM2MService();
+            // Return the service to track it
+            return resourcesAccessorService;
+        }
+
+        public void modifiedService(ServiceReference reference, Object service) {
+        }
+
+        public void removedService(ServiceReference reference, Object service) {
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Removing service " + ResourcesAccessorService.class.getName() + "...");
+            }
+            if (service == resourcesAccessorService) {
+                stopM2MService();
+                resourcesAccessorService = null;
             }
         }
     }

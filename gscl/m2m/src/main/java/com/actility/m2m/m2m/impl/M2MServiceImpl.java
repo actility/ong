@@ -39,6 +39,7 @@ import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.framework.resources.ResourcesAccessorService;
 import com.actility.m2m.m2m.M2MContext;
 import com.actility.m2m.m2m.M2MEventHandler;
 import com.actility.m2m.m2m.M2MException;
@@ -57,11 +58,14 @@ public final class M2MServiceImpl implements M2MService {
 
     private final SongService songService;
     private final XoService xoService;
+    private final ResourcesAccessorService resourcesAccessorService;
     private final M2MUtils m2mUtils;
 
-    public M2MServiceImpl(SongService songService, XoService xoService) {
+    public M2MServiceImpl(SongService songService, XoService xoService,
+            ResourcesAccessorService resourcesAccessorService) {
         this.songService = songService;
         this.xoService = xoService;
+        this.resourcesAccessorService = resourcesAccessorService;
         this.m2mUtils = new M2MUtilsImpl(xoService);
     }
 
@@ -73,7 +77,8 @@ public final class M2MServiceImpl implements M2MService {
         ServletContext servletContext = null;
         boolean error = false;
         try {
-            M2MContextImpl context = new M2MContextImpl(null, proxyHandler, m2mHandler, xoService, m2mUtils);
+            M2MContextImpl context = new M2MContextImpl(null, proxyHandler, m2mHandler, xoService,
+                    resourcesAccessorService, m2mUtils);
             m2mHandler.init(context);
             servletContext = songService.createApplication(applicationPath, applicationName, null, context,
                     new Object[] { context });
@@ -86,8 +91,9 @@ public final class M2MServiceImpl implements M2MService {
                     StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         } catch (NamespaceException e) {
             error = true;
-            throw new M2MException("Application path '" + applicationPath + "' is already registered for M2M application "
-                    + applicationName, StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+            throw new M2MException("Application path '" + applicationPath
+                    + "' is already registered for M2M application " + applicationName,
+                    StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         } catch (RuntimeException e) {
             error = true;
             e.printStackTrace();
@@ -108,7 +114,8 @@ public final class M2MServiceImpl implements M2MService {
         ServletContext servletContext = null;
         boolean error = false;
         try {
-            M2MContextImpl context = new M2MContextImpl(sclUri, null, m2mHandler, xoService, m2mUtils);
+            M2MContextImpl context = new M2MContextImpl(sclUri, null, m2mHandler, xoService, resourcesAccessorService,
+                    m2mUtils);
             m2mHandler.init(context);
             servletContext = songService.createApplication(applicationPath, applicationName, null, context,
                     new Object[] { context });
@@ -120,8 +127,9 @@ public final class M2MServiceImpl implements M2MService {
                     StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         } catch (NamespaceException e) {
             error = true;
-            throw new M2MException("Application path '" + applicationPath + "' is already registered for M2M application "
-                    + applicationName, StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+            throw new M2MException("Application path '" + applicationPath
+                    + "' is already registered for M2M application " + applicationName,
+                    StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         } catch (RuntimeException e) {
             error = true;
             throw new M2MException("RuntimeException while registering the M2M application " + applicationName,

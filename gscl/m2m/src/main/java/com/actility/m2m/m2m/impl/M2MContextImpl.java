@@ -40,6 +40,8 @@ import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 
+import com.actility.m2m.framework.resources.BackupClassLoader;
+import com.actility.m2m.framework.resources.ResourcesAccessorService;
 import com.actility.m2m.m2m.ChannelClientListener;
 import com.actility.m2m.m2m.ChannelServerListener;
 import com.actility.m2m.m2m.M2MConstants;
@@ -84,6 +86,7 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
     private ServletContext servletContext;
     private ApplicationSession appSession;
     private final XoService xoService;
+    private final ResourcesAccessorService resourcesAccessorService;
     private final M2MUtils m2mUtils;
     private final M2MProxyHandler proxyHandler;
     private final M2MEventHandler eventHandler;
@@ -95,17 +98,18 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
     private volatile int[] backtrackableErrorCodes;
 
     public M2MContextImpl(URI sclUri, M2MProxyHandler proxyHandler, M2MEventHandler eventHandler, XoService xoService,
-            M2MUtils m2mUtils) {
+            ResourcesAccessorService resourcesAccessorService, M2MUtils m2mUtils) {
         this.sclUri = sclUri;
         this.proxyHandler = proxyHandler;
         this.eventHandler = eventHandler;
         this.xoService = xoService;
+        this.resourcesAccessorService = resourcesAccessorService;
         this.m2mUtils = m2mUtils;
         this.backtrackableErrorCodes = new int[0];
     }
 
-    private void sendUnsuccessResponse(IndicationImpl indication, StatusCode statusCode, String message) throws IOException,
-            ServletException {
+    private void sendUnsuccessResponse(IndicationImpl indication, StatusCode statusCode, String message)
+            throws IOException, ServletException {
         if (!indication.isCommitted()) {
             String mediaType = null;
             StatusCode realStatusCode = statusCode;
@@ -129,7 +133,8 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
                     if (M2MConstants.MT_APPLICATION_EXI.equals(mediaType)) {
                         response.getSongResponse().setContent(errorInfo.saveExi(), M2MConstants.MT_APPLICATION_EXI);
                     } else {
-                        response.getSongResponse().setContent(errorInfo.saveXml(), M2MConstants.CT_APPLICATION_XML_UTF8);
+                        response.getSongResponse().setContent(errorInfo.saveXml(),
+                                M2MConstants.CT_APPLICATION_XML_UTF8);
                     }
                 }
 
@@ -238,11 +243,12 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
 
     public URI[] createServerNotificationChannel(URI remoteTarget, ChannelServerListener listener) throws M2MException {
         try {
-            LongPollingURIs uris = songDynamicRouter.createServerNotificationChannel(songFactory.createURI(remoteTarget),
-                    new ChannelServerListenerImpl(listener));
+            LongPollingURIs uris = songDynamicRouter.createServerNotificationChannel(
+                    songFactory.createURI(remoteTarget), new ChannelServerListenerImpl(listener));
             return new URI[] { uris.getContactURI().toURI(), uris.getLongPollingURI().toURI() };
         } catch (ServletException e) {
-            throw new M2MException("Cannot create a server long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+            throw new M2MException("Cannot create a server long poll connection",
+                    StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -252,7 +258,8 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
             songDynamicRouter.createServerNotificationChannel(songFactory.createURI(contactUri),
                     songFactory.createURI(longPollingUri), new ChannelServerListenerImpl(listener));
         } catch (ServletException e) {
-            throw new M2MException("Cannot create a server long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+            throw new M2MException("Cannot create a server long poll connection",
+                    StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -269,7 +276,8 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
                     songFactory.createURI(relatedRequestingEntity), songFactory.createURI(relatedTargetID),
                     new ChannelClientListenerImpl(listener));
         } catch (ServletException e) {
-            throw new M2MException("Cannot create a client long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+            throw new M2MException("Cannot create a client long poll connection",
+                    StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -278,13 +286,15 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
                 songFactory.createURI(longPollingUri));
     }
 
-    public URI[] createServerCommunicationChannel(URI remoteTarget, ChannelServerListener listener) throws M2MException {
+    public URI[] createServerCommunicationChannel(URI remoteTarget, ChannelServerListener listener)
+            throws M2MException {
         try {
-            LongPollingURIs uris = songDynamicRouter.createServerCommunicationChannel(songFactory.createURI(remoteTarget),
-                    new ChannelServerListenerImpl(listener));
+            LongPollingURIs uris = songDynamicRouter.createServerCommunicationChannel(
+                    songFactory.createURI(remoteTarget), new ChannelServerListenerImpl(listener));
             return new URI[] { uris.getContactURI().toURI(), uris.getLongPollingURI().toURI() };
         } catch (ServletException e) {
-            throw new M2MException("Cannot create a server long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+            throw new M2MException("Cannot create a server long poll connection",
+                    StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -294,7 +304,8 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
             songDynamicRouter.createServerCommunicationChannel(songFactory.createURI(contactUri),
                     songFactory.createURI(longPollingUri), new ChannelServerListenerImpl(listener));
         } catch (ServletException e) {
-            throw new M2MException("Cannot create a server long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+            throw new M2MException("Cannot create a server long poll connection",
+                    StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -310,7 +321,8 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
                     songFactory.createURI(longPollingUri), songFactory.createURI(requestingEntity),
                     new ChannelClientListenerImpl(listener));
         } catch (ServletException e) {
-            throw new M2MException("Cannot create a client long poll connection", StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
+            throw new M2MException("Cannot create a client long poll connection",
+                    StatusCode.STATUS_INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -337,9 +349,19 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
         String message = null;
         try {
             if (request.isProxy()) {
-                proxyHandler.doProxyCreateIndication(indication);
+                BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(proxyHandler.getClass());
+                try {
+                    proxyHandler.doProxyCreateIndication(indication);
+                } finally {
+                    backup.restoreThreadClassLoader();
+                }
             } else {
-                eventHandler.doCreateIndication(indication);
+                BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(eventHandler.getClass());
+                try {
+                    eventHandler.doCreateIndication(indication);
+                } finally {
+                    backup.restoreThreadClassLoader();
+                }
             }
         } catch (M2MException e) {
             statusCode = e.getStatusCode();
@@ -356,9 +378,19 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
         String message = null;
         try {
             if (request.isProxy()) {
-                proxyHandler.doProxyRetrieveIndication(indication);
+                BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(proxyHandler.getClass());
+                try {
+                    proxyHandler.doProxyRetrieveIndication(indication);
+                } finally {
+                    backup.restoreThreadClassLoader();
+                }
             } else {
-                eventHandler.doRetrieveIndication(indication);
+                BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(eventHandler.getClass());
+                try {
+                    eventHandler.doRetrieveIndication(indication);
+                } finally {
+                    backup.restoreThreadClassLoader();
+                }
             }
         } catch (M2MException e) {
             statusCode = e.getStatusCode();
@@ -375,9 +407,19 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
         String message = null;
         try {
             if (request.isProxy()) {
-                proxyHandler.doProxyUpdateIndication(indication);
+                BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(proxyHandler.getClass());
+                try {
+                    proxyHandler.doProxyUpdateIndication(indication);
+                } finally {
+                    backup.restoreThreadClassLoader();
+                }
             } else {
-                eventHandler.doUpdateIndication(indication);
+                BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(eventHandler.getClass());
+                try {
+                    eventHandler.doUpdateIndication(indication);
+                } finally {
+                    backup.restoreThreadClassLoader();
+                }
             }
         } catch (M2MException e) {
             statusCode = e.getStatusCode();
@@ -394,9 +436,19 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
         String message = null;
         try {
             if (request.isProxy()) {
-                proxyHandler.doProxyDeleteIndication(indication);
+                BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(proxyHandler.getClass());
+                try {
+                    proxyHandler.doProxyDeleteIndication(indication);
+                } finally {
+                    backup.restoreThreadClassLoader();
+                }
             } else {
-                eventHandler.doDeleteIndication(indication);
+                BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(eventHandler.getClass());
+                try {
+                    eventHandler.doDeleteIndication(indication);
+                } finally {
+                    backup.restoreThreadClassLoader();
+                }
             }
         } catch (M2MException e) {
             statusCode = e.getStatusCode();
@@ -410,7 +462,12 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
     public void doSuccessResponse(SongServletResponse response) throws IOException {
         ConfirmImpl confirm = new ConfirmImpl(xoService, response);
         try {
-            eventHandler.doSuccessConfirm(confirm);
+            BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(eventHandler.getClass());
+            try {
+                eventHandler.doSuccessConfirm(confirm);
+            } finally {
+                backup.restoreThreadClassLoader();
+            }
         } catch (M2MException e) {
             LOG.error("ResourceException while calling doSuccessResponseConfirm for request on "
                     + response.getRequest().getTargetID().absoluteURI(), e);
@@ -420,7 +477,12 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
     public void doErrorResponse(SongServletResponse response) throws IOException {
         ConfirmImpl confirm = new ConfirmImpl(xoService, response);
         try {
-            eventHandler.doUnsuccessConfirm(confirm);
+            BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(eventHandler.getClass());
+            try {
+                eventHandler.doUnsuccessConfirm(confirm);
+            } finally {
+                backup.restoreThreadClassLoader();
+            }
         } catch (M2MException e) {
             LOG.error("ResourceException while calling doSuccessResponseConfirm for request on "
                     + response.getRequest().getTargetID().absoluteURI(), e);
@@ -430,7 +492,12 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
     public void timeout(ServletTimer timer) {
         M2MSession session = (M2MSession) timer.getApplicationSession().getAttribute(M2M_TIMER_PREFIX + timer.getId());
         try {
-            eventHandler.timeout(timer.getId(), session, timer.getInfo());
+            BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(eventHandler.getClass());
+            try {
+                eventHandler.timeout(timer.getId(), session, timer.getInfo());
+            } finally {
+                backup.restoreThreadClassLoader();
+            }
         } catch (IOException e) {
             LOG.error("IOException while calling timeout", e);
         } catch (M2MException e) {
@@ -450,7 +517,12 @@ public final class M2MContextImpl extends SongServlet implements M2MContext, Tim
         M2MSession session = (M2MSession) ev.getApplicationSession().getAttribute(AT_M2M_SESSION);
         if (session != null) {
             try {
-                eventHandler.sessionExpired(session);
+                BackupClassLoader backup = resourcesAccessorService.setThreadClassLoader(eventHandler.getClass());
+                try {
+                    eventHandler.sessionExpired(session);
+                } finally {
+                    backup.restoreThreadClassLoader();
+                }
             } catch (IOException e) {
                 LOG.error("IOException while calling sessionExpired", e);
             } catch (M2MException e) {
