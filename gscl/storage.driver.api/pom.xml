@@ -5,10 +5,10 @@
   <parent>
     <groupId>com.actility.m2m</groupId>
     <artifactId>java.cdc.pom</artifactId>
-    <version>[3.0.0,4)</version>
+    <version>4.0.0</version>
   </parent>
   <artifactId>storage.driver.api</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>bundle</packaging>
 
   <name>[API] Storage driver Service</name>
@@ -17,7 +17,7 @@
     <dependency>
       <groupId>com.actility.m2m</groupId>
       <artifactId>storage.api</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>1.0.0</version>
     </dependency>
   </dependencies>
 
