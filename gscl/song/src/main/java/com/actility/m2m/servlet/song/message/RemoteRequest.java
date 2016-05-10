@@ -241,6 +241,7 @@ public final class RemoteRequest extends HC implements InternalRequest {
                 sendSyncResponse(response);
             }
         } catch (MessagingException e) {
+            LOG.error("Cannot send request", e);
             // Send 500
             SongServletResponse response = createResponse(SongServletResponse.SC_INTERNAL_SERVER_ERROR,
                     SongServletResponse.RP_INTERNAL_SERVER_ERROR, StatusCode.STATUS_INTERNAL_SERVER_ERROR,

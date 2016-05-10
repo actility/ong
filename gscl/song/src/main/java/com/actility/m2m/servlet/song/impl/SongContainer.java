@@ -152,22 +152,39 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
     /**
      * Default constructor for the SONG Container.
      *
-     * @param servletService The generic servlet service
-     * @param backendService The Backend service in charge of managing threads, message passing and queuing
-     * @param xoService The XO service in charge of serializing objects
-     * @param resourcesAccessorService The resources accessor service in charge of accessing low level resources
-     * @param transportLoggerService The transport logger service in charge of logging SONG messages and compute statistics
-     * @param routesConfiguration Defines IP routes on which the application is server capable or not
-     * @param hostName The local host name
-     * @param domainName The local domain name
-     * @param maxRemoteRequests The maximum number of concurrent remote requests
-     * @throws BackendException If any problem occurs while registering to the Bacnkend service
-     * @throws UnknownHostException If a problem occurs while trying to detect the local hostname if not given
+     * @param servletService
+     *            The generic servlet service
+     * @param backendService
+     *            The Backend service in charge of managing threads, message
+     *            passing and queuing
+     * @param xoService
+     *            The XO service in charge of serializing objects
+     * @param resourcesAccessorService
+     *            The resources accessor service in charge of accessing low
+     *            level resources
+     * @param transportLoggerService
+     *            The transport logger service in charge of logging SONG
+     *            messages and compute statistics
+     * @param routesConfiguration
+     *            Defines IP routes on which the application is server capable
+     *            or not
+     * @param hostName
+     *            The local host name
+     * @param domainName
+     *            The local domain name
+     * @param maxRemoteRequests
+     *            The maximum number of concurrent remote requests
+     * @throws BackendException
+     *             If any problem occurs while registering to the Bacnkend
+     *             service
+     * @throws UnknownHostException
+     *             If a problem occurs while trying to detect the local hostname
+     *             if not given
      */
     public SongContainer(ExtServletService servletService, BackendService backendService, XoService xoService,
             ResourcesAccessorService resourcesAccessorService, TransportLoggerService transportLoggerService,
             RouteConfiguration[] routesConfiguration, String hostName, String domainName, long maxRemoteRequests)
-            throws BackendException, UnknownHostException {
+                    throws BackendException, UnknownHostException {
         this.servletService = servletService;
         this.backendService = backendService;
         this.xoService = xoService;
@@ -336,7 +353,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         if (internalContextPath != null) {
             String remainingPath = "";
             if ((externalAlias.length() - slashOffset) >= (bestPrefix.length() + 1)) {
-                remainingPath = externalAlias.substring(bestPrefix.length() - 1, externalAlias.length() - 1 - slashOffset);
+                remainingPath = externalAlias.substring(bestPrefix.length() - 1,
+                        externalAlias.length() - 1 - slashOffset);
             }
             externalContextPath = uri.getPath().substring(0, uri.getPath().length() - remainingPath.length());
             URI newTarget = URI.create(internalContextPath + remainingPath);
@@ -456,7 +474,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         MatchResult result = null;
         if (localhostNames.contains(uri.getHost())) {
             if (LOG.isInfoEnabled()) {
-                LOG.info(id + ": Host corresponds to the local server. Resolve request with port \"" + uri.getPort() + "\"");
+                LOG.info(id + ": Host corresponds to the local server. Resolve request with port \"" + uri.getPort()
+                        + "\"");
             }
             result = resolveScheme(id, uri.getScheme());
             if (result != null) {
@@ -485,8 +504,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         return applicationName + "." + servletName;
     }
 
-    private void registerInternalServlet(String fullServletName, String servletName, EndpointNode endpoint, Map initParams,
-            Map configuration) throws ServletException {
+    private void registerInternalServlet(String fullServletName, String servletName, EndpointNode endpoint,
+            Map initParams, Map configuration) throws ServletException {
         try {
             ExtServletContext servletContext = endpoint.getServletContext();
             if (ServletEndpointNode.class.equals(endpoint.getClass())) {
@@ -583,8 +602,9 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
     public void setRoutesConfiguration(RouteConfiguration[] routesConfiguration) {
         if (Arrays.equals(routesConfiguration, this.routesConfiguration)) {
             if (LOG.isInfoEnabled()) {
-                LOG.info("Modifying routesConfiguration from " + ArrayUtils.toString(this.routesConfiguration, "[", "]", ", ")
-                        + " to " + ArrayUtils.toString(routesConfiguration, "[", "]", ", "));
+                LOG.info("Modifying routesConfiguration from "
+                        + ArrayUtils.toString(this.routesConfiguration, "[", "]", ", ") + " to "
+                        + ArrayUtils.toString(routesConfiguration, "[", "]", ", "));
             }
             this.routesConfiguration = routesConfiguration;
         }
@@ -641,14 +661,15 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
 
         InternalRequest request = (InternalRequest) message;
         if (Profiler.getInstance().isTraceEnabled()) {
-            Profiler.getInstance().trace(
-                    request.getId() + ": >>> Router: " + request.getMethod() + " (requestingEntity: "
+            Profiler.getInstance()
+                    .trace(request.getId() + ": >>> Router: " + request.getMethod() + " (requestingEntity: "
                             + request.getRequestingEntity().absoluteURI() + ") (targetID: "
                             + request.getTargetID().absoluteURI() + ")");
         }
         if (LOG.isInfoEnabled()) {
             LOG.info(request.getId() + ": >>> Router: " + request.getMethod() + " (requestingEntity: "
-                    + request.getRequestingEntity().absoluteURI() + ") (targetID: " + request.getTargetID().absoluteURI() + ")");
+                    + request.getRequestingEntity().absoluteURI() + ") (targetID: "
+                    + request.getTargetID().absoluteURI() + ")");
         }
 
         long now = System.currentTimeMillis();
@@ -660,11 +681,12 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
                     if (request.isProxy()) {
                         matchingResult = new MatchResult(proxyServlet, null, null, null);
                     } else {
-                        matchingResult = resolveLocalServlet(request.getId(), null, request.getTargetID().toURI().normalize(),
-                                false);
+                        matchingResult = resolveLocalServlet(request.getId(), null,
+                                request.getTargetID().toURI().normalize(), false);
                     }
                 } else if (request.getProxy().getProxyTo() != null) {
-                    matchingResult = resolveProxyNode(request.getId(), request.getProxy().getProxyTo().toURI().normalize());
+                    matchingResult = resolveProxyNode(request.getId(),
+                            request.getProxy().getProxyTo().toURI().normalize());
                 } else {
                     SongURI targetURI = request.getTargetID();
                     if (LocalRequest.class == messageClass) {
@@ -685,8 +707,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
                     matchingResult.getSongNode().update(exchange, request, null, matchingResult.getContextPath(),
                             matchingResult.getServletPath(), matchingResult.getPathInfo());
                     if (Profiler.getInstance().isTraceEnabled()) {
-                        Profiler.getInstance().trace(
-                                request.getId() + ": <<< Router: " + request.getMethod() + " (requestingEntity: "
+                        Profiler.getInstance()
+                                .trace(request.getId() + ": <<< Router: " + request.getMethod() + " (requestingEntity: "
                                         + request.getRequestingEntity().absoluteURI() + ") (targetID: "
                                         + request.getTargetID().absoluteURI() + ") (forwardedTo: "
                                         + matchingResult.getSongNode().getTarget() + ")");
@@ -736,8 +758,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
             try {
                 if (LocalRequest.class == messageClass) {
                     LocalRequest localRequest = (LocalRequest) request;
-                    response = localRequest.createResponse(errorStatusCode, errorReasonPhrase, errorM2MStatus, errorMessage,
-                            errorException);
+                    response = localRequest.createResponse(errorStatusCode, errorReasonPhrase, errorM2MStatus,
+                            errorMessage, errorException);
                     localRequest.sendSyncResponse(response);
                 } else if (LocalForwardedRequest.class == messageClass) {
                     LocalForwardedRequest localForwardedRequest = (LocalForwardedRequest) request;
@@ -746,8 +768,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
                     localForwardedRequest.sendSyncResponse(response);
                 } else {
                     RemoteRequest remoteRequest = (RemoteRequest) request;
-                    response = remoteRequest.createResponse(errorStatusCode, errorReasonPhrase, errorM2MStatus, errorMessage,
-                            errorException);
+                    response = remoteRequest.createResponse(errorStatusCode, errorReasonPhrase, errorM2MStatus,
+                            errorMessage, errorException);
                     remoteRequest.sendSyncResponse(response);
                 }
             } catch (MessagingException e) {
@@ -829,7 +851,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
                     String path = null;
                     while (it.hasNext()) {
                         path = (String) it.next();
-                        buf.append("    { path: ").append(path).append(" }").append(System.getProperty("line.separator"));
+                        buf.append("    { path: ").append(path).append(" }")
+                                .append(System.getProperty("line.separator"));
                     }
                 }
                 if (servletEndpoint == proxyServlet) {
@@ -857,8 +880,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         servletService.scheduleTimer(timer, millis);
     }
 
-    public void addPath(String contextPath, String path, EndpointNode endpoint, Map configuration) throws ServletException,
-            NamespaceException {
+    public void addPath(String contextPath, String path, EndpointNode endpoint, Map configuration)
+            throws ServletException, NamespaceException {
         String realPath = contextPath + path;
         String normalizedPath = path;
         if (!realPath.endsWith("/")) {
@@ -922,9 +945,9 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
     }
 
     public void registerBindingServlet(ServletContext context, String servletName, SongServlet servlet, Map initParams,
-            SongBindingFacade facade, String serverScheme, int serverPort, String[] managedSchemes, boolean longPollSupported,
-            String defaultProtocol, InetAddress address, int port, Map configuration) throws NamespaceException,
-            ServletException {
+            SongBindingFacade facade, String serverScheme, int serverPort, String[] managedSchemes,
+            boolean longPollSupported, String defaultProtocol, InetAddress address, int port, Map configuration)
+                    throws NamespaceException, ServletException {
         String fullServletName = buildServletName(context.getServletContextName(), servletName);
         if (LOG.isInfoEnabled()) {
             LOG.info("registerBindingServlet " + fullServletName);
@@ -1007,8 +1030,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         registerInternalServlet(fullServletName, servletName, endpoint, initParams, configuration);
         synchronized (this) {
             if (proxyServlet != null) {
-                throw new ServletException("A default proxy servlet is already registered. Cannot register servlet: "
-                        + fullServletName);
+                throw new ServletException(
+                        "A default proxy servlet is already registered. Cannot register servlet: " + fullServletName);
             }
             proxyServlet = endpoint;
         }
@@ -1069,8 +1092,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         throw new UnsupportedOperationException("SONG binding does not support <notificationChannel> connections");
     }
 
-    public void createServerNotificationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
-            throws ServletException {
+    public void createServerNotificationChannel(SongURI contactURI, SongURI longPollingURI,
+            ChannelServerListener listener) throws ServletException {
         if (LOG.isInfoEnabled()) {
             LOG.info("Create server <notificationChannel> connection with contact " + contactURI.absoluteURI()
                     + " and long polling " + longPollingURI.absoluteURI());
@@ -1094,13 +1117,14 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         } catch (ServletException e) {
             LOG.warn("Servlet exception while deleting the server <notificationChannel> connection", e);
         } catch (UnsupportedOperationException e) {
-            LOG.warn("Try to delete a server <notificationChannel> connection on a binding which does not support this", e);
+            LOG.warn("Try to delete a server <notificationChannel> connection on a binding which does not support this",
+                    e);
         }
     }
 
     public void createClientNotificationChannel(SongURI contactURI, SongURI longPollingURI, SongURI requestingEntity,
-            SongURI relatedRequestingEntity, SongURI relatedTargetID, String contextPath, ChannelClientListener listener)
-            throws ServletException {
+            SongURI relatedRequestingEntity, SongURI relatedTargetID, String contextPath,
+            ChannelClientListener listener) throws ServletException {
         if (LOG.isInfoEnabled()) {
             LOG.info("Create client <notificationChannel> connection with contact " + contactURI.absoluteURI()
                     + " and long polling " + longPollingURI.absoluteURI());
@@ -1112,8 +1136,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
                 aliasURI += "/";
             }
             synchronized (externalAliasRoutes) {
-                facade.createClientNotificationChannel(contactURI, longPollingURI, requestingEntity, relatedRequestingEntity,
-                        relatedTargetID, listener);
+                facade.createClientNotificationChannel(contactURI, longPollingURI, requestingEntity,
+                        relatedRequestingEntity, relatedTargetID, listener);
                 externalAliasRoutes.put(aliasURI, contextPath);
             }
         } else {
@@ -1141,7 +1165,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         } catch (ServletException e) {
             LOG.warn("Servlet exception while deleting the client <notificationChannel> connection", e);
         } catch (UnsupportedOperationException e) {
-            LOG.warn("Try to delete a client <notificationChannel> connection on a binding which does not support this", e);
+            LOG.warn("Try to delete a client <notificationChannel> connection on a binding which does not support this",
+                    e);
         }
     }
 
@@ -1157,8 +1182,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         throw new UnsupportedOperationException("SONG binding does not support <communicationChannel> connections");
     }
 
-    public void createServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI, ChannelServerListener listener)
-            throws ServletException {
+    public void createServerCommunicationChannel(SongURI contactURI, SongURI longPollingURI,
+            ChannelServerListener listener) throws ServletException {
         if (LOG.isInfoEnabled()) {
             LOG.info("Create server <communicationChannel> connection with contact " + contactURI.absoluteURI()
                     + " and long polling " + longPollingURI.absoluteURI());
@@ -1182,7 +1207,9 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         } catch (ServletException e) {
             LOG.warn("Servlet exception while deleting the server <communicationChannel> connection", e);
         } catch (UnsupportedOperationException e) {
-            LOG.warn("Try to delete a server <communicationChannel> connection on a binding which does not support this", e);
+            LOG.warn(
+                    "Try to delete a server <communicationChannel> connection on a binding which does not support this",
+                    e);
         }
     }
 
@@ -1227,7 +1254,9 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
         } catch (ServletException e) {
             LOG.warn("Servlet exception while deleting the client <communicationChannel> connection", e);
         } catch (UnsupportedOperationException e) {
-            LOG.warn("Try to delete a client <communicationChannel> connection on a binding which does not support this", e);
+            LOG.warn(
+                    "Try to delete a client <communicationChannel> connection on a binding which does not support this",
+                    e);
         }
     }
 
@@ -1253,7 +1282,8 @@ public final class SongContainer implements BackendEndpoint, SongContainerFacade
                     }
                 }
             } else {
-                throw new ServletException("Scheme " + targetedURI.getScheme() + " does not have a corresponding binding");
+                throw new ServletException(
+                        "Scheme " + targetedURI.getScheme() + " does not have a corresponding binding");
             }
             LOG.debug("No configuration found for route, return true");
             return true;

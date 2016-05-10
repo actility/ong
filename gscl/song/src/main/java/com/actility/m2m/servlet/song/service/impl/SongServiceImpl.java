@@ -103,26 +103,6 @@ public final class SongServiceImpl implements ExtSongService, ExtSongBindingServ
         }
     }
 
-    // private Object checkWithDefault(Map config, String name, Class type, Object defaultValue) {
-    // Object result = defaultValue;
-    // Object value = config.get(name);
-    // if (value == null) {
-    // if (LOG.isEnabledFor(Level.WARN)) {
-    // LOG.warn("Configuration property " + name + " is null -> use default value instead " + defaultValue);
-    // }
-    // } else if (!type.equals(value.getClass())) {
-    // LOG.error("Configuration property " + name + " must be of type " + type.toString() + " while it is of type "
-    // + value.getClass() + " -> use default value instead " + defaultValue);
-    // } else {
-    // result = value;
-    // }
-    // return result;
-    // }
-    //
-    // private String[] getRoutesConfiguration(Map config) {
-    // return (String[]) checkWithDefault(config, "routesConfiguration", String[].class, null);
-    // }
-
     private RouteConfiguration[] parseRoutesConfiguration(String[] config) {
         if (config == null || config.length == 0) {
             return null;
