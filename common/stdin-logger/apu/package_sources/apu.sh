@@ -1,7 +1,9 @@
 
 buildProject()
 {
-  cd stdin-logger/ && \
+  cd stdin-logger/
+  rm -rf .svn
+  make clean TARGET=$1
   make clean
 
   return $?
@@ -9,15 +11,11 @@ buildProject()
 
 buildApuImage()
 {
-  rm -rf apu && \
-  mkdir -p apu/data && \
-  mkdir -p apu/control && \
-  cp -r stdin-logger apu/data/
-}
+  rm -rf apu
+  mkdir -p apu/data
+  mkdir -p apu/control
 
-projectName()
-{
-  echo "stdin-logger-src"
+  cp -r stdin-logger apu/data/
 }
 
 projectDescription()

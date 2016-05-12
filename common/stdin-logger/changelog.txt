@@ -1,6 +1,19 @@
 -------------------------------------------------------------------------------
 stdin-logger changelog
 -------------------------------------------------------------------------------
+Version: 1.4.0-0
+Date: 2014-08-11
+
+New Features:
+-------------
+ - Changed groupId from com.actility to com.actility.m2m
+ - Updated APU compilation to point to makefile-common dependency
+
+Bug Fixes:
+----------
+ - N/A
+
+-------------------------------------------------------------------------------
 Version: 1.2.1-0
 Date: 2014-02-04
 

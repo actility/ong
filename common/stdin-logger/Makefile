@@ -34,13 +34,13 @@
 # Date: 2011-07-27
 ###############################################################################
 
-ROOT_PATH = $(shell cd .. && pwd)
-OUTPUT_PATH ?= $(ROOT_PATH)
+ROOT_PATH = $(shell cd ..; pwd)
+OUTPUT_PATH ?= $(ROOT_PATH)/stdin-logger
 export OUTPUT_PATH
 
-BIN_TARGET ?= $(OUTPUT_PATH)/stdin-logger/bin/
+BIN_TARGET ?= $(OUTPUT_PATH)/bin/
 
-PROJECTS_DIR = $(ROOT_PATH)/stdin-logger
+PROJECTS_DIR = $(ROOT_PATH)/stdin-logger/
 
 SRC_PATH = $(PROJECTS_DIR)/sources
 OBJS_TARGET = $(OUTPUT_PATH)/obj/
