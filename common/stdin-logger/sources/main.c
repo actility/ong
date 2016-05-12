@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 
-#define VERSION "1.2.0"
+#define VERSION "1.4.0"
 #define MAX_PATH 256
 #define DEFAULT_NB_LINES_BEFORE_FLUSH 50
 
