@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,38 +20,31 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: BackendExecutor.java 6058 2013-10-14 12:01:59Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6058 $
- * lastrevision $Date: 2013-10-14 14:01:59 +0200 (Mon, 14 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-14 14:01:59 +0200 (Mon, 14 Oct 2013) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.be;
 
 import com.actility.m2m.be.messaging.MessageExchange;
-import com.actility.m2m.be.messaging.MessagingException;
 
 /**
- * The class that concretely executes the process method of the {@link BackendEndpoint endpoint} with the given
- * {@link MessageExchange exchange}.
+ * A hook that receives all exchanges that go through the backend bus.
  */
-public interface BackendExecutor {
+public interface BackendHook {
 
     /**
-     * Sends an exchange to the destination endpoint. This is an asynchonous call.
-     *
-     * @param exchange The exchange to send
-     * @param destination The destination endpoint to reach
-     * @param priority exchange priority
-     * @throws MessagingException If any problem occurs during the transfer
+     * An exchange has been received on the bus and the destination is known.
+     * 
+     * @param exchange The exchange that has been received
+     * @param from The origin of the exchange
+     * @param to The destination of the exchange
      */
-    void send(MessageExchange exchange, BackendEndpoint destination, int priority) throws MessagingException;
+    void resolvedExchange(MessageExchange exchange, BackendEndpoint from, BackendEndpoint to);
 
     /**
-     * Destroys the backend executor and its associated context and threads
+     * An exchange has been received on the bus and the destination is unknown.
+     * 
+     * @param exchange The exchange that has been received
+     * @param from The origin of the exchange
      */
-    void destroy();
+    void unresolvedExchange(MessageExchange exchange, BackendEndpoint from);
 }

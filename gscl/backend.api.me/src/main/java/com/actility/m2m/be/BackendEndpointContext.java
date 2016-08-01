@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,14 +20,7 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: BackendEndpointContext.java 8016 2014-03-07 16:58:26Z JReich $
- * author $Author: JReich $
- * version $Revision: 8016 $
- * lastrevision $Date: 2014-03-07 17:58:26 +0100 (Fri, 07 Mar 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-03-07 17:58:26 +0100 (Fri, 07 Mar 2014) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.be;
 

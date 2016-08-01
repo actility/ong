@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,14 +20,7 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: BackendException.java 7604 2014-02-06 13:01:34Z JReich $
- * author $Author: JReich $
- * version $Revision: 7604 $
- * lastrevision $Date: 2014-02-06 14:01:34 +0100 (Thu, 06 Feb 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-02-06 14:01:34 +0100 (Thu, 06 Feb 2014) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.be;
 
