@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,28 +20,24 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: $
- * author $Author: $
- * version $Revision: $
- * lastrevision $Date: $
- * modifiedby $LastChangedBy: $
- * lastmodified $LastChangedDate: $
- */
+ *******************************************************************************/
 
-package com.actility.m2m.cm.log;
+package com.actility.m2m.cm;
 
-import com.actility.m2m.util.log.BundleStaticLogger;
+public final class Property {
+    private final Object value;
+    private final boolean userValue;
 
-public final class BundleLogger {
-    // TODO remove this patch. Start patch
-    private static BundleStaticLogger LOG;
-
-    public synchronized static BundleStaticLogger getStaticLogger() {
-        if (LOG == null) {
-            LOG = new BundleStaticLogger();
-        }
-        return LOG;
+    public Property(Object value, boolean userValue) {
+        this.value = value;
+        this.userValue = userValue;
     }
-    // End patch
+
+    public Object getValue() {
+        return value;
+    }
+
+    public boolean isUserValue() {
+        return userValue;
+    }
 }
