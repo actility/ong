@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,14 +20,7 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: TelnetServer.java 9060 2014-07-09 15:43:26Z JReich $
- * author $Author: JReich $
- * version $Revision: 9060 $
- * lastrevision $Date: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-07-09 17:43:26 +0200 (Wed, 09 Jul 2014) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.felix.shell.telnet;
 
