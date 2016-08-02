@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,14 +20,7 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: EditCommand.java 7124 2014-01-04 13:15:00Z JReich $
- * author $Author: JReich $
- * version $Revision: 7124 $
- * lastrevision $Date: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.cm.command;
 
@@ -42,28 +35,27 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
-public class EditCommand implements SessionCommand {
+public class ListCommand implements SessionCommand {
 
     private BundleContext bundleContext;
 
-    public EditCommand(BundleContext bundleContext) {
+    public ListCommand(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
     public String getName() {
-        return "cm-edit";
+        return "cm-list";
     }
 
     public String getUsage() {
-        return "cm-edit <selection>\n" + "<selection>  A pid that can contain wildcards '*',\n"
+        return "cm-list [<selection>] ...\n" + "<selection>  A pid that can contain wildcards '*',\n"
                 + "             or an ldap filter, or an index in output\n"
-                + "             from the latest use of the 'list' command.\n"
-                + "             If the selection doesn't match exactly one\n"
-                + "             configuration it will have to be refined.";
+                + "             from the latest use of this command.\n"
+                + "             If no selection is given all existing pids\n" + "             will be listed.";
     }
 
     public String getShortDescription() {
-        return "Edit an existing configuration.";
+        return "List the pids of existing configurations.";
     }
 
     public void execute(String line, PrintStream out, PrintStream err) {
@@ -84,7 +76,10 @@ public class EditCommand implements SessionCommand {
                 argsSelection.add(st.nextToken().trim());
             }
         }
-        String[] selection = (String[]) argsSelection.toArray(new String[argsSelection.size()]);
+        String[] selection = null;
+        if (argsSelection.size() > 0) {
+            selection = (String[]) argsSelection.toArray(new String[argsSelection.size()]);
+        }
 
         ServiceReference sr = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
         if (sr == null) {
@@ -97,29 +92,29 @@ public class EditCommand implements SessionCommand {
             return;
         }
 
-        session.setAttribute(Activator.CURRENT, null);
-        session.setAttribute(Activator.EDITED, null);
-
         try {
-            Configuration[] cs = Activator.getConfigurations(bundleContext, session, configAdmin, selection);
-            if (cs == null || cs.length == 0) {
-                throw new Exception("Selection didn't match any configurations. "
-                        + "Use 'create' to create the configuration you want to edit "
-                        + "if it doesnt exist, or change your selection to match " + "exactly one configuration.");
-            } else if (cs.length == 1) {
-                out.println("Editing " + cs[0].getPid());
-                session.setAttribute(Activator.CURRENT, cs[0]);
+            Configuration[] cs = null;
+            if (selection == null) {
+                cs = configAdmin.listConfigurations(null);
             } else {
-                throw new Exception("Selection matched " + cs.length + " configurations. "
-                        + "Refine your selection to match exactly one configuration.");
+                cs = Activator.getConfigurations(bundleContext, session, configAdmin, selection);
             }
-
+            if (cs == null || cs.length == 0) {
+                out.println("No configurations available");
+            } else {
+                session.setAttribute(Activator.LISTED_CONFIGS, cs);
+                out.println("Available configurations:");
+                for (int i = 0; i < cs.length; ++i) {
+                    out.println("[" + i + "] " + cs[i].getPid());
+                }
+            }
         } catch (Exception e) {
-            out.println("Edit failed. Details:");
+            out.println("List failed. Details:");
             String reason = e.getMessage();
             out.println(reason == null ? "<unknown>: " + e.toString() : reason);
         } finally {
             bundleContext.ungetService(sr);
         }
     }
+
 }

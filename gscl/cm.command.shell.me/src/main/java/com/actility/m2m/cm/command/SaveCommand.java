@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,19 +20,12 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: DeleteCommand.java 7124 2014-01-04 13:15:00Z JReich $
- * author $Author: JReich $
- * version $Revision: 7124 $
- * lastrevision $Date: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.cm.command;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.StringTokenizer;
 
 import org.apache.felix.shell.Session;
@@ -42,28 +35,24 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
-public class DeleteCommand implements SessionCommand {
+public class SaveCommand implements SessionCommand {
 
     private BundleContext bundleContext;
 
-    public DeleteCommand(BundleContext bundleContext) {
+    public SaveCommand(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
     public String getName() {
-        return "cm-delete";
+        return "cm-save";
     }
 
     public String getUsage() {
-        return "cm-delete <selection>\n" + "<selection>  A pid that can contain wildcards '*',\n"
-                + "             or an ldap filter, or an index in output\n"
-                + "             from the latest use of the 'list' command.\n"
-                + "             If the selection doesn't match exactly one\n "
-                + "             configuration it will have to be refined.";
+        return "cm-save [-force]\n" + "-force   Force the save";
     }
 
     public String getShortDescription() {
-        return "Delete an existing configuration.";
+        return "Save the currently open configuration in the CM.";
     }
 
     public void execute(String line, PrintStream out, PrintStream err) {
@@ -78,13 +67,16 @@ public class DeleteCommand implements SessionCommand {
         st.nextToken();
 
         // Check for optional argument.
-        ArrayList argsSelection = new ArrayList();
+        String pid = null;
+        boolean forceOptionNotSpecified = false;
         if (st.countTokens() >= 1) {
             while (st.hasMoreTokens()) {
-                argsSelection.add(st.nextToken().trim());
+                String token = st.nextToken().trim();
+                if (token.equals("-force")) {
+                    forceOptionNotSpecified = true;
+                }
             }
         }
-        String[] selection = (String[]) argsSelection.toArray(new String[argsSelection.size()]);
 
         ServiceReference sr = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
         if (sr == null) {
@@ -98,24 +90,25 @@ public class DeleteCommand implements SessionCommand {
         }
 
         try {
-            Configuration[] cs = Activator.getConfigurations(bundleContext, session, configAdmin, selection);
-            if (cs == null || cs.length == 0) {
-                throw new Exception("Selection didn't match any configurations. " + "Change your selection to match exactly "
-                        + "one configuration.");
-            } else if (cs.length == 1) {
-                out.println("Deleting " + cs[0].getPid());
-                Configuration current = (Configuration) session.getAttribute(Activator.CURRENT);
-                if (current != null && current.getPid().equals(cs[0].getPid())) {
-                    session.setAttribute(Activator.CURRENT, null);
-                    session.setAttribute(Activator.EDITED, null);
-                }
-                cs[0].delete();
+            Configuration cfg = (Configuration) session.getAttribute(Activator.CURRENT);
+            if (cfg == null) {
+                throw new Exception("No configuration open currently");
+            }
+
+            if (forceOptionNotSpecified) {
+                throw new Exception("The configuration has changed in CM since it was opened."
+                        + "Use -force option if you want to force saving of your changes.");
+            }
+
+            if (session.getAttribute(Activator.EDITED) != null) {
+                Dictionary dict = (Dictionary) session.getAttribute(Activator.EDITED);
+                cfg.update(dict);
+                session.setAttribute(Activator.EDITED, null);
             } else {
-                throw new Exception("Selection matched " + cs.length + " configurations. "
-                        + "Refine your selection to match exactly one configuration.");
+                throw new Exception("No changes to save");
             }
         } catch (Exception e) {
-            out.println("Delete failed. Details:");
+            out.println("Save failed. Details:");
             String reason = e.getMessage();
             out.println(reason == null ? "<unknown>: " + e.toString() : reason);
         } finally {

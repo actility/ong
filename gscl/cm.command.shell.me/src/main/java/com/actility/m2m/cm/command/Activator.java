@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,14 +20,7 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: Activator.java 6544 2013-11-25 14:29:57Z JReich $
- * author $Author: JReich $
- * version $Revision: 6544 $
- * lastrevision $Date: 2013-11-25 15:29:57 +0100 (Mon, 25 Nov 2013) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2013-11-25 15:29:57 +0100 (Mon, 25 Nov 2013) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.cm.command;
 

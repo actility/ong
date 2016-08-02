@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,44 +20,38 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: UnsetCommand.java 7124 2014-01-04 13:15:00Z JReich $
- * author $Author: JReich $
- * version $Revision: 7124 $
- * lastrevision $Date: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.cm.command;
 
 import java.io.PrintStream;
-import java.util.Dictionary;
 import java.util.StringTokenizer;
 
 import org.apache.felix.shell.Session;
 import org.apache.felix.shell.SessionCommand;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 
-public class UnsetCommand implements SessionCommand {
-
+public class CreateCommand implements SessionCommand {
     private BundleContext bundleContext;
 
-    public UnsetCommand(BundleContext bundleContext) {
+    public CreateCommand(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
     public String getName() {
-        return "cm-unset";
+        return "cm-create";
     }
 
     public String getUsage() {
-        return "cm-unset <property>\n" + "<property> Name of property to remove from the configuration.";
+        return "cm-create [-f] <pid>\n" + "-f     If specified the pid argument is a factory pid.\n"
+                + "<pid>  Pid or factory pid of configuration to create\n" + "       depending on if -f flag is specified.";
     }
 
     public String getShortDescription() {
-        return "Remove a property from the currently open configuration.";
+        return "Create a configuration and open it for editing.";
     }
 
     public void execute(String line, PrintStream out, PrintStream err) {
@@ -72,30 +66,50 @@ public class UnsetCommand implements SessionCommand {
         st.nextToken();
 
         // Check for optional argument.
-        String property = null;
+        String pid = null;
+        boolean createFactoryConfiguration = false;
         if (st.countTokens() >= 1) {
-            property = st.nextToken().trim();
+            while (st.hasMoreTokens()) {
+                String token = st.nextToken().trim();
+                if (token.equals("-f")) {
+                    createFactoryConfiguration = true;
+                } else {
+                    pid = token;
+                }
+            }
         }
 
+        ServiceReference sr = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
+        if (sr == null) {
+            err.println("Unable to get the ConfigurationAdmin");
+            return;
+        }
+        ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(sr);
+        if (configAdmin == null) {
+            err.println("Unable to get the ConfigurationAdmin");
+            return;
+        }
+
+        session.setAttribute(Activator.CURRENT, null);
+        session.setAttribute(Activator.EDITED, null);
         try {
-            if (session.getAttribute(Activator.CURRENT) == null) {
-                throw new Exception("No configuration open currently");
+            Configuration cfg = null;
+            if (createFactoryConfiguration) {
+                cfg = configAdmin.createFactoryConfiguration(pid, null);
+            } else {
+                cfg = configAdmin.getConfiguration(pid, null);
             }
-            Dictionary dict = (Dictionary) session.getAttribute(Activator.EDITED);
-            if (dict == null) {
-                Configuration cfg = (Configuration) session.getAttribute(Activator.CURRENT);
-                dict = cfg.getProperties();
-                session.setAttribute(Activator.EDITED, dict);
+
+            if (cfg == null) {
+                throw new Exception("Failed creating configuration for " + pid);
             }
-            Object oldValue = dict.remove(property);
-            if (oldValue == null) {
-                throw new Exception("No property named " + property + " in current configuration.");
-            }
+            session.setAttribute(Activator.CURRENT, cfg);
         } catch (Exception e) {
-            out.println("Unset failed. Details:");
+            out.println("Create failed. Details:");
             String reason = e.getMessage();
             out.println(reason == null ? "<unknown>: " + e.toString() : reason);
+        } finally {
+            bundleContext.ungetService(sr);
         }
     }
-
 }

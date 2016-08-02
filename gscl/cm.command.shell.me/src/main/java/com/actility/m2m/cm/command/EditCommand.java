@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,18 +20,12 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: CreateCommand.java 7124 2014-01-04 13:15:00Z JReich $
- * author $Author: JReich $
- * version $Revision: 7124 $
- * lastrevision $Date: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.cm.command;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import org.apache.felix.shell.Session;
@@ -41,24 +35,28 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
-public class CreateCommand implements SessionCommand {
+public class EditCommand implements SessionCommand {
+
     private BundleContext bundleContext;
 
-    public CreateCommand(BundleContext bundleContext) {
+    public EditCommand(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
     public String getName() {
-        return "cm-create";
+        return "cm-edit";
     }
 
     public String getUsage() {
-        return "cm-create [-f] <pid>\n" + "-f     If specified the pid argument is a factory pid.\n"
-                + "<pid>  Pid or factory pid of configuration to create\n" + "       depending on if -f flag is specified.";
+        return "cm-edit <selection>\n" + "<selection>  A pid that can contain wildcards '*',\n"
+                + "             or an ldap filter, or an index in output\n"
+                + "             from the latest use of the 'list' command.\n"
+                + "             If the selection doesn't match exactly one\n"
+                + "             configuration it will have to be refined.";
     }
 
     public String getShortDescription() {
-        return "Create a configuration and open it for editing.";
+        return "Edit an existing configuration.";
     }
 
     public void execute(String line, PrintStream out, PrintStream err) {
@@ -73,18 +71,13 @@ public class CreateCommand implements SessionCommand {
         st.nextToken();
 
         // Check for optional argument.
-        String pid = null;
-        boolean createFactoryConfiguration = false;
+        ArrayList argsSelection = new ArrayList();
         if (st.countTokens() >= 1) {
             while (st.hasMoreTokens()) {
-                String token = st.nextToken().trim();
-                if (token.equals("-f")) {
-                    createFactoryConfiguration = true;
-                } else {
-                    pid = token;
-                }
+                argsSelection.add(st.nextToken().trim());
             }
         }
+        String[] selection = (String[]) argsSelection.toArray(new String[argsSelection.size()]);
 
         ServiceReference sr = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
         if (sr == null) {
@@ -99,20 +92,23 @@ public class CreateCommand implements SessionCommand {
 
         session.setAttribute(Activator.CURRENT, null);
         session.setAttribute(Activator.EDITED, null);
+
         try {
-            Configuration cfg = null;
-            if (createFactoryConfiguration) {
-                cfg = configAdmin.createFactoryConfiguration(pid, null);
+            Configuration[] cs = Activator.getConfigurations(bundleContext, session, configAdmin, selection);
+            if (cs == null || cs.length == 0) {
+                throw new Exception("Selection didn't match any configurations. "
+                        + "Use 'create' to create the configuration you want to edit "
+                        + "if it doesnt exist, or change your selection to match " + "exactly one configuration.");
+            } else if (cs.length == 1) {
+                out.println("Editing " + cs[0].getPid());
+                session.setAttribute(Activator.CURRENT, cs[0]);
             } else {
-                cfg = configAdmin.getConfiguration(pid, null);
+                throw new Exception("Selection matched " + cs.length + " configurations. "
+                        + "Refine your selection to match exactly one configuration.");
             }
 
-            if (cfg == null) {
-                throw new Exception("Failed creating configuration for " + pid);
-            }
-            session.setAttribute(Activator.CURRENT, cfg);
         } catch (Exception e) {
-            out.println("Create failed. Details:");
+            out.println("Edit failed. Details:");
             String reason = e.getMessage();
             out.println(reason == null ? "<unknown>: " + e.toString() : reason);
         } finally {

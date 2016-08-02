@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,14 +20,7 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: ListCommand.java 7124 2014-01-04 13:15:00Z JReich $
- * author $Author: JReich $
- * version $Revision: 7124 $
- * lastrevision $Date: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.cm.command;
 
@@ -42,27 +35,28 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
-public class ListCommand implements SessionCommand {
+public class DeleteCommand implements SessionCommand {
 
     private BundleContext bundleContext;
 
-    public ListCommand(BundleContext bundleContext) {
+    public DeleteCommand(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
     public String getName() {
-        return "cm-list";
+        return "cm-delete";
     }
 
     public String getUsage() {
-        return "cm-list [<selection>] ...\n" + "<selection>  A pid that can contain wildcards '*',\n"
+        return "cm-delete <selection>\n" + "<selection>  A pid that can contain wildcards '*',\n"
                 + "             or an ldap filter, or an index in output\n"
-                + "             from the latest use of this command.\n"
-                + "             If no selection is given all existing pids\n" + "             will be listed.";
+                + "             from the latest use of the 'list' command.\n"
+                + "             If the selection doesn't match exactly one\n "
+                + "             configuration it will have to be refined.";
     }
 
     public String getShortDescription() {
-        return "List the pids of existing configurations.";
+        return "Delete an existing configuration.";
     }
 
     public void execute(String line, PrintStream out, PrintStream err) {
@@ -83,10 +77,7 @@ public class ListCommand implements SessionCommand {
                 argsSelection.add(st.nextToken().trim());
             }
         }
-        String[] selection = null;
-        if (argsSelection.size() > 0) {
-            selection = (String[]) argsSelection.toArray(new String[argsSelection.size()]);
-        }
+        String[] selection = (String[]) argsSelection.toArray(new String[argsSelection.size()]);
 
         ServiceReference sr = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
         if (sr == null) {
@@ -100,28 +91,28 @@ public class ListCommand implements SessionCommand {
         }
 
         try {
-            Configuration[] cs = null;
-            if (selection == null) {
-                cs = configAdmin.listConfigurations(null);
-            } else {
-                cs = Activator.getConfigurations(bundleContext, session, configAdmin, selection);
-            }
+            Configuration[] cs = Activator.getConfigurations(bundleContext, session, configAdmin, selection);
             if (cs == null || cs.length == 0) {
-                out.println("No configurations available");
-            } else {
-                session.setAttribute(Activator.LISTED_CONFIGS, cs);
-                out.println("Available configurations:");
-                for (int i = 0; i < cs.length; ++i) {
-                    out.println("[" + i + "] " + cs[i].getPid());
+                throw new Exception("Selection didn't match any configurations. " + "Change your selection to match exactly "
+                        + "one configuration.");
+            } else if (cs.length == 1) {
+                out.println("Deleting " + cs[0].getPid());
+                Configuration current = (Configuration) session.getAttribute(Activator.CURRENT);
+                if (current != null && current.getPid().equals(cs[0].getPid())) {
+                    session.setAttribute(Activator.CURRENT, null);
+                    session.setAttribute(Activator.EDITED, null);
                 }
+                cs[0].delete();
+            } else {
+                throw new Exception("Selection matched " + cs.length + " configurations. "
+                        + "Refine your selection to match exactly one configuration.");
             }
         } catch (Exception e) {
-            out.println("List failed. Details:");
+            out.println("Delete failed. Details:");
             String reason = e.getMessage();
             out.println(reason == null ? "<unknown>: " + e.toString() : reason);
         } finally {
             bundleContext.ungetService(sr);
         }
     }
-
 }

@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,20 +20,14 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: SaveCommand.java 7124 2014-01-04 13:15:00Z JReich $
- * author $Author: JReich $
- * version $Revision: 7124 $
- * lastrevision $Date: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-01-04 14:15:00 +0100 (Sat, 04 Jan 2014) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.cm.command;
 
 import java.io.PrintStream;
 import java.util.Dictionary;
-import java.util.StringTokenizer;
+import java.util.Enumeration;
+import java.util.Vector;
 
 import org.apache.felix.shell.Session;
 import org.apache.felix.shell.SessionCommand;
@@ -42,24 +36,23 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
-public class SaveCommand implements SessionCommand {
-
+public class CurrentCommand implements SessionCommand {
     private BundleContext bundleContext;
 
-    public SaveCommand(BundleContext bundleContext) {
+    public CurrentCommand(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
     }
 
     public String getName() {
-        return "cm-save";
+        return "cm-current";
     }
 
     public String getUsage() {
-        return "cm-save [-force]\n" + "-force   Force the save";
+        return "cm-current";
     }
 
     public String getShortDescription() {
-        return "Save the currently open configuration in the CM.";
+        return "Show the currently open configuration.";
     }
 
     public void execute(String line, PrintStream out, PrintStream err) {
@@ -67,24 +60,6 @@ public class SaveCommand implements SessionCommand {
     }
 
     public void execute(Session session, String line, PrintStream out, PrintStream err) {
-        // Parse command line.
-        StringTokenizer st = new StringTokenizer(line, " ");
-
-        // Ignore the command name.
-        st.nextToken();
-
-        // Check for optional argument.
-        String pid = null;
-        boolean forceOptionNotSpecified = false;
-        if (st.countTokens() >= 1) {
-            while (st.hasMoreTokens()) {
-                String token = st.nextToken().trim();
-                if (token.equals("-force")) {
-                    forceOptionNotSpecified = true;
-                }
-            }
-        }
-
         ServiceReference sr = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
         if (sr == null) {
             err.println("Unable to get the ConfigurationAdmin");
@@ -96,30 +71,63 @@ public class SaveCommand implements SessionCommand {
             return;
         }
 
-        try {
-            Configuration cfg = (Configuration) session.getAttribute(Activator.CURRENT);
-            if (cfg == null) {
-                throw new Exception("No configuration open currently");
-            }
-
-            if (forceOptionNotSpecified) {
-                throw new Exception("The configuration has changed in CM since it was opened."
-                        + "Use -force option if you want to force saving of your changes.");
-            }
-
+        Configuration cfg = (Configuration) session.getAttribute(Activator.CURRENT);
+        if (cfg == null) {
+            out.println("No configuration open currently");
+        } else {
             if (session.getAttribute(Activator.EDITED) != null) {
-                Dictionary dict = (Dictionary) session.getAttribute(Activator.EDITED);
-                cfg.update(dict);
-                session.setAttribute(Activator.EDITED, null);
+                printDictionary(out, (Dictionary) session.getAttribute(Activator.EDITED));
             } else {
-                throw new Exception("No changes to save");
+                Dictionary dict = cfg.getProperties();
+                if (dict == null) {
+                    out.println("No properties set in current configuration");
+                } else {
+                    printDictionary(out, dict);
+                }
             }
-        } catch (Exception e) {
-            out.println("Save failed. Details:");
-            String reason = e.getMessage();
-            out.println(reason == null ? "<unknown>: " + e.toString() : reason);
-        } finally {
-            bundleContext.ungetService(sr);
         }
     }
+
+    private void printDictionary(PrintStream out, Dictionary d) {
+        String[] keyNames = new String[d.size()];
+        int i = 0;
+        for (Enumeration keys = d.keys(); keys.hasMoreElements();) {
+            keyNames[i++] = (String) keys.nextElement();
+        }
+        for (i = 0; i < keyNames.length; i++) {
+            out.print(" ");
+            out.print(keyNames[i]);
+            out.print(": ");
+            printValue(out, d.get(keyNames[i]));
+            out.println();
+        }
+    }
+
+    public void printValue(PrintStream out, Object val) {
+      out.print(val.toString());
+    }
+
+    public void printValue(PrintStream out, Vector val) {
+      out.print("{");
+      for (int i = 0; i < val.size(); i++) {
+        if (i > 0) {
+          out.print(", ");
+        }
+        printValue(out, val.elementAt(i));
+      }
+      out.print("}");
+    }
+
+    public void printValue(PrintStream out, Object[] val) {
+      int length = val.length;
+      out.print("[");
+      for (int i = 0; i < length; i++) {
+        if (i > 0) {
+          out.print(", ");
+        }
+        printValue(out, val[i]);
+      }
+      out.print("]");
+    }
+
 }
