@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,20 +20,21 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: $
- * author $Author: $
- * version $Revision: $
- * lastrevision $Date: $
- * modifiedby $LastChangedBy: $
- * lastmodified $LastChangedDate: $
- */
+ *******************************************************************************/
+package com.actility.m2m.framework.resources.osgi;
 
-package com.actility.m2m.framework.resources.osgi.log;
+import com.actility.m2m.framework.resources.BackupClassLoader;
 
-import com.actility.m2m.util.log.BundleStaticLogger;
+public final class BackupClassLoaderImpl implements BackupClassLoader {
 
+    private final ClassLoader classLoader;
 
-public final class BundleLogger {
-    public static final BundleStaticLogger LOG = new BundleStaticLogger();
+    public BackupClassLoaderImpl(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+    public void restoreThreadClassLoader() {
+        Thread.currentThread().setContextClassLoader(classLoader);
+    }
+
 }
