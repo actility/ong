@@ -85,14 +85,14 @@
   </build>
   <distributionManagement>
     <repository>
-      <id>central</id>
-      <name>releases</name>
-      <url>http://10.10.12.201:8081/nexus/content/repositories/releases/</url>
+      <id>IT-PRV-CI-releases</id>
+      <name>IT-PRV-CI-releases</name>
+      <url>http://artifactory.int.actility.com/artifactory/mvn-releases/</url>
     </repository>
     <snapshotRepository>
-      <id>central</id>
-      <name>snapshots</name>
-      <url>http://10.10.12.201:8081/nexus/content/repositories/snapshots</url>
+      <id>IT-PRV-CI-snapshots</id>
+      <name>IT-PRV-CI-snapshots</name>
+      <url>http://artifactory.int.actility.com/artifactory/mvn-snapshots/</url>
     </snapshotRepository>
   </distributionManagement>
 </project>
