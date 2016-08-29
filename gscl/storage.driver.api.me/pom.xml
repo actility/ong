@@ -34,7 +34,7 @@
   <version>1.0.0</version>
   <packaging>bundle</packaging>
 
-  <name>[API] Storage driver Service ME</name>
+  <name>[API] Storage driver Service (ME)</name>
 
   <dependencies>
     <dependency>

@@ -35,7 +35,7 @@
   <version>1.0.0</version>
   <packaging>bundle</packaging>
 
-  <name>[Bnd] Felix Shell Telnet console ME</name>
+  <name>[Bnd] Felix Shell Telnet console (ME)</name>
 
   <dependencies>
     <dependency>

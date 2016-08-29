@@ -35,7 +35,7 @@
   <version>1.0.0</version>
   <packaging>bundle</packaging>
 
-  <name>[API] Backend Service ME</name>
+  <name>[API] Backend Service (ME)</name>
 
   <build>
     <plugins>

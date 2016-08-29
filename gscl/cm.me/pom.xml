@@ -35,7 +35,7 @@
   <version>1.0.0</version>
   <packaging>bundle</packaging>
 
-  <name>[Bnd] Configuration Admin ME</name>
+  <name>[Bnd] Configuration Admin (ME)</name>
 
   <dependencies>
     <dependency>

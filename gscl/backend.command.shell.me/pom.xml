@@ -34,7 +34,7 @@
   <version>1.0.0</version>
   <packaging>bundle</packaging>
 
-  <name>[Bnd] Felix Shell Backend commands ME</name>
+  <name>[Bnd] Felix Shell Backend commands (ME)</name>
   <url>http://www.actility.com</url>
 
   <dependencies>

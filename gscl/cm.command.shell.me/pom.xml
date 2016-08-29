@@ -35,7 +35,7 @@
   <version>1.0.0</version>
   <packaging>bundle</packaging>
 
-  <name>[Bnd] Felix Shell Configuration Admin commands ME</name>
+  <name>[Bnd] Felix Shell Configuration Admin commands (ME)</name>
 
   <dependencies>
     <dependency>

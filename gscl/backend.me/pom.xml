@@ -35,7 +35,7 @@
   <version>1.0.0</version>
   <packaging>bundle</packaging>
 
-  <name>[Bnd] Backend Service ME</name>
+  <name>[Bnd] Backend Service (ME)</name>
 
   <dependencies>
     <dependency>
