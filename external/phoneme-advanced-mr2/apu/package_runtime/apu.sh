@@ -52,7 +52,7 @@ buildProject()
       PHONEME_DEBUG=1
       echo -n "Apply patch to linux-x86-generic GNUmakefile..."
       sed -i "s|^CC_ARCH_FLAGS[ \t]*=\(.*\)$|CC_ARCH_FLAGS = -m32 \1|" $COMPILE_DIR/GNUmakefile
-      sed -i "s|^ASM_ARCH_FLAGS[ \t]*=\(.\)*$|ASM_ARCH_FLAGS = -m32 \1|" $COMPILE_DIR/GNUmakefile
+      sed -i "s|^ASM_ARCH_FLAGS[ \t]*=\(.*\)$|ASM_ARCH_FLAGS = -m32 \1|" $COMPILE_DIR/GNUmakefile
       sed -i "s|^LINK_ARCH_FLAGS[ \t]*=\(.*\)$|LINK_ARCH_FLAGS = -m32 \1|" $COMPILE_DIR/GNUmakefile
       echo "OK"
       ;;
