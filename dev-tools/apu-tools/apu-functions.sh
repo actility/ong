@@ -31,20 +31,20 @@
 # lastmodified $LastChangedDate$
 #
 
-AFN_APU_TOOLS_VERS=2.0.0
+AFN_APU_TOOLS_VERS=3.0.0
 
 # Define Local Configuration
 AFN_MVN_LOCAL_REPO=~/.m2/repository
 
 # Define Nexus Configuration
-AFN_REST_PATH=/service/local
-AFN_ART_REDIR=/artifact/maven/redirect
-AFN_READ_PATH=/repositories/releases/content
-AFN_DEPLOY_PATH=/content/repositories/releases/
+AFN_ART_REDIR=${MVN_REPO_ART_REDIR}
+AFN_READ_PATH=${MVN_REPO_READ_PATH}
+AFN_DEPLOY_PATH=${MVN_REPO_DEPLOY_PATH}
 
-AFN_REDIRECT_URL=${NEXUS_BASE}${AFN_REST_PATH}${AFN_ART_REDIR}
-AFN_DEPLOY_URL=${NEXUS_BASE}${AFN_DEPLOY_PATH}
-AFN_READ_URL=${NEXUS_BASE}${AFN_REST_PATH}${AFN_READ_PATH}
+AFN_REDIRECT_URL=${MVN_REPO_BASE}${AFN_ART_REDIR}
+AFN_DEPLOY_URL=${MVN_REPO_BASE}${AFN_DEPLOY_PATH}
+AFN_REPO_ID=${MVN_REPO_ID}
+AFN_READ_URL=${MVN_REPO_BASE}${AFN_READ_PATH}
 
 AFN_TEMP_DIR=.apu_tmp
 AFN_DEPENDENCIES_SUB_DIR=apu/dependencies
@@ -607,7 +607,7 @@ mvnDeploy() {
   
   mvn deploy:deploy-file -DgroupId=$_AFN_GROUP -DartifactId=$_AFN_PACKAGE -Dversion=$_AFN_VERSION-$_AFN_APUREV \
     -Dclassifier=$_AFN_ARCH -Dpackaging=apu -Dfile=$_AFN_PACKAGE-$_AFN_VERSION-$_AFN_APUREV-$_AFN_ARCH.apu \
-    -DrepositoryId=central -Durl=$AFN_DEPLOY_URL -DgeneratePom=true
+    -DrepositoryId=$AFN_REPO_ID -Durl=$AFN_DEPLOY_URL -DgeneratePom=true
 }
 
 mvnDeployNoArch() {
@@ -617,7 +617,7 @@ mvnDeployNoArch() {
   _AFN_APUREV=$4
   
   mvn deploy:deploy-file -DgroupId=$_AFN_GROUP -DartifactId=$_AFN_PACKAGE -Dversion=$_AFN_VERSION-$_AFN_APUREV \
-    -Dpackaging=apu -Dfile=$_AFN_PACKAGE-$_AFN_VERSION-$_AFN_APUREV.apu -DrepositoryId=central \
+    -Dpackaging=apu -Dfile=$_AFN_PACKAGE-$_AFN_VERSION-$_AFN_APUREV.apu -DrepositoryId=$AFN_REPO_ID \
      -Durl=$AFN_DEPLOY_URL -DgeneratePom=true
 }
 
