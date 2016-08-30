@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,33 +20,26 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: XoUnknownTypeException.java 6065 2013-10-14 12:36:17Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6065 $
- * lastrevision $Date: 2013-10-14 14:36:17 +0200 (Mon, 14 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-14 14:36:17 +0200 (Mon, 14 Oct 2013) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.xo;
 
 /**
- * Xo exception to declare an unknown object while reading a Binary, XML, oBIX...
+ * Generic exception in the Xo service.
  */
-public final class XoUnknownTypeException extends XoException {
+public class XoException extends Exception {
 
     /**
      *
      */
-    private static final long serialVersionUID = 2549531277851331235L;
+    private static final long serialVersionUID = 4837367095530875564L;
 
     /**
      * Builds an Xo exception with the given message.
      *
      * @param aMessage The message of the exception
      */
-    public XoUnknownTypeException(String aMessage) {
+    public XoException(String aMessage) {
         super(aMessage);
     }
 
@@ -56,8 +49,8 @@ public final class XoUnknownTypeException extends XoException {
      * @param aMessage The message of the exception
      * @param aCause The root cause of the exception
      */
-    public XoUnknownTypeException(String aMessage, Throwable aCause) {
-        super(aMessage, aCause);
+    public XoException(String aMessage, Throwable aCause) {
+        super(aMessage + " " + aCause.toString());
     }
 
     /**
@@ -65,7 +58,19 @@ public final class XoUnknownTypeException extends XoException {
      *
      * @param aCause The root cause of the exception
      */
-    public XoUnknownTypeException(Throwable aCause) {
-        super(aCause);
+    public XoException(Throwable aCause) {
+        super(aCause.toString());
+    }
+
+    /**
+     * The cause of this exception can only be set when constructed.
+     *
+     * @param cause Cause of the exception.
+     * @return This object.
+     * @throws java.lang.IllegalStateException This method will always throw an <code>IllegalStateException</code> since the
+     *             cause of this exception can only be set when constructed.
+     */
+    public synchronized Throwable initCause(Throwable cause) {
+        throw new IllegalStateException();
     }
 }
