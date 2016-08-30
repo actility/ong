@@ -32,7 +32,7 @@
     <version>4.0.0</version>
   </parent>
   <artifactId>util.me</artifactId>
-  <version>4.2.0</version>
+  <version>1.0.0</version>
   <packaging>bundle</packaging>
 
   <name>[Lib] Actility Util (ME)</name>
