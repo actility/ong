@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright   Actility, SA. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  *
@@ -20,14 +20,7 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: XoServiceImplTest.java 7469 2014-02-03 14:49:26Z JReich $
- * author $Author: JReich $
- * version $Revision: 7469 $
- * lastrevision $Date: 2014-02-03 15:49:26 +0100 (Mon, 03 Feb 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-02-03 15:49:26 +0100 (Mon, 03 Feb 2014) $
- */
+ *******************************************************************************/
 
 package com.actility.m2m.xo.impl;
 
