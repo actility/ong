@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright   Actility, SA. All Rights Reserved.
+    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+   
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License version
+    2 only, as published by the Free Software Foundation.
+   
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License version 2 for more details (a copy is
+    included at /legal/license.txt).
+   
+    You should have received a copy of the GNU General Public License
+    version 2 along with this work; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+    02110-1301 USA
+   
+    Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
+    or visit www.actility.com if you need additional
+    information or have any questions.
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.actility.m2m</groupId>
+    <artifactId>java.cdc.pom</artifactId>
+    <version>4.0.0</version>
+  </parent>
+  <artifactId>util.me</artifactId>
+  <version>4.2.0</version>
+  <packaging>bundle</packaging>
+
+  <name>[Lib] Actility Util (ME)</name>
+  <description>Some utils classes to develop bundles on CDC architecture</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.actility.m2m</groupId>
+      <artifactId>log.api</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Export-Package>
+              com.actility.m2m.util;version=${project.version},
+              com.actility.m2m.util.concurrent;version=${project.version},
+              com.actility.m2m.util.log;version=${project.version},
+              org.apache.log4j;version=1.2.16
+            </Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
