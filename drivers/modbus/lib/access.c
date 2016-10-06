@@ -228,7 +228,7 @@ modbusAccessWrite(Sensor_t *device, Attr_t *attr, void *xo)
 
 #define MODBUS_CHECK_READ_ERROR() \
   if (rc == -1) {                                         \
-    RTL_TRDBG(TRACE_ERROR, "Modbus error '%s'(%d)\n", modbus_strerror(errno), errno);           \
+    RTL_TRDBG(TRACE_ERROR, "Modbus error on read (map:%d) (reg:%d) '%s'(%d)\n", map, reg, modbus_strerror(errno), errno);           \
     if (xo == NULL) {                                       \
       diaIncomingRequestCompletion(-1, NULL, 0, "application/xml", WDiaStatusCode(-1, 503)); \
     } else {                                          \
