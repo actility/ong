@@ -20,13 +20,6 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: M2MSessionImpl.java 6083 2013-10-15 13:38:23Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6083 $
- * lastrevision $Date: 2013-10-15 15:38:23 +0200 (Tue, 15 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-15 15:38:23 +0200 (Tue, 15 Oct 2013) $
  */
 
 package com.actility.m2m.m2m.impl;

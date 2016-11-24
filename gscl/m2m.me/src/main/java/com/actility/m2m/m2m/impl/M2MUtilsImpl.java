@@ -20,13 +20,6 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: $
- * author $Author: $
- * version $Revision: $
- * lastrevision $Date: $
- * modifiedby $LastChangedBy: $
- * lastmodified $LastChangedDate: $
  */
 
 package com.actility.m2m.m2m.impl;

@@ -20,13 +20,6 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: ConfirmImpl.java 9290 2014-08-20 09:33:59Z JReich $
- * author $Author: JReich $
- * version $Revision: 9290 $
- * lastrevision $Date: 2014-08-20 11:33:59 +0200 (Wed, 20 Aug 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-08-20 11:33:59 +0200 (Wed, 20 Aug 2014) $
  */
 
 package com.actility.m2m.m2m.impl;
