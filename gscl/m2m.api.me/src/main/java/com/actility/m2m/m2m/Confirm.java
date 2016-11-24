@@ -20,27 +20,43 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: M2MSession.java 6080 2013-10-15 13:25:46Z mlouiset $
- * author $Author: mlouiset $
- * version $Revision: 6080 $
- * lastrevision $Date: 2013-10-15 15:25:46 +0200 (Tue, 15 Oct 2013) $
- * modifiedby $LastChangedBy: mlouiset $
- * lastmodified $LastChangedDate: 2013-10-15 15:25:46 +0200 (Tue, 15 Oct 2013) $
  */
 
 package com.actility.m2m.m2m;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
+import java.util.Iterator;
+import java.util.ListIterator;
 
+import com.actility.m2m.xo.XoException;
+import com.actility.m2m.xo.XoObject;
 
-public interface M2MSession extends Serializable {
-    Object getAttribute(String name);
-    void setAttribute(String name, Object attribute);
-    void removeAttribute(String name);
-    String getId();
-    String startTimer(long timeout, Serializable info);
-    void cancelTimer(String timerId);
-    void setExpires(long expires);
-    void delete();
+public interface Confirm extends Serializable {
+    String getTransactionId();
+
+    boolean isCommitted();
+
+    Request getRequest();
+
+    StatusCode getStatusCode();
+
+    String getHeader(String name);
+
+    Iterator getHeaderNames();
+
+    ListIterator getHeaders(String name);
+
+    URI getResourceURI();
+
+    XoObject getRepresentation() throws IOException, XoException, M2MException;
+
+    int getRawStatusCode();
+
+    String getRawContentType();
+
+    byte[] getRawBytes() throws IOException;
+
+    void free();
 }

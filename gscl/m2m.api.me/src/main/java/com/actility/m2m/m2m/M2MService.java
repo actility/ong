@@ -20,21 +20,23 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: $
- * author $Author: $
- * version $Revision: $
- * lastrevision $Date: $
- * modifiedby $LastChangedBy: $
- * lastmodified $LastChangedDate: $
  */
 
 package com.actility.m2m.m2m;
 
-public interface M2MUtils {
-    String[] getAvailableXoMediaTypes();
+import java.net.URI;
+import java.util.Map;
 
-    String getAcceptedXoMediaType(String accept) throws M2MException;
+public interface M2MService {
+    String PRIVATE_PATH = "com.actility.m2m.PrivatePath";
 
-    String getAcceptedMediaType(String accept, String[] acceptedMediaTypes) throws M2MException;
+    M2MContext registerScl(String applicationName, String applicationPath, M2MEventHandler m2mHandler,
+            M2MProxyHandler proxyHandler, Map configuration) throws M2MException;
+
+    M2MContext registerApplication(String applicationName, String applicationPath, URI sclUri, M2MEventHandler m2mHandler,
+            Map configuration) throws M2MException;
+
+    void unregisterContext(M2MContext m2mContext);
+
+    M2MUtils getM2MUtils();
 }

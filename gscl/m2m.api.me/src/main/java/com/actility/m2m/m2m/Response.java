@@ -20,30 +20,43 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: M2MService.java 7982 2014-03-07 14:49:04Z JReich $
- * author $Author: JReich $
- * version $Revision: 7982 $
- * lastrevision $Date: 2014-03-07 15:49:04 +0100 (Fri, 07 Mar 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-03-07 15:49:04 +0100 (Fri, 07 Mar 2014) $
  */
 
 package com.actility.m2m.m2m;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
-import java.util.Map;
 
-public interface M2MService {
-    String PRIVATE_PATH = "com.actility.m2m.PrivatePath";
+import com.actility.m2m.xo.XoException;
+import com.actility.m2m.xo.XoObject;
 
-    M2MContext registerScl(String applicationName, String applicationPath, M2MEventHandler m2mHandler,
-            M2MProxyHandler proxyHandler, Map configuration) throws M2MException;
+public interface Response extends Serializable {
+    String getTransactionId();
 
-    M2MContext registerApplication(String applicationName, String applicationPath, URI sclUri, M2MEventHandler m2mHandler,
-            Map configuration) throws M2MException;
+    boolean isCommitted();
 
-    void unregisterContext(M2MContext m2mContext);
+    Indication getIndication();
 
-    M2MUtils getM2MUtils();
+    void setResouceURI(URI resourceURI);
+
+    void setRepresentation(XoObject representation) throws XoException, IOException, M2MException;
+
+    void setRepresentationWithDefaultMediaType(XoObject representation) throws XoException, IOException;
+
+    void setRawContent(byte[] content, String contentType) throws IOException;
+
+    void setCacheExpiration(long cacheExpiration);
+
+    void setLastModified(long lastModified);
+
+    void setETag(String eTag);
+
+    void setAllow(boolean createAllowed, boolean retrieveAllowed, boolean updateAllowed, boolean deleteAllowed);
+
+    void addHeader(String name, String value);
+
+    void setHeader(String name, String value);
+
+    void send() throws IOException;
 }

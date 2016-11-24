@@ -20,13 +20,6 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: M2MConstants.java 9480 2014-09-06 09:36:22Z JReich $
- * author $Author: JReich $
- * version $Revision: 9480 $
- * lastrevision $Date: 2014-09-06 11:36:22 +0200 (Sat, 06 Sep 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-09-06 11:36:22 +0200 (Sat, 06 Sep 2014) $
  */
 
 package com.actility.m2m.m2m;

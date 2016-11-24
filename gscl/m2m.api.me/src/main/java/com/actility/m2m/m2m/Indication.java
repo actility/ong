@@ -20,13 +20,6 @@
  * Please contact Actility, SA.,  4, rue Ampere 22300 LANNION FRANCE
  * or visit www.actility.com if you need additional
  * information or have any questions.
- *
- * id $Id: Indication.java 7982 2014-03-07 14:49:04Z JReich $
- * author $Author: JReich $
- * version $Revision: 7982 $
- * lastrevision $Date: 2014-03-07 15:49:04 +0100 (Fri, 07 Mar 2014) $
- * modifiedby $LastChangedBy: JReich $
- * lastmodified $LastChangedDate: 2014-03-07 15:49:04 +0100 (Fri, 07 Mar 2014) $
  */
 
 package com.actility.m2m.m2m;
